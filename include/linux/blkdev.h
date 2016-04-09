@@ -1338,6 +1338,8 @@ static inline long nr_blockdev_pages(void)
 
 extern void blk_io_schedule(void);
 
+extern void blkdev_issue_flush_nowait(struct block_device *, gfp_t);
+
 extern int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
 		sector_t nr_sects, gfp_t gfp_mask, struct page *page);
 
@@ -2056,6 +2058,10 @@ static inline int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
 static inline int sync_blockdev(struct block_device *bdev)
 {
 	return 0;
+}
+
+static inline void blkdev_issue_flush_nowait(struct block_device *bdev, gfp_t gfp_mask)
+{
 }
 #endif
 int fsync_bdev(struct block_device *bdev);
