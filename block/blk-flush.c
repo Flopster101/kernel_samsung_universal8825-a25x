@@ -468,6 +468,39 @@ int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask)
 EXPORT_SYMBOL(blkdev_issue_flush);
 
 #include <trace/hooks/block.h>
+
+/**
+ * blkdev_issue_flush_nowait - queue a flush
+ * @bdev:	blockdev to issue flush for
+ * @gfp_mask:	memory allocation flags (for bio_alloc)
+ * @error_sector:	error sector
+ *
+ * Description:
+ *    Issue a flush for the block device in question. Caller can supply
+ *    room for storing the error offset in case of a flush error, if they
+ *    wish to. If WAIT flag is not passed then caller may check only what
+ *    request was pushed in some internal queue for later handling.
+ */
+void blkdev_issue_flush_nowait(struct block_device *bdev, gfp_t gfp_mask)
+{
+	struct request_queue *q;
+	struct bio *bio;
+
+	if (bdev->bd_disk == NULL)
+		return;
+
+	q = bdev_get_queue(bdev);
+	if (!q)
+		return;
+
+	bio = bio_alloc(gfp_mask, 0);
+	bio_set_dev(bio, bdev);
+	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
+
+	submit_bio_nowait(bio);
+}
+EXPORT_SYMBOL(blkdev_issue_flush_nowait);
+
 struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
 					      gfp_t flags)
 {
