@@ -52,6 +52,8 @@
 #define USB_TP_TRANSMISSION_DELAY_MAX	65535	/* ns */
 #define USB_PING_RESPONSE_TIME		400	/* ns */
 
+extern int deny_new_usb;
+
 /* Protect struct usb_device->state and ->children members
  * Note: Both are also protected by ->dev.sem, except that ->state can
  * change to USB_STATE_NOTATTACHED even when the semaphore isn't held. */
@@ -5307,6 +5309,11 @@ static void hub_port_connect(struct usb_hub *hub, int port1, u16 portstatus,
 	/* clear unreliable_port when port is stable */
 	if (unreliable_port == port1)
 		unreliable_port = -1;
+
+	if (deny_new_usb) {
+		dev_err(&port_dev->dev, "denied insert of USB device on port %d\n", port1);
+		goto done;
+	}
 
 	if (hub_is_superspeed(hub->hdev))
 		unit_load = 150;
