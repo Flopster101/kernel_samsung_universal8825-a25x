@@ -50,3 +50,7 @@ config ZRAM_LRU_WRITEBACK_LIMIT
 	int "Limit zram lru writeback"
 	default 5120
 	depends on ZRAM_LRU_WRITEBACK
+
+config ZRAM_DEFAULT_COMP_ALGORITHM
+	string "Default ZRAM algorithm"
+	default "lzo"
