@@ -12,6 +12,7 @@
 #include <linux/blk-mq.h>
 #include <linux/blk-cgroup.h>
 #include <linux/debugfs.h>
+#include <linux/binfmts.h>
 
 #include "blk.h"
 #include "blk-mq.h"
@@ -102,6 +103,9 @@ queue_ra_store(struct request_queue *q, const char *page, size_t count)
 
 	if (ret < 0)
 		return ret;
+
+	if (task_is_booster(current))
+		ra_kb = SZ_128K;
 
 	q->backing_dev_info->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
 
