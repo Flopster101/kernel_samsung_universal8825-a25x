@@ -7100,8 +7100,8 @@ CONFIG_SEC_KQ_MESH=m
 #
 # samsung Performace manager
 #
-CONFIG_KPERFMON=y
-CONFIG_KPERFMON_BUILD=m
+# CONFIG_KPERFMON is not set
+# CONFIG_KPERFMON_BUILD is not set
 # end of samsung Performace manager
 
 CONFIG_SENSORS_FINGERPRINT=m
