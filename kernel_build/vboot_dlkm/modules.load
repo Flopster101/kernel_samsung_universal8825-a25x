@@ -259,7 +259,6 @@ muic_platform.ko
 pdic_s2mf301.ko
 sb-core.ko
 mesh.ko
-kperfmon.ko
 fingerprint.ko
 fingerprint_sysfs.ko
 s2m_pdic_notifier_module.ko
