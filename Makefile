@@ -5,6 +5,10 @@ SUBLEVEL = 198
 EXTRAVERSION =
 NAME = Dare mighty things
 
+PLATFORM_VERSION ?= 12
+@echo "PLATFORM_VERSION: $(PLATFORM_VERSION)"
+export PLATFORM_VERSION
+
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
