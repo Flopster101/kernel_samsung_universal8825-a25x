@@ -883,3 +883,12 @@ On same-directory ->rename() the (tautological) update of .. is not protected
 by any locks; just don't do it if the old parent is the same as the new one.
 We really can't lock two subdirectories in same-directory rename - not without
 deadlocks.
+
+---
+
+**mandatory**
+
+For bvec based itererators bio_iov_iter_get_pages() now doesn't copy bvecs but
+uses the one provided. Anyone issuing kiocb-I/O should ensure that the bvec and
+page references stay until I/O has completed, i.e. until ->ki_complete() has
+been called or returned with non -EIOCBQUEUED code.
