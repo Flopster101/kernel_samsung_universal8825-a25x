@@ -130,24 +130,6 @@ static int tzdev_get_sysconf(struct file *filp, unsigned long arg)
 	return 0;
 }
 
-static int tzdev_check_version(void)
-{
-	int ret;
-
-	ret = tzdev_smc_check_version();
-	if (ret == -ENOSYS) {
-		log_info(tzdev, "Minor version of TZDev driver is newer than version of"
-			"secure kernel.\nNot critical, continue...\n");
-		ret = 0;
-	} else if (ret == -EINVAL) {
-		log_error(tzdev, "The version of the Linux kernel or "
-			"TZDev driver is not compatible with "
-			"secure kernel\n");
-	}
-
-	return ret;
-}
-
 static int tzdev_boost_on(struct file *filp)
 {
 	int ret = 0;
@@ -439,8 +421,6 @@ int tzdev_run_init_sequence(void)
 	if (atomic_read(&tzdev_swd_state) != TZDEV_SWD_DOWN)
 		return 0;
 
-	if (tzdev_check_version())
-		goto out;
 	if (tz_iwio_init())
 		goto out;
 	if (tz_iwservice_init())
