@@ -263,7 +263,7 @@ void topology_scale_freq_tick(void)
 			  const_cnt - prev_const_cnt);
 
 	scale = min_t(unsigned long, scale, SCHED_CAPACITY_SCALE);
-	this_cpu_write(freq_scale, (unsigned long)scale);
+	this_cpu_write(arch_freq_scale, (unsigned long)scale);
 
 store_and_exit:
 	this_cpu_write(arch_core_cycles_prev, core_cnt);
