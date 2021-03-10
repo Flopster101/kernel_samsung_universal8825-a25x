@@ -168,67 +168,7 @@ enable_policy_freq_counters(int cpu, cpumask_var_t valid_cpus)
 	return true;
 }
 
-static DEFINE_STATIC_KEY_FALSE(amu_fie_key);
-#define amu_freq_invariant() static_branch_unlikely(&amu_fie_key)
-
-static int __init init_amu_fie(void)
-{
-	cpumask_var_t valid_cpus;
-	bool have_policy = false;
-	int ret = 0;
-	int cpu;
-
-	if (!zalloc_cpumask_var(&valid_cpus, GFP_KERNEL))
-		return -ENOMEM;
-
-	if (!zalloc_cpumask_var(&amu_fie_cpus, GFP_KERNEL)) {
-		ret = -ENOMEM;
-		goto free_valid_mask;
-	}
-
-	for_each_present_cpu(cpu) {
-		if (validate_cpu_freq_invariance_counters(cpu))
-			continue;
-		cpumask_set_cpu(cpu, valid_cpus);
-		have_policy |= enable_policy_freq_counters(cpu, valid_cpus);
-	}
-
-	/*
-	 * If we are not restricted by cpufreq policies, we only enable
-	 * the use of the AMU feature for FIE if all CPUs support AMU.
-	 * Otherwise, enable_policy_freq_counters has already enabled
-	 * policy cpus.
-	 */
-	if (!have_policy && cpumask_equal(valid_cpus, cpu_present_mask))
-		cpumask_or(amu_fie_cpus, amu_fie_cpus, valid_cpus);
-
-	if (!cpumask_empty(amu_fie_cpus)) {
-		pr_info("CPUs[%*pbl]: counters will be used for FIE.",
-			cpumask_pr_args(amu_fie_cpus));
-		static_branch_enable(&amu_fie_key);
-	}
-
-	/*
-	 * If the system is not fully invariant after AMU init, disable
-	 * partial use of counters for frequency invariance.
-	 */
-	if (!topology_scale_freq_invariant())
-		static_branch_disable(&amu_fie_key);
-
-free_valid_mask:
-	free_cpumask_var(valid_cpus);
-
-	return ret;
-}
-late_initcall_sync(init_amu_fie);
-
-bool arch_freq_counters_available(const struct cpumask *cpus)
-{
-	return amu_freq_invariant() &&
-	       cpumask_subset(cpus, amu_fie_cpus);
-}
-
-void topology_scale_freq_tick(void)
+static void amu_scale_freq_tick(void)
 {
 	u64 prev_core_cnt, prev_const_cnt;
 	u64 core_cnt, const_cnt, scale;
@@ -269,4 +209,53 @@ store_and_exit:
 	this_cpu_write(arch_core_cycles_prev, core_cnt);
 	this_cpu_write(arch_const_cycles_prev, const_cnt);
 }
+
+static struct scale_freq_data amu_sfd = {
+	.source = SCALE_FREQ_SOURCE_ARCH,
+	.set_freq_scale = amu_scale_freq_tick,
+};
+
+static int __init init_amu_fie(void)
+{
+	cpumask_var_t valid_cpus;
+	bool have_policy = false;
+	int ret = 0;
+	int cpu;
+
+	if (!zalloc_cpumask_var(&valid_cpus, GFP_KERNEL))
+		return -ENOMEM;
+
+	if (!zalloc_cpumask_var(&amu_fie_cpus, GFP_KERNEL)) {
+		ret = -ENOMEM;
+		goto free_valid_mask;
+	}
+
+	for_each_present_cpu(cpu) {
+		if (validate_cpu_freq_invariance_counters(cpu))
+			continue;
+		cpumask_set_cpu(cpu, valid_cpus);
+		have_policy |= enable_policy_freq_counters(cpu, valid_cpus);
+	}
+
+	/*
+	 * If we are not restricted by cpufreq policies, we only enable
+	 * the use of the AMU feature for FIE if all CPUs support AMU.
+	 * Otherwise, enable_policy_freq_counters has already enabled
+	 * policy cpus.
+	 */
+	if (!have_policy && cpumask_equal(valid_cpus, cpu_present_mask))
+		cpumask_or(amu_fie_cpus, amu_fie_cpus, valid_cpus);
+
+	if (!cpumask_empty(amu_fie_cpus)) {
+		pr_info("CPUs[%*pbl]: counters will be used for FIE.",
+			cpumask_pr_args(amu_fie_cpus));
+		topology_set_scale_freq_source(&amu_sfd, amu_fie_cpus);
+	}
+
+free_valid_mask:
+	free_cpumask_var(valid_cpus);
+
+	return ret;
+}
+late_initcall_sync(init_amu_fie);
 #endif /* CONFIG_ARM64_AMU_EXTN */
