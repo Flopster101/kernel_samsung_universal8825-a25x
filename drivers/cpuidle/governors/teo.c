@@ -5,6 +5,10 @@
  * TEO governor:
  * Copyright (C) 2018 - 2021 Intel Corporation
  * Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+ */
+
+/**
+ * DOC: teo-description
  *
  * Util-awareness mechanism:
  * Copyright (C) 2022 Arm Ltd.
