@@ -171,6 +171,7 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 	unsigned int idx, l_freq, h_freq;
 	unsigned long next_freq = 0;
 
+	util = map_util_perf(util);
 	trace_android_vh_map_util_freq(util, freq, max, &next_freq, policy,
 			&sg_policy->need_freq_update);
 	if (next_freq)
