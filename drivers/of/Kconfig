@@ -82,11 +82,19 @@ config OF_RESERVED_MEM
 config OF_RESOLVE
 	bool
 
+config OF_SYMBOLS
+	bool "Include device tree symbols"
+	help
+	  Loading a device tree overlay dynamically can require the base
+	  device tree symbols to be present.
+	  If this is enabled, the device tree blobs will be bigger.
+
 config OF_OVERLAY
 	bool "Device Tree overlays"
 	select OF_DYNAMIC
 	select OF_FLATTREE
 	select OF_RESOLVE
+	select OF_SYMBOLS
 	help
 	  Overlays are a method to dynamically modify part of the kernel's
 	  device tree with dynamically loaded data.
