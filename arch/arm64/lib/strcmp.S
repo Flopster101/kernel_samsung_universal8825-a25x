@@ -220,4 +220,4 @@ CPU_BE(	orr	syndrome, diff, has_nul )
 	sub	result, data1, data2, lsr #56
 	ret
 SYM_FUNC_END_PI(strcmp)
-EXPORT_SYMBOL_NOKASAN(strcmp)
+EXPORT_SYMBOL_NOHWKASAN(strcmp)
