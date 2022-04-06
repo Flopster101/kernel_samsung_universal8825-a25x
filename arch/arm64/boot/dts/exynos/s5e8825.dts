@@ -9637,7 +9637,7 @@
 	};
 
 	chosen {
-		bootargs = "printk.devkmsg=on clk_ignore_unused clocksource=arch_sys_counter firmware_class.path=/vendor/firmware rcupdate.rcu_expedited=1 s3c2410_wdt.tmr_atboot=1 swiotlb=noforce loop.max_part=7 allow_file_spec_access";
+		bootargs = "printk.devkmsg=on clk_ignore_unused clocksource=arch_sys_counter firmware_class.path=/vendor/firmware rcupdate.rcu_expedited=1 s3c2410_wdt.tmr_atboot=1 swiotlb=noforce loop.max_part=7 allow_file_spec_access rcu_nocbs=0-7";
 		linux,initrd-start = <0x84000000>;
 		linux,initrd-end = <0x84ffffff>;
 		phandle = <0x242>;
