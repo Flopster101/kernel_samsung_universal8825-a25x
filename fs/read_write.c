@@ -29,10 +29,6 @@
 #include <linux/fscrypto_sdp_cache.h>
 #endif
 
-#ifdef CONFIG_SECURITY_DEFEX
-#include <linux/defex.h>
-#endif
-
 const struct file_operations generic_ro_fops = {
 	.llseek		= generic_file_llseek,
 	.read_iter	= generic_file_read_iter,
@@ -604,10 +600,6 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
 	ret = rw_verify_area(WRITE, file, pos, count);
 	if (ret)
 		return ret;
-#ifdef CONFIG_SECURITY_DEFEX
-	if (task_defex_enforce(current, file, -__NR_write))
-		return -EPERM;
-#endif
 	if (count > MAX_RW_COUNT)
 		count =  MAX_RW_COUNT;
 	file_start_write(file);
