@@ -121,7 +121,11 @@
 #define HUGE_BITS	1
 #define FULLNESS_BITS	4
 #define CLASS_BITS	8
+#ifdef CONFIG_OPLUS_MM_HACKS
+#define ISOLATED_BITS	4
+#else
 #define ISOLATED_BITS	5
+#endif /*CONFIG_OPLUS_MM_HACKS*/
 #define MAGIC_VAL_BITS	8
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))

@@ -893,6 +893,13 @@ config PAGE_BOOST_RECORDING
 	  Record Everything for the chosen process.
 	  As Android executes an app one by one, only allow 1 recording
 	  at a time.
+	
+config OPLUS_MM_HACKS
+	bool "Enable hacks used by Oplus to improve memory management"
+	default y
+	help
+	  Improves memory management as well as swappiness. Used by Oplus
+	  on their devices, and has been tested on multiple devices from other OEMs.
 
 config GUP_BENCHMARK
 	bool "Enable infrastructure for get_user_pages() and related calls benchmarking"
