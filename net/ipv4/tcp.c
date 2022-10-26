@@ -2860,6 +2860,7 @@ int tcp_disconnect(struct sock *sk, int flags)
 	tp->sacked_out = 0;
 	tp->tlp_high_seq = 0;
 	tp->last_oow_ack_time = 0;
+	tp->plb_rehash = 0;
 	/* There's a bubble in the pipe until at least the first ACK. */
 	tp->app_limited = ~0U;
 	tp->rate_app_limited = 1;
@@ -3650,6 +3651,7 @@ static size_t tcp_opt_stats_get_size(void)
 		nla_total_size(sizeof(u16)) + /* TCP_NLA_TIMEOUT_REHASH */
 		nla_total_size(sizeof(u32)) + /* TCP_NLA_BYTES_NOTSENT */
 		nla_total_size_64bit(sizeof(u64)) + /* TCP_NLA_EDT */
+		nla_total_size(sizeof(u32)) + /* TCP_NLA_REHASH */
 		0;
 }
 
@@ -3710,6 +3712,7 @@ struct sk_buff *tcp_get_timestamping_opt_stats(const struct sock *sk,
 		    max_t(int, 0, tp->write_seq - tp->snd_nxt));
 	nla_put_u64_64bit(stats, TCP_NLA_EDT, orig_skb->skb_mstamp_ns,
 			  TCP_NLA_PAD);
+	nla_put_u32(stats, TCP_NLA_REHASH, tp->plb_rehash + tp->timeout_rehash);
 
 	return stats;
 }
