@@ -523,6 +523,10 @@ static void ego_update_next_freq(struct ego_policy *egp, u64 time,
 				   unsigned int next_freq)
 {
 	ego_update_freq_variant_param(egp, time, next_freq);
+
+	if (egp->next_freq > next_freq)
+		next_freq = (egp->next_freq + next_freq) >> 1;
+
 	egp->next_freq = next_freq;
 	egp->last_freq_update_time = time;
 }
