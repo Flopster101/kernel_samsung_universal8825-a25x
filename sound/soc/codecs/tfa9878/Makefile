@@ -217,6 +217,7 @@ endif
 ifdef TFA_ENABLE_STC_TUNING
 ccflags-y               += -DTFA_ENABLE_STC_TUNING
 endif
+ccflags-y		+= $(call cc-disable-warning, enum-conversion)
 
 # objs
 snd-soc-tfa98xx-objs    := tfa98xx.o
