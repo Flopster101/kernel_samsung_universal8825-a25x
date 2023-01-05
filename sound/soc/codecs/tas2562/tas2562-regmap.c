@@ -728,7 +728,7 @@ static void tas2562_irq_work_routine(struct tas2562_priv *p_tas2562)
 		if (temp_err_code_r)
 			tas2562_update_bigdata(channel_right, temp_err_code_r);
 
-		goto reload;
+	goto reload;
 	} else {
 		n_counter = 2;
 
