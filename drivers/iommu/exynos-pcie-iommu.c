@@ -691,6 +691,7 @@ static sysmmu_pte_t *alloc_lv2entry(struct exynos_iommu_domain *domain,
 			if (!pent)
 				return ERR_PTR(-ENOMEM);
 		}
+		kmemleak_ignore(pent);
 #else /* Use genpool */
 		if (gen_pool_avail(lv2table_pool) >= LV2TABLE_AND_REFBUF_SZ) {
 			pent = phys_to_virt(gen_pool_alloc(lv2table_pool,
@@ -700,6 +701,7 @@ static sysmmu_pte_t *alloc_lv2entry(struct exynos_iommu_domain *domain,
 			pent = kmem_cache_zalloc(lv2table_kmem_cache, gfpmask);
 			if (!pent)
 				return ERR_PTR(-ENOMEM);
+			kmemleak_ignore(pent);
 		}
 #endif
 
@@ -707,7 +709,6 @@ static sysmmu_pte_t *alloc_lv2entry(struct exynos_iommu_domain *domain,
 		pgtable_flush(sent, sent + 1);
 		pgtable_flush(pent, pent + NUM_LV2ENTRIES);
 		atomic_set(pgcounter, NUM_LV2ENTRIES);
-		kmemleak_ignore(pent);
 	}
 
 	return page_entry(sent, iova);
