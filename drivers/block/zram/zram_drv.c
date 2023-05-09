@@ -3466,7 +3466,12 @@ static ssize_t disksize_store(struct device *dev,
 		goto out_unlock;
 	}
 
+#ifndef CONFIG_ZRAM_SIZE_OVERRIDE
 	disksize = PAGE_ALIGN(disksize);
+#else
+	disksize = (u64)SZ_1 * CONFIG_ZRAM_SIZE_OVERRIDE;
+	pr_info("Overriding zram size to %li", disksize);
+#endif
 	if (!zram_meta_alloc(zram, disksize)) {
 		err = -ENOMEM;
 		goto out_unlock;
