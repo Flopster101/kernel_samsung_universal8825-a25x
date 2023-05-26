@@ -92,7 +92,7 @@ struct acpm_debug_info {
 #define SR2					0x0088
 #define SR3					0x008C
 
-#define IPC_TIMEOUT				(15000000)
+#define IPC_TIMEOUT				(200000000)
 #define APM_PERITIMER_NS_PERIOD			(10416)
 
 #define UNTIL_EQUAL(arg0, arg1, flag)			\
