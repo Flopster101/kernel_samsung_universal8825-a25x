@@ -800,6 +800,7 @@ void profile_task_exit(struct task_struct *tsk)
 }
 #endif
 
+void dead_special_task(void);
 void __noreturn do_exit(long code)
 {
 	struct task_struct *tsk = current;
@@ -808,6 +809,8 @@ void __noreturn do_exit(long code)
 #ifdef CONFIG_SECURITY_DEFEX
 	task_defex_zero_creds(current);
 #endif
+
+	dead_special_task();
 
 	/*
 	 * We can get here from a kernel oops, sometimes with preemption off.
