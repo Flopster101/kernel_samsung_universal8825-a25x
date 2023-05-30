@@ -126,7 +126,12 @@ extern int cal_chub_reset_release(void);
 extern int cal_init(void);
 extern int cal_if_init(void *);
 
+#ifdef CONFIG_DEBUG_FS
 extern void cal_register_pd_lookup_cmu_id(void *(*func)(u32 cmu_id));
+#else
+static inline
+void cal_register_pd_lookup_cmu_id(void *(*func)(u32 cmu_id)) { }
+#endif
 /* It is for debugging. */
 #define cal_vclk_dbg_info(a)	do{} while(0);
 //extern void cal_vclk_dbg_info(unsigned int id);
