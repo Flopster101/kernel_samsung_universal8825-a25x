@@ -8,7 +8,6 @@
 #include <linux/plist.h>
 #include <linux/notifier.h>
 #include <linux/device.h>
-#include <linux/workqueue.h>
 #include <linux/mutex.h>
 
 enum {
@@ -147,7 +146,6 @@ enum exynos_pm_qos_flags_status {
 struct exynos_pm_qos_request {
 	struct plist_node node;
 	int exynos_pm_qos_class;
-	struct delayed_work work; /* for exynos_pm_qos_update_request_timeout */
 	char *func;
 	unsigned int line;
 	ktime_t time;
@@ -215,8 +213,6 @@ extern void exynos_pm_qos_update_request(struct exynos_pm_qos_request *req,
 		s32 new_value);
 extern void exynos_pm_qos_update_request_nosync(struct exynos_pm_qos_request *req,
 		s32 new_value);
-extern void exynos_pm_qos_update_request_timeout(struct exynos_pm_qos_request *req,
-		s32 new_value, unsigned long timeout_us);
 extern void exynos_pm_qos_remove_request(struct exynos_pm_qos_request *req);
 
 extern int exynos_pm_qos_request(int exynos_pm_qos_class);
