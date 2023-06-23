@@ -39,6 +39,8 @@
 #define DEFAULT_TLB_NONE	~0U
 #define UNUSED_TLB_INDEX	~0U
 
+#define ENABLE_FAULT_REPORTING 0
+
 static const unsigned int sysmmu_reg_set[MAX_SET_IDX][MAX_REG_IDX] = {
 	/* Default without VM */
 	{
@@ -1246,6 +1248,7 @@ static int __sysmmu_secure_irq_init(struct device *sysmmu,
 	}
 	data->secure_irq = ret;
 
+#if ENABLE_FAULT_REPORTING
 	ret = devm_request_threaded_irq(sysmmu, data->secure_irq,
 					samsung_sysmmu_irq,
 					samsung_sysmmu_irq_thread,
@@ -1255,6 +1258,7 @@ static int __sysmmu_secure_irq_init(struct device *sysmmu,
 			data->secure_irq, ret);
 		return ret;
 	}
+#endif
 
 	ret = of_property_read_u32(sysmmu->of_node, "sysmmu,secure_base",
 				   &data->secure_base);
@@ -1362,6 +1366,7 @@ static int samsung_sysmmu_device_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
+#if ENABLE_FAULT_REPORTING
 	ret = devm_request_threaded_irq(dev, irq, samsung_sysmmu_irq,
 					samsung_sysmmu_irq_thread,
 					IRQF_ONESHOT, dev_name(dev), data);
@@ -1369,6 +1374,7 @@ static int samsung_sysmmu_device_probe(struct platform_device *pdev)
 		dev_err(dev, "unabled to register handler of irq %d\n", irq);
 		return ret;
 	}
+#endif
 
 	data->clk = devm_clk_get(dev, "gate");
 	if (PTR_ERR(data->clk) == -ENOENT) {
