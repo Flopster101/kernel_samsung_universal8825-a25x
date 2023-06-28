@@ -6,8 +6,11 @@ EXTRAVERSION =
 NAME = Dare mighty things
 
 PLATFORM_VERSION ?= 12
+ANDROID_MAJOR_VERSION ?= s
 @echo "PLATFORM_VERSION: $(PLATFORM_VERSION)"
+@echo "ANDROID_MAJOR_VERSION: $(ANDROID_MAJOR_VERSION)"
 export PLATFORM_VERSION
+export ANDROID_MAJOR_VERSION
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
