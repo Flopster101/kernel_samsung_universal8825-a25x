@@ -34,6 +34,8 @@
 #include "exynos_tmu.h"
 #include "../thermal_core.h"
 
+#define GPU_CUSTOM_MAX_CLOCK (1209000)
+
 /**
  * struct power_table - frequency to power conversion
  * @frequency:	frequency in KHz
@@ -732,6 +734,10 @@ static struct thermal_zone_device* parse_ect_cooling_level(struct thermal_coolin
 	for (i = 0; i < function->num_of_range; ++i) {
 		unsigned long max_level = 0;
 		int level;
+
+		if (function->range_list[i].max_frequency == 897000) {
+			function->range_list[i].max_frequency = GPU_CUSTOM_MAX_CLOCK;
+		}
 
 		temperature = function->range_list[i].lower_bound_temperature;
 		freq = function->range_list[i].max_frequency;
