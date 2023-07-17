@@ -18,6 +18,8 @@
 
 #define ARRAY_SIZE32(array)		((u32)ARRAY_SIZE(array))
 
+#define GPU_CUSTOM_MAX_CLOCK (1209000)
+
 /* Variable */
 
 static struct ect_info ect_list[];
@@ -557,6 +559,9 @@ static int ect_parse_ap_thermal_function(int parser_version, void *address, stru
 		ect_parse_integer(&address, &range->lower_bound_temperature);
 		ect_parse_integer(&address, &range->upper_bound_temperature);
 		ect_parse_integer(&address, &range->max_frequency);
+		if (range->max_frequency == 897000) {
+			range->max_frequency = GPU_CUSTOM_MAX_CLOCK;
+		}
 		ect_parse_integer(&address, &range->sw_trip);
 		ect_parse_integer(&address, &range->flag);
 	}
