@@ -451,8 +451,10 @@ static void __dpp_enable(struct dpp_device *dpp)
 	dpp_reg_init(dpp->id, dpp->attr);
 
 	dpp->state = DPP_STATE_ON;
-	enable_irq(dpp->dma_irq);
-	enable_irq(dpp->dpp_irq);
+	if (dpp->dma_irq)
+		enable_irq(dpp->dma_irq);
+	if (dpp->dpp_irq)
+		enable_irq(dpp->dpp_irq);
 
 	dpp_debug(dpp, "enabled\n");
 }
@@ -506,8 +508,10 @@ static void __dpp_disable(struct dpp_device *dpp)
 	if (dpp->state == DPP_STATE_OFF)
 		return;
 
-	disable_irq(dpp->dpp_irq);
-	disable_irq(dpp->dma_irq);
+	if (dpp->dpp_irq)
+		disable_irq(dpp->dpp_irq);
+	if (dpp->dma_irq)
+		disable_irq(dpp->dma_irq);
 
 	dpp_reg_deinit(dpp->id, false, dpp->attr);
 
@@ -888,6 +892,7 @@ fail:
 	return ret;
 }
 
+#ifdef CONFIG_DRM_SAMSUNG_ENABLE_DEBUG_IRQS
 static irqreturn_t dpp_irq_handler(int irq, void *priv)
 {
 	struct dpp_device *dpp = priv;
@@ -955,6 +960,7 @@ irq_end:
 	spin_unlock(&dpp->dma_slock);
 	return IRQ_HANDLED;
 }
+#endif
 
 static int dpp_remap_by_name(struct dpp_device *dpp, void __iomem **base,
 		const char *reg_name, enum dpp_regs_type type)
@@ -998,7 +1004,9 @@ err:
 static int dpp_register_irqs(struct dpp_device *dpp)
 {
 	struct device *dev = dpp->dev;
+#ifdef CONFIG_DRM_SAMSUNG_ENABLE_DEBUG_IRQS
 	struct device_node *np = dev->of_node;
+#endif
 	struct platform_device *pdev;
 	int ret = 0;
 
@@ -1010,6 +1018,7 @@ static int dpp_register_irqs(struct dpp_device *dpp)
 	dpp_irq_clear_mask(dpp->id, dpp->attr);
 	dpp_info(dpp, "cleared irq and masked \n");
 
+#ifdef CONFIG_DRM_SAMSUNG_ENABLE_DEBUG_IRQS
 	dpp->dma_irq = of_irq_get_byname(np, "dma");
 	dpp_info(dpp, "dma irq no = %lld\n", dpp->dma_irq);
 	ret = devm_request_irq(dev, dpp->dma_irq, dma_irq_handler, 0,
@@ -1018,7 +1027,8 @@ static int dpp_register_irqs(struct dpp_device *dpp)
 		dpp_err(dpp, "failed to install DPU DMA irq\n");
 		return ret;
 	}
-	disable_irq(dpp->dma_irq);
+	if (dpp->dma_irq)
+		disable_irq(dpp->dma_irq);
 
 	/*Enable and unmask after irq disable*/
 	dpp_irq_enable_unmask(dpp->id, dpp->attr);
@@ -1034,6 +1044,7 @@ static int dpp_register_irqs(struct dpp_device *dpp)
 		}
 		disable_irq(dpp->dpp_irq);
 	}
+#endif
 
 	return ret;
 }
