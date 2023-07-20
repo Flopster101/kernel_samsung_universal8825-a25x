@@ -838,8 +838,7 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 		i2c_int_en |= HSI2C_INT_TX_ALMOSTEMPTY_EN;
 	}
 
-	if (operation_mode == HSI2C_INTERRUPT)
-		exynos5_i2c_clr_pend_irq(i2c);
+	exynos5_i2c_clr_pend_irq(i2c);
 
 	if ((stop == 1) || (i2c->stop_after_trans == 1))
 		i2c_auto_conf |= HSI2C_STOP_AFTER_TRANS;
