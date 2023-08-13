@@ -473,6 +473,10 @@ static bool ego_should_update_freq(struct ego_policy *egp, u64 time)
 	 */
 	rate_limit_ns = min(egp->up_rate_limit_ns, egp->down_rate_limit_ns);
 
+	/* If the last frequency wasn't set yet then we can still amend it */
+	if (egp->work_in_progress)
+		return true;
+
 	return delta_ns >= rate_limit_ns;
 }
 
