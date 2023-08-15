@@ -1353,7 +1353,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 		}
 
 		ret = devm_request_irq(&pdev->dev, i2c->irq,
-					exynos5_i2c_irq, IRQF_NO_THREAD, dev_name(&pdev->dev), i2c);
+					exynos5_i2c_irq, IRQF_NOBALANCING, dev_name(&pdev->dev), i2c);
 		disable_irq(i2c->irq);
 
 		if (ret != 0) {
