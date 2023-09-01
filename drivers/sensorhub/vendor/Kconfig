@@ -5,3 +5,4 @@ config SHUB_MTK
 config SHUB_LSI
 	tristate "lsi sensorhub"
 	default y
+
