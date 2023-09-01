@@ -282,7 +282,7 @@ static int cpuhp_do(void)
 	cpuhp_print_debug_info(&new_mask);
 
 	/* if there is no mask change, skip */
-	if (cpumask_empty(&new_mask) |
+	if (cpumask_empty(&new_mask) ||
 		cpumask_equal(&cpuhp.mask, &new_mask))
 		goto out;
 
