@@ -614,8 +614,9 @@ static void destroy_gre_conntrack(struct nf_conn *ct)
 static void
 destroy_conntrack(struct nf_conntrack *nfct)
 {
-	
+#ifdef CONFIG_KNOX_NCM
 	unsigned long flags;
+#endif
 	struct nf_conn *ct = (struct nf_conn *)nfct;
 
     // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
@@ -1580,8 +1581,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_alloc);
 
 void nf_conntrack_free(struct nf_conn *ct)
 {
-	
+#ifdef CONFIG_KNOX_NCM
 	unsigned long flags;
+#endif
 	struct net *net = nf_ct_net(ct);
 
 	/* A freed object has refcnt == 0, that's
