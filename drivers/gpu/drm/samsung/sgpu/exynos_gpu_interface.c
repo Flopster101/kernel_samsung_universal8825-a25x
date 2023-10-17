@@ -577,7 +577,7 @@ static ssize_t gpu_min_clock_store(struct kobject *kobj,
 
 	return count;
 }
-static struct kobj_attribute attr_gpu_min_clock = __ATTR_RW(gpu_min_clock);
+static struct kobj_attribute attr_gpu_min_clock = __ATTR_RO(gpu_min_clock);
 
 static ssize_t gpu_max_clock_show(struct kobject *kobj,
 				  struct kobj_attribute *attr, char *buf)
@@ -610,7 +610,7 @@ static ssize_t gpu_max_clock_store(struct kobject *kobj,
 
 	return count;
 }
-static struct kobj_attribute attr_gpu_max_clock = __ATTR_RW(gpu_max_clock);
+static struct kobj_attribute attr_gpu_max_clock = __ATTR_RO(gpu_max_clock);
 
 static ssize_t gpu_siop_max_clock_show(struct kobject *kobj,
 				  struct kobj_attribute *attr, char *buf)
