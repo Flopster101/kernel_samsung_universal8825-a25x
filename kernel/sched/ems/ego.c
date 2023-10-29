@@ -890,6 +890,8 @@ static unsigned long ego_iowait_apply(struct ego_cpu *egc, u64 time,
 	 * into the same scale so we can compare.
 	 */
 	boost = (egc->iowait_boost * max) >> SCHED_CAPACITY_SHIFT;
+	boost = max(boost, util);
+	boost = uclamp_rq_util_with(cpu_rq(egc->cpu), boost, NULL);
 	return boost;
 }
 
