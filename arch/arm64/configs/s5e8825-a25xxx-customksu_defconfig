@@ -1004,7 +1004,9 @@ CONFIG_HIGHATOMIC_PAGEBLOCKS=1
 CONFIG_DAMON=y
 # CONFIG_DAMON_VADDR is not set
 CONFIG_DAMON_PADDR=y
+CONFIG_DAMON_SYSFS=y
 CONFIG_DAMON_RECLAIM=y
+# CONFIG_DAMON_LRU_SORT is not set
 # end of Data Access Monitoring
 # end of Memory Management options
 
