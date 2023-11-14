@@ -1216,8 +1216,8 @@ static int ego_start(struct cpufreq_policy *policy)
 
 	egp->pelt_margin		= DEFAULT_PELT_MARGIN;
 	egp->freq_update_delay_ns	= 4 * NSEC_PER_MSEC;
-	egp->up_rate_limit_ns		= 4 * NSEC_PER_MSEC;
-	egp->down_rate_limit_ns		= 4 * NSEC_PER_MSEC;
+	egp->up_rate_limit_ns		= 500 * NSEC_PER_MSEC;
+	egp->down_rate_limit_ns		= 1000 * NSEC_PER_MSEC;
 	egp->last_freq_update_time	= 0;
 	egp->next_freq			= 0;
 	egp->work_in_progress		= false;
