@@ -3431,10 +3431,14 @@ static int pl330_resume(struct device *dev)
 	if (pl330->inst_wrapper)
 		__raw_writel((pl330->mcode_bus >> 32) & 0xf, pl330->inst_wrapper);
 
+	if (IS_ENABLED(CONFIG_IRQ_SBALANCE))
+		return 0;
+
 	if(pl330->multi_irq) {
 		for (i = 0; i < AMBA_NR_IRQS; i++) {
 			int irq = pl330->irqnum_having_multi[i];
 			if (irq)
+#ifndef CONFIG_IRQ_SBALANCE
 #if defined(CONFIG_SCHED_HMP)
 				irq_set_affinity_hint(irq, &hmp_slow_cpu_mask);
 #else
@@ -3442,6 +3446,9 @@ static int pl330_resume(struct device *dev)
 #endif
 			else
 				break;
+#else
+			break;
+#endif
 		}
 	}
 	return ret;
