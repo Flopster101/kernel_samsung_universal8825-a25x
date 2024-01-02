@@ -1864,7 +1864,7 @@ static void dma_pl330_rqcb(struct dma_pl330_desc *desc, enum pl330_op_err err)
 	if (desc->infiniteloop)
 		pl330_tasklet((unsigned long)pch);
 	else
-		tasklet_schedule(&pch->task);
+		tasklet_hi_schedule(&pch->task);
 }
 
 static void pl330_dotask(unsigned long data)
