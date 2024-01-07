@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
+TARGET_SOC ?= s5e8825
+
 # UFSHCD makefile
 ifdef CONFIG_SCSI_UFS_EXYNOS
 ccflags-y += -I$(srctree)/drivers/scsi/ufs/$(TARGET_SOC)
