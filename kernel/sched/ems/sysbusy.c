@@ -40,7 +40,7 @@ struct sysbusy_stat {
 	u64 time_in_state;
 } sysbusy_stats[NUM_OF_SYSBUSY_STATE];
 
-static cpn_next_cpu[VENDOR_NR_CPUS] = { [0 ... VENDOR_NR_CPUS - 1] = -1 };
+static int cpn_next_cpu[VENDOR_NR_CPUS] = { [0 ... VENDOR_NR_CPUS - 1] = -1 };
 /******************************************************************************
  * sysbusy notify                                                             *
  ******************************************************************************/
