@@ -50,3 +50,4 @@ obj-$(CONFIG_QLGE)		+= qlge/
 obj-$(CONFIG_WFX)		+= wfx/
 obj-$(CONFIG_NANOHUB)		+= nanohub/
 obj-y				+= hikey9xx/
+obj-$(CONFIG_BINDER_PRIO)	+= binder_prio/
