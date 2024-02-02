@@ -22,8 +22,7 @@ menu "ARM GPU Configuration"
 
 choice
 	prompt "Mali Version Configuration"
-	default MALI_DDK_VALHALL_R32P1 if $(PLATFORM_VERSION_FOR_GPU) = 12
-	default MALI_DDK_VALHALL_R32P1 if $(PLATFORM_VERSION_FOR_GPU) >= 13
+	default MALI_DDK_VALHALL_R32P1
 	help
 	  Select Mali GPU driver version.
 
@@ -36,9 +35,6 @@ config MALI_DDK_VALHALL_R26P0
 config MALI_DDK_VALHALL_R32P1
 	bool "Valhall r32p1 driver"
 
-config MALI_DDK_VALHALL_R38P1
-	bool "Valhall r38p1 driver"
-
 endchoice
 
 if MALI_DDK_VALHALL_R26P0
@@ -47,10 +43,6 @@ endif
 
 if MALI_DDK_VALHALL_R32P1
 source "drivers/gpu/arm/bv_r32p1/Kconfig"
-endif
-
-if MALI_DDK_VALHALL_R38P1
-source "drivers/gpu/arm/bv_r38p1/Kconfig"
 endif
 
 endmenu
