@@ -237,6 +237,7 @@
 /* UHD resolution (include 21:9 3840 x 1644) */
 #define MFC_UHD_RES		(3840 * 1600)
 #define OVER_UHD_RES(ctx)	(((ctx)->crop_width * (ctx)->crop_height) >= MFC_UHD_RES)
+#define IS_UHD_RES(ctx)		(((ctx)->crop_width * (ctx)->crop_height) == MFC_UHD_RES)
 
 /* FHD resolution */
 #define MFC_FHD_RES		(1920 * 1088)
