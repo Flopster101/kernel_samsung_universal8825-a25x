@@ -29,6 +29,18 @@ enum { sysctl_hung_task_timeout_secs = 0 };
 extern unsigned int sysctl_sched_latency;
 extern unsigned int sysctl_sched_min_granularity;
 extern unsigned int sysctl_sched_wakeup_granularity;
+
+#ifdef CONFIG_SCHED_BORE
+extern bool sched_bore;
+extern bool sched_burst_score_rounding;
+extern bool sched_burst_smoothness_long;
+extern bool sched_burst_smoothness_short;
+extern u8   sched_burst_fork_atavistic;
+extern u8   sched_burst_penalty_offset;
+extern uint sched_burst_penalty_scale;
+extern uint sched_burst_cache_lifetime;
+#endif // CONFIG_SCHED_BORE
+
 extern unsigned int sysctl_sched_child_runs_first;
 
 enum sched_tunable_scaling {
