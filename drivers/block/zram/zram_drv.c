@@ -2973,10 +2973,12 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
 		zcomp_stream_put(zram->comp);
 	}
 
+#ifdef CONFIG_ZRAM_LRU_WRITEBACK
 	/* Should NEVER happen. BUG() if it does. */
 	if (unlikely(ret))
 		handle_decomp_fail(zram->compressor, ret, index, src, size,
 				   NULL);
+#endif
 
 	zs_unmap_object(zram->mem_pool, handle);
 #ifdef CONFIG_ZRAM_LRU_WRITEBACK
