@@ -144,7 +144,6 @@ static const int cap_last_cap = CAP_LAST_CAP;
 
 #ifdef CONFIG_SCHED_BORE
 extern u8   sched_bore;
-extern u8   sched_burst_score_rounding;
 extern u8   sched_burst_smoothness_long;
 extern u8   sched_burst_smoothness_short;
 extern u8   sched_burst_fork_atavistic;
@@ -1774,15 +1773,6 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler = proc_dou8vec_minmax,
 		.extra1		= SYSCTL_ONE,
-		.extra2		= SYSCTL_ONE,
-	},
-	{
-		.procname	= "sched_burst_score_rounding",
-		.data		= &sched_burst_score_rounding,
-		.maxlen		= sizeof(u8),
-		.mode		= 0644,
-		.proc_handler = proc_dou8vec_minmax,
-		.extra1		= SYSCTL_ZERO,
 		.extra2		= SYSCTL_ONE,
 	},
 	{
