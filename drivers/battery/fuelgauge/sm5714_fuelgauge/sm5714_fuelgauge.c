@@ -2106,8 +2106,8 @@ static int sm5714_fg_get_property(struct power_supply *psy,
 		val->intval = fuelgauge->capacity_max;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-		val->intval =
-			fuelgauge->battery_data->Capacity * fuelgauge->raw_capacity;
+		psy_do_property("battery", get, POWER_SUPPLY_PROP_CHARGE_FULL, value);
+		val->intval = value.intval/1000 * fuelgauge->raw_capacity; //uAh
 		pr_info("%s: charge_counter = %d\n", __func__, val->intval);
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY_LEVEL:
