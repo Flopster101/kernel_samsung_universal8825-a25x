@@ -1790,6 +1790,7 @@ static int s2mu106_fg_get_property(struct power_supply *psy,
 					power_supply_get_drvdata(psy);
 	enum power_supply_ext_property ext_psp = (enum power_supply_ext_property) psp;
 	int ret = 0;
+	union power_supply_propval value;
 
 	switch ((int)psp) {
 	case POWER_SUPPLY_PROP_STATUS:
@@ -1975,7 +1976,8 @@ static int s2mu106_fg_get_property(struct power_supply *psy,
 		val->intval = fuelgauge->mode;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-		val->intval = fuelgauge->pdata->capacity_full * fuelgauge->raw_capacity;
+		psy_do_property("battery", get, POWER_SUPPLY_PROP_CHARGE_FULL, value);
+		val->intval = value.intval/1000 * fuelgauge->raw_capacity; //uAh
 		break;
 	case POWER_SUPPLY_EXT_PROP_MIN ... POWER_SUPPLY_EXT_PROP_MAX:
 		switch ((int)ext_psp) {
