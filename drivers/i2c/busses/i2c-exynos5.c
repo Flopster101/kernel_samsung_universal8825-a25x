@@ -236,7 +236,7 @@ static void change_i2c_gpio(struct exynos5_i2c *i2c)
 
 	default_i2c_pinctrl = devm_pinctrl_get(i2c->dev);
 	if (IS_ERR(default_i2c_pinctrl)) {
-		dev_err(i2c->dev, "Can't get i2c pinctrl!!!\n");
+		dev_dbg(i2c->dev, "Can't get i2c pinctrl!!!\n");
 		return ;
 	}
 
@@ -246,9 +246,9 @@ static void change_i2c_gpio(struct exynos5_i2c *i2c)
 		default_i2c_pinctrl->state = NULL;
 		status = pinctrl_select_state(default_i2c_pinctrl, default_i2c_pins);
 		if (status)
-			dev_err(i2c->dev, "Can't set default i2c pins!!!\n");
+			dev_dbg(i2c->dev, "Can't set default i2c pins!!!\n");
 	} else {
-		dev_err(i2c->dev, "Can't get default pinstate!!!\n");
+		dev_dbg(i2c->dev, "Can't get default pinstate!!!\n");
 	}
 }
 
@@ -259,23 +259,23 @@ static void recover_gpio_pins(struct exynos5_i2c *i2c)
 	unsigned long timeout;
 	struct device_node *np = i2c->adap.dev.of_node;
 
-	dev_err(i2c->dev, "Recover GPIO pins\n");
+	dev_dbg(i2c->dev, "Recover GPIO pins\n");
 
 	gpio_sda = of_get_named_gpio(np, "gpio_sda", 0);
 	if (!gpio_is_valid(gpio_sda)) {
-		dev_err(i2c->dev, "Can't get gpio_sda!!!\n");
+		dev_dbg(i2c->dev, "Can't get gpio_sda!!!\n");
 		return ;
 	}
 	gpio_scl = of_get_named_gpio(np, "gpio_scl", 0);
 	if (!gpio_is_valid(gpio_scl)) {
-		dev_err(i2c->dev, "Can't get gpio_scl!!!\n");
+		dev_dbg(i2c->dev, "Can't get gpio_scl!!!\n");
 		return ;
 	}
 
 	sda_val = gpio_get_value(gpio_sda);
 	scl_val = gpio_get_value(gpio_scl);
 
-	dev_err(i2c->dev, "SDA line : %s, SCL line : %s\n",
+	dev_dbg(i2c->dev, "SDA line : %s, SCL line : %s\n",
 			sda_val ? "HIGH" : "LOW", scl_val ? "HIGH" : "LOW");
 
 	if (sda_val == 1)
@@ -292,7 +292,7 @@ static void recover_gpio_pins(struct exynos5_i2c *i2c)
 			msleep(10);
 		}
 		if (timeout)
-			dev_err(i2c->dev, "SCL line is still LOW!!!\n");
+			dev_dbg(i2c->dev, "SCL line is still LOW!!!\n");
 	}
 
 	sda_val = gpio_get_value(gpio_sda);
@@ -308,12 +308,12 @@ static void recover_gpio_pins(struct exynos5_i2c *i2c)
 			gpio_set_value(gpio_scl, 1);
 			udelay(5);
 			if (gpio_get_value(gpio_sda) == 1) {
-				dev_err(i2c->dev, "SDA line is recovered.\n");
+				dev_dbg(i2c->dev, "SDA line is recovered.\n");
 				break;
 			}
 		}
 		if (clk_cnt == 100)
-			dev_err(i2c->dev, "SDA line is not recovered!!!\n");
+			dev_dbg(i2c->dev, "SDA line is not recovered!!!\n");
 	}
 
 	/* Change I2C GPIO as default function */
@@ -323,7 +323,7 @@ static void recover_gpio_pins(struct exynos5_i2c *i2c)
 
 static inline void dump_i2c_register(struct exynos5_i2c *i2c)
 {
-	dev_err(i2c->dev, "Register dump(suspended : %d)\n"
+	dev_dbg(i2c->dev, "Register dump(suspended : %d)\n"
 		"CTL          0x%08x   "
 		"FIFO_CTL     0x%08x   "
 		"INT_EN       0x%08x   "
@@ -394,7 +394,7 @@ static int exynos5_i2c_set_timing(struct exynos5_i2c *i2c, int mode)
 		ret = clk_set_rate(i2c->rate_clk, i2c->default_clk);
 
 		if (ret < 0)
-			dev_err(i2c->dev, "Failed to set clock\n");
+			dev_dbg(i2c->dev, "Failed to set clock\n");
 	}
 
 	ipclk = (unsigned int)clk_get_rate(i2c->rate_clk);
@@ -571,13 +571,13 @@ static int exynos5_hsi2c_clock_setup(struct exynos5_i2c *i2c)
 	 */
 	if (i2c->speed_mode == HSI2C_HIGH_SPD) {
 		if (exynos5_i2c_set_timing(i2c, HSI2C_FAST_SPD)) {
-			dev_err(i2c->dev, "HSI2C FS Clock set up failed\n");
+			dev_dbg(i2c->dev, "HSI2C FS Clock set up failed\n");
 			return -EINVAL;
 		}
 	}
 
 	if (exynos5_i2c_set_timing(i2c, i2c->speed_mode)) {
-		dev_err(i2c->dev, "HSI2C mode(%d) Clock set up failed\n", i2c->speed_mode);
+		dev_dbg(i2c->dev, "HSI2C mode(%d) Clock set up failed\n", i2c->speed_mode);
 		return -EINVAL;
 	}
 
@@ -713,12 +713,12 @@ static irqreturn_t exynos5_i2c_irq(int irqno, void *dev_id)
 	 */
 	if (reg_val & HSI2C_INT_CHK_TRANS_STATE) {
 		trans_status = readl(i2c->regs + HSI2C_TRANS_STATUS);
-		dev_err(i2c->dev, "HSI2C Error Interrupt "
+		dev_dbg(i2c->dev, "HSI2C Error Interrupt "
 				"occurred(IS:0x%08x, TR:0x%08x)\n",
 				(unsigned int)reg_val, (unsigned int)trans_status);
 
 		if (reg_val & HSI2C_INT_NODEV) {
-			dev_err(i2c->dev, "HSI2C NO ACK occured\n");
+			dev_dbg(i2c->dev, "HSI2C NO ACK occured\n");
 			if (i2c->nack_restart) {
 				if (reg_val & HSI2C_INT_TRANSFER_DONE)
 					exynos5_i2c_stop(i2c);
@@ -751,7 +751,7 @@ static irqreturn_t exynos5_i2c_irq(int irqno, void *dev_id)
 			writel(reg_val, i2c->regs + HSI2C_INT_ENABLE);
 			exynos5_i2c_stop(i2c);
 		} else {
-			dev_err(i2c->dev, "Get transfer done. But Bytes not enough\n");
+			dev_dbg(i2c->dev, "Get transfer done. But Bytes not enough\n");
 		}
 	}
 out:
@@ -781,12 +781,12 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 	i2c->trans_done = 0;
 
 	if (!i2c->msg) {
-		dev_err(i2c->dev, "i2c message is null ptr!\n");
+		dev_dbg(i2c->dev, "i2c message is null ptr!\n");
 		return -EINVAL;
 	}
 
 	if (!i2c->msg->buf) {
-		dev_err(i2c->dev, "i2c message buffer is null ptr!\n");
+		dev_dbg(i2c->dev, "i2c message buffer is null ptr!\n");
 		return -EINVAL;
 	}
 
@@ -927,13 +927,13 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 				} while(time_before(jiffies, timeout));
 
 				if (timeout)
-					dev_err(i2c->dev, "SDA check timeout AT READ!!! = 0x%8lx\n",trans_status);
+					dev_dbg(i2c->dev, "SDA check timeout AT READ!!! = 0x%8lx\n",trans_status);
 			}
 
 			disable_irq(i2c->irq);
 
 			if (i2c->trans_done < 0) {
-				dev_err(i2c->dev, "ack was not received at read\n");
+				dev_dbg(i2c->dev, "ack was not received at read\n");
 				ret = i2c->trans_done;
 				exynos5_i2c_reset(i2c);
 			}
@@ -990,7 +990,7 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 
 			timeout = jiffies + timeout;
 			if (i2c->trans_done < 0) {
-				dev_err(i2c->dev, "ack was not received at write\n");
+				dev_dbg(i2c->dev, "ack was not received at write\n");
 				ret = i2c->trans_done;
 				exynos5_i2c_reset(i2c);
 			} else {
@@ -1006,7 +1006,7 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 					} while(time_before(jiffies, timeout));
 
 					if (timeout)
-						dev_err(i2c->dev, "SDA check timeout AT WRITE!!! = 0x%8lx\n",trans_status);
+						dev_dbg(i2c->dev, "SDA check timeout AT WRITE!!! = 0x%8lx\n",trans_status);
 				}
 
 				ret = 0;
@@ -1031,7 +1031,7 @@ static int exynos5_i2c_xfer(struct i2c_adapter *adap,
 #endif
 
 	if (i2c->suspended) {
-		dev_err(i2c->dev, "HS-I2C is not initialized.\n");
+		dev_dbg(i2c->dev, "HS-I2C is not initialized.\n");
 		return -EIO;
 	}
 
@@ -1077,7 +1077,7 @@ static int exynos5_i2c_xfer(struct i2c_adapter *adap,
 
 	if (unlikely(!(readl(i2c->regs + HSI2C_CONF)
 			& HSI2C_AUTO_MODE))) {
-		dev_err(i2c->dev, "HSI2C should be reconfigured\n");
+		dev_dbg(i2c->dev, "HSI2C should be reconfigured\n");
 		exynos5_hsi2c_clock_setup(i2c);
 		exynos5_i2c_init(i2c);
 	}
@@ -1154,13 +1154,13 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 	int ret;
 
 	if (!np) {
-		dev_err(&pdev->dev, "no device node\n");
+		dev_dbg(&pdev->dev, "no device node\n");
 		return -ENOENT;
 	}
 
 	i2c = devm_kzalloc(&pdev->dev, sizeof(struct exynos5_i2c), GFP_KERNEL);
 	if (!i2c) {
-		dev_err(&pdev->dev, "no memory for state\n");
+		dev_dbg(&pdev->dev, "no memory for state\n");
 		return -ENOMEM;
 	}
 
@@ -1180,7 +1180,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 	}
 
 	if (of_property_read_u32(np, "default-clk", &i2c->default_clk))
-		dev_err(i2c->dev, "Failed to get default clk info\n");
+		dev_dbg(i2c->dev, "Failed to get default clk info\n");
 
 	if (of_get_property(np, "samsung,no_lose_arbitration", NULL)) {
 		i2c->is_no_arbitration = 1;
@@ -1287,19 +1287,19 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 	i2c->dev = &pdev->dev;
 	i2c->clk = devm_clk_get(&pdev->dev, "gate_hsi2c_clk");
 	if (IS_ERR(i2c->clk)) {
-		dev_err(&pdev->dev, "cannot get clock\n");
+		dev_dbg(&pdev->dev, "cannot get clock\n");
 		return -ENOENT;
 	}
 
 	i2c->rate_clk = devm_clk_get(&pdev->dev, "ipclk_hsi2c");
 	if (IS_ERR(i2c->rate_clk)) {
-		dev_err(&pdev->dev, "cannot get rate clock\n");
+		dev_dbg(&pdev->dev, "cannot get rate clock\n");
 		return -ENOENT;
 	}
 
 	ret = clk_prepare(i2c->clk);
 	if (ret) {
-		dev_err(&pdev->dev, "Clock prepare failed\n");
+		dev_dbg(&pdev->dev, "Clock prepare failed\n");
 			return ret;
 	}
 
@@ -1311,7 +1311,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 
 	i2c->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(i2c->regs)) {
-		dev_err(&pdev->dev, "cannot map HS-I2C IO\n");
+		dev_dbg(&pdev->dev, "cannot map HS-I2C IO\n");
 		ret = PTR_ERR(i2c->regs);
 		goto err_clk1;
 	}
@@ -1347,7 +1347,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 	if (i2c->operation_mode == HSI2C_INTERRUPT) {
 		i2c->irq = ret = irq_of_parse_and_map(np, 0);
 		if (ret <= 0) {
-			dev_err(&pdev->dev, "cannot find HS-I2C IRQ\n");
+			dev_dbg(&pdev->dev, "cannot find HS-I2C IRQ\n");
 			ret = -EINVAL;
 			goto err_clk1;
 		}
@@ -1357,7 +1357,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 		disable_irq(i2c->irq);
 
 		if (ret != 0) {
-			dev_err(&pdev->dev, "cannot request HS-I2C IRQ %d\n",
+			dev_dbg(&pdev->dev, "cannot request HS-I2C IRQ %d\n",
 					i2c->irq);
 			goto err_clk1;
 		}
@@ -1377,7 +1377,7 @@ static int exynos5_i2c_probe(struct platform_device *pdev)
 	i2c->adap.nr = -1;
 	ret = i2c_add_numbered_adapter(&i2c->adap);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "failed to add bus to i2c core\n");
+		dev_dbg(&pdev->dev, "failed to add bus to i2c core\n");
 		goto err_clk2;
 	}
 
