@@ -430,7 +430,7 @@ static int exynos5_i2c_set_timing(struct exynos5_i2c *i2c, int mode)
 		utemp = readl(i2c->regs + HSI2C_TIMING_FS1) & ~0x00FF0000;
 		writel(utemp | (uTSTART_HD_FS << 16), i2c->regs + HSI2C_TIMING_FS1);
 
-		dev_info(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1(STAND) = 0x%X "
+		dev_dbg(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1(STAND) = 0x%X "
 				"TIMING FS2(STAND) = 0x%X TIMING FS3(STAND) = 0x%X\n",__func__, ipclk, op_clk, fs_div,
 				readl(i2c->regs + HSI2C_TIMING_FS1), readl(i2c->regs + HSI2C_TIMING_FS2),
 				readl(i2c->regs + HSI2C_TIMING_FS3));
@@ -472,7 +472,7 @@ static int exynos5_i2c_set_timing(struct exynos5_i2c *i2c, int mode)
 		utemp = readl(i2c->regs + HSI2C_TIMING_FS1) & ~0x00FF0000;
 		writel(utemp | (uTSTART_HD_FS << 16), i2c->regs + HSI2C_TIMING_FS1);
 
-		dev_info(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1(FS+) = 0x%X "
+		dev_dbg(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1(FS+) = 0x%X "
 				"TIMING FS2(FS+) = 0x%X TIMING FS3(FS+) = 0x%X\n",__func__, ipclk, op_clk, fs_div,
 				readl(i2c->regs + HSI2C_TIMING_FS1), readl(i2c->regs + HSI2C_TIMING_FS2),
 				readl(i2c->regs + HSI2C_TIMING_FS3));
@@ -512,7 +512,7 @@ static int exynos5_i2c_set_timing(struct exynos5_i2c *i2c, int mode)
 		utemp = readl(i2c->regs + HSI2C_TIMING_HS1) & ~0x00FF0000;
 		writel(utemp | (uTSTART_HD_HS << 16), i2c->regs + HSI2C_TIMING_HS1);
 
-		dev_info(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing HS1 = 0x%08X "
+		dev_dbg(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing HS1 = 0x%08X "
 				"TIMING HS2 = 0x%08X TIMING HS3 = 0x%08X\n",__func__, ipclk, op_clk, hs_div,
 				readl(i2c->regs + HSI2C_TIMING_HS1), readl(i2c->regs + HSI2C_TIMING_HS2),
 				readl(i2c->regs + HSI2C_TIMING_HS3));
@@ -554,7 +554,7 @@ static int exynos5_i2c_set_timing(struct exynos5_i2c *i2c, int mode)
 		utemp = readl(i2c->regs + HSI2C_TIMING_FS1) & ~0x00FF0000;
 		writel(utemp | (uTSTART_HD_FS << 16), i2c->regs + HSI2C_TIMING_FS1);
 
-		dev_info(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1 = 0x%X "
+		dev_dbg(i2c->dev, "%s IPCLK = %d OP_CLK = %d DIV = %d Timing FS1 = 0x%X "
 				"TIMING FS2 = 0x%X TIMING FS3 = 0x%X\n",__func__, ipclk, op_clk, fs_div,
 				readl(i2c->regs + HSI2C_TIMING_FS1), readl(i2c->regs + HSI2C_TIMING_FS2),
 				readl(i2c->regs + HSI2C_TIMING_FS3));
@@ -1006,7 +1006,7 @@ static int exynos5_i2c_xfer_msg(struct exynos5_i2c *i2c,
 					} while(time_before(jiffies, timeout));
 
 					if (timeout)
-						dev_dbg(i2c->dev, "SDA check timeout AT WRITE!!! = 0x%8lx\n",trans_status);
+						dev_err(i2c->dev, "SDA check timeout AT WRITE!!! = 0x%8lx\n",trans_status);
 				}
 
 				ret = 0;
