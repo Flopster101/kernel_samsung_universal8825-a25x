@@ -37,10 +37,10 @@
  * In steady state a BBR flow only uses PROBE_BW and PROBE_RTT.
  * A long-lived BBR flow spends the vast majority of its time remaining
  * (repeatedly) in PROBE_BW, fully probing and utilizing the pipe's bandwidth
- * in a fair manner, with a small, bounded queue. *If* a flow has been
- * continuously sending for the entire min_rtt window, and hasn't seen an RTT
- * sample that matches or decreases its min_rtt estimate for 10 seconds, then
- * it briefly enters PROBE_RTT to cut inflight to a minimum value to re-probe
+ * in a fair manner, with a small, bounded queue. *If* a flow has not seen
+ * a measured RTT reduction for probe_rtt_win_ms (likely meaning it has been
+ * continuously sending for the entire probe_rtt_win_ms interval) then
+ * it briefly enters PROBE_RTT to cut inflight to a smaller value to re-probe
  * the path's two-way propagation delay (min_rtt). When exiting PROBE_RTT, if
  * we estimated that we reached the full bw of the pipe then we enter PROBE_BW;
  * otherwise we enter STARTUP to try to fill the pipe.
@@ -231,7 +231,7 @@ enum bbr_pacing_gain_phase {
 	BBR_BW_PROBE_UP		= 0,  /* push up inflight to probe for bw/vol */
 	BBR_BW_PROBE_DOWN	= 1,  /* drain excess inflight from the queue */
 	BBR_BW_PROBE_CRUISE	= 2,  /* use pipe, w/ headroom in queue/pipe */
-	BBR_BW_PROBE_REFILL	= 3,  /* v2: refill the pipe again to 100% */
+	BBR_BW_PROBE_REFILL	= 3,  /* try to refill the pipe again to 100% */
 };
 
 /* Try to keep at least this many packets in flight, if things go smoothly. For
@@ -434,7 +434,7 @@ static unsigned long bbr_bw_to_pacing_rate(struct sock *sk, u32 bw, int gain)
 
 	rate = bbr_rate_bytes_per_sec(sk, rate, gain,
 				      bbr_pacing_margin_percent);
-	rate = min_t(u64, rate, sk->sk_max_pacing_rate);
+	rate = min_t(u64, rate, READ_ONCE(sk->sk_max_pacing_rate));
 	return rate;
 }
 
@@ -454,8 +454,8 @@ static void bbr_init_pacing_rate_from_rtt(struct sock *sk)
 	}
 	bw = (u64)tcp_snd_cwnd(tp) * BW_UNIT;
 	do_div(bw, rtt_us);
-	sk->sk_pacing_rate =
-	  bbr_bw_to_pacing_rate(sk, bw, bbr_param(sk, startup_pacing_gain));
+	WRITE_ONCE(sk->sk_pacing_rate,
+	   bbr_bw_to_pacing_rate(sk, bw, bbr_param(sk, startup_pacing_gain)));
 }
 
 /* Pace using current bw estimate and a gain factor. */
@@ -467,8 +467,8 @@ static void bbr_set_pacing_rate(struct sock *sk, u32 bw, int gain)
 
 	if (unlikely(!bbr->has_seen_rtt && tp->srtt_us))
 		bbr_init_pacing_rate_from_rtt(sk);
-	if (bbr_full_bw_reached(sk) || rate > sk->sk_pacing_rate)
-		sk->sk_pacing_rate = rate;
+	if (bbr_full_bw_reached(sk) || rate > READ_ONCE(sk->sk_pacing_rate))
+		WRITE_ONCE(sk->sk_pacing_rate, rate);
 }
 
 /* Return the number of segments BBR would like in a TSO/GSO skb, given a
@@ -483,7 +483,7 @@ static u32 bbr_tso_segs_generic(struct sock *sk, unsigned int mss_now,
 	u64 bytes;
 
 	/* Budget a TSO/GSO burst size allowance based on bw (pacing_rate). */
-	bytes = sk->sk_pacing_rate >> sk->sk_pacing_shift;
+	bytes = READ_ONCE(sk->sk_pacing_rate) >> READ_ONCE(sk->sk_pacing_shift);
 
 	/* Budget a TSO/GSO burst size allowance based on min_rtt. For every
 	 * K = 2^tso_rtt_shift microseconds of min_rtt, halve the burst.
@@ -867,16 +867,18 @@ static void bbr_check_probe_rtt_done(struct sock *sk)
  * small (reducing queuing delay and packet loss) and achieve fairness among
  * BBR flows.
  *
- * The min_rtt filter window is 10 seconds. When the min_rtt estimate expires,
- * we enter PROBE_RTT mode and cap the cwnd at bbr_cwnd_min_target=4 packets.
+ * The PROBE_RTT window is probe_rtt_win_ms (5 sec). If this elapses without
+ * measuring a lower RTT sample, we enter PROBE_RTT mode and reduce cwnd
+ * using the bbr_probe_rtt_cwnd_gain factor of 0.5x, i.e. cwnd ~= 0.5 * est_BDP.
  * After at least bbr_probe_rtt_mode_ms=200ms and at least one packet-timed
- * round trip elapsed with that flight size <= 4, we leave PROBE_RTT mode and
+ * round trip elapsed with the lower flight size, we leave PROBE_RTT mode and
  * re-enter the previous mode. BBR uses 200ms to approximately bound the
- * performance penalty of PROBE_RTT's cwnd capping to roughly 2% (200ms/10s).
+ * performance penalty of PROBE_RTT's cwnd capping to roughly 2% (note that
+ * the expected bandwidth utilization is 0.5*.2/5 + 1.0*( 5 - .2)/5 = 0.98).
  *
- * Note that flows need only pay 2% if they are busy sending over the last 10
+ * Note that flows need only pay 2% if they are busy sending over the last 5
  * seconds. Interactive applications (e.g., Web, RPCs, video chunks) often have
- * natural silences or low-rate periods within 10 seconds where the rate is low
+ * natural silences or low-rate periods within 5 seconds where the rate is low
  * enough for long enough to drain its queue in the bottleneck. We pick up
  * these min RTT measurements opportunistically with our min_rtt filter. :-)
  */
@@ -1163,10 +1165,9 @@ static void bbr_probe_inflight_hi_upward(struct sock *sk,
 		bbr_raise_inflight_hi_slope(sk);
 }
 
-/* Does loss/ECN rate for this sample say inflight is "too high"?
- * This is used by both the bbr_check_loss_too_high_in_startup() function,
- * which can be used in either v1 or v2, and the PROBE_UP phase of v2, which
- * uses it to notice when loss/ECN rates suggest inflight is too high.
+/* Does loss/ECN rate for this sample suggest inflight is "too high"? This is
+ * used both in STARTUP and BBR_BW_PROBE_UP, to notice when loss/ECN rates
+ * suggest the volume of in-flight data is too high.
  */
 static bool bbr_is_inflight_too_high(const struct sock *sk,
 				      const struct rate_sample *rs)
@@ -1311,7 +1312,7 @@ static void bbr_bound_cwnd_for_inflight_model(struct sock *sk)
 }
 
 /* How should we multiplicatively cut bw or inflight limits based on ECN? */
-u32 bbr_ecn_cut(struct sock *sk)
+static u32 bbr_ecn_cut(struct sock *sk)
 {
 	struct bbr *bbr = inet_csk_ca(sk);
 
@@ -2032,7 +2033,7 @@ static bool bbr_run_fast_path(struct sock *sk, bool *update_model,
 	return false;
 }
 
-void bbr_main(struct sock *sk, const struct rate_sample *rs)
+static void bbr_main(struct sock *sk, const struct rate_sample *rs)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct bbr *bbr = inet_csk_ca(sk);
