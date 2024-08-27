@@ -51,5 +51,4 @@ fips_clean:
 	@rm -f $(objtree)/drivers/crypto/fmp/fipsed_*.c
 	@rm -f $(objtree)/drivers/crypto/fmp/fips140_ic_support.c
 	@rm -f $(objtree)/drivers/crypto/fmp/*.o
-	@sync
 	@echo " Clean FIPS module artefacts completed "
