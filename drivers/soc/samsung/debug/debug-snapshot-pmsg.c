@@ -16,7 +16,7 @@
 #define LOGGER_LEVEL_HEADER	(1)
 #define LOGGER_LEVEL_PREFIX	(2)
 #define LOGGER_LEVEL_TEXT	(3)
-#define LOGGER_HEADER_SIZE	(68)
+#define LOGGER_HEADER_SIZE	(69)
 
 #define LOG_ID_MAIN		(0)
 #define LOG_ID_RADIO		(1)
