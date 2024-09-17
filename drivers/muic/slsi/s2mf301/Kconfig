@@ -6,7 +6,7 @@ config MUIC_S2MF301
 	  If you say yes here you will get support for the S2MF301 MUIC chip.
 
 config TOP_S2MF301
-	bool "Using S2MF301 MUIC"
+	tristate "Using S2MF301 MUIC"
 	depends on USE_MUIC && MFD_S2MF301
 	default n
 	help
