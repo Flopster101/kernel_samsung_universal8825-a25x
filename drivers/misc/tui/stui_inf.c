@@ -17,7 +17,7 @@
 #include <linux/spinlock.h>
 #include <linux/types.h>
 #ifdef USE_TEE_CLIENT_API
-#include <tee_client_api.h>
+#include <linux/tzdev/tee_client_api.h>
 #endif /* USE_TEE_CLIENT_API */
 #include "stui_inf.h"
 
