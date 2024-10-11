@@ -1487,7 +1487,7 @@ CONFIG_VIRTIO_VSOCKETS_COMMON=y
 # CONFIG_NET_L3_MASTER_DEV is not set
 # CONFIG_QRTR is not set
 # CONFIG_NET_NCSI is not set
-CONFIG_KNOX_NCM=y
+# CONFIG_KNOX_NCM is not set
 CONFIG_RPS=y
 CONFIG_RFS_ACCEL=y
 CONFIG_XPS=y
@@ -7648,11 +7648,11 @@ CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
 # end of Kernel hardening options
 
 # CONFIG_SECURITY_DEFEX is not set
-CONFIG_GAF=y
+# CONFIG_GAF is not set
 # CONFIG_GAF_V3 is not set
 # CONFIG_GAF_V4 is not set
 # CONFIG_GAF_V5 is not set
-CONFIG_GAF_V6=y
+# CONFIG_GAF_V6 is not set
 # CONFIG_MEMORY_ZEROISATION is not set
 # CONFIG_MZ_PAGE_V2 is not set
 # end of Security options
