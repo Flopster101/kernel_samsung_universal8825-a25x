@@ -4749,12 +4749,6 @@ static int get_bMaxPacketSize0(struct usb_device *udev,
 			if (rc >= 0)
 				rc = -EPROTO;
 			break;
-#if defined(CONFIG_USB_HOST_SAMSUNG_FEATURE)
-		if (rc == -ETIMEDOUT && udev->reset_resume == 1) {
-			dev_err(&udev->dev, "get descriptor fail in reset resume\n");
-			break;
-		}
-#endif
 		}
 
 		/*
@@ -4766,6 +4760,12 @@ static int get_bMaxPacketSize0(struct usb_device *udev,
 		if (rc > 0 || (rc == -ETIMEDOUT && first_time &&
 				udev->speed > USB_SPEED_FULL))
 			break;
+#if defined(CONFIG_USB_HOST_SAMSUNG_FEATURE)
+		if (rc == -ETIMEDOUT && udev->reset_resume == 1) {
+			dev_err(&udev->dev, "get descriptor fail in reset resume\n");
+			break;
+		}
+#endif
 	}
 	return rc;
 }
@@ -4965,7 +4965,6 @@ hub_port_init(struct usb_hub *hub, struct usb_device *udev, int port1,
 			else
 				trstrcy = 50;
 #endif
-
 			retval = hub_port_reset(hub, port1, udev, delay, false);
 			if (retval < 0)		/* error or disconnect */
 				goto fail;
