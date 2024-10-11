@@ -1,0 +1,49 @@
+config NANOHUB
+	tristate "Nanohub"
+	default N
+	select IIO
+	help
+	  Enable support for the nanohub sensorhub driver.
+
+	  This driver supports the android nanohub sensorhub.
+
+	  If in doubt, say N here.
+
+if NANOHUB
+
+config NANOHUB_MAILBOX
+	bool "Nanohub Mailbox"
+	default Y
+	help
+	  Enable nanohub Mailbox support.
+
+	  Either this or NANOHUB_MAILBOX should be selected.
+
+	  If in doubt, say N here.
+
+config SENSOR_DRV
+	bool "Sensor driver to support exynos sensor Hal"
+	default N
+	help
+	  Enable sensorhub hal support.
+
+config CONTEXTHUB_DEBUG
+	bool "Nanohub debug"
+	default N
+	help
+	  Enable nanohub device debug message
+
+config CONTEXTHUB_SENSOR_DEBUG
+	bool "Nanohub sensor debug"
+	default N
+	help
+	  Enable nanohub seneor alive check
+
+config LOGBUF_NUM
+	int "Nanohub logbuf number"
+	depends on NANOHUB
+	default 230 if SOC_S5E5515 || SOC_S5E9925 || SOC_S5E8825
+	help
+	  A number of logbuf lines, depends on soc
+
+endif # NANOHUB

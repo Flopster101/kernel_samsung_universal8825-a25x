@@ -1,0 +1,11 @@
+/*
+&${inf_spi} {
+	pinctrl-0 = <&spi2_bus &spi2_cs>;
+};
+*/
+
+&tsp_stm_spi {
+	sync-reportrate-120;
+	sec,bringup = <1>;
+};
+

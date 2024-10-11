@@ -1,0 +1,13 @@
+Effect driver of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-effect"
+
+- reg : address for I/O.
+
+- reg-names : "reg".
+
+Optional properties: no optional property.

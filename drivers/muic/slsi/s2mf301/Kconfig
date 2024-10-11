@@ -1,0 +1,61 @@
+config MUIC_S2MF301
+	tristate "Using S2MF301 MUIC"
+	depends on USE_MUIC && MFD_S2MF301
+	default n
+	help
+	  If you say yes here you will get support for the S2MF301 MUIC chip.
+
+config TOP_S2MF301
+	bool "Using S2MF301 MUIC"
+	depends on USE_MUIC && MFD_S2MF301
+	default n
+	help
+	  If you say yes here you will get support
+	  for the S2MF301 Top driver
+	  for RID detection, Full-auto DC
+	  ''
+
+config TOP_S2MF301_SUPPORT_S2MC501
+    bool "Using S2MF301 TOP support auto pps"
+    default n
+    help
+      If you say yes here you will get support
+      for the S2MF301 Top driver
+      for auto pps function with S2MC501
+      ''
+
+config HV_MUIC_S2MF301_AFC
+	tristate "Using S2MF301 MUIC AFC"
+	depends on MUIC_HV && MUIC_S2MF301
+	default n
+	help
+	  If you say yes here you will get support for the AFC.
+
+config HV_MUIC_AFC_DISABLE_ENFORCE
+	bool "Using S2MF301 MUIC AFC DISABLE ENFORCE"
+	depends on HV_MUIC_S2MF301_AFC
+	default n
+	help
+	  If you say yes here you will disable AFC charging.
+
+config MUIC_S2MF301_RID
+	bool "Using S2MF301 MUIC RID"
+	depends on MUIC_S2MF301
+	default n
+	help
+	  If you say yes here you will get support for the S2MF301 MUIC RID functions.
+
+config MUIC_NOT_SUPPORT_QC
+	bool "Not using S2MF301 MUIC QC AFC"
+	depends on MUIC_HV && MUIC_S2MF301
+	default n
+	help
+	  If you say yes here you will get support for the NOT QC AFC.
+
+config MUIC_HV_SUPPORT_POGO_DOCK
+	bool "MUIC_HV_SUPPORT_POGO_DOCK"
+	depends on USE_MUIC
+	default n
+	help
+	  If you say yes here you will get support for the AFC pogo dock.
+

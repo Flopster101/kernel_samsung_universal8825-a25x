@@ -1,0 +1,29 @@
+Sound card of Exynos
+
+This device is a sound card of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,exynos-sound".
+
+- clock-names : "xclkout"
+
+- clocks : phandle to clock
+
+- MICBIAS1-supply : phandle to regulator for micbias1
+
+- MICBIAS2-supply : phandle to regulator for micbias2
+
+- MICBIAS3-supply : phandle to regulator for micbias3
+
+- samsung,routing : routing for current machine
+
+- samsung,codec : phandle to codec devices
+
+- samsung,prefix : prefix for the codec devices
+
+- samsung,aux : phandle to sound devices but not in the DAI link definitions
+
+- rdma0, rdma1, ... : DAI link definitions.
+
+Optional properties: no optional property.

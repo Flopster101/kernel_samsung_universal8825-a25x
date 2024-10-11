@@ -1,0 +1,15 @@
+GIC of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-gic"
+
+- reg : address of GICD and GICC.
+
+- reg-names : "gicd", "gicc".
+
+- interrupts : phandle to parent GIC interrupt ID.
+
+Optional properties: no optional property.

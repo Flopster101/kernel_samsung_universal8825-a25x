@@ -1,0 +1,41 @@
+config SND_SOC_SAMSUNG_MAILBOX
+	tristate "Samsung MAILBOX"
+	help
+	  Say Y if you want to use mailbox for voice trigger system.
+
+config SND_SOC_SAMSUNG_VTS
+	tristate "Samsung VTS"
+	depends on SND_SOC_SAMSUNG_MAILBOX
+	help
+	  Say Y if you want to use voice trigger system.
+
+config SND_SOC_SAMSUNG_VTS_VERSION
+	hex "VTS version"
+	depends on SND_SOC_SAMSUNG_VTS
+	default 0x10000 if SOC_EXYNOS2100
+	default 0x20000 if SOC_S5E9925
+	default 0x20100 if SOC_S5E8825
+	help
+	  Version of VTS.
+	  Value = 0x10000 * major + 0x100 * minor + rev.
+	  Ex. 1.00 rev0 => 0x10000, 1.01 rev1 => 0x10101
+
+config SND_SOC_SAMSUNG_VTS_V1
+	bool
+	depends on SND_SOC_SAMSUNG_VTS
+	default y if SND_SOC_SAMSUNG_VTS_VERSION < 0x20000
+	default n if SND_SOC_SAMSUNG_VTS_VERSION >= 0x20000
+
+config SND_SOC_SAMSUNG_VTS_V2
+	bool
+	depends on SND_SOC_SAMSUNG_VTS
+	default n if SND_SOC_SAMSUNG_VTS_VERSION < 0x20000
+	default y if SND_SOC_SAMSUNG_VTS_VERSION >= 0x20000 \
+		&& SND_SOC_SAMSUNG_VTS_VERSION < 0x20100
+
+config SND_SOC_SAMSUNG_VTS_V2_1
+	bool
+	depends on SND_SOC_SAMSUNG_VTS
+	default n if SND_SOC_SAMSUNG_VTS_VERSION < 0x20100
+	default y if SND_SOC_SAMSUNG_VTS_VERSION >= 0x20100 \
+		&& SND_SOC_SAMSUNG_VTS_VERSION < 0x30000

@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+source "drivers/mfd/max77705/Kconfig"
+source "drivers/mfd/sm5714/Kconfig"
