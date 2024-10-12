@@ -6,11 +6,10 @@ K_VER="TEST-$DATE"
 
 set -e
 
-if [ -z "$1" ]; then
-    echo "Please exec from root directory"
+if [ ! -d drivers ]; then
+    echo "Please exec from top-level kernel tree."
     exit 1
 fi
-cd "$1"
 
 if [ "$(uname -m)" != "x86_64" ]; then
   echo "This script requires an x86_64 (64-bit) machine."
@@ -49,14 +48,16 @@ OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="KBUILD_BUILD_USER=Flopster101 KBUILD_BUILD_HOST=buildbot"
+export KBUILD_BUILD_USER="Flopster101"
+export KBUILD_BUILD_HOST="buildbot"
 KDIR="$(readlink -f .)"
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
 kfinish() {
     rm -rf "$TMPDIR"
-    rm -rf "$OUTDIR"
+    # DON'T delete output directory, ugh...
+    #rm -rf "$OUTDIR"
     rm -rf "$MODULES_OUTDIR"
 }
 
@@ -76,10 +77,11 @@ export ANDROID_MAJOR_VERSION=s
 export TARGET_SOC=s5e8825
 
 # Run build
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS $DEFCONFIG >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
+echo "Build start"
+make -j$(nproc --all) O=out $DEFCONFIG
+make -j$(nproc --all) O=out dtbs
+make -j$(nproc --all) O=out
+make -j$(nproc --all) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
 
 # Post build
 rm -rf "$TMPDIR"
