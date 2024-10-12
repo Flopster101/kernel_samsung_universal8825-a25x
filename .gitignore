@@ -157,3 +157,8 @@ x509.genkey
 
 # Documentation toolchain
 sphinx_*/
+
+*.tar
+/kernel_build/tmp
+*__pycache__*
+*.br
