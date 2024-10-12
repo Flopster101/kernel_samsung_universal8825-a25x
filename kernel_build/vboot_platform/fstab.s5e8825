@@ -1,0 +1,72 @@
+# Android fstab file.
+#<src>                  <mnt_point>         <type>    <mnt_flags and options>                               <fs_mgr_flags>
+# The filesystem that contains the filesystem checker binary (typically /system) cannot
+# specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
+
+system	     /system      f2fs ro wait,logical,first_stage_mount
+system       /system      ext4 ro wait,logical,first_stage_mount
+system       /system      xfs ro wait,logical,first_stage_mount
+system       /system      erofs ro wait,logical,first_stage_mount
+system       /system      squashfs ro wait,logical,first_stage_mount
+system       /system      btrfs ro wait,logical,first_stage_mount,compress-force=zstd:15
+
+vendor       /vendor      f2fs ro wait,logical,first_stage_mount
+vendor       /vendor      ext4 ro wait,logical,first_stage_mount
+vendor       /vendor      xfs ro wait,logical,first_stage_mount
+vendor       /vendor      erofs ro wait,logical,first_stage_mount
+vendor       /vendor      squashfs ro wait,logical,first_stage_mount
+vendor       /vendor      btrfs ro wait,logical,first_stage_mount,compress-force=zstd:15
+
+vendor_dlkm       /vendor_dlkm      f2fs ro wait,logical,first_stage_mount
+vendor_dlkm       /vendor_dlkm      ext4 ro wait,logical,first_stage_mount
+vendor_dlkm       /vendor_dlkm      xfs ro wait,logical,first_stage_mount
+vendor_dlkm       /vendor_dlkm      erofs ro wait,logical,first_stage_mount
+vendor_dlkm       /vendor_dlkm      squashfs ro wait,logical,first_stage_mount
+vendor_dlkm       /vendor_dlkm      btrfs ro wait,logical,first_stage_mount,compress-force=zstd:15
+
+product       /product      f2fs ro wait,logical,first_stage_mount
+product       /product      ext4 ro wait,logical,first_stage_mount
+product       /product      xfs ro wait,logical,first_stage_mount
+product       /product      erofs ro wait,logical,first_stage_mount
+product       /product      squashfs ro wait,logical,first_stage_mount
+product       /product      btrfs ro wait,logical,first_stage_mount,compress-force=zstd:15
+
+odm       /odm      f2fs ro wait,logical,first_stage_mount
+odm       /odm      ext4 ro wait,logical,first_stage_mount
+odm       /odm      xfs ro wait,logical,first_stage_mount
+odm       /odm      erofs ro wait,logical,first_stage_mount
+odm       /odm      squashfs ro wait,logical,first_stage_mount
+odm       /odm      btrfs ro wait,logical,first_stage_mount,compress-force=zstd:15
+
+/dev/block/by-name/boot	/boot	emmc	defaults	first_stage_mount,formattable
+/dev/block/by-name/vendor_boot	/vendor_boot	emmc	defaults	first_stage_mount,formattable
+/dev/block/by-name/dtbo	/dtbo	emmc	defaults	first_stage_mount,formattable
+/dev/block/by-name/metadata	/metadata	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic,sync	wait,formattable,first_stage_mount,check
+/dev/block/by-name/userdata	/data	f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678,whint_mode=fs-based,inlinecrypt	latemount,wait,check,quota,reservedsize=128M,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,checkpoint=fs,fscompress,keydirectory=/metadata/vold/metadata_encryption
+/dev/block/by-name/userdata     /data   btrfs    noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678,whint_mode=fs-based      latemount,wait,check,quota,checkpoint=fs,compress=zstd:1
+/dev/block/by-name/efs	/mnt/vendor/efs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check
+/dev/block/by-name/cpefs	/mnt/vendor/cpefs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,nofail
+/dev/block/by-name/misc	/misc	emmc	defaults	defaults,first_stage_mount
+/dev/block/by-name/recovery	/recovery	emmc	defaults	first_stage_mount
+/dev/block/by-name/cache        /cache  ext4    noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic wait,check
+/dev/block/by-name/keystorage	/keystorage	emmc	defaults	first_stage_mount
+/dev/block/by-name/harx	/harx	emmc	defaults	first_stage_mount
+
+# CSC
+/dev/block/by-name/prism        /prism                  f2fs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/prism        /prism                  ext4    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/prism        /prism                  xfs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/prism        /prism                  erofs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/prism        /prism                  squashfs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/prism        /prism                  btrfs    ro,barrier=1    nofail,first_stage_mount,compress-force=zstd:15
+
+/dev/block/by-name/optics        /optics                  f2fs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics        /optics                  ext4    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics        /optics                  xfs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics        /optics                  erofs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics        /optics                  squashfs    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics        /optics                  btrfs    ro,barrier=1    nofail,first_stage_mount,compress-force=zstd:15
+
+# VOLD
+/devices/platform/13200000.usb*	auto	vfat	default	voldmanaged=usb:auto
+/devices/platform/100e0000.dwmmc2/mmc_host*	auto	auto	default	voldmanaged=sdcard:auto
