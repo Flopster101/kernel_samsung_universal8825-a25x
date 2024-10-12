@@ -7,6 +7,16 @@ sudo apt install lz4 brotli -y
 DATE="$(date '+%Y%m%d-%H%M')"
 K_VER="TEST-$DATE"
 
+# Check all args
+for arg in "$@"
+do
+    if [ "$arg" == "clean" ]; then
+        echo "clean argument passed, cleaning output directory..."
+        make clean
+        make mrproper
+    fi
+done
+
 set -e
 
 if [ ! -d drivers ]; then
