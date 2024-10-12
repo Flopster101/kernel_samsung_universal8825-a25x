@@ -38,7 +38,6 @@ exynos-pmu-if.ko
 exynos-flexpmu-dbg.ko
 exynos-pd.ko
 exynos-pd_el3.ko
-exynos-pd-dbg.ko
 cmupmucal.ko
 exynos_acpm.ko
 plugin_dbg.ko
