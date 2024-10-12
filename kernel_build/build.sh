@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Dependencies
+sudo apt install lz4 brotli -y
+
 # Vars
 DATE="$(date '+%Y%m%d-%H%M')"
 K_VER="TEST-$DATE"
@@ -132,7 +135,7 @@ rm -rf "$MODULES_DIR/0.0"
 
 # Build the images
 echo "Building dtb image..."
-python2 "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff000000 --version=0 --page_size=2048 "$IN_DTB" || exit 1
+python "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff000000 --version=0 --page_size=2048 "$IN_DTB" || exit 1
 
 echo "Building boot image..."
 $MKBOOTIMG --header_version 4 \
@@ -167,7 +170,7 @@ cd "$KDIR"
 echo "Done!"
 
 # Build zip
-if [ $DOTAR = 1 ]; then
+if [ $DOZIP = 1 ]; then
     echo "Building zip..."
     cd "$(pwd)/kernel_build/zip"
     rm -f "$OUT_KERNELZIP"
