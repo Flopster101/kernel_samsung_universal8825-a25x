@@ -115,6 +115,8 @@ fi
 
 missing_modules=""
 
+find "$MODULES_OUTDIR/lib/modules" -type f -name "*.ko" -exec basename {} \; > "$WP/last_modules.load"
+
 for module in $(cat "$IN_DLKM/modules.load"); do
     i=$(find "$MODULES_OUTDIR/lib/modules" -name $module);
     if [ -f "$i" ]; then
