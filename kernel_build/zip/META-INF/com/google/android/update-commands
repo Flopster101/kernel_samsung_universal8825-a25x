@@ -1,0 +1,24 @@
+### SFF ###
+# Supported commands:
+# flash_compressed - flashes lz4 (.lz4), zstandard (.zst), lzma2 (.xz) or brotli (.br) (Not the same as .new.dat.br!!!) compressed files
+# flash_raw - flashes raw files
+# prop_equals - checks if property equals to value
+# prop_contains - checks if property contains value
+# prop_startswith - checks if property starts with value
+# prop_endswith - checks if property ends with value
+# ui_print - prints everything after it to the UI
+# notify_flash - prints '%s - OK' when a file flashing ends. Default: 'no'. Opts: 'yes', 'no'; 'true', 'false'; '1', '0'; 'on', 'off'.
+# quick_flash - allows up to (nLogicalProcs / 2) parallel flashing threads to be initialized simultaneously, useful with lzma2 (.xz) files.
+## quick_flash - Warning: don't use other kind of commands (like ui_print) between/after flashing commands
+## quick_flash - if quick_flash is enabled because they will not be respected and will be done/finish/printed immediately.
+## quick_flash - Default: 'no'. Opts: 'yes', 'no'; 'true', 'false'; '1', '0'; 'on', 'off'.
+# exec_bash - executes command in shell
+# exec_check_bash - executes command in shell and exits if return code is not 0
+# set_total_bytes - sets total bytes of data expected, should be the sum of all decompressed data (file1 + file2 ...). When set, shows the progress bar.
+### All lines starting with '#' are treated as comments
+### Commands & arguments should be separated by ' ', '=' or ':'
+
+prop_startswith ro.boot.bootloader A536
+quick_flash yes
+flash_compressed boot.br /dev/block/by-name/boot
+flash_compressed vendor_boot.br /dev/block/by-name/vendor_boot
