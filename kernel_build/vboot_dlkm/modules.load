@@ -179,7 +179,6 @@ dw_mmc.ko
 dw_mmc-pltfm.ko
 dw_mmc-exynos-sec.ko
 leds-s2mf301.ko
-fmp-core.ko
 hid-a4tech.ko
 hid-axff.ko
 hid-belkin.ko
@@ -261,7 +260,6 @@ muic_platform.ko
 pdic_s2mf301.ko
 sb-core.ko
 mesh.ko
-kperfmon.ko
 fingerprint.ko
 fingerprint_sysfs.ko
 s2m_pdic_notifier_module.ko
