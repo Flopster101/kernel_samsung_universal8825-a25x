@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Dependencies
-sudo apt install lz4 brotli -y
+sudo apt install lz4 brotli flex bc cpio -y
 
 # Vars
 DATE="$(date '+%Y%m%d-%H%M')"
