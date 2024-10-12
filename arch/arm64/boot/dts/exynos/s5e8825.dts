@@ -5945,8 +5945,8 @@
 		phandle = <0xcb>;
 	};
 
-	usb_notifier {
-		compatible = "samsung,usb-notifier";
+	origin_usb_notifier {
+		compatible = "samsung,origin-usb-notifier";
 		udc = <0xcc>;
 		status = "okay";
 		disable_host_wakelock;
@@ -7151,11 +7151,11 @@
 		pe-list {
 
 			list@0 {
-				cpus = "0-5\06-7";
+				cpus = "0-5", "6-7";
 			};
 
 			list@1 {
-				cpus = "6-7\00-5";
+				cpus = "6-7", "0-5";
 			};
 		};
 
@@ -11730,7 +11730,7 @@
 			power-domains = <0x00>;
 		};
 
-		usb_notifier {
+		origin_usb_notifier {
 			udc = <0x00>;
 		};
 
