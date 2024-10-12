@@ -138,3 +138,8 @@ x509.genkey
 /compile_commands.json
 # Documentation toolchain
 sphinx_*/
+
+*.tar
+/kernel_build/tmp
+*__pycache__*
+*.br
