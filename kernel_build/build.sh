@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Dependencies
-sudo apt install lz4 brotli flex bc cpio -y
+sudo apt install lz4 brotli flex bc cpio kmod ccache -y
 
 # Vars
 DATE="$(date '+%Y%m%d-%H%M')"
@@ -76,10 +76,13 @@ kfinish() {
 
 kfinish
 
+## Prepare ccache
+echo -e "\nPreparing ccache..."
+export CCACHE_DIR=$WP/.ccache
+ccache -M 10G
+
 # Toolchain
 TCDIR="$WP/toolchain/clang/host/linux-x86/clang-r416183b"
-export CROSS_COMPILE="$TCDIR/bin/aarch64-linux-gnu-"
-export CC="$TCDIR/bin/clang"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 export PATH="$WP/toolchain/prebuilts/build-tools/linux-x86:$TCDIR/bin:$PATH"
@@ -91,10 +94,10 @@ export TARGET_SOC=s5e8825
 
 # Run build
 echo "Build start"
-make -j$(nproc --all) O=out $DEFCONFIG
-make -j$(nproc --all) O=out dtbs
-make -j$(nproc --all) O=out
-make -j$(nproc --all) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
+make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" $DEFCONFIG
+make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" dtbs
+make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-"
+make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
 
 # Post build
 rm -rf "$TMPDIR"
