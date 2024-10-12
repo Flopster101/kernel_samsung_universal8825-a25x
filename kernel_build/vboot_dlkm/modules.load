@@ -146,6 +146,7 @@ i3c-hci-exynos.ko
 videobuf2-dma-sg.ko
 exynos_mfc.ko
 fimc-is.ko
+is-cis-imx258.ko
 is-cis-4ha.ko
 is-cis-gc02m1.ko
 is-cis-hi1339.ko
