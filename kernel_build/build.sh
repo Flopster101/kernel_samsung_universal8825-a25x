@@ -1,6 +1,8 @@
 #!/bin/bash
 
-XY_VERSION="R3.0"
+# Vars
+DATE="$(date '+%Y%m%d-%H%M')"
+K_VER="TEST-$DATE"
 
 set -e
 
@@ -21,28 +23,36 @@ export PATH="$(pwd)/kernel_build/bin:$PATH"
 OUTDIR="$(pwd)/out"
 MODULES_OUTDIR="$(pwd)/modules_out"
 TMPDIR="$(pwd)/kernel_build/tmp"
+WP="/workspace"
 
+# Device
 IN_PLATFORM="$(pwd)/kernel_build/vboot_platform"
 IN_DLKM="$(pwd)/kernel_build/vboot_dlkm"
 IN_DTB="$OUTDIR/arch/arm64/boot/dts/exynos/s5e8825.dtb"
+DEFCONFIG="s5e8825-a25xxx-custom_defconfig"
 
+# Toggles
+DOTAR="1"
+DOZIP="0"
+
+# Working paths
 PLATFORM_RAMDISK_DIR="$TMPDIR/ramdisk_platform"
 DLKM_RAMDISK_DIR="$TMPDIR/ramdisk_dlkm"
 PREBUILT_RAMDISK="$(pwd)/kernel_build/boot/ramdisk"
 MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 
-MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
-MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
-
-OUT_KERNELZIP="$(pwd)/kernel_build/ExynosUnbound-${XY_VERSION}_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/ExynosUnbound-${XY_VERSION}_a53x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/FlopKernel-${K_VER}_a25x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FlopKernel-${K_VER}_a25x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-XyUnbound-${XY_VERSION} KBUILD_BUILD_USER=Gabriel260BR KBUILD_BUILD_HOST=ExynosUnbound"
+BUILD_ARGS="KBUILD_BUILD_USER=Flopster101 KBUILD_BUILD_HOST=buildbot"
+KDIR="$(readlink -f .)"
+export LLVM=1 LLVM_IAS=1
+export ARCH=arm64
 
 kfinish() {
     rm -rf "$TMPDIR"
@@ -52,32 +62,26 @@ kfinish() {
 
 kfinish
 
-DIR="$(readlink -f .)"
-PARENT_DIR="$(readlink -f ${DIR}/..)"
+# Toolchain
+TCDIR="$WP/toolchain/clang/host/linux-x86/clang-r416183b"
+export CROSS_COMPILE="$TCDIR/bin/aarch64-linux-gnu-"
+export CC="$TCDIR/bin/clang"
+MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
+MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
+export PATH="$WP/toolchain/prebuilts/build-tools/linux-x86:$TCDIR/bin:$PATH"
 
-export CROSS_COMPILE="$PARENT_DIR/clang-r416183b/bin/aarch64-linux-gnu-"
-export CC="$PARENT_DIR/clang-r416183b/bin/clang"
-
+# Platform vars
 export PLATFORM_VERSION=12
 export ANDROID_MAJOR_VERSION=s
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r416183b/bin:$PATH"
 export TARGET_SOC=s5e8825
-export LLVM=1 LLVM_IAS=1
-export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r416183b" ]; then
-    git clone https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r416183b "$PARENT_DIR/clang-r416183b" --depth=1
-fi
-
-if [ ! -d "$PARENT_DIR/build-tools" ]; then
-    git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
-fi
-
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
+# Run build
+make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS $DEFCONFIG >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
 
+# Post build
 rm -rf "$TMPDIR"
 rm -f "$OUT_BOOTIMG"
 rm -f "$OUT_VENDORBOOTIMG"
@@ -118,27 +122,26 @@ for i in $(find . -name "modules.*" -type f); do
         rm -f "$i"
     fi
 done
-cd "$DIR"
+cd "$KDIR"
 
 cp -f "$IN_DLKM/modules.load" "$MODULES_DIR/0.0/modules.load"
 mv "$MODULES_DIR/0.0"/* "$MODULES_DIR/"
 rm -rf "$MODULES_DIR/0.0"
 
+# Build the images
 echo "Building dtb image..."
 python2 "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff000000 --version=0 --page_size=2048 "$IN_DTB" || exit 1
 
 echo "Building boot image..."
-
 $MKBOOTIMG --header_version 4 \
     --kernel "$OUT_KERNEL" \
     --output "$OUT_BOOTIMG" \
     --ramdisk "$PREBUILT_RAMDISK" \
     --os_version 12.0.0 \
-    --os_patch_level 2024-01 || exit 1
-
+    --os_patch_level 2024-09 || exit 1
 echo "Done!"
-echo "Building vendor_boot image..."
 
+echo "Building vendor_boot image..."
 cd "$DLKM_RAMDISK_DIR"
 find . | cpio --quiet -o -H newc -R root:root | lz4 -9cl > ../ramdisk_dlkm.lz4
 cd ../ramdisk_platform
@@ -155,32 +158,39 @@ $MKBOOTIMG --header_version 4 \
     --ramdisk_name dlkm \
     --vendor_ramdisk_fragment "$(pwd)/ramdisk_dlkm.lz4" \
     --os_version 12.0.0 \
-    --os_patch_level 2024-01 || exit 1
+    --os_patch_level 2024-09 || exit 1
 
-cd "$DIR"
+cd "$KDIR"
 
 echo "Done!"
 
-echo "Building zip..."
-cd "$(pwd)/kernel_build/zip"
-rm -f "$OUT_KERNELZIP"
-brotli --quality=11 -c boot.img > boot.br
-brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-zip -r9 -q "$OUT_KERNELZIP" META-INF boot.br vendor_boot.br
-rm -f boot.br vendor_boot.br
-cd "$DIR"
-echo "Done! Output: $OUT_KERNELZIP"
+# Build zip
+if [ $DOTAR = 1 ]; then
+    echo "Building zip..."
+    cd "$(pwd)/kernel_build/zip"
+    rm -f "$OUT_KERNELZIP"
+    brotli --quality=11 -c boot.img > boot.br
+    brotli --quality=11 -c vendor_boot.img > vendor_boot.br
+    zip -r9 -q "$OUT_KERNELZIP" META-INF boot.br vendor_boot.br
+    rm -f boot.br vendor_boot.br
+    cd "$KDIR"
+    echo "Done! Output: $OUT_KERNELZIP"
+fi
 
-echo "Building tar..."
-cd "$(pwd)/kernel_build"
-rm -f "$OUT_KERNELTAR"
-lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
-lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
-tar -cf "$OUT_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
-cd "$DIR"
-rm -f boot.img.lz4 vendor_boot.img.lz4
-echo "Done! Output: $OUT_KERNELTAR"
+# Build tar
+if [ $DOTAR = 1 ]; then
+    echo "Building tar..."
+    cd "$(pwd)/kernel_build"
+    rm -f "$OUT_KERNELTAR"
+    lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
+    lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
+    tar -cf "$OUT_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+    cd "$KDIR"
+    rm -f boot.img.lz4 vendor_boot.img.lz4
+    echo "Done! Output: $OUT_KERNELTAR"
+fi
 
+# Cleanup
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
 kfinish
