@@ -111,3 +111,6 @@ obj-$(CONFIG_VIPERBOARD_ADC) += viperboard_adc.o
 xilinx-xadc-y := xilinx-xadc-core.o xilinx-xadc-events.o
 obj-$(CONFIG_XILINX_XADC) += xilinx-xadc.o
 obj-$(CONFIG_SD_ADC_MODULATOR) += sd_adc_modulator.o
+obj-$(CONFIG_S2MPS23_ADC) += s2mps23_adc.o
+obj-$(CONFIG_S2MPS25_ADC) += s2mps25_adc.o
+obj-$(CONFIG_S2MPU13_ADC) += s2mpu13_adc.o
