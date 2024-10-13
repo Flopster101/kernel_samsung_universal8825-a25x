@@ -94,10 +94,10 @@ export TARGET_SOC=s5e8825
 
 # Run build
 echo "Build start"
-make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" $DEFCONFIG
-make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" dtbs
+make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-" $DEFCONFIG
+make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-" dtbs
 make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-"
-make -j$(nproc --all) O=out CC="ccache clang" CROSS_COMPILE="aarch64-linux-gnu-" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
+make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
 
 # Post build
 rm -rf "$TMPDIR"
