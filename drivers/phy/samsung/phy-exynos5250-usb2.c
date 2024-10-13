@@ -1,9 +1,18 @@
-// SPDX-License-Identifier: GPL-2.0-only
-/*
- * Samsung SoC USB 1.1/2.0 PHY driver - Exynos 5250 support
+// SPDX-License-Identifier: GPL-2.0
+/**
  *
- * Copyright (C) 2013 Samsung Electronics Co., Ltd.
- * Author: Kamil Debski <k.debski@samsung.com>
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ *        http://www.samsung.com
+ *
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2  of
+ * the License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 #include <linux/delay.h>

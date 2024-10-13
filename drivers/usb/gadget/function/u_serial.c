@@ -453,6 +453,15 @@ static void gs_read_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct gs_port	*port = ep->driver_data;
 
+	/*
+	 * Port became NULL when 'dwc3_gadget_pullup' returns ETIMEDOUT.
+	 * Return here to avoid panic.
+	 */
+	if (!port) {
+		pr_err("%s, failed to get port\n", __func__);
+		return;
+	}
+
 	/* Queue all received data until the tty layer is ready for it. */
 	spin_lock(&port->port_lock);
 	list_add_tail(&req->list, &port->read_queue);
@@ -463,6 +472,15 @@ static void gs_read_complete(struct usb_ep *ep, struct usb_request *req)
 static void gs_write_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct gs_port	*port = ep->driver_data;
+
+	/*
+	 * port became NULL when 'dwc3_gadget_pullup' returns ETIMEDOUT.
+	 * Return here to avoid panic.
+	 */
+	if (!port) {
+		pr_err("%s, failed to get port\n", __func__);
+		return;
+	}
 
 	spin_lock(&port->port_lock);
 	list_add(&req->list, &port->write_pool);
@@ -548,6 +566,12 @@ static int gs_start_io(struct gs_port *port)
 	 * configurations may use different endpoints with a given port;
 	 * and high speed vs full speed changes packet sizes too.
 	 */
+	 
+	if (!ep->enabled || !port->port_usb->in->enabled) {
+		pr_err("%s: ep is disabled.\n", __func__);
+		return -ENODEV;
+	}
+	
 	status = gs_alloc_requests(ep, head, gs_read_complete,
 		&port->read_allocated);
 	if (status)
@@ -568,7 +592,8 @@ static int gs_start_io(struct gs_port *port)
 		gs_start_tx(port);
 		/* Unblock any pending writes into our circular buffer, in case
 		 * we didn't in gs_start_tx() */
-		tty_wakeup(port->port.tty);
+		if (port->port.tty)
+			tty_wakeup(port->port.tty);
 	} else {
 		gs_free_requests(ep, head, &port->read_allocated);
 		gs_free_requests(port->port_usb->in, &port->write_pool,
