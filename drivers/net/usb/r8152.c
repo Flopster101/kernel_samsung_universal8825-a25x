@@ -5089,6 +5089,7 @@ static void set_carrier(struct r8152 *tp)
 			napi_enable(&tp->napi);
 			netif_wake_queue(netdev);
 			netif_info(tp, link, netdev, "carrier on\n");
+			pr_info("r8152 carrier on\n");
 		} else if (netif_queue_stopped(netdev) &&
 			   skb_queue_len(&tp->tx_queue) < tp->tx_qlen) {
 			netif_wake_queue(netdev);
@@ -5102,6 +5103,7 @@ static void set_carrier(struct r8152 *tp)
 			napi_enable(napi);
 			tasklet_enable(&tp->tx_tl);
 			netif_info(tp, link, netdev, "carrier off\n");
+			pr_info("r8152 carrier off\n");
 		}
 	}
 }
