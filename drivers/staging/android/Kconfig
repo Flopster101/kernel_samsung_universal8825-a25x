@@ -25,7 +25,21 @@ config DEBUG_KINFO
 	   - UTS_RELEASE
 	   - BUILD_INFO(ro.build.fingerprint)
 
+config SAMSUNG_LMKD_DEBUG
+	bool "record lmkd kill history"
+	default y
+	help
+	  record lmkd kill history
+
+config SAMSUNG_FREECESS
+	bool "thraw frozen process when recv sig"
+	default n
+	help
+	  thraw frozen process when recv sig.
+
 source "drivers/staging/android/ion/Kconfig"
+
+source "drivers/staging/android/Kconfig.variant1"
 
 endif # if ANDROID
 
