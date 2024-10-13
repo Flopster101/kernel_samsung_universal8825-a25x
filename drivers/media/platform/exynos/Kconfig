@@ -1,0 +1,17 @@
+#
+# Exynos multimedia device drivers
+#
+config VIDEO_EXYNOS
+        bool "Exynos Multimedia Devices"
+        default y
+        help
+          This is a representative exynos multimedia device.
+
+if VIDEO_EXYNOS
+        source "drivers/media/platform/exynos/mfc/Kconfig"
+
+source "drivers/media/platform/exynos/camera/Kconfig"
+source "drivers/media/platform/exynos/camera-pp/Kconfig"
+        source "drivers/media/platform/exynos/jsqz/Kconfig"
+        source "drivers/media/platform/exynos/mcfrc/Kconfig"
+endif

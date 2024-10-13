@@ -6,12 +6,17 @@
 menuconfig RADIO_ADAPTERS
 	bool "Radio Adapters"
 	depends on VIDEO_V4L2
-	depends on MEDIA_RADIO_SUPPORT
 	default y
 	help
 	  Say Y here to enable selecting AM/FM radio adapters.
 
 if RADIO_ADAPTERS && VIDEO_V4L2
+
+config RADIO_S5E8825
+	tristate "SAMSUNG S5E8825 FM Radio"
+	depends on VIDEO_V4L2
+
+source "drivers/media/radio/s610/Kconfig"
 
 config RADIO_TEA575X
 	tristate
