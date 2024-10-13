@@ -893,6 +893,18 @@ config LEDS_LM36274
 	  Say Y to enable the LM36274 LED driver for TI LMU devices.
 	  This supports the LED device LM36274.
 
+config LEDS_S2MPB02
+	tristate "LED support for the S2MPB02"
+	depends on LEDS_CLASS
+	help
+	  This option enables support for the LEDs on the S2MPB02.
+
+config LEDS_SM5714
+	tristate "LED support for the SM5714"
+	depends on MFD_SM5714
+	help
+	  This option enables support for the LEDs on the SM5714.
+
 config LEDS_TPS6105X
 	tristate "LED support for TI TPS6105X"
 	depends on LEDS_CLASS
@@ -928,6 +940,34 @@ config LEDS_ACER_A500
 	help
 	  This option enables support for the Power Button LED of
 	  Acer Iconia Tab A500.
+
+config LEDS_S2MPB02
+	tristate "LED support for the S2MPB02"
+    depends on (MFD_S2MPB02) && I2C
+	help
+	  If you say yes here you will get support for
+	  for the LEDS_S2MPB02 led chip.
+
+config LEDS_S2MPB02_FLASH
+	tristate "FLASH LED support for the S2MPB02"
+    depends on (MFD_S2MPB02) && I2C
+	help
+	  If you say yes here you will get support for
+	  for the LEDS_S2MPB02_FLASH led chip.
+
+config LEDS_S2MU106_FLASH
+	tristate "FLASH LED support for the S2MU106"
+    depends on (MFD_S2MU106) && I2C
+	help
+	  If you say yes here you will get support for
+	  for the LEDS_S2MU106_FLASH led chip.
+
+config LEDS_S2MF301_FLASH
+	tristate "FLASH LED support for the S2MF301"
+    depends on (MFD_S2MF301) && I2C
+	help
+	  If you say yes here you will get support for
+	  for the LEDS_S2MF301_FLASH led chip.
 
 comment "LED Triggers"
 source "drivers/leds/trigger/Kconfig"
