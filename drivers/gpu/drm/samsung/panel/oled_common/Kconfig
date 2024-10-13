@@ -1,0 +1,9 @@
+menuconfig USDM_PANEL_OLED_COMMON
+	tristate "OLED_COMMON DDI Panel Driver"
+	depends on USDM_PANEL
+	default y
+	help
+		This enables OLED_COMMON DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the OLED_COMMON DDI.
+
