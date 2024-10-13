@@ -1,0 +1,5 @@
+config SHUB_DEBUG
+	tristate "sensor hub debug mode"
+	default n
+	help
+	  If you want to use debug mode for sensor hub, it should be set.
