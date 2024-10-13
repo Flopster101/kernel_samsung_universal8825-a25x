@@ -1,0 +1,31 @@
+config SHUB
+	tristate "shub"
+	default y
+	help
+	  shub driver for sensor hub.
+	  If you say yes here you get shub support for sensor hub.
+	  To compile this driver as a module, choose M here: the module will be called shub.
+
+config SHUB_PM_WAKEUP_LINUX_VER_5_4
+	tristate "pm wakeup linux version 5.4"
+	default y
+	help
+	  ssp driver for sensor hub.
+	  If you say yes here, the code of pm_wakeup is applied over linux version 5.4.
+	  To compile this driver as a module, choose M here: the
+	  module will be called ssp.
+
+config SHUB_AOIS
+	tristate "SHUB_AOIS"
+	default n
+	help
+	  This is AOIS driver for camera
+	  Set as y if the driver is used in this project
+	  use CONFIG_SHUB_AOIS
+
+config SHUB_PANEL_NOTIFY
+	tristate "SHUB_PANEL_NOTI"
+	default n
+	help
+	  This is panel notify for chub
+	  Set as y if the driver is used in this project
