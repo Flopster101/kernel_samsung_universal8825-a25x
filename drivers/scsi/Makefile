@@ -154,6 +154,11 @@ obj-$(CONFIG_SCSI_ENCLOSURE)	+= ses.o
 
 obj-$(CONFIG_SCSI_HISI_SAS) += hisi_sas/
 
+ifdef CONFIG_UFS_SRPMB
+ccflags-y += -I$(srctree)/drivers/scsi/ufs/$(TARGET_SOC)
+endif
+obj-$(CONFIG_UFS_SRPMB)		+= scsi_srpmb.o
+
 # This goes last, so that "real" scsi devices probe earlier
 obj-$(CONFIG_SCSI_DEBUG)	+= scsi_debug.o
 scsi_mod-y			+= scsi.o hosts.o scsi_ioctl.o \
