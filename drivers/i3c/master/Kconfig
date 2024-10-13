@@ -21,3 +21,11 @@ config DW_I3C_MASTER
 
 	  This driver can also be built as a module.  If so, the module
 	  will be called dw-i3c-master.
+
+config I3C_HCI_EXYNOS
+	tristate "EXYNOS I3C HCI driver"
+	depends on I3C
+	depends on HAS_IOMEM
+	help
+		I3C HCI protocol control device driver on EXYNOS SoC.
+		EXYNOS supports I3C HCI v1.0 protocol.
