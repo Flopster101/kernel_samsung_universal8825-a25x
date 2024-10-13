@@ -83,10 +83,45 @@ config PCIE_DW_PLAT_EP
 	  selected.
 
 config PCI_EXYNOS
-	bool "Samsung Exynos PCIe controller"
-	depends on SOC_EXYNOS5440 || COMPILE_TEST
+	tristate "Samsung Exynos PCIe controller"
+	depends on PCI
+	depends on OF
+	depends on PCI_MSI_IRQ_DOMAIN
+	select PCIEPORTBUS
+	select PCIE_DW_HOST
+
+config PCI_EXYNOS_S5E9925
+	tristate "Samsung Exynos PCIe controller S5E9925"
+	depends on PCI
+	depends on OF
 	depends on PCI_MSI_IRQ_DOMAIN
 	select PCIE_DW_HOST
+
+config PCI_EXYNOS_S5E9925_S5300
+	tristate "Samsung Exynos PCIe controller S5E9925 and S5300"
+	depends on PCI
+	depends on OF
+	depends on PCI_MSI_IRQ_DOMAIN
+	select PCIE_DW_HOST
+
+config EXYNOS_PCIE_GEN2_S2MPU
+	tristate "Enable Exynos PCIe S2MPU"
+	depends on PCI_EXYNOS
+	help
+	enable S2MPU feature for PCIe GEN2 channel
+
+config EXYNOS_PCIE_IOMMU
+	tristate "Enable Exynos PCIe IOMMU"
+	depends on PCI_EXYNOS
+	help
+	  enable IOMMU feature for Exynos PCIe
+
+config PCIE_IOMMU_HISTORY_LOG
+	bool "Enable Exynos PCIe IOMMU Map/Unmap History"
+	depends on EXYNOS_PCIE_IOMMU
+	help
+	  Say Y here if you want to see map/unmap informations for debugging
+	  purpose. This feature saves map/unmap historys to global variables.
 
 config PCI_IMX6
 	bool "Freescale i.MX6/7/8 PCIe controller"
@@ -311,5 +346,10 @@ config PCIE_AL
 	  core plus Annapurna Labs proprietary hardware wrappers. This is
 	  required only for DT-based platforms. ACPI platforms with the
 	  Annapurna Labs PCIe controller don't need to enable this.
+	  
+config SEC_PANIC_PCIE_ERR
+	depends on PCI_EXYNOS
+	default y if SEC_FACTORY && !SEC_FACTORY_INTERPOSER
+	bool "Force PANIC on PCIe Main Errors"
 
 endmenu
