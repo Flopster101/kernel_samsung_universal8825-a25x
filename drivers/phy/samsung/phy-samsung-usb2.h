@@ -2,8 +2,19 @@
 /*
  * Samsung SoC USB 1.1/2.0 PHY driver
  *
- * Copyright (C) 2013 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ *        http://www.samsung.com
+ *
  * Author: Kamil Debski <k.debski@samsung.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2  of
+ * the License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 #ifndef _PHY_EXYNOS_USB2_H
@@ -43,7 +54,7 @@ struct samsung_usb2_phy_driver {
 	struct regmap *reg_pmu;
 	struct regmap *reg_sys;
 	spinlock_t lock;
-	struct samsung_usb2_phy_instance instances[];
+	struct samsung_usb2_phy_instance instances[0];
 };
 
 struct samsung_usb2_common_phy {
