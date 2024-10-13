@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: GPL-2.0
+config DMABUF_SAMSUNG_HEAPS
+	tristate "DMA-BUF Userland Memory Heaps for Samsung"
+	select SAMSUNG_SECURE_IOVA
+	select DMABUF_CONTAINER
+	select DMABUF_HEAPS_PAGE_POOL
+	select DMABUF_HEAPS_DEFERRED_FREE
+	depends on DMABUF_HEAPS
+	help
+	  Choose this option to enable the DMA-BUF userland memory heaps for samsung.
+	  This options creates per heap chardevs in /dev/dma_heap/* which allows
+	  userspace to allocate dma-bufs that can be shared between drivers.
+
+config DMABUF_HEAPS_SAMSUNG_CHUNK
+	bool "DMA-BUF CHUNK Samsung Heap"
+	help
+	  Choose this option to enable dma-buf CHUNK heap. This heap is backed
+	  by the Contiguous Memory Allocator (CMA) and allocates the buffers that
+	  are arranged into a list of fixed size chunks taken from CMA.
+
+config DMABUF_HEAPS_SAMSUNG_CMA
+	bool "DMA-BUF CMA Samsung Heap"
+	depends on DMABUF_SAMSUNG_HEAPS
+	help
+	  Choose this option to enable dma-buf CMA heap for samsung.
+	  This heap is backed by the Contiguous Memory Allocator (CMA) and have own
+	  cma region by dt binding.
+
+config DMABUF_HEAPS_SAMSUNG_CARVEOUT
+	bool "DMA-BUF Carveout Samsung Heap"
+	depends on DMABUF_SAMSUNG_HEAPS
+	help
+	  Choose this option to enable dma-buf Carveout heap for samsung.
+	  This heap has own reserved region by dt binding.
+
+config DMABUF_HEAPS_SAMSUNG_HPA
+	bool "DMA-BUF HPA Samsung Heap"
+	depends on DMABUF_HEAPS && HPA
+	help
+	  Choose this option to enable dma-buf HPA heap for samsung.
+	  This heap is backed by the High-order Pages Allocator (HPA).
+	  If your system needs HPA for some reason, you should say Y here.
+
+config DMABUF_HEAPS_SAMSUNG_SYSTEM
+	bool "DMA-BUF System Samsung Heap"
+	depends on DMABUF_SAMSUNG_HEAPS
+	help
+	  Choose this option to enable dma-buf System heap for samsung.
+
+config DMABUF_CONTAINER
+	tristate "Dma-buf container support"
+	depends on DMA_SHARED_BUFFER
+	help
+	  dma-buf container is a dma-buf that can contain multiple different
+	  dma-buf objects. It is useful when delivering a lot of dma-buf objects
+	  between processes or user and kernel to reduce communication overhead.
+
+config RBIN
+	bool "DMA-BUF RBIN Samsung Heap"
+	depends on DMABUF_SAMSUNG_HEAPS && CLEANCACHE
+	default y
+	help
+	  Choose this option to enable dma-buf rbin heap for samsung.
