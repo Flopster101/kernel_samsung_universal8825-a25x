@@ -40,6 +40,10 @@
 #include <linux/init_task.h>
 #include <linux/uaccess.h>
 
+#ifdef CONFIG_FSCRYPT_SDP
+#include <linux/fscrypto_sdp_name.h>
+#endif
+
 #include "internal.h"
 #include "mount.h"
 
@@ -3855,6 +3859,12 @@ int vfs_rmdir(struct inode *dir, struct dentry *dentry)
 	if (error)
 		goto out;
 
+#ifdef CONFIG_FSCRYPT_SDP
+	error = fscrypt_sdp_check_rmdir(dentry);
+	if (error == -EIO)
+		goto out;
+#endif
+
 	error = dir->i_op->rmdir(dir, dentry);
 	if (error)
 		goto out;
@@ -3916,6 +3926,10 @@ retry:
 	if (error)
 		goto exit3;
 	error = vfs_rmdir(path.dentry->d_inode, dentry);
+#ifdef CONFIG_PROC_DLOG
+	if (!error)
+		dlog_hook_rmdir(dentry, &path);
+#endif
 exit3:
 	dput(dentry);
 exit2:
@@ -4040,6 +4054,10 @@ retry_deleg:
 		if (error)
 			goto exit2;
 		error = vfs_unlink(path.dentry->d_inode, dentry, &delegated_inode);
+#ifdef CONFIG_PROC_DLOG
+		if (!error)
+			dlog_hook(dentry, inode, &path);
+#endif
 exit2:
 		dput(dentry);
 	}
@@ -4452,10 +4470,19 @@ int vfs_rename(struct inode *old_dir, struct dentry *old_dentry,
 		if (error)
 			goto out;
 	}
+#ifdef CONFIG_FSCRYPT_SDP
+	error = fscrypt_sdp_check_rename_pre(old_dentry);
+	if (error == -EIO)
+		goto out;
+#endif
 	error = old_dir->i_op->rename(old_dir, old_dentry,
 				       new_dir, new_dentry, flags);
 	if (error)
 		goto out;
+#ifdef CONFIG_FSCRYPT_SDP
+	fscrypt_sdp_check_rename_post(old_dir, old_dentry,
+						new_dir, new_dentry);
+#endif
 
 	if (!(flags & RENAME_EXCHANGE) && target) {
 		if (is_dir) {

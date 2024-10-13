@@ -23,6 +23,10 @@
 #include <linux/unicode.h>
 #include <linux/fscrypt.h>
 
+#ifdef CONFIG_FSCRYPT_SDP
+#include "crypto/sdp/fscrypto_sdp_private.h"
+#endif
+
 #include <linux/uaccess.h>
 
 #include "internal.h"
@@ -1379,6 +1383,17 @@ bool is_empty_dir_inode(struct inode *inode)
 		(inode->i_op == &empty_dir_inode_operations);
 }
 
+#ifdef CONFIG_FSCRYPT_SDP
+static int fscrypt_sdp_d_delete(const struct dentry *dentry)
+{
+	return fscrypt_sdp_d_delete_wrapper(dentry);
+}
+
+static const struct dentry_operations sdp_dentry_ops = {
+	.d_delete	= fscrypt_sdp_d_delete,
+};
+#endif
+
 #ifdef CONFIG_UNICODE
 /*
  * Determine if the name of a dentry should be casefolded.
@@ -1464,12 +1479,18 @@ static int generic_ci_d_hash(const struct dentry *dentry, struct qstr *str)
 static const struct dentry_operations generic_ci_dentry_ops = {
 	.d_hash = generic_ci_d_hash,
 	.d_compare = generic_ci_d_compare,
+#ifdef CONFIG_FSCRYPT_SDP
+	.d_delete	= fscrypt_sdp_d_delete,
+#endif
 };
 #endif
 
 #ifdef CONFIG_FS_ENCRYPTION
 static const struct dentry_operations generic_encrypted_dentry_ops = {
 	.d_revalidate = fscrypt_d_revalidate,
+#ifdef CONFIG_FSCRYPT_SDP
+	.d_delete	= fscrypt_sdp_d_delete,
+#endif
 };
 #endif
 
@@ -1478,6 +1499,9 @@ static const struct dentry_operations generic_encrypted_ci_dentry_ops = {
 	.d_hash = generic_ci_d_hash,
 	.d_compare = generic_ci_d_compare,
 	.d_revalidate = fscrypt_d_revalidate,
+#ifdef CONFIG_FSCRYPT_SDP
+	.d_delete	= fscrypt_sdp_d_delete,
+#endif
 };
 #endif
 
@@ -1511,6 +1535,9 @@ void generic_set_encrypted_ci_d_ops(struct dentry *dentry)
 #ifdef CONFIG_UNICODE
 	bool needs_ci_ops = dentry->d_sb->s_encoding;
 #endif
+#ifdef CONFIG_FSCRYPT_SDP
+	struct inode *inode;
+#endif
 #if defined(CONFIG_FS_ENCRYPTION) && defined(CONFIG_UNICODE)
 	if (needs_encrypt_ops && needs_ci_ops) {
 		d_set_d_op(dentry, &generic_encrypted_ci_dentry_ops);
@@ -1526,6 +1553,13 @@ void generic_set_encrypted_ci_d_ops(struct dentry *dentry)
 #ifdef CONFIG_UNICODE
 	if (needs_ci_ops) {
 		d_set_d_op(dentry, &generic_ci_dentry_ops);
+		return;
+	}
+#endif
+#ifdef CONFIG_FSCRYPT_SDP
+	inode = d_inode(dentry);
+	if (inode && inode->i_crypt_info) {
+		d_set_d_op(dentry, &sdp_dentry_ops);
 		return;
 	}
 #endif
