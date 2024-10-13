@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: MIT
+config DRM_SGPU
+	tristate "Samsung GPU"
+	depends on DRM && MMU
+	select FW_LOADER
+        select DRM_KMS_HELPER
+	select DRM_SCHED
+        select DRM_TTM
+	select POWER_SUPPLY
+	select HWMON
+	select BACKLIGHT_CLASS_DEVICE
+	select INTERVAL_TREE
+	select CHASH
+	select TRACE_GPU_MEM
+	help
+	  Choose this option if you have a recent SGPU.
+
+	  If M is selected, the module will be called sgpu.
+
+config DRM_SGPU_BUILTIN_FIRMWARE
+	bool "Enable use of built-in firmware"
+	depends on DRM_SGPU
+	default y
+	help
+	  Selecting this option enables linking firmware binaries into the driver.
+
+config DRM_SGPU_EXYNOS
+	bool "Enable Exynos related code"
+	depends on DRM_SGPU
+	default n
+	help
+	  This option is for SGPU in Eynos.
+
+config DRM_AMDGPU_SI
+	bool "Enable amdgpu support for SI parts"
+	depends on DRM_SGPU
+	help
+	  Choose this option if you want to enable experimental support
+	  for SI asics.
+
+	  SI is already supported in radeon. Experimental support for SI
+	  in amdgpu will be disabled by default and is still provided by
+	  radeon. Use module options to override this:
+
+	  radeon.si_support=0 amdgpu.si_support=1
+
+config DRM_AMDGPU_CIK
+	bool "Enable amdgpu support for CIK parts"
+	depends on DRM_SGPU
+	help
+	  Choose this option if you want to enable support for CIK asics.
+
+	  CIK is already supported in radeon. Support for CIK in amdgpu
+	  will be disabled by default and is still provided by radeon.
+	  Use module options to override this:
+
+	  radeon.cik_support=0 amdgpu.cik_support=1
+
+config DRM_AMDGPU_USERPTR
+	bool "Always enable userptr write support"
+	depends on DRM_SGPU
+	depends on MMU
+	select HMM_MIRROR
+	select MMU_NOTIFIER
+	help
+	  This option selects CONFIG_HMM and CONFIG_HMM_MIRROR if it
+	  isn't already selected to enabled full userptr support.
+
+config DRM_AMDGPU_GART_DEBUGFS
+	bool "Allow GART access through debugfs"
+	depends on DRM_SGPU
+	depends on DEBUG_FS
+	default n
+	help
+	  Selecting this option creates a debugfs file to inspect the mapped
+	  pages. Uses more memory for housekeeping, enable only for debugging.
+
+config DRM_AMDGPU_DUMP
+	bool "Enable AMDGPU GPU dump upon GPU hang"
+	depends on DRM_SGPU
+	depends on DRM_DUMP
+	default y
+	help
+	  Selecting this option enables support for persisting AMDGPU's
+	  different blocks register status upon GPU hang.
+
+config DRM_AMDGPU_GMC_DUMP
+	bool "Persist GMC block's status"
+	depends on DRM_AMDGPU_DUMP
+	default y
+	help
+	  Selecting this option enables support for persisting
+	  AMDGPU's GMC block register status upon GPU hang.
+
+config DRM_AMDGPU_GFX_DUMP
+	bool "Persist GFX block's status"
+	depends on DRM_AMDGPU_DUMP
+	default y
+	help
+	  Selecting this option enables support for persisting
+	  AMDGPU's GFX block register status upon GPU hang.
+
+config DRM_AMDGPU_COMPUTE_DUMP
+	bool "Persist COMPUTE block's status"
+	depends on DRM_AMDGPU_DUMP
+	default y
+	help
+	  Selecting this option enables support for persisting
+	  AMDGPU's COMPUTE block register status upon GPU hang.
+
+config DRM_AMDGPU_SDMA_DUMP
+	bool "Persist SDMA block's status"
+	depends on DRM_AMDGPU_DUMP
+	default y
+	help
+	  Selecting this option enables support for persisting
+	  AMDGPU's SDMA block register status upon GPU hang.
+
+config DRM_SGPU_BPMD
+	bool "Enable BPMD (Binary PostMortem Dump)"
+	default n
+	help
+	  This option is for SGPU BPMD.
+
+config DRM_SGPU_BPMD_OUTPUT_DEFAULT
+	string "Default path to BMPD's output"
+	depends on DRM_SGPU_BPMD
+	default "/tmp"
+	help
+	  Serves as a default value for the `bmpdpath` module parameter
