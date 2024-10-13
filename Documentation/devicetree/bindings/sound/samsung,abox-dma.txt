@@ -1,0 +1,22 @@
+DMA of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-ddma", "samsung,abox-dual", "samsung,abox-udma-rd",
+  "samsung,abox-udma-wr", "samsung,abox-udma-wr-dual", "samsung,abox-udma-wr-debug".
+
+- reg : address of SFR.
+
+- reg-names : "sfr".
+
+- samsung,id : id of the DMA.
+
+- samsung,buffer_type : type of the DMA buffer. "dma", "ion", "ram".
+
+- #sound-dai-cells : 0
+
+- sound-name-prefix : prefix of the DMA. It should start with "ABOX"
+
+Optional properties: no optional property.
