@@ -1,0 +1,44 @@
+#
+# MUIC platform
+#
+
+comment "MUIC platform configs"
+
+config MUIC_PLATFORM
+	tristate "MUIC platform support"
+	depends on MUIC_NOTIFIER
+	default n
+	help
+	  A wrapper layer dedicated to lsi for using muic common layer.
+	  Used to fill the callback function of muic_pdata.
+	  It is used from s2mm006.
+
+config MUIC_SUPPORT_POWERMETER
+	bool "MUIC supports PM chip interface"
+	depends on USE_MUIC
+	default n
+	help
+	  If you say yes here you will get support for the Power Meter.
+
+config HV_MUIC_VOLTAGE_CTRL
+	bool "Using AFC Voltage control functionality"
+	default n
+	help
+	  If you say yes here you will get support for
+	  the AFC voltage control functionality.
+
+config MUIC_SUPPORT_PRSWAP
+	bool "MUIC supports power role swap"
+	depends on USE_MUIC
+	default n
+	help
+	  If you say yes here you will get support for the power role swap.
+
+config SIDO_OVP
+	bool "Using SIDO(Single Input Dual Output) dual ovp structure"
+	depends on USE_MUIC
+	default n
+	help
+	  If you say yes here, you will get support for SIDO structure.
+	  we use this feature to be distinguish MUIC operation
+	  for SISO/SIDO OVP circuit design.
