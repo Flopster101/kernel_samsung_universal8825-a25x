@@ -292,39 +292,45 @@ int dwc3_core_soft_reset(struct dwc3 *dwc)
 {
 	u32		reg;
 	int		retries = 1000;
+	int		i;
 
-	/*
-	 * We're resetting only the device side because, if we're in host mode,
-	 * XHCI driver will reset the host block. If dwc3 was configured for
-	 * host-only mode, then we can return early.
-	 */
-	if (dwc->current_dr_role == DWC3_GCTL_PRTCAP_HOST)
-		return 0;
+	for (i = 0; i < 3; i++) {
+		pr_info("%s +++\n", __func__);
+		/*
+		 * We're resetting only the device side because, if we're in host mode,
+		 * XHCI driver will reset the host block. If dwc3 was configured for
+		 * host-only mode, then we can return early.
+		 */
+		if (dwc->current_dr_role == DWC3_GCTL_PRTCAP_HOST)
+			return 0;
 
-	reg = dwc3_readl(dwc->regs, DWC3_DCTL);
-	reg |= DWC3_DCTL_CSFTRST;
-	reg &= ~DWC3_DCTL_RUN_STOP;
-	dwc3_gadget_dctl_write_safe(dwc, reg);
-
-	/*
-	 * For DWC_usb31 controller 1.90a and later, the DCTL.CSFRST bit
-	 * is cleared only after all the clocks are synchronized. This can
-	 * take a little more than 50ms. Set the polling rate at 20ms
-	 * for 10 times instead.
-	 */
-	if (DWC3_VER_IS_WITHIN(DWC31, 190A, ANY) || DWC3_IP_IS(DWC32))
-		retries = 10;
-
-	do {
 		reg = dwc3_readl(dwc->regs, DWC3_DCTL);
-		if (!(reg & DWC3_DCTL_CSFTRST))
-			goto done;
+		reg |= DWC3_DCTL_CSFTRST;
+		reg &= ~DWC3_DCTL_RUN_STOP;
+		dwc3_gadget_dctl_write_safe(dwc, reg);
 
+		/*
+		 * For DWC_usb31 controller 1.90a and later, the DCTL.CSFRST bit
+		 * is cleared only after all the clocks are synchronized. This can
+		 * take a little more than 50ms. Set the polling rate at 20ms
+		 * for 10 times instead.
+		 */
 		if (DWC3_VER_IS_WITHIN(DWC31, 190A, ANY) || DWC3_IP_IS(DWC32))
-			msleep(20);
-		else
-			udelay(1);
-	} while (--retries);
+			retries = 10;
+
+		do {
+			reg = dwc3_readl(dwc->regs, DWC3_DCTL);
+			if (!(reg & DWC3_DCTL_CSFTRST))
+				goto done;
+
+			if (DWC3_VER_IS_WITHIN(DWC31, 190A, ANY) || DWC3_IP_IS(DWC32))
+				msleep(20);
+			else
+				udelay(1);
+		} while (--retries);
+
+		pr_info("%s soft_reset retry %d\n", __func__, i + 1);
+	}
 
 	dev_warn(dwc->dev, "DWC3 controller soft reset failed.\n");
 	return -ETIMEDOUT;
@@ -337,6 +343,8 @@ done:
 	 */
 	if (DWC3_VER_IS_WITHIN(DWC31, ANY, 180A))
 		msleep(50);
+
+	pr_info("%s ---\n", __func__);
 
 	return 0;
 }
@@ -1535,6 +1543,8 @@ static int dwc3_probe(struct platform_device *pdev)
 
 	void __iomem		*regs;
 
+	pr_info("%s +++\n", __func__);
+
 	vdwc = devm_kzalloc(dev, sizeof(*vdwc), GFP_KERNEL);
 	if (!vdwc)
 		return -ENOMEM;
@@ -1647,6 +1657,7 @@ static int dwc3_probe(struct platform_device *pdev)
 
 	pm_runtime_put(dev);
 
+	pr_info("%s ---\n", __func__);
 	dma_set_max_seg_size(dev, UINT_MAX);
 
 	return 0;
@@ -1756,7 +1767,9 @@ static int dwc3_suspend_common(struct dwc3 *dwc, pm_message_t msg)
 	case DWC3_GCTL_PRTCAP_DEVICE:
 		if (pm_runtime_suspended(dwc->dev))
 			break;
+		spin_lock_irqsave(&dwc->lock, flags);
 		dwc3_gadget_suspend(dwc);
+		spin_unlock_irqrestore(&dwc->lock, flags);
 		synchronize_irq(dwc->irq_gadget);
 		dwc3_core_exit(dwc);
 		break;
@@ -1817,7 +1830,9 @@ static int dwc3_resume_common(struct dwc3 *dwc, pm_message_t msg)
 			return ret;
 
 		dwc3_set_prtcap(dwc, DWC3_GCTL_PRTCAP_DEVICE);
+		spin_lock_irqsave(&dwc->lock, flags);
 		dwc3_gadget_resume(dwc);
+		spin_unlock_irqrestore(&dwc->lock, flags);
 		break;
 	case DWC3_GCTL_PRTCAP_HOST:
 		if (!PMSG_IS_AUTO(msg)) {
@@ -1890,6 +1905,8 @@ static int dwc3_runtime_suspend(struct device *dev)
 	struct dwc3     *dwc = dev_get_drvdata(dev);
 	int		ret;
 
+	pr_info("%s +++\n", __func__);
+
 	if (dwc3_runtime_checks(dwc))
 		return -EBUSY;
 
@@ -1898,6 +1915,7 @@ static int dwc3_runtime_suspend(struct device *dev)
 		return ret;
 
 	device_init_wakeup(dev, true);
+	pr_info("%s ---\n", __func__);
 
 	return 0;
 }
@@ -1907,6 +1925,7 @@ static int dwc3_runtime_resume(struct device *dev)
 	struct dwc3     *dwc = dev_get_drvdata(dev);
 	int		ret;
 
+	pr_info("%s +++\n", __func__);
 	device_init_wakeup(dev, false);
 
 	ret = dwc3_resume_common(dwc, PMSG_AUTO_RESUME);
@@ -1925,6 +1944,7 @@ static int dwc3_runtime_resume(struct device *dev)
 
 	pm_runtime_mark_last_busy(dev);
 
+	pr_info("%s ---\n", __func__);
 	return 0;
 }
 
@@ -1932,6 +1952,7 @@ static int dwc3_runtime_idle(struct device *dev)
 {
 	struct dwc3     *dwc = dev_get_drvdata(dev);
 
+	pr_info("%s +++\n", __func__);
 	switch (dwc->current_dr_role) {
 	case DWC3_GCTL_PRTCAP_DEVICE:
 		if (dwc3_runtime_checks(dwc))
@@ -1946,6 +1967,7 @@ static int dwc3_runtime_idle(struct device *dev)
 	pm_runtime_mark_last_busy(dev);
 	pm_runtime_autosuspend(dev);
 
+	pr_info("%s ---\n", __func__);
 	return 0;
 }
 #endif /* CONFIG_PM */
@@ -1956,12 +1978,14 @@ static int dwc3_suspend(struct device *dev)
 	struct dwc3	*dwc = dev_get_drvdata(dev);
 	int		ret;
 
+	pr_info("%s +++\n", __func__);
 	ret = dwc3_suspend_common(dwc, PMSG_SUSPEND);
 	if (ret)
 		return ret;
 
 	pinctrl_pm_select_sleep_state(dev);
 
+	pr_info("%s ---\n", __func__);
 	return 0;
 }
 
@@ -1970,6 +1994,7 @@ static int dwc3_resume(struct device *dev)
 	struct dwc3	*dwc = dev_get_drvdata(dev);
 	int		ret;
 
+	pr_info("%s +++\n", __func__);
 	pinctrl_pm_select_default_state(dev);
 
 	ret = dwc3_resume_common(dwc, PMSG_RESUME);
@@ -1980,6 +2005,7 @@ static int dwc3_resume(struct device *dev)
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 
+	pr_info("%s ---\n", __func__);
 	return 0;
 }
 
