@@ -1,0 +1,13 @@
+VSS of ABOX IP
+
+This device is an audio subsytem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-vss"
+
+- samsung,magic-offset : magic offset address
+
+- reg : <0x0 0x0 0x0>.
+
+Optional properties: no optional property.

@@ -1,0 +1,59 @@
+ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox".
+
+- reg : address and size of the io resources
+
+- reg-names : "sfr", "sysreg", "sram", "timer", "mailbox_apm"
+
+- #address-cells : <2>
+
+- #size-cells : <1>
+
+- ranges
+
+- iommus : phandle to iommu device
+
+- memory-region : phandle to reserved memory 
+
+- samsung,iommu-group : phandle to iommu group
+
+- power-domains : phandle to power domain
+
+- clocks : phandle to clocks
+
+- clock-names : "pll", "pll1", "audif", "bus", "cnt", "sclk", "cp_pcmc", "aud_pcmc"
+
+- #sound-dai-cells : <1>
+
+- sound-name-prefix : "ABOX"
+
+- samsung,ipc-tx-area : offset and size of IPC TX area
+
+- samsung,ipc-rx-area : offset and size of IPC RX area
+
+- samsung,shm-area : offset and size of shared area
+
+- samsung,handshake-area : offset and size of handshake area
+
+- samsung,abox-gic : phandle to abox_gic device
+
+- samsung,uaif-max-div : maximum divider value of uaif clock
+
+- samsung,atune-count : number of ATUNE in SPUS and SPUM each
+
+- samsung,pm-qos-aud : DVFS level of AUD
+
+- samsung,pm-qos-stable-min : minimum level for stable operation
+
+- samsung,sys_acp_con : ACP controlling SFR address and value
+
+- samsung,abox-llc-way : number of LLC way in each scenario
+
+Optional properties:
+
+- samsung,quirks : "try to asrc off", "silent reset"

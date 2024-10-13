@@ -1,0 +1,11 @@
+Sample client driver of ABOX IP
+
+This is sample driver using IPC of ABOX driver.
+
+Required properties:
+
+- compatible : "samsung,abox-adaptation".
+
+- abox : phandle to abox device.
+
+Optional properties: no optional property.
