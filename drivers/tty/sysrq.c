@@ -309,9 +309,13 @@ static const struct sysrq_key_op sysrq_showstate_op = {
 	.enable_mask	= SYSRQ_ENABLE_DUMP,
 };
 
+extern void mm_debug_dump_tasks(void);
+
 static void sysrq_handle_showstate_blocked(int key)
 {
 	show_state_filter(TASK_UNINTERRUPTIBLE);
+	show_mem(0, NULL);
+	mm_debug_dump_tasks();
 }
 static const struct sysrq_key_op sysrq_showstate_blocked_op = {
 	.handler	= sysrq_handle_showstate_blocked,
@@ -339,7 +343,10 @@ static const struct sysrq_key_op sysrq_ftrace_dump_op = {
 
 static void sysrq_handle_showmem(int key)
 {
+	static DEFINE_RATELIMIT_STATE(showmem_rs, DEFAULT_RATELIMIT_INTERVAL, 1);
 	show_mem(0, NULL);
+	if (__ratelimit(&showmem_rs))
+		mm_debug_dump_tasks();
 }
 static const struct sysrq_key_op sysrq_showmem_op = {
 	.handler	= sysrq_handle_showmem,
