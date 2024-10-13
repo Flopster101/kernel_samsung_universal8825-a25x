@@ -74,6 +74,11 @@ config ANDROID_VENDOR_HOOKS
 	  Allow vendor modules to attach to tracepoint "hooks" defined via
 	  DECLARE_HOOK or DECLARE_RESTRICTED_HOOK.
 
+config SEC_MPAM
+	tristate "SEC MPAM vendor-hook-based prototype"
+	depends on ANDROID_VENDOR_HOOKS
+	default n
+
 config ANDROID_KABI_RESERVE
 	bool "Android KABI reserve padding"
 	default y
