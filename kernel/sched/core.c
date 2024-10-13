@@ -20,6 +20,8 @@
 #include <asm/switch_to.h>
 #include <asm/tlb.h>
 
+#include <linux/sec_debug.h>
+
 #include "../workqueue_internal.h"
 #include "../../io_uring/io-wq.h"
 #include "../smpboot.h"
@@ -3004,6 +3006,8 @@ static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
  * accesses to the task state; see try_to_wake_up() and set_current_state().
  */
 
+extern bool freezing_32bit_capable_cpus;
+
 /**
  * try_to_wake_up - wake up a thread
  * @p: the thread to be awakened
@@ -3093,6 +3097,10 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 	    !cpumask_intersects(cpu_active_mask, task_cpu_possible_mask(p)))
 		goto unlock;
 #endif
+
+	if (unlikely(freezing_32bit_capable_cpus) &&
+	    task_cpu_possible_mask(p) != cpu_possible_mask)
+		goto unlock;
 
 	trace_sched_waking(p);
 
@@ -4518,7 +4526,7 @@ static noinline void __schedule_bug(struct task_struct *prev)
 	if (oops_in_progress)
 		return;
 
-	printk(KERN_ERR "BUG: scheduling while atomic: %s/%d/0x%08x\n",
+	pr_auto(ASL6, "BUG: scheduling while atomic: %s/%d/0x%08x\n",
 		prev->comm, prev->pid, preempt_count());
 
 	debug_show_held_locks(prev);
@@ -6739,6 +6747,37 @@ void sched_show_task(struct task_struct *p)
 }
 EXPORT_SYMBOL_GPL(sched_show_task);
 
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+void sched_show_task_auto_comment(struct task_struct *p)
+{
+	unsigned long free = 0;
+	int ppid;
+
+	if (!try_get_task_stack(p))
+		return;
+
+	pr_auto(ASL1, "task:%-15.15s state:%c", p->comm, task_state_to_char(p));
+
+	if (p->state == TASK_RUNNING)
+		pr_cont("  running task    ");
+#ifdef CONFIG_DEBUG_STACK_USAGE
+	free = stack_not_used(p);
+#endif
+	ppid = 0;
+	rcu_read_lock();
+	if (pid_alive(p))
+		ppid = task_pid_nr(rcu_dereference(p->real_parent));
+	rcu_read_unlock();
+	pr_cont(" stack:%5lu pid:%5d ppid:%6d flags:0x%08lx\n",
+		free, task_pid_nr(p), ppid,
+		(unsigned long)task_thread_info(p)->flags);
+
+	print_worker_info(KERN_INFO, p);
+	show_stack_auto_comment(p, NULL);
+	put_task_stack(p);
+}
+#endif /* CONFIG_SEC_DEBUG_AUTO_COMMENT */
+
 static inline bool
 state_filter_match(unsigned long state_filter, struct task_struct *p)
 {
@@ -7679,7 +7718,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
 	/* Save this before calling printk(), since that will clobber it: */
 	preempt_disable_ip = get_preempt_disable_ip(current);
 
-	printk(KERN_ERR
+	pr_auto(ASL6,
 		"BUG: sleeping function called from invalid context at %s:%d\n",
 			file, line);
 	printk(KERN_ERR

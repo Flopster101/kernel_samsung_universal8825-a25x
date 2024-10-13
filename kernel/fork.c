@@ -111,6 +111,7 @@
 
 #undef CREATE_TRACE_POINTS
 #include <trace/hooks/sched.h>
+
 /*
  * Minimum number of threads to boot the kernel
  */
