@@ -33,6 +33,11 @@ config CPU_IDLE_GOV_TEO
 	  Some workloads benefit from using it and it generally should be safe
 	  to use.  Say Y here if you are not happy with the alternatives.
 
+config CPU_IDLE_GOV_HALO
+	bool "History AnaLysis Oriented (HALO) idle governor (for tickless systems)"
+	help
+	  Exynos Custom idle governor
+
 config CPU_IDLE_GOV_HALTPOLL
 	bool "Haltpoll governor (for virtualized systems)"
 	depends on KVM_GUEST
