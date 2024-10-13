@@ -25,6 +25,7 @@
 #include <linux/perf_event.h>
 #include <linux/preempt.h>
 #include <linux/hugetlb.h>
+#include <linux/sec_debug.h>
 
 #include <asm/acpi.h>
 #include <asm/bug.h>
@@ -290,7 +291,7 @@ static void die_kernel_fault(const char *msg, unsigned long addr,
 {
 	bust_spinlocks(1);
 
-	pr_alert("Unable to handle kernel %s at virtual address %016lx\n", msg,
+	pr_auto(ASL1, "Unable to handle kernel %s at virtual address %016lx\n", msg,
 		 addr);
 
 	trace_android_rvh_die_kernel_fault(regs, esr, addr, msg);
@@ -724,6 +725,20 @@ static int do_bad(unsigned long far, unsigned int esr, struct pt_regs *regs)
 	return ret;
 }
 
+#define __is_in_kernel_image(addr)					\
+	((unsigned long)(addr) >= (unsigned long)KERNEL_START &&	\
+	 (unsigned long)(addr) <= (unsigned long)KERNEL_END)
+
+static phys_addr_t show_virt_to_phys(unsigned long addr)
+{
+	if (!is_vmalloc_or_module_addr((void *)addr) ||
+			__is_in_kernel_image(addr))
+		return __pa(addr);
+	else
+		return page_to_phys(vmalloc_to_page((void *)addr)) +
+		       offset_in_page(addr);
+}
+
 static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
 {
 	const struct fault_info *inf;
@@ -749,6 +764,9 @@ static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
 		 */
 		siaddr  = untagged_addr(far);
 	}
+	if (IS_ENABLED(CONFIG_SEC_DEBUG_FAULT_MSG_ADV))
+		pr_auto(ASL1, "%s (0x%08x) at 0x%016lx[0x%09llx]\n",
+			      inf->name, esr, siaddr, show_virt_to_phys(siaddr));
 	trace_android_rvh_do_sea(regs, esr, siaddr, inf->name);
 	arm64_notify_die(inf->name, regs, inf->sig, inf->code, siaddr, esr);
 
@@ -844,7 +862,11 @@ void do_mem_abort(unsigned long far, unsigned int esr, struct pt_regs *regs)
 		return;
 
 	if (!user_mode(regs)) {
-		pr_alert("Unhandled fault at 0x%016lx\n", addr);
+		if (IS_ENABLED(CONFIG_SEC_DEBUG_FAULT_MSG_ADV))
+			pr_auto(ASL1, "Unhandled fault: %s (0x%08x) at 0x%016lx\n",
+						inf->name, esr, addr);
+		else
+			pr_alert("Unhandled fault at 0x%016lx\n", addr);
 		trace_android_rvh_do_mem_abort(regs, esr, addr, inf->name);
 		mem_abort_decode(esr);
 		show_pte(addr);
@@ -869,6 +891,11 @@ NOKPROBE_SYMBOL(do_el0_irq_bp_hardening);
 void do_sp_pc_abort(unsigned long addr, unsigned int esr, struct pt_regs *regs)
 {
 	trace_android_rvh_do_sp_pc_abort(regs, esr, addr, user_mode(regs));
+
+	if (IS_ENABLED(CONFIG_SEC_DEBUG_FAULT_MSG_ADV) && !user_mode(regs))
+		pr_auto(ASL1, "%s exception: pc=0x%016llx sp=0x%016llx\n",
+			esr_get_class_string(esr),
+			regs->pc, regs->sp);
 
 	arm64_notify_die("SP/PC alignment exception", regs, SIGBUS, BUS_ADRALN,
 			 addr, esr);

@@ -614,6 +614,15 @@ config ARM64_ERRATUM_1530923
 
 config ARM64_WORKAROUND_REPEAT_TLBI
 	bool
+	default y
+	help
+	  This option adds a workaround for an ARM Klein erratum.
+
+config ARM64_WORKAROUND_DSB_AFTER_TLBI
+	bool "Klein: Under rare conditions, a longer sequence of TLBI instructions might cause a deadlock"
+	default y
+	help
+	  This option adds a workaround for an ARM Klein erratum.
 
 config ARM64_ERRATUM_1286807
 	bool "Cortex-A76: Modification of the translation table for a virtual address might lead to read-after-read ordering violation"
@@ -1095,6 +1104,11 @@ config NR_CPUS
 	range 2 4096
 	default "256"
 
+config VENDOR_NR_CPUS
+	int "Maximum number of CPUs (2-4096) governed by vendor"
+	range 2 4096
+	default "8"
+
 config HOTPLUG_CPU
 	bool "Support for hot-pluggable CPUs"
 	select GENERIC_IRQ_MIGRATION
@@ -1287,7 +1301,7 @@ config FORCE_MAX_ZONEORDER
 
 config UNMAP_KERNEL_AT_EL0
 	bool "Unmap kernel when running in userspace (aka \"KAISER\")" if EXPERT
-	default y
+	default n
 	help
 	  Speculation attacks against some high-performance processors can
 	  be used to bypass MMU permission checks and leak kernel data to
@@ -1607,7 +1621,7 @@ config ARM64_RAS_EXTN
 
 config ARM64_CNP
 	bool "Enable support for Common Not Private (CNP) translations"
-	default y
+	default n
 	depends on ARM64_PAN || !ARM64_SW_TTBR0_PAN
 	help
 	  Common Not Private (CNP) allows translation table entries to
