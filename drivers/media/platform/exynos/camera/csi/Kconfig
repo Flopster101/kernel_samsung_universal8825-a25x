@@ -1,0 +1,23 @@
+config CSIS_V1_2
+	bool "Use CSI H/W v1.2"
+	depends on PABLO_V8_20_0
+	help
+	  csi version 1.2
+
+config CSIS_V5_3
+	bool "Use CSI H/W v5.3"
+	depends on PABLO_V8_1_0 || PABLO_V8_10_0
+	help
+	  csi version 5.3
+
+config CSIS_V5_4
+	bool "Use CSI H/W v5.4"
+	depends on PABLO_V9_1_0 || PABLO_V9_10_0 || PABLO_V10_20_0
+	help
+	  csi version 5.4
+
+config CSIS_V8_0
+	bool "Use CSI H/W v8.0"
+	depends on PABLO_V10_0_0 || PABLO_V10_1_0
+	help
+	  csi version 8.0

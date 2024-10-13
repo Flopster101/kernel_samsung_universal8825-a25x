@@ -1,0 +1,294 @@
+/*
+ * SAMSUNG EXYNOSxxxx board camera device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/camera/exynos_is_dt.h>
+
+/ {
+	fragment@camera {
+		target-path = "/";
+		__overlay__ {
+			is_sensor_imx374: is_sensor_imx374@10 {
+				compatible = "samsung,sensor-module";
+
+				/* common */
+				sensor_id = <SENSOR_NAME_IMX374>;
+				active_width = <3968>;
+				active_height = <2736>;
+				margin_left = <0>;
+				margin_right = <0>;
+				margin_top = <0>;
+				margin_bottom = <0>;
+				max_framerate = <240>;
+				bitwidth = <10>;
+				use_retention_mode = <SENSOR_RETENTION_UNSUPPORTED>;
+				sensor_maker = "SONY";
+				sensor_name = "IMX374";
+				setfile_name = "setfile_imx374.bin";
+
+				status = "okay";
+
+				/* board */
+				pinctrl-names = "pin0", "pin1", "pin2", "release";
+				pinctrl-0 = <>;
+				pinctrl-1 = <&sensor_mclk0_out>;
+				pinctrl-2 = <&sensor_mclk0_fn>;
+				pinctrl-3 = <>;
+
+				position = <1>;	/* Rear:0. Front:1. Rear_sub:2. Secure:3. */
+				id = <1>; /* is_sensor id */
+				mclk_ch = <0>;
+				mclk_freq = <19200>;
+				sensor_i2c_ch = <5>; /* SENSOR_CONTROL_I2C5 */
+
+				/* vendor */
+				rom_type = <2>; /* ROM_TYPE_EEPROM */
+				rom_id = <1>;
+				rom_cal_index = <0>;
+
+				/* peri*/
+				af {
+					product_name = <18>; /* ACTUATOR_NAME_AK737X */
+					i2c_ch = <6>; /* SENSOR_CONTROL_I2C6 */
+				};
+
+				flash {
+					product_name = <100>; /* NOTHING */
+				};
+
+				ois {
+					product_name = <100>; /* NOTHING */
+				};
+
+				vc_extra {
+					/* ex) statX = <stat_type, sensor_mode, max_width, max_height, max_element> */
+					stat0 = </* not available */>;									/* VC_BUF_DATA_TYPE_SENSOR_STAT1 */
+					stat1 = </*VC_STAT_TYPE_PDP_4_1_PDAF_STAT0*/ 1200 /*VC_SENSOR_MODE_2PD_MODE3*/ 102 3648 684 2>;	/* VC_BUF_DATA_TYPE_GENERAL_STAT1 */
+					stat2 = </* not available */>;									/* VC_BUF_DATA_TYPE_SENSOR_STAT2 */
+					stat3 = </*VC_STAT_TYPE_PDP_4_1_PDAF_STAT1*/ 1201 /*VC_SENSOR_MODE_2PD_MODE3*/ 102 3648 684 2>;	/* VC_BUF_DATA_TYPE_GENERAL_STAT2 */
+					stat_vc = <2>; /* STAT out VC after CSIS link */
+				};
+
+				/* sensor modes */
+				modes {
+					/* IMX374 sensor setting version - IMX374P_SAM-DPHY-19.2M_RegisterSetting_ver3.00-2.00_b_s22_211101_SEC.xlsx */
+					/* 0: 05A_HDR3_D1722_3648x2736_30_19 HDR_MODE3_Full_10M */
+					/* 1: 05A_HDR3_D1722_3648x2736_30_19 HDR_MODE3_Full_10M FD Mode */
+					/* 2: 09A_HDR3_D1722_3968x2232_30_19 HDR_MODE3_4K2K */
+					/* 3: 46H_HDR3_D2394_3968x2232_60_19 HDR_MODE3_4K2K_60fps */
+					/* 4: 43A_HDR3_D1722_3216x2208_30_19 HDR_MODE3_3216x2208_DigCrop */
+					/* 5: 24A_HDR3_D1722_2944x2208_30_19 HDR_MODE3_2944x2208_DigCrop */
+					/* 6: 25A_HDR3_D1722_3216x1808_30_19 HDR_MODE3_3216x1808_DigCrop */
+					/* 7: 13A_NML3_D1722_1988x1120_30_19 NML_MODE3_2x2 bin (16:9)_Test */
+					/* 8: 40A_NML2_D1722_1988x1120_120_19 NML_MODE2_2x2 bin (16:9) */
+					/* 9: 11A_NML3_D1722_1824x1368_30_19 NML_MODE3_2x2 bin (4:3) */
+					/* 10: 47A_NML3_D1722_1472x1104_30_19 NML_MODE3_2x2 bin (4:3) */
+					/* 11: 04A_NML2_D1722_912x684_120_19 NML_MODE2_4x4 bin (4:3)_FastAE */
+
+						/* common = <width, height, fps, settle, mode, lane, speed, interleave, lrte, pd_mode> */
+						/* vcX = <map, hwformat, width, height, hwformat, type, width, height> */
+					mode0 {
+						common = <3648 2736 30 0 0 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3648 2736	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3648 2736>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3648 684	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 3648 684>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode1 {
+						common = <3648 2736 30 0 0 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_NONE EX_PDSTAT_OFF>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3648 2736	/* out */ HW_FORMAT_RAW10 VC_NOTHING 1824 1368>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3648 684	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3648 684>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode2 {
+						common = <3968 2232 30 0 1 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3968 2232	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3968 2232>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3968 558	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 3968 558>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode3 {
+						common = <3968 2232 60 0 2 CSI_DATA_LANES_4 2393 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3968 2232	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3968 2232>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3968 558	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 3968 558>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode4 {
+						common = <3216 2208 30 0 3 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3216 2208	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3216 2208>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3216 552	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 3216 552>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode5 {
+						common = <2944 2208 30 0 4 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 2944 2208	/* out */ HW_FORMAT_RAW10 VC_NOTHING 2944 2208>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 2944 552	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 2944 552>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode6 {
+						common = <3216 1808 30 0 5 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3216 1808	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3216 1808>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 3216 452	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 3216 452>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode7 {
+						common = <1988 1120 30 0 6 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 1988 1120	/* out */ HW_FORMAT_RAW10 VC_NOTHING 1988 1120>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 1988 280	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 1988 280>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; binnig = <1995>; };
+					};
+					mode8 {
+						common = <1988 1120 120 0 7 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_NONE EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 1988 1120	/* out */ HW_FORMAT_RAW10 VC_NOTHING 1988 1120>;
+						vc1 = </* in */ 1 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; binnig = <1995>; };
+					};
+					mode9 {
+						common = <1824 1368 30 0 8 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 1824 1368	/* out */ HW_FORMAT_RAW10 VC_NOTHING 1824 1368>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 1824 342	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 1824 342>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; binnig = <1995>; };
+					};
+					mode10 {
+						common = <1472 1104 30 0 9 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_MOD3 EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 1472 1104	/* out */ HW_FORMAT_RAW10 VC_NOTHING 1472 1104>;
+						vc1 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 1 HW_FORMAT_RAW10_POTF 1472 276	/* out */ HW_FORMAT_RAW10_POTF VC_TAILPDAF 1472 276>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; };
+					};
+					mode11 {
+						common = <912 684 120 0 10 CSI_DATA_LANES_4 1721 CSI_MODE_VC_ONLY LRTE_DISABLE PD_NONE EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 912 684	/* out */ HW_FORMAT_RAW10 VC_NOTHING 912 684>;
+						vc1 = </* in */ 1 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 2 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc3 = </* in */ 3 HW_FORMAT_UNKNOWN 0 0	/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						option { votf = <0>; binnig = <1995>; special_mode = <IS_SPECIAL_MODE_FASTAE>; };
+					};
+				};
+
+				power_seq {
+					use = <1>;
+					gpio_mclk = <&gpg1 0 0x1>;
+					scenario_normal_on {
+						sensor_scenario = <SENSOR_SCENARIO_NORMAL>;
+						gpio_scenario = <GPIO_SCENARIO_ON>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						5 { pname = "S2MPB02_BUCK2"; pin = <PIN_REGULATOR 1 0>; share = <SRT_ACQUIRE SHARED_PIN0 1>; };
+						10 { pname = "VDDAF_2.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						20 { pname = "VDDA_2.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						30 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						40 { pname = "VDDD_1.05V_VT"; pin = <PIN_REGULATOR 1 1>; };
+						50 { pname = "on_i2c"; pin = <PIN_I2C 1 0>; };
+						60 { pname = "rst_high"; pin = <PIN_OUTPUT 1 0>; gpio = <&gpg0 1 0x1>; };
+						70 { pname = "pin"; pin = <PIN_FUNCTION 2 0>; };
+						80 { pname = "MCLK"; pin = <PIN_MCLK 1 11500>; };
+					};
+
+					scenario_normal_off {
+						sensor_scenario = <SENSOR_SCENARIO_NORMAL>;
+						gpio_scenario = <GPIO_SCENARIO_OFF>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						10 { pname = "MCLK"; pin = <PIN_MCLK 0 1>; };
+						20 { pname = "pin"; pin = <PIN_FUNCTION 0 0>; };
+						30 { pname = "pin"; pin = <PIN_FUNCTION 1 0>; };
+						40 { pname = "pin"; pin = <PIN_FUNCTION 0 0>; };
+						50 { pname = "rst_low"; pin = <PIN_OUTPUT 0 0>; gpio = <&gpg0 1 0x1>; };
+						60 { pname = "off_i2c"; pin = <PIN_I2C 0 0>; };
+						70 { pname = "VDDAF_2.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						80 { pname = "VDDD_1.05V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						90 { pname = "VDDA_2.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						100 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						140 { pname = "S2MPB02_BUCK2"; pin = <PIN_REGULATOR 0 0>; share = <SRT_RELEASE SHARED_PIN0 0>; };
+					};
+
+					scenario_vision_on {
+						sensor_scenario = <SENSOR_SCENARIO_VISION>;
+						gpio_scenario = <GPIO_SCENARIO_ON>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						5 { pname = "S2MPB02_BUCK2"; pin = <PIN_REGULATOR 1 0>; share = <SRT_ACQUIRE SHARED_PIN0 1>; };
+						10 { pname = "VDDAF_2.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						20 { pname = "VDDA_2.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						30 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 1 0>; };
+						40 { pname = "VDDD_1.05V_VT"; pin = <PIN_REGULATOR 1 1>; };
+						50 { pname = "on_i2c"; pin = <PIN_I2C 1 0>; };
+						60 { pname = "rst_high"; pin = <PIN_OUTPUT 1 0>; gpio = <&gpg0 1 0x1>; };
+						70 { pname = "pin"; pin = <PIN_FUNCTION 2 0>; };
+						80 { pname = "MCLK"; pin = <PIN_MCLK 1 11500>; };
+					};
+
+					scenario_vision_off {
+						sensor_scenario = <SENSOR_SCENARIO_VISION>;
+						gpio_scenario = <GPIO_SCENARIO_OFF>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						10 { pname = "MCLK"; pin = <PIN_MCLK 0 1>; };
+						20 { pname = "pin"; pin = <PIN_FUNCTION 0 0>; };
+						30 { pname = "pin"; pin = <PIN_FUNCTION 1 0>; };
+						40 { pname = "pin"; pin = <PIN_FUNCTION 0 0>; };
+						50 { pname = "rst_low"; pin = <PIN_OUTPUT 0 0>; gpio = <&gpg0 1 0x1>; };
+						60 { pname = "off_i2c"; pin = <PIN_I2C 0 0>; };
+						70 { pname = "VDDAF_2.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						80 { pname = "VDDD_1.05V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						90 { pname = "VDDA_2.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						100 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+						140 { pname = "S2MPB02_BUCK2"; pin = <PIN_REGULATOR 0 0>; share = <SRT_RELEASE SHARED_PIN0 0>; };
+					};
+
+					scenario_read_rom_on {
+						sensor_scenario = <SENSOR_SCENARIO_READ_ROM>;
+						gpio_scenario = <GPIO_SCENARIO_ON>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						5 { pname = "delay"; pin = <PIN_NONE 0 20000>; };
+						10 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 1 5000>; };
+						20 { pname = "on_i2c"; pin = <PIN_I2C 1 10>; };
+					};
+
+					scenario_read_rom_off {
+						sensor_scenario = <SENSOR_SCENARIO_READ_ROM>;
+						gpio_scenario = <GPIO_SCENARIO_OFF>;
+
+						/* A start node number should be over the 10 for reserved number 0~9. */
+						/* pname = "name"; pin = <act value dealy voltage>; gpio = <gpx# # 0x1>; */
+						10 { pname = "off_i2c"; pin = <PIN_I2C 0 0>; };
+						20 { pname = "VDDIO_1.8V_VT"; pin = <PIN_REGULATOR 0 0>; };
+					};
+				};
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
