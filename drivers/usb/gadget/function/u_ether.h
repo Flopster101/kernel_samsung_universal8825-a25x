@@ -16,7 +16,7 @@
 #include <linux/usb/cdc.h>
 #include <linux/netdevice.h>
 
-#define QMULT_DEFAULT 5
+#define QMULT_DEFAULT 10
 
 /*
  * dev_addr: initial value
@@ -69,6 +69,9 @@ struct gether {
 	bool				is_fixed;
 	u32				fixed_out_len;
 	u32				fixed_in_len;
+	u32				ul_max_pkts_per_xfer;
+	u32				dl_max_pkts_per_xfer;
+	bool				multi_pkt_xfer;
 	bool				supports_multi_frame;
 	struct sk_buff			*(*wrap)(struct gether *port,
 						struct sk_buff *skb);
