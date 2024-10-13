@@ -297,9 +297,10 @@ static size_t cfg80211_gen_new_ie(const u8 *ie, size_t ielen,
 	 */
 	tmp_old = cfg80211_find_ie(WLAN_EID_SSID, ie, ielen);
 	tmp_old = (tmp_old) ? tmp_old + tmp_old[1] + 2 : ie;
-
+	
 	while (tmp_old + 2 - ie <= ielen &&
-	       tmp_old + tmp_old[1] + 2 - ie <= ielen) {
+		   tmp_old + tmp_old[1] + 2 - ie <= ielen) {
+
 		if (tmp_old[0] == 0) {
 			tmp_old++;
 			continue;
@@ -1620,6 +1621,7 @@ static void cfg80211_update_hidden_bsses(struct cfg80211_internal_bss *known,
 	}
 }
 
+
 static bool
 cfg80211_update_known_bss(struct cfg80211_registered_device *rdev,
 			  struct cfg80211_internal_bss *known,
@@ -1669,10 +1671,8 @@ cfg80211_update_known_bss(struct cfg80211_registered_device *rdev,
 		/* Override IEs if they were from a beacon before */
 		if (old == rcu_access_pointer(known->pub.ies))
 			rcu_assign_pointer(known->pub.ies, new->pub.beacon_ies);
-
-		cfg80211_update_hidden_bsses(known,
-					     rcu_access_pointer(new->pub.beacon_ies),
-					     old);
+		
+		cfg80211_update_hidden_bsses(known, new->pub.beacon_ies, old);
 
 		if (old)
 			kfree_rcu((struct cfg80211_bss_ies *)old, rcu_head);
