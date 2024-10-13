@@ -63,6 +63,10 @@
 #include "braille.h"
 #include "internal.h"
 
+#if IS_ENABLED(CONFIG_SEC_DEBUG) && IS_ENABLED(CONFIG_PRINTK_PROCESS)
+#undef CONFIG_PRINTK_CALLER
+#endif
+
 int console_printk[4] = {
 	CONSOLE_LOGLEVEL_DEFAULT,	/* console_loglevel */
 	MESSAGE_LOGLEVEL_DEFAULT,	/* default_message_loglevel */
@@ -410,7 +414,11 @@ static unsigned long console_dropped;
 /* the next printk record to read after the last 'clear' command */
 static u64 clear_seq;
 
-#ifdef CONFIG_PRINTK_CALLER
+#if defined(CONFIG_PRINTK_CALLER) && defined(CONFIG_PRINTK_PROCESS)
+#define PREFIX_MAX		72
+#elif defined(CONFIG_PRINTK_PROCESS)
+#define PREFIX_MAX		58
+#elif defined(CONFIG_PRINTK_CALLER)
 #define PREFIX_MAX		48
 #else
 #define PREFIX_MAX		32
@@ -445,6 +453,14 @@ static struct printk_ringbuffer printk_rb_dynamic;
 
 static struct printk_ringbuffer *prb = &printk_rb_static;
 
+struct {
+	struct printk_ringbuffer **pprb;
+	char name[];
+} __prb_name = {
+	.pprb = &prb,
+	.name = "!PRINTK_RINGBUFFER!",
+};
+
 /*
  * We cannot access per-CPU data (e.g. per-CPU flush irq_work) before
  * per_cpu_areas are initialised. This variable is set to true when
@@ -470,6 +486,19 @@ u32 log_buf_len_get(void)
 	return log_buf_len;
 }
 EXPORT_SYMBOL_GPL(log_buf_len_get);
+
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+static char hook_text[LOG_LINE_MAX + PREFIX_MAX];
+static void (*func_hook_auto_comm)(int type, const char *buf, size_t size);
+
+static size_t record_print_text(struct printk_record *r, bool syslog,
+				bool time);
+
+void register_set_auto_comm_buf(void (*func)(int type, const char *buf, size_t size))
+{
+	func_hook_auto_comm = func;
+}
+#endif
 
 /*
  * Define how much of the log buffer we could take at maximum. The value
@@ -507,6 +536,16 @@ static int log_store(u32 caller_id, int facility, int level,
 	struct prb_reserved_entry e;
 	struct printk_record r;
 	u16 trunc_msg_len = 0;
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+	bool is_auto_comm = false;
+	int type_auto_comm;
+
+	if (level / 10 == 9) {
+		is_auto_comm = true;
+		type_auto_comm = level - LOGLEVEL_PR_AUTO_BASE;
+		level = 0;
+	}
+#endif
 
 	prb_rec_init_wr(&r, text_len);
 
@@ -532,6 +571,13 @@ static int log_store(u32 caller_id, int facility, int level,
 	else
 		r.info->ts_nsec = local_clock();
 	r.info->caller_id = caller_id;
+#ifdef CONFIG_PRINTK_PROCESS
+	strncpy(r.info->process, current->comm, sizeof(r.info->process) - 1);
+	r.info->process[sizeof(r.info->process) - 1] = '\0';
+	r.info->pid = task_pid_nr(current);
+	r.info->cpu = smp_processor_id();
+	r.info->in_interrupt = in_interrupt() ? 1 : 0;
+#endif
 	if (dev_info)
 		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
 
@@ -540,6 +586,21 @@ static int log_store(u32 caller_id, int facility, int level,
 		prb_commit(&e);
 	else
 		prb_final_commit(&e);
+
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+	if (is_auto_comm && func_hook_auto_comm) {
+		struct printk_info hook_info;
+		struct printk_record hook_r;
+		size_t len;
+
+		prb_rec_init_rd(&hook_r, &hook_info, hook_text, sizeof(hook_text));
+		if (prb_read_valid(prb, r.info->seq, &hook_r)) {
+			len = record_print_text(&hook_r, false, true);
+
+			func_hook_auto_comm(type_auto_comm, hook_text, len);
+		}
+	}
+#endif
 
 	trace_android_vh_logbuf(prb, &r);
 
@@ -715,11 +776,12 @@ static ssize_t devkmsg_write(struct kiocb *iocb, struct iov_iter *from)
 		return len;
 
 	/* Ratelimit when not explicitly enabled. */
+	/*
 	if (!(devkmsg_log & DEVKMSG_LOG_MASK_ON)) {
 		if (!___ratelimit(&user->rs, current->comm))
 			return ret;
 	}
-
+	*/
 	buf = kmalloc(len+1, GFP_KERNEL);
 	if (buf == NULL)
 		return -ENOMEM;
@@ -1320,6 +1382,15 @@ static size_t print_caller(u32 id, char *buf)
 #else
 #define print_caller(id, buf) 0
 #endif
+#ifdef CONFIG_PRINTK_PROCESS
+static size_t print_process(const struct printk_info *info, char *buf)
+{
+	return sprintf(buf, "%c[%1d:%15s:%5d]", info->in_interrupt ? 'I' : ' ',
+			info->cpu, info->process, info->pid);
+}
+#else
+#define print_process(info, buf) 0
+#endif
 
 static size_t info_print_prefix(const struct printk_info  *info, bool syslog,
 				bool time, char *buf)
@@ -1333,8 +1404,9 @@ static size_t info_print_prefix(const struct printk_info  *info, bool syslog,
 		len += print_time(info->ts_nsec, buf + len);
 
 	len += print_caller(info->caller_id, buf + len);
+	len += print_process(info, buf + len);
 
-	if (IS_ENABLED(CONFIG_PRINTK_CALLER) || time) {
+	if (IS_ENABLED(CONFIG_PRINTK_CALLER) || IS_ENABLED(CONFIG_PRINTK_PROCESS) || time) {
 		buf[len++] = ' ';
 		buf[len] = '\0';
 	}
@@ -2003,6 +2075,12 @@ int vprintk_store(int facility, int level,
 				if (level == LOGLEVEL_DEFAULT)
 					level = kern_level - '0';
 				break;
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+			case 'B' ... 'J':
+				if (level == LOGLEVEL_DEFAULT)
+					level = LOGLEVEL_PR_AUTO_BASE + (kern_level - 'A'); /* 91 ~ 99 */
+				break;
+#endif
 			case 'c':	/* KERN_CONT */
 				lflags |= LOG_CONT;
 			}

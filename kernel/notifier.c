@@ -6,6 +6,7 @@
 #include <linux/rcupdate.h>
 #include <linux/vmalloc.h>
 #include <linux/reboot.h>
+#include <linux/kernel.h>
 
 /*
  *	Notifier list for kernel code which wants to be called
@@ -18,6 +19,9 @@ BLOCKING_NOTIFIER_HEAD(reboot_notifier_list);
  *	Notifier chain core routines.  The exported routines below
  *	are layered on top of these, with appropriate locking added.
  */
+#ifdef CONFIG_DEBUG_NOTIFIERS
+void notifier_call_print(struct notifier_block **nl, notifier_fn_t func, int en);
+#endif
 
 static int notifier_chain_register(struct notifier_block **nl,
 		struct notifier_block *n)
@@ -79,8 +83,13 @@ static int notifier_call_chain(struct notifier_block **nl,
 			nb = next_nb;
 			continue;
 		}
-#endif
+
+		notifier_call_print(nl, nb->notifier_call, 1);
 		ret = nb->notifier_call(nb, val, v);
+		notifier_call_print(nl, nb->notifier_call, 3);
+#else
+		ret = nb->notifier_call(nb, val, v);
+#endif
 
 		if (nr_calls)
 			(*nr_calls)++;
@@ -560,3 +569,33 @@ int unregister_die_notifier(struct notifier_block *nb)
 	return atomic_notifier_chain_unregister(&die_chain, nb);
 }
 EXPORT_SYMBOL_GPL(unregister_die_notifier);
+
+#ifdef CONFIG_DEBUG_NOTIFIERS
+static struct notifier_block **should_check_nl[] = {
+	(struct notifier_block **)(&panic_notifier_list.head),
+	(struct notifier_block **)(&reboot_notifier_list.head),
+	(struct notifier_block **)(&restart_handler_list.head),
+	(struct notifier_block **)(&die_chain.head),
+#if IS_ENABLED(CONFIG_PM_SLEEP)
+	(struct notifier_block **)(&pm_chain_head.head),
+#endif
+};
+
+void notifier_call_print(struct notifier_block **nl, notifier_fn_t func, int en)
+{
+	char notifier_name[KSYM_NAME_LEN];
+	char notifier_func_name[KSYM_NAME_LEN];
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(should_check_nl); i++) {
+		if (nl == should_check_nl[i]) {
+			sprint_symbol(notifier_name, (unsigned long)nl);
+			sprint_symbol(notifier_func_name, (unsigned long)func);
+
+			pr_info("%s -> %s call %s\n", notifier_name,
+				notifier_func_name, en == 1 ? "+" : "-");
+			break;
+		}
+	}
+}
+#endif
