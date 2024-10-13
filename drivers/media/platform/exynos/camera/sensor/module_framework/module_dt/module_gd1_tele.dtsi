@@ -1,0 +1,75 @@
+/*
+ * SAMSUNG EXYNOSxxxx board camera device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/camera/exynos_is_dt.h>
+
+/ {
+	fragment@camera {
+		target-path = "/";
+		__overlay__ {
+			is_sensor_gd1_tele: is_sensor_gd1_tele@SENSOR_NAME_S5KGD1_TELE {
+				compatible = "samsung,sensor-module";
+
+				/* common */
+				active_width = <6528>;
+				active_height = <4896>;
+				margin_left = <0>;
+				margin_right = <0>;
+				margin_top = <0>;
+				margin_bottom = <0>;
+				max_framerate = <120>;
+				bitwidth = <10>;
+				use_retention_mode = <SENSOR_RETENTION_INACTIVE>;
+				sensor_maker = "SLSI";
+				sensor_name = "GD1_TELE";
+				setfile_name = "setfile_gd1_tele.bin";
+
+				status = "okay";
+
+				vc_extra {
+					/* ex) statX = <stat_type, sensor_mode, max_width, max_height, max_element> */
+					stat0 = </* not avaliable */>;	/* VC_BUF_DATA_TYPE_SENSOR_STAT1 */
+					stat1 = </* VC_STAT_TYPE_PDP_1_1_PDAF_STAT0 */ 800 /* VC_SENSOR_MODE_ULTRA_PD_2_TAIL */ 303 408 612 1>; /* VC_BUF_DATA_TYPE_GENERAL_STAT1 */
+					stat2 = </* not avaliable */>;	/* VC_BUF_DATA_TYPE_SENSOR_STAT2 */
+					stat3 = </* VC_STAT_TYPE_PDP_1_1_PDAF_STAT1 */ 801 /* VC_SENSOR_MODE_ULTRA_PD_2_TAIL */ 303 408 612 1>; /* VC_BUF_DATA_TYPE_GENERAL_STAT2 */
+				};
+
+				/* sensor modes */
+				modes {
+						/* common = <width, height, fps, settle, mode, lane, speed, interleave, pd_mode> */
+						/* vcX = <map, hwformat, width, height, hwformat, type, width, height> */
+					mode0 {
+						common = <6528 4896 24 0 0 CSI_DATA_LANES_4 2262 CSI_MODE_VC_DT LRTE_DISABLE PD_NONE EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 6528 4896	/* out */ HW_FORMAT_RAW10 VC_NOTHING 6528 4896>;
+						vc1 = </* in */ 1 HW_FORMAT_UNKNOWN 0 0		/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+						vc2 = </* in */ 2 HW_FORMAT_USER 0 0		/* out */ HW_FORMAT_USER VC_NOTHING 0 0>;
+						vc3 = </* in */ 0 HW_FORMAT_EMBEDDED_8BIT 0 0		/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+					};
+					mode1 {
+						common = <3264 2448 30 0 1 CSI_DATA_LANES_4 865 CSI_MODE_VC_DT LRTE_DISABLE PD_MSPD_TAIL EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3264 2448	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3264 2448>;
+						vc1 = </* in */ 1 HW_FORMAT_RAW10 408 612		/* out */ HW_FORMAT_USER VC_PRIVATE 408 612>;
+						vc2 = </* in */ 2 HW_FORMAT_USER 0 0		/* out */ HW_FORMAT_USER VC_MIPISTAT 408 612>;
+						vc3 = </* in */ 0 HW_FORMAT_EMBEDDED_8BIT 0 0		/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+					};
+					mode2 {
+						common = <3264 1836 30 0 2 CSI_DATA_LANES_4 757 CSI_MODE_VC_DT LRTE_DISABLE PD_MSPD_TAIL EX_NONE>;
+						vc0 = </* in */ 0 HW_FORMAT_RAW10 3264 1836	/* out */ HW_FORMAT_RAW10 VC_NOTHING 3264 1836>;
+						vc1 = </* in */ 1 HW_FORMAT_RAW10 408 460		/* out */ HW_FORMAT_USER VC_PRIVATE 408 460>;
+						vc2 = </* in */ 2 HW_FORMAT_USER 0 0		/* out */ HW_FORMAT_USER VC_MIPISTAT 408 460>;
+						vc3 = </* in */ 0 HW_FORMAT_EMBEDDED_8BIT 0 0		/* out */ HW_FORMAT_UNKNOWN VC_NOTHING 0 0>;
+					};
+				};
+
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
