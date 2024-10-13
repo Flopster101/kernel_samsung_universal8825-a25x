@@ -40,6 +40,9 @@
 #include <uapi/linux/mount.h>
 #include "internal.h"
 
+/* @fs.sec -- 89e449513e5bea6196d9aaf62a6936ae -- */
+void (*ufs_debug_func)(void *) = NULL;
+
 static int thaw_super_locked(struct super_block *sb);
 
 static LIST_HEAD(super_blocks);

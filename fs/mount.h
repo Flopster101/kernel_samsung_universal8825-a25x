@@ -80,6 +80,7 @@ struct mount {
 	struct hlist_head mnt_stuck_children;
 } __randomize_layout;
 
+
 #define MNT_NS_INTERNAL ERR_PTR(-EINVAL) /* distinct from any mnt_namespace */
 
 static inline struct mount *real_mount(struct vfsmount *mnt)

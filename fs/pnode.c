@@ -129,10 +129,11 @@ void change_mnt_propagation(struct mount *mnt, int type)
 	if (type != MS_SLAVE) {
 		list_del_init(&mnt->mnt_slave);
 		mnt->mnt_master = NULL;
-		if (type == MS_UNBINDABLE)
+		if (type == MS_UNBINDABLE) {
 			mnt->mnt.mnt_flags |= MNT_UNBINDABLE;
-		else
+		} else {
 			mnt->mnt.mnt_flags &= ~MNT_UNBINDABLE;
+		}
 	}
 }
 
@@ -257,7 +258,6 @@ static int propagate_one(struct mount *m)
 		if (IS_MNT_SHARED(m))
 			type |= CL_MAKE_SHARED;
 	}
-		
 	child = copy_tree(last_source, last_source->mnt.mnt_root, type);
 	if (IS_ERR(child))
 		return PTR_ERR(child);
