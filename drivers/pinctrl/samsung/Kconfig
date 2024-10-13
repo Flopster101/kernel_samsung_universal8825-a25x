@@ -3,7 +3,7 @@
 # Samsung Pin control drivers
 #
 config PINCTRL_SAMSUNG
-	bool
+	tristate "Pinctrl driver data for Samsung SoCs"
 	select GPIOLIB
 	select PINMUX
 	select PINCONF
@@ -11,7 +11,6 @@ config PINCTRL_SAMSUNG
 config PINCTRL_EXYNOS
 	bool "Pinctrl common driver part for Samsung Exynos SoCs"
 	depends on ARCH_EXYNOS || ARCH_S5PV210 || (COMPILE_TEST && OF)
-	select PINCTRL_SAMSUNG
 	select PINCTRL_EXYNOS_ARM if ARM && (ARCH_EXYNOS || ARCH_S5PV210)
 	select PINCTRL_EXYNOS_ARM64 if ARM64 && ARCH_EXYNOS
 
@@ -26,9 +25,13 @@ config PINCTRL_EXYNOS_ARM64
 config PINCTRL_S3C24XX
 	bool "Samsung S3C24XX SoC pinctrl driver"
 	depends on ARCH_S3C24XX || (COMPILE_TEST && OF)
-	select PINCTRL_SAMSUNG
 
 config PINCTRL_S3C64XX
 	bool "Samsung S3C64XX SoC pinctrl driver"
 	depends on ARCH_S3C64XX || (COMPILE_TEST && OF)
-	select PINCTRL_SAMSUNG
+
+config PINCTRL_SEC_GPIO_DVS
+	tristate "Samsung GPIO debugging and verification system"
+	depends on SEC_PM && PINCTRL_EXYNOS_ARM64
+	default n
+
