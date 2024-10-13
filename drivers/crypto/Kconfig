@@ -908,4 +908,7 @@ config CRYPTO_DEV_SA2UL
 	  used for crypto offload.  Select this if you want to use hardware
 	  acceleration for cryptographic algorithms on these devices.
 
+source "drivers/crypto/fmp/Kconfig"
+source "drivers/crypto/fmp_simulator/Kconfig"
+
 endif # CRYPTO_HW
