@@ -93,8 +93,10 @@ config QCOM_PDR_HELPERS
 	select QCOM_QMI_HELPERS
 
 config QCOM_QMI_HELPERS
-	tristate
+	tristate "Qualcomm QMI Helpers"
 	depends on NET
+        help
+          Qualcomm Technologies, Inc. platform specific
 
 config QCOM_RMTFS_MEM
 	tristate "Qualcomm Remote Filesystem memory driver"

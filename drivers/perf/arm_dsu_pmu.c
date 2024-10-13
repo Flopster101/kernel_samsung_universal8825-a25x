@@ -31,6 +31,8 @@
 #include <asm/arm_dsu_pmu.h>
 #include <asm/local64.h>
 
+#include <soc/samsung/dsu_theodul_errata.h>
+
 /* PMU event codes */
 #define DSU_PMU_EVT_CYCLES		0x11
 #define DSU_PMU_EVT_CHAIN		0x1e
@@ -364,7 +366,9 @@ static void dsu_pmu_event_update(struct perf_event *event)
 
 static void dsu_pmu_read(struct perf_event *event)
 {
+	arm_smcc_disable_clock_gating();
 	dsu_pmu_event_update(event);
+	arm_smcc_enable_clock_gating();
 }
 
 static inline u32 dsu_pmu_get_reset_overflow(void)
@@ -396,9 +400,12 @@ static irqreturn_t dsu_pmu_handle_irq(int irq_num, void *dev)
 	struct dsu_hw_events *hw_events = &dsu_pmu->hw_events;
 	unsigned long overflow;
 
+	arm_smcc_disable_clock_gating();
 	overflow = dsu_pmu_get_reset_overflow();
-	if (!overflow)
+	if (!overflow) {
+		arm_smcc_enable_clock_gating();
 		return IRQ_NONE;
+	}
 
 	for_each_set_bit(i, &overflow, DSU_PMU_MAX_HW_CNTRS) {
 		struct perf_event *event = hw_events->events[i];
@@ -409,6 +416,7 @@ static irqreturn_t dsu_pmu_handle_irq(int irq_num, void *dev)
 		dsu_pmu_set_event_period(event);
 		handled = true;
 	}
+	arm_smcc_enable_clock_gating();
 
 	return IRQ_RETVAL(handled);
 }
@@ -417,6 +425,7 @@ static void dsu_pmu_start(struct perf_event *event, int pmu_flags)
 {
 	struct dsu_pmu *dsu_pmu = to_dsu_pmu(event->pmu);
 
+	arm_smcc_disable_clock_gating();
 	/* We always reprogram the counter */
 	if (pmu_flags & PERF_EF_RELOAD)
 		WARN_ON(!(event->hw.state & PERF_HES_UPTODATE));
@@ -425,6 +434,7 @@ static void dsu_pmu_start(struct perf_event *event, int pmu_flags)
 		dsu_pmu_set_event(dsu_pmu, event);
 	event->hw.state = 0;
 	dsu_pmu_enable_counter(dsu_pmu, event->hw.idx);
+	arm_smcc_enable_clock_gating();
 }
 
 static void dsu_pmu_stop(struct perf_event *event, int pmu_flags)
@@ -471,7 +481,9 @@ static void dsu_pmu_del(struct perf_event *event, int flags)
 	struct hw_perf_event *hwc = &event->hw;
 	int idx = hwc->idx;
 
+	arm_smcc_disable_clock_gating();
 	dsu_pmu_stop(event, PERF_EF_UPDATE);
+	arm_smcc_enable_clock_gating();
 	hw_events->events[idx] = NULL;
 	clear_bit(idx, hw_events->used_mask);
 	perf_event_update_userpage(event);
@@ -487,11 +499,13 @@ static void dsu_pmu_enable(struct pmu *pmu)
 	if (bitmap_empty(dsu_pmu->hw_events.used_mask, DSU_PMU_MAX_HW_CNTRS))
 		return;
 
+	arm_smcc_disable_clock_gating();
 	raw_spin_lock_irqsave(&dsu_pmu->pmu_lock, flags);
 	pmcr = __dsu_pmu_read_pmcr();
 	pmcr |= CLUSTERPMCR_E;
 	__dsu_pmu_write_pmcr(pmcr);
 	raw_spin_unlock_irqrestore(&dsu_pmu->pmu_lock, flags);
+	arm_smcc_enable_clock_gating();
 }
 
 static void dsu_pmu_disable(struct pmu *pmu)
@@ -500,11 +514,13 @@ static void dsu_pmu_disable(struct pmu *pmu)
 	unsigned long flags;
 	struct dsu_pmu *dsu_pmu = to_dsu_pmu(pmu);
 
+	arm_smcc_disable_clock_gating();
 	raw_spin_lock_irqsave(&dsu_pmu->pmu_lock, flags);
 	pmcr = __dsu_pmu_read_pmcr();
 	pmcr &= ~CLUSTERPMCR_E;
 	__dsu_pmu_write_pmcr(pmcr);
 	raw_spin_unlock_irqrestore(&dsu_pmu->pmu_lock, flags);
+	arm_smcc_enable_clock_gating();
 }
 
 static bool dsu_pmu_validate_event(struct pmu *pmu,
@@ -698,10 +714,12 @@ static void dsu_pmu_set_active_cpu(int cpu, struct dsu_pmu *dsu_pmu)
  */
 static void dsu_pmu_init_pmu(struct dsu_pmu *dsu_pmu)
 {
+	arm_smcc_disable_clock_gating();
 	if (dsu_pmu->num_counters == -1)
 		dsu_pmu_probe_pmu(dsu_pmu);
 	/* Reset the interrupt overflow mask */
 	dsu_pmu_get_reset_overflow();
+	arm_smcc_enable_clock_gating();
 }
 
 static int dsu_pmu_device_probe(struct platform_device *pdev)

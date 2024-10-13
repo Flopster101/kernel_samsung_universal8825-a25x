@@ -1379,6 +1379,19 @@ config SENSORS_NTC_THERMISTOR
 	  This driver can also be built as a module. If so, the module
 	  will be called ntc-thermistor.
 
+config SENSORS_EXYNOS_NTC_THERMISTOR
+	tristate "NTC thermistor on Exynos Reference Development board"
+	depends on !OF || IIO=n || IIO
+	depends on THERMAL || !THERMAL_OF
+	help
+	  This driver is same as SENSORS_NTC_THERMISTOR. But, this driver is
+	  more specific for Exynos Reference Development (ERD) board.
+
+	  Currently, this driver supports
+	  NCP15WB473, NCP18WB473, NCP21WB473, NCP03WB473, NCP15WL333,
+	  NCP03WF104 and NCP15XH103 from Murata and B57330V2103 and
+	  B57891S0103 from EPCOS.
+
 config SENSORS_NCT6683
 	tristate "Nuvoton NCT6683D"
 	depends on !PPC
