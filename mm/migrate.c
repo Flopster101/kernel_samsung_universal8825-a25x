@@ -932,6 +932,9 @@ static int move_to_new_page(struct page *newpage, struct page *page,
 
 	VM_BUG_ON_PAGE(!PageLocked(page), page);
 	VM_BUG_ON_PAGE(!PageLocked(newpage), newpage);
+#ifdef CONFIG_HUGEPAGE_POOL_DEBUG
+	BUG_ON(PageCompound(page));
+#endif
 
 	mapping = page_mapping(page);
 
