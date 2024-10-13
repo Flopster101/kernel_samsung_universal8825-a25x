@@ -1,0 +1,127 @@
+menuconfig EXYNOS_DEBUG
+        bool "Exynos Debug Features"
+        depends on ARCH_EXYNOS
+        default n
+
+if EXYNOS_DEBUG
+menuconfig DEBUG_SNAPSHOT
+	tristate "Debug SnapShot Support"
+	depends on EXYNOS_DEBUG
+	default n
+	help
+	  Debug snapshot supports SoC debugging easily. This feature supports
+	  to trace kernel events and other module events such frequceny change
+	  and IPC. This supports to save GPR and PC when panic or exception and
+	  to enter ramdump mode when panic is occurred and other exception.
+	  This supports to reserve memory for h/w debug feature such as
+	  scan2dram, arraydump.
+
+config DEBUG_SNAPSHOT_API
+	bool "Support Debug Snapshot API"
+	depends on DEBUG_SNAPSHOT
+	default n
+	help
+	  Debug Snapshot API supports access of dss log and dss log item.
+	  If you use this API, you can get last or first index, paddr of item.
+
+config DEBUG_SNAPSHOT_FREQ_DOMAIN_NUM
+	int "Number of freq logging domain type"
+	range 4 32
+	default 32
+	help
+	  This option decides number of frequency logging domain type.
+
+config DEBUG_SNAPSHOT_LOG_ITEM_SIZE
+	int "Number of logging item base size"
+	range 256 1024
+	default 1024
+	help
+	  This option decides size of logging item.
+
+config DEBUG_SNAPSHOT_SFRDUMP
+	tristate "Debug Snapshot SFRDUMP"
+	depends on DEBUG_SNAPSHOT
+	default n
+	help
+	  This supports sfrdump to string format into the DRAM
+	  if kernel panic happened. If you want to get dump,
+	  you should write list of sfr registers in device tree.
+	  If you want to dump sfr register, you say Y here.
+
+config DEBUG_SNAPSHOT_QUICKDUMP
+	tristate "Debug Snapshot quickdump"
+	depends on DEBUG_SNAPSHOT
+	default n
+	help
+	  This is for weight ligntening of ramdump. If DRAM size is too big,
+	  Ramdump is also big. Then it takes a long time to get ramdump.
+	  So we get important data such as dss logging and H/W raw data.
+	  If you access text symbol and stack data, you could get them.
+
+config DEBUG_SNAPSHOT_DEBUG_KINFO
+	tristate "Debug Kernel Information Support"
+	depends on DEBUG_SNAPSHOT
+        default n
+	help
+	  This prepares memory for the debug-kinfo driver
+
+config EXYNOS_DEBUG_TEST
+        tristate "Exynos debug feature test"
+        depends on DEBUG_SNAPSHOT
+        default n
+	help
+	  This can be tested for various errors. If you say y you can confirm
+	  that the debug feature works properly for the error.
+
+config EXYNOS_ITMON
+        tristate "Exynos IPs Traffic Monitor"
+        depends on EXYNOS_DEBUG
+        default n
+
+config EXYNOS_CORESIGHT
+        tristate "Enable Coresight of exynos"
+	depends on DEBUG_SNAPSHOT
+        default n
+	help
+	  This is support to show PC values of each cpus when kernel panic
+	  caused by hard lockup.
+
+config EXYNOS_ECC_HANDLER
+	tristate "Exynos support ECC handler"
+	depends on DEBUG_SNAPSHOT
+	default n
+	help
+	  If ECC happened in cache of CPU, interrupt occurs to cpu.
+
+config EXYNOS_HARDLOCKUP_WATCHDOG
+	tristate "Exynos Hardlockup Watchdog"
+	depends on DEBUG_SNAPSHOT
+	default n
+
+config EXYNOS_ADV_TRACER
+        tristate "Exynos Advanced Tracer"
+        depends on ARM || ARM64
+        default n
+	help
+	  This driver communicates with debugcore via mailbox. This supports
+	  ipc API with debugcore. If you make a driver to communicates with
+	  debugcore, you should use this API.
+
+config EXYNOS_ADV_TRACER_S2D
+        tristate "Exynos Advanced Tracer: Plug-in - S2D"
+        depends on EXYNOS_ADV_TRACER
+        default n
+	help
+	  This driver communicates with scan2dram plugin in debugcore.
+
+config EXYNOS_EHLD
+        tristate "Exynos support Early Hardlockup Detector"
+        depends on EXYNOS_DEBUG
+        default n
+
+config EXYNOS_SSLD
+        tristate "Exynos support S2R Scenario Lockup Detector"
+        depends on EXYNOS_DEBUG
+        default n
+
+endif
