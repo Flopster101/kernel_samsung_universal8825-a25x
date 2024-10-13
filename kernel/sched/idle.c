@@ -451,7 +451,7 @@ static void
 dequeue_task_idle(struct rq *rq, struct task_struct *p, int flags)
 {
 	raw_spin_unlock_irq(&rq->lock);
-	printk(KERN_ERR "bad: scheduling from the idle thread!\n");
+	pr_auto(ASL6, "bad: scheduling from the idle thread!\n");
 
 	trace_android_rvh_dequeue_task_idle(p);
 	dump_stack();

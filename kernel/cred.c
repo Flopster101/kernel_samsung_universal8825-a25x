@@ -143,6 +143,7 @@ void __put_cred(struct cred *cred)
 	cred->magic = CRED_MAGIC_DEAD;
 	cred->put_addr = __builtin_return_address(0);
 #endif
+
 	BUG_ON(cred == current->cred);
 	BUG_ON(cred == current->real_cred);
 

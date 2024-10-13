@@ -171,6 +171,9 @@ __setup("psi=", setup_psi);
 #define WINDOW_MAX_US 10000000	/* Max window size is 10s */
 #define UPDATES_PER_WINDOW 10	/* 10 updates per window */
 
+#define MONITOR_WINDOW_MIN_NS 1000000000 /* 1s */
+#define MONITOR_THRESHOLD_MIN_NS 100000000 /* 100ms */
+
 /* Sampling frequency in nanoseconds */
 static u64 psi_period __read_mostly;
 
@@ -544,6 +547,11 @@ static u64 update_triggers(struct psi_group *group, u64 now)
 		if (now < t->last_event_time + t->win.size)
 			continue;
 
+		if ((t->win.size >= MONITOR_WINDOW_MIN_NS) &&
+		    (t->threshold >= MONITOR_THRESHOLD_MIN_NS))
+			printk_deferred("psi: %s %lu %lu %d %lu %lu\n", __func__, now,
+					t->last_event_time, t->state, t->threshold, growth);
+
 		trace_android_vh_psi_event(t);
 
 		/* Generate an event */
@@ -890,20 +898,35 @@ void psi_task_switch(struct task_struct *prev, struct task_struct *next,
 		}
 	}
 
-	/*
-	 * If this is a voluntary sleep, dequeue will have taken care
-	 * of the outgoing TSK_ONCPU alongside TSK_RUNNING already. We
-	 * only need to deal with it during preemption.
-	 */
-	if (sleep)
-		return;
-
 	if (prev->pid) {
-		psi_flags_change(prev, TSK_ONCPU, 0);
+		int clear = TSK_ONCPU, set = 0;
+
+		/*
+		 * When we're going to sleep, psi_dequeue() lets us handle
+		 * TSK_RUNNING and TSK_IOWAIT here, where we can combine it
+		 * with TSK_ONCPU and save walking common ancestors twice.
+		 */
+		if (sleep) {
+			clear |= TSK_RUNNING;
+			if (prev->in_iowait)
+				set |= TSK_IOWAIT;
+		}
+
+		psi_flags_change(prev, clear, set);
 
 		iter = NULL;
 		while ((group = iterate_groups(prev, &iter)) && group != common)
-			psi_group_change(group, cpu, TSK_ONCPU, 0, true);
+			psi_group_change(group, cpu, clear, set, true);
+
+		/*
+		 * TSK_ONCPU is handled up to the common ancestor. If we're tasked
+		 * with dequeuing too, finish that for the rest of the hierarchy.
+		 */
+		if (sleep) {
+			clear &= ~TSK_ONCPU;
+			for (; group; group = iterate_groups(prev, &iter))
+				psi_group_change(group, cpu, clear, set, true);
+		}
 	}
 }
 
