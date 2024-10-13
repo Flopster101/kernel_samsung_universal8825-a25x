@@ -1,0 +1,23 @@
+menu "Goodix TFA9878 amplifier configuration"
+
+if SND_SOC_TFA9878
+config TFA_STEREO_NODE
+        bool "Stereo sysfs node support"
+        help
+          Extend sysfs nodes for stereo support.
+          In application, it's necessary to differ nodes between channels.
+          In mono case, it provides with 'NODE_NAME', and
+          in stereo case, it provides 'NODE_NAME' for left and 'NODE_NAME'_r for right.
+
+config PLATFORM_EXYNOS
+        bool "Exynos platform support"
+        default y
+        help
+          Enable compile options for Exynos platform.
+          It adapts codec driver to the target platform.
+          It encloses the options, used in codec driver, for Exynos platform.
+          It differs the configuration between Exynos platform and the others.
+
+endif # SND_SOC_TFA9878
+
+endmenu
