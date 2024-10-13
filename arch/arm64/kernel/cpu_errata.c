@@ -346,6 +346,15 @@ static const struct midr_range erratum_1463225[] = {
 };
 #endif
 
+#ifdef CONFIG_ARM64_WORKAROUND_DSB_AFTER_TLBI
+static const struct arm64_cpu_capabilities arm64_dsb_after_tlbi_list[] = {
+	{
+	/* Klein r0p0 - r0p1 */
+		ERRATA_MIDR_RANGE(MIDR_CORTEX_A510, 0, 0, 0, 1),
+	},
+	{},
+};
+#endif
 #ifdef CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE
 static const struct midr_range tsb_flush_fail_cpus[] = {
 #ifdef CONFIG_ARM64_ERRATUM_2067961
@@ -557,6 +566,15 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		ERRATA_MIDR_RANGE(MIDR_CORTEX_A77,
 				  0, 0,
 				  1, 0),
+	},
+#endif
+#ifdef CONFIG_ARM64_WORKAROUND_DSB_AFTER_TLBI
+	{
+		.desc = "Klein erratum (PJ02607-8576)",
+		.capability = ARM64_WORKAROUND_DSB_AFTER_TLBI,
+		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+		.matches = cpucap_multi_entry_cap_matches,
+		.match_list = arm64_dsb_after_tlbi_list,
 	},
 #endif
 #ifdef CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE

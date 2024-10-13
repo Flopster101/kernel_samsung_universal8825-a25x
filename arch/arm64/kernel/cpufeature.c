@@ -87,6 +87,7 @@
 #include <asm/traps.h>
 #include <asm/vectors.h>
 #include <asm/virt.h>
+#include <linux/wakeup_reason.h>
 
 /* Kernel representation of AT_HWCAP and AT_HWCAP2 */
 static unsigned long elf_hwcap __read_mostly;
@@ -2986,6 +2987,24 @@ static int enable_mismatched_32bit_el0(unsigned int cpu)
 	return 0;
 }
 
+int sched_check_cfs_rq_32bit(int cpu);
+static int check_remained_32bit_el0_task(unsigned int cpu)
+{
+	int ret;
+
+	if (cpumask_intersects(cpu_active_mask, system_32bit_el0_cpumask()))
+		return 0;
+
+	/* Run here if all 32bit capable cpus are inactive */
+	ret = sched_check_cfs_rq_32bit(cpu);
+	if (ret) {
+		pr_warn("32bit task is still running but there is no 32bit capable cpu\n");
+		log_suspend_abort_reason("32bit task abort disabling cpu");
+	}
+
+	return ret;
+}
+
 static int __init init_32bit_el0_mask(void)
 {
 	if (!allow_mismatched_32bit_el0)
@@ -2996,7 +3015,7 @@ static int __init init_32bit_el0_mask(void)
 
 	return cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
 				 "arm64/mismatched_32bit_el0:online",
-				 enable_mismatched_32bit_el0, NULL);
+				 enable_mismatched_32bit_el0, check_remained_32bit_el0_task);
 }
 subsys_initcall_sync(init_32bit_el0_mask);
 
