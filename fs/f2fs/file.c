@@ -32,6 +32,12 @@
 #include <trace/events/f2fs.h>
 #include <uapi/linux/f2fs.h>
 
+/* @fs.sec -- 80d73a766b8cf3cd0e32fdfe7adebe4b -- */
+
+#ifdef CONFIG_FSCRYPT_SDP
+#include <linux/fscrypto_sdp_ioctl.h>
+#endif
+
 static vm_fault_t f2fs_filemap_fault(struct vm_fault *vmf)
 {
 	struct inode *inode = file_inode(vmf->vma->vm_file);
@@ -220,6 +226,8 @@ static inline enum cp_reason_type need_do_checkpoint(struct inode *inode)
 							TRANS_DIR_INO))
 		cp_reason = CP_RECOVER_DIR;
 
+	sbi->sec_stat.cpr_cnt[cp_reason]++;
+
 	return cp_reason;
 }
 
@@ -248,6 +256,21 @@ static void try_to_fix_pino(struct inode *inode)
 	f2fs_up_write(&fi->i_sem);
 }
 
+/* P190723-05556 */
+static inline bool should_issue_flush(struct f2fs_sb_info *sbi)
+{
+	if (F2FS_OPTION(sbi).fsync_mode != FSYNC_MODE_NOBARRIER)
+		return true;
+
+	if (uid_eq(make_kuid(&init_user_ns, F2FS_DEF_RESUID), current_fsuid()))
+		return true;
+
+	if (in_group_p(F2FS_OPTION(sbi).flush_group))
+		return true;
+
+	return false;
+}
+
 static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 						int datasync, bool atomic)
 {
@@ -270,6 +293,9 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 
 	if (S_ISDIR(inode->i_mode))
 		goto go_write;
+
+	sbi->sec_stat.fsync_count++;
+	sbi->sec_stat.fsync_dirty_pages += get_dirty_pages(inode);
 
 	/* if fdatasync is triggered, let's do in-place-update */
 	if (datasync || get_dirty_pages(inode) <= SM_I(sbi)->min_fsync_blocks)
@@ -323,6 +349,7 @@ go_write:
 		try_to_fix_pino(inode);
 		clear_inode_flag(inode, FI_APPEND_WRITE);
 		clear_inode_flag(inode, FI_UPDATE_WRITE);
+		sbi->sec_stat.cp_cnt[STAT_CP_FSYNC]++;
 		goto out;
 	}
 sync_nodes:
@@ -362,7 +389,7 @@ sync_nodes:
 	f2fs_remove_ino_entry(sbi, ino, APPEND_INO);
 	clear_inode_flag(inode, FI_APPEND_WRITE);
 flush_out:
-	if (!atomic && F2FS_OPTION(sbi).fsync_mode != FSYNC_MODE_NOBARRIER)
+	if (!atomic && should_issue_flush(sbi))
 		ret = f2fs_issue_flush(sbi, inode->i_ino);
 	if (!ret) {
 		f2fs_remove_ino_entry(sbi, ino, UPDATE_INO);
@@ -1629,6 +1656,7 @@ static int expand_inode_data(struct inode *inode, loff_t offset,
 	loff_t off_end;
 	block_t expanded = 0;
 	int err;
+	bool init_victim_map = true;
 
 	err = inode_newsize_ok(inode, (len + offset));
 	if (err)
@@ -1661,9 +1689,11 @@ next_alloc:
 		if (has_not_enough_free_secs(sbi, 0,
 			GET_SEC_FROM_SEG(sbi, overprovision_segments(sbi)))) {
 			f2fs_down_write(&sbi->gc_lock);
-			err = f2fs_gc(sbi, true, false, false, NULL_SEGNO);
+			err = __f2fs_gc(sbi, true, false, false, NULL_SEGNO,
+							init_victim_map);
 			if (err && err != -ENODATA && err != -EAGAIN)
 				goto out_err;
+			init_victim_map = false;
 		}
 
 		f2fs_down_write(&sbi->pin_sem);
@@ -1818,6 +1848,181 @@ static int f2fs_file_flush(struct file *file, fl_owner_t id)
 	return 0;
 }
 
+#ifdef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
+/* inode = 0, else >= 1 */
+static unsigned long calculate_nid_idx(pgoff_t orig_index, pgoff_t *offs,
+						unsigned int direct_index, unsigned int direct_blks)
+{
+	unsigned long nidx = 0;
+	pgoff_t index = orig_index;
+
+	if (index > direct_index) {
+		index -= direct_index;
+		nidx = index + direct_blks;
+		do_div(nidx, direct_blks);
+		// nidx += (index + direct_blks) / direct_blks;
+	}
+
+	if (offs) {
+		index = orig_index;
+		if (nidx == 0) {
+			*offs = index;
+		} else {
+			index -= direct_index;
+			*offs = index - ((nidx - 1) * direct_blks);
+		}
+	}
+
+	return nidx;
+}
+
+#define calc_comp_nidx(index, offs) \
+	calculate_nid_idx(index, offs, comp_didx, comp_dblks)
+#define calc_nocomp_nidx(index, offs) \
+	calculate_nid_idx(index, offs, nocomp_didx, nocomp_dblks)
+static int convert_and_set_compress_context(struct inode *inode)
+{
+	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+
+	unsigned int i_cluster_size = 1 << F2FS_OPTION(sbi).compress_log_size;
+	unsigned int nocomp_didx = ADDRS_PER_INODE(inode);
+	unsigned int nocomp_dblks = ADDRS_PER_BLOCK(inode);
+	unsigned int comp_didx, comp_dblks;
+	unsigned int nocomp_nidx = 0, comp_nidx = 0, prev_nocomp_nidx;
+	pgoff_t nocomp_offs = 0, comp_offs = 0;
+	struct dnode_of_data dn, dn2, *comp_dn;
+	pgoff_t index = 0;
+	unsigned int i = 0, temp_offs;
+	unsigned int min_offs;
+	int err = 0;
+	block_t blkaddr;
+	struct node_info ni;
+
+	comp_didx = ALIGN_DOWN(nocomp_didx, i_cluster_size);
+	comp_dblks = ALIGN_DOWN(nocomp_dblks, i_cluster_size);
+
+	if (inode->i_size == 0) {
+		set_compress_context(inode);
+		return 0;
+	}
+
+	index = DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE) - 1;
+	comp_nidx = calc_comp_nidx(index, NULL);
+
+	/* Create new dnode if necessary */
+	if (comp_nidx) {
+		index = nocomp_didx;
+
+		f2fs_lock_op(sbi);
+		for (i = 0; i < comp_nidx; i++) {
+			set_new_dnode(&dn, inode, NULL, NULL, 0);
+			err = f2fs_get_dnode_of_data(&dn, index, ALLOC_NODE);
+			f2fs_put_dnode(&dn);
+			if (err) {
+				f2fs_err(sbi, "Failed to allocate new dnode\n");
+				f2fs_unlock_op(sbi);
+				return err;
+			}
+			index += nocomp_dblks;
+		}
+		f2fs_unlock_op(sbi);
+	}
+
+	f2fs_down_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
+	f2fs_lock_op(sbi);
+
+	/* relocate blkaddr in dnode for compression feature */
+	f2fs_down_write(&F2FS_I(inode)->i_dnode_sem);
+	index = DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE) - 1;
+
+	min_offs = comp_didx;
+	if (comp_didx == nocomp_didx)
+		min_offs += comp_dblks;
+
+	set_new_dnode(&dn, inode, NULL, NULL, 0);
+	prev_nocomp_nidx = -1;
+
+	for (i = index; i >= min_offs; i--) {
+		nocomp_nidx = calc_nocomp_nidx(i, &nocomp_offs);
+		comp_nidx = calc_comp_nidx(i, &comp_offs);
+		temp_offs = (nocomp_nidx > 0) ? nocomp_didx:0;
+		temp_offs += ((comp_nidx - 1) * nocomp_dblks) + comp_offs;
+
+		if (nocomp_nidx != prev_nocomp_nidx) {
+			f2fs_put_dnode(&dn);
+			set_new_dnode(&dn, inode, NULL, NULL, 0);
+			dn.for_dnode_relocation = true;
+			err = f2fs_get_dnode_of_data(&dn, i, LOOKUP_NODE);
+
+			f2fs_wait_on_page_writeback(dn.node_page, NODE, true, true);
+			if (f2fs_get_node_info(sbi, dn.nid, &ni, false)) {
+				f2fs_err(sbi, "Error while get node info\n");
+				goto convert_error_out;
+			}
+
+			f2fs_bug_on(sbi, ni.ino != inode->i_ino);
+		}
+
+		if (!err) {
+			blkaddr = data_blkaddr(dn.inode, dn.node_page, nocomp_offs);
+		} else if (err && err == -ENOENT) {
+			if (comp_nidx == nocomp_nidx)
+				continue;
+			blkaddr = NULL_ADDR;
+		} else {
+			f2fs_err(sbi, "Error while get dnode for getting src blkaddr\n");
+			goto convert_error_out;
+		}
+
+		if (comp_nidx == nocomp_nidx) {
+			comp_dn = &dn;
+			goto get_comp_dnode;
+		}
+
+		set_new_dnode(&dn2, inode, NULL, NULL, 0);
+		dn2.for_dnode_relocation = true;
+		err = f2fs_get_dnode_of_data(&dn2, temp_offs, LOOKUP_NODE);
+		if (!err) {
+			comp_dn = &dn2;
+		} else if (err && err == -ENOENT && blkaddr == NULL_ADDR) {
+			continue;
+		} else {
+			f2fs_err(sbi, "Error while get dnode for converting\n");
+			goto convert_error_out;
+		}
+
+get_comp_dnode:
+		comp_dn->ofs_in_node = comp_offs;
+		//f2fs_update_data_blkaddr(comp_dn, blkaddr);
+		f2fs_relocate_ofs_in_node_of_block(sbi, comp_dn, blkaddr, ni.version);
+		if (comp_nidx != nocomp_nidx)
+			f2fs_put_dnode(&dn2);
+
+	}
+
+	f2fs_put_dnode(&dn);
+
+	set_compress_context(inode);
+	f2fs_up_write(&F2FS_I(inode)->i_dnode_sem);
+
+	f2fs_unlock_op(sbi);
+	f2fs_up_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
+
+	return 0;
+
+convert_error_out:
+	f2fs_put_dnode(&dn);
+	f2fs_up_write(&F2FS_I(inode)->i_dnode_sem);
+
+	f2fs_unlock_op(sbi);
+	f2fs_up_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
+
+	f2fs_bug_on(sbi, 1);
+
+	return -EINVAL;
+}
+#endif
+
 static int f2fs_setflags_common(struct inode *inode, u32 iflags, u32 mask)
 {
 	struct f2fs_inode_info *fi = F2FS_I(inode);
@@ -1851,10 +2056,25 @@ static int f2fs_setflags_common(struct inode *inode, u32 iflags, u32 mask)
 		} else {
 			if (!f2fs_may_compress(inode))
 				return -EINVAL;
-			if (S_ISREG(inode->i_mode) && inode->i_size)
-				return -EINVAL;
-			if (set_compress_context(inode))
-				return -EOPNOTSUPP;
+			if (S_ISREG(inode->i_mode)) {
+#ifdef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
+				if (fi->i_extra_isize
+				    < F2FS_COMPRESS_SUPPORT_EXTRA_ATTR_SIZE)
+					return -EINVAL;
+
+				f2fs_drop_extent_tree(inode);
+				if (convert_and_set_compress_context(inode))
+					return -EINVAL;
+#else
+				if (inode->i_size)
+					return -EINVAL;
+				if (set_compress_context(inode))
+					return -EOPNOTSUPP;
+#endif
+			} else {
+				if (set_compress_context(inode))
+					return -EOPNOTSUPP;
+			}
 		}
 	}
 
@@ -4126,6 +4346,10 @@ static int f2fs_ioc_decompress_file(struct file *filp, unsigned long arg)
 		goto out;
 	}
 
+#ifndef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
+		goto out;
+	}
+#endif
 	ret = filemap_write_and_wait_range(inode->i_mapping, 0, LLONG_MAX);
 	if (ret)
 		goto out;
@@ -4136,6 +4360,8 @@ static int f2fs_ioc_decompress_file(struct file *filp, unsigned long arg)
 	last_idx = DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE);
 
 	count = last_idx - page_idx;
+
+	f2fs_down_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
 	while (count) {
 		int len = min(cluster_size, count);
 
@@ -4153,6 +4379,7 @@ static int f2fs_ioc_decompress_file(struct file *filp, unsigned long arg)
 	if (!ret)
 		ret = filemap_write_and_wait_range(inode->i_mapping, 0,
 							LLONG_MAX);
+	f2fs_up_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
 
 	if (ret)
 		f2fs_warn(sbi, "%s: The file might be partially decompressed (errno=%d). Please delete the file.",
@@ -4198,15 +4425,26 @@ static int f2fs_ioc_compress_file(struct file *filp, unsigned long arg)
 		goto out;
 	}
 
+#ifndef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
+		goto out;
+	}
+#endif
 	ret = filemap_write_and_wait_range(inode->i_mapping, 0, LLONG_MAX);
 	if (ret)
 		goto out;
 
-	set_inode_flag(inode, FI_ENABLE_COMPRESS);
-
 	last_idx = DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE);
 
 	count = last_idx - page_idx;
+
+	if (count < cluster_size) {
+		ret = 0;
+		goto out;
+	}
+
+	set_inode_flag(inode, FI_ENABLE_COMPRESS);
+
+	f2fs_down_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
 	while (count) {
 		int len = min(cluster_size, count);
 
@@ -4224,6 +4462,7 @@ static int f2fs_ioc_compress_file(struct file *filp, unsigned long arg)
 	if (!ret)
 		ret = filemap_write_and_wait_range(inode->i_mapping, 0,
 							LLONG_MAX);
+	f2fs_up_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
 
 	clear_inode_flag(inode, FI_ENABLE_COMPRESS);
 
@@ -4235,6 +4474,60 @@ out:
 	file_end_write(filp);
 
 	return ret;
+}
+
+static int f2fs_ioc_get_valid_node_count(struct file *filp, unsigned long arg)
+{
+	struct f2fs_sb_info *sbi = F2FS_I_SB(file_inode(filp));
+	u32 node_count = (u32)valid_node_count(sbi);
+
+	return put_user(node_count, (u32 __user *)arg);
+}
+
+static int f2fs_ioc_stat_compress_file(struct file *filp, unsigned long arg)
+{
+	static struct f2fs_sec_heimdallfs_stat heimdallfs_stat;
+	struct inode *inode = file_inode(filp);
+	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+	struct f2fs_sec_stat_compfile compStat;
+
+	if (!f2fs_sb_has_compression(F2FS_I_SB(inode)))
+		return -EOPNOTSUPP;
+
+	if (copy_from_user(&compStat, (struct f2fs_sec_stat_compfile __user *)arg,
+				sizeof(compStat)))
+		return -EFAULT;
+
+	compStat.st_blocks = inode->i_blocks;
+	if (unlikely(f2fs_compressed_file(inode))) {
+		compStat.st_compressed_blocks = atomic_read(&F2FS_I(inode)->i_compr_blocks);
+		compStat.out_compressed = 1;
+	} else {
+		compStat.out_compressed = 0;
+	}
+
+	if (compStat.in_init)
+		memset(&heimdallfs_stat, 0x0, sizeof(heimdallfs_stat));
+
+	if (compStat.in_scan) {
+		heimdallfs_stat.nr_pkgs++;
+		heimdallfs_stat.nr_pkg_blks += compStat.st_blocks;
+
+		if (unlikely(f2fs_compressed_file(inode))) {
+			heimdallfs_stat.nr_comp_pkgs++;
+			heimdallfs_stat.nr_comp_pkg_blks += compStat.st_blocks;
+			heimdallfs_stat.nr_comp_saved_blks += compStat.st_compressed_blocks;
+		}
+	}
+
+	if (compStat.in_commit)
+		sbi->sec_heimdallfs_stat = heimdallfs_stat;
+
+	if (copy_to_user((struct f2fs_sec_stat_compfile __user *)arg, &compStat,
+				sizeof(compStat)))
+		return -EFAULT;
+
+	return 0;
 }
 
 static long __f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -4330,6 +4623,30 @@ static long __f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return f2fs_ioc_decompress_file(filp, arg);
 	case F2FS_IOC_COMPRESS_FILE:
 		return f2fs_ioc_compress_file(filp, arg);
+	case F2FS_IOC_GET_VALID_NODE_COUNT:
+		return f2fs_ioc_get_valid_node_count(filp, arg);
+	case F2FS_IOC_STAT_COMPRESS_FILE:
+		return f2fs_ioc_stat_compress_file(filp, arg);
+#ifdef CONFIG_DDAR
+	case F2FS_IOC_GET_DD_POLICY:
+	case F2FS_IOC_SET_DD_POLICY:
+	case FS_IOC_GET_DD_INODE_COUNT:
+	case FS_IOC_HAS_DD_POLICY: /* KNOX_SUPPORT_DAR_DUAL_DO */
+		return fscrypt_dd_ioctl(cmd, &arg, file_inode(filp));
+#endif
+#ifdef CONFIG_FSCRYPT_SDP
+	case FS_IOC_GET_SDP_INFO:
+	case FS_IOC_SET_SDP_POLICY:
+	case FS_IOC_SET_SENSITIVE:
+	case FS_IOC_SET_PROTECTED:
+	case FS_IOC_ADD_CHAMBER:
+	case FS_IOC_REMOVE_CHAMBER:
+#ifdef CONFIG_SDP_KEY_DUMP
+	case FS_IOC_DUMP_FILE_KEY:
+	case FS_IOC_TRACE_FILE:
+#endif
+		return fscrypt_sdp_ioctl(filp, cmd, arg);
+#endif
 	default:
 		return -ENOTTY;
 	}
@@ -4344,6 +4661,61 @@ long f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	return __f2fs_ioctl(filp, cmd, arg);
 }
+
+#ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
+static void f2fs_inode_update_trace(struct inode *inode, loff_t pos, struct dentry *dentry)
+{
+
+	struct f2fs_inode_info *fi = F2FS_I(inode);
+	struct timespec64 t;
+	unsigned long long old_time;
+	long long old_time2;
+
+	if (pos < inode->i_size)
+		fi->overwrite_cnt += 1;
+	else if (pos == inode->i_size)
+		fi->append_cnt += 1;
+
+	ktime_get_coarse_real_ts64(&t);
+
+	old_time2 = (t.tv_sec - inode->i_mtime.tv_sec) * 1000000000
+				+ t.tv_nsec-inode->i_mtime.tv_nsec;
+
+	if (fi->mtime_cnt == 0) {
+		fi->mtime_interval = -1;
+	} else if (fi->mtime_cnt == 1) {
+		fi->mtime_interval = old_time2;
+	} else {
+		old_time = (fi->mtime_interval*(fi->mtime_cnt-1)) + (old_time2);
+		do_div(old_time, fi->mtime_cnt);
+		fi->mtime_interval = old_time;
+	}
+	fi->mtime_cnt = fi->mtime_cnt+1;
+}
+
+static void f2fs_inode_update_write_trace(struct inode *inode, long long written)
+{
+
+	struct f2fs_inode_info *fi = F2FS_I(inode);
+	long long write_chunk;
+	long long res;
+
+	if (written < 0)
+		return;
+	write_chunk = written;
+	res = do_div(write_chunk, 4096);
+	if (res != 0)
+		write_chunk += 1;
+
+	write_chunk = fi->write_chunk*fi->write_chunk_cnt
+				 + write_chunk*4096;
+	do_div(write_chunk, fi->write_chunk_cnt+1);
+	fi->write_chunk = write_chunk;
+	fi->write_chunk_cnt += 1;
+
+}
+
+#endif
 
 static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 {
@@ -4451,9 +4823,14 @@ out_err:
 			goto out;
 		}
 write:
+#ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
+		f2fs_inode_update_trace(inode, iocb->ki_pos, file->f_path.dentry->d_parent);
+#endif
 		ret = __generic_file_write_iter(iocb, from);
 		clear_inode_flag(inode, FI_NO_PREALLOC);
-
+#ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
+		f2fs_inode_update_write_trace(inode, ret);
+#endif
 		/* if we couldn't write data, we should deallocate blocks. */
 		if (preallocated && i_size_read(inode) < target_size) {
 			f2fs_down_write(&F2FS_I(inode)->i_gc_rwsem[WRITE]);
@@ -4588,6 +4965,26 @@ long f2fs_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case F2FS_IOC_SET_COMPRESS_OPTION:
 	case F2FS_IOC_DECOMPRESS_FILE:
 	case F2FS_IOC_COMPRESS_FILE:
+	case F2FS_IOC_GET_VALID_NODE_COUNT:
+	case F2FS_IOC_STAT_COMPRESS_FILE:
+#ifdef CONFIG_DDAR
+	case F2FS_IOC_GET_DD_POLICY:
+	case F2FS_IOC_SET_DD_POLICY:
+	case FS_IOC_GET_DD_INODE_COUNT:
+	case FS_IOC_HAS_DD_POLICY: /* KNOX_SUPPORT_DAR_DUAL_DO */
+#endif
+#ifdef CONFIG_FSCRYPT_SDP
+	case FS_IOC_GET_SDP_INFO:
+	case FS_IOC_SET_SDP_POLICY:
+	case FS_IOC_SET_SENSITIVE:
+	case FS_IOC_SET_PROTECTED:
+	case FS_IOC_ADD_CHAMBER:
+	case FS_IOC_REMOVE_CHAMBER:
+#ifdef CONFIG_SDP_KEY_DUMP
+	case FS_IOC_DUMP_FILE_KEY:
+	case FS_IOC_TRACE_FILE:
+#endif // End of CONFIG_SDP_KEY_DUMP
+#endif // End of CONFIG_FSCRYPT_SDP
 		break;
 	default:
 		return -ENOIOCTLCMD;

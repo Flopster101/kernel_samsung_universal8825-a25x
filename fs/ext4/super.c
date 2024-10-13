@@ -46,6 +46,7 @@
 #include <linux/part_stat.h>
 #include <linux/kthread.h>
 #include <linux/freezer.h>
+#include <uapi/linux/mount.h>
 
 #include "ext4.h"
 #include "ext4_extents.h"	/* Needed for trace points definition */

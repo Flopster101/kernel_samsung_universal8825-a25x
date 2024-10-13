@@ -103,6 +103,10 @@
 
 #include "../../lib/kstrtox.h"
 
+#ifdef CONFIG_PAGE_BOOST
+#include <linux/delayacct.h>
+#endif
+
 /* NOTE:
  *	Implementing inode permission operations in /proc is almost
  *	certainly an error.  Permission checks need to happen during
@@ -466,6 +470,57 @@ static int proc_pid_stack(struct seq_file *m, struct pid_namespace *ns,
 	kfree(entries);
 
 	return err;
+}
+#endif
+
+#ifdef CONFIG_PAGE_BOOST
+static int proc_pid_ioinfo(struct seq_file *m, struct pid_namespace *ns,
+			      struct pid *pid, struct task_struct *task)
+{
+	struct task_io_accounting acct = task->ioac;
+	unsigned long flags;
+	int result;
+
+	result = mutex_lock_killable(&task->signal->cred_guard_mutex);
+	if (result)
+		return result;
+
+	if (!ptrace_may_access(task, PTRACE_MODE_READ_FSCREDS)) {
+		result = -EACCES;
+		goto out_unlock;
+	}
+
+	if (lock_task_sighand(task, &flags)) {
+		struct task_struct *t = task;
+
+		task_io_accounting_add(&acct, &task->signal->ioac);
+		while_each_thread(task, t)
+			task_io_accounting_add(&acct, &t->ioac);
+
+		unlock_task_sighand(task, &flags);
+	}
+
+	seq_printf(m,
+		   "%llu\n"
+		   "%llu\n"
+		   "%llu\n",
+#ifdef CONFIG_TASK_XACCT
+		   (unsigned long long)acct.rchar,
+#else
+		   (unsigned long long)0,
+#endif
+#ifdef CONFIG_TASK_IO_ACCOUNTING
+		   (unsigned long long)acct.read_bytes,
+#else
+		   (unsigned long long)0,
+#endif
+		   (unsigned long long)delayacct_blkio_nsecs(task));
+
+	result = 0;
+
+out_unlock:
+	mutex_unlock(&task->signal->cred_guard_mutex);
+	return result;
 }
 #endif
 
@@ -3201,6 +3256,13 @@ static const struct pid_entry tgid_base_stuff[] = {
 	ONE("stat",       S_IRUGO, proc_tgid_stat),
 	ONE("statm",      S_IRUGO, proc_pid_statm),
 	REG("maps",       S_IRUGO, proc_pid_maps_operations),
+#ifdef CONFIG_PAGE_BOOST
+	REG("filemap_list",       S_IRUGO, proc_pid_filemap_list_operations),
+	ONE("ioinfo",  S_IRUGO, proc_pid_ioinfo),
+#ifdef CONFIG_PAGE_BOOST_RECORDING
+	REG("io_record_control",      S_IRUGO|S_IWUGO, proc_pid_io_record_operations),
+#endif
+#endif
 #ifdef CONFIG_NUMA
 	REG("numa_maps",  S_IRUGO, proc_pid_numa_maps_operations),
 #endif
