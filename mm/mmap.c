@@ -2219,6 +2219,13 @@ unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info)
 	else
 		addr = unmapped_area(info);
 
+	if (IS_ERR_VALUE(addr)) {
+		pr_warn_ratelimited("%s err:%ld total_vm:0x%lx flags:0x%lx len:0x%lx low:0x%lx high:0x%lx mask:0x%lx offset:0x%lx\n",
+			__func__, addr, current->mm->total_vm, info->flags,
+			info->length, info->low_limit, info->high_limit,
+			info->align_mask, info->align_offset);
+	}
+
 	trace_vm_unmapped_area(addr, info);
 	return addr;
 }
