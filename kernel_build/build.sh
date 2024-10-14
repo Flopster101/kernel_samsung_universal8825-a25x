@@ -111,15 +111,15 @@ if [ "$USE_CCACHE" = "1" ]; then
 fi
 
 # Toolchain
-TCDIR="$WP/toolchain"
+TCDIR="$WP/aospclang"
 if [ ! -d $TCDIR ]; then
-    echo -e "INFO: Toolchain not found! Aborting..."
+    echo -e "\nINFO: Toolchain not found! Aborting..."
     exit 1
 fi
+GCC64_DIR="$WP/gcc64"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
-export PATH="$TCDIR/clang/host/linux-x86/clang-r416183b/bin:$PATH"
-export PATH="$TCDIR/prebuilts/gas/linux-x86:$PATH"
+export PATH="$GCC64_DIR/bin:$TCDIR/bin:$PATH"
 
 # Platform vars
 export PLATFORM_VERSION="12"
