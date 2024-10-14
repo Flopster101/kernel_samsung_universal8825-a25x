@@ -3439,10 +3439,6 @@ static void kfree_rcu_monitor(struct work_struct *work)
 		}
 	}
 
-	// Repeat if any "free" corresponding channel is still busy.
-	if (need_offload_krc(krcp))
-		repeat = true;
-
 	raw_spin_unlock_irqrestore(&krcp->lock, flags);
 
 	// If there is nothing to detach, it means that our job is
