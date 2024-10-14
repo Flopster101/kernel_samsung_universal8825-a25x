@@ -1374,6 +1374,11 @@ struct task_struct {
 	int				mce_count;
 #endif
 	ANDROID_VENDOR_DATA_ARRAY(1, 64);
+
+	/*
+	 * [0] : sec_debug_wait.type
+	 * [1] : sec_debug_wait.data
+	 */
 	ANDROID_OEM_DATA_ARRAY(1, 32);
 
 	/* PF_IO_WORKER */

@@ -4,6 +4,9 @@
 
 #include <linux/list.h>
 #include <linux/spinlock.h>
+#ifdef CONFIG_SEC_DEBUG_OBJECTS_ADDITIONAL_INFO
+#include <linux/stacktrace.h>
+#endif
 
 enum debug_obj_state {
 	ODEBUG_STATE_NONE,
@@ -31,6 +34,12 @@ struct debug_obj {
 	unsigned int		astate;
 	void			*object;
 	const struct debug_obj_descr *descr;
+// To Test stack trace when creating object
+#ifdef CONFIG_SEC_DEBUG_OBJECTS_ADDITIONAL_INFO
+#define DEBUG_OBJ_CALLSTACK_MAX 4
+	unsigned long stack_entries[DEBUG_OBJ_CALLSTACK_MAX];
+	unsigned int nr_entries;
+#endif
 };
 
 /**
