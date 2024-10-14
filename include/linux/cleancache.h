@@ -39,6 +39,7 @@ struct cleancache_ops {
 	void (*invalidate_fs)(int);
 	ANDROID_OEM_DATA(1);
 };
+typedef int (*rbin_module_oem_func)(int, int *);
 
 extern int cleancache_register_ops(const struct cleancache_ops *ops);
 extern void __cleancache_init_fs(struct super_block *);

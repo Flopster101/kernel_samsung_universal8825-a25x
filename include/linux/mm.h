@@ -3363,6 +3363,11 @@ void __init setup_nr_node_ids(void);
 static inline void setup_nr_node_ids(void) {}
 #endif
 
+#ifdef CONFIG_KZEROD
+extern atomic_t kzerod_zero_page_alloc_total;
+extern atomic_t kzerod_zero_page_alloc_prezero;
+#endif
+
 extern int memcmp_pages(struct page *page1, struct page *page2);
 
 static inline int pages_identical(struct page *page1, struct page *page2)
@@ -3417,6 +3422,43 @@ static inline int seal_check_future_write(int seals, struct vm_area_struct *vma)
 
 	return 0;
 }
+
+struct seq_file;
+void seq_printf(struct seq_file *m, const char *f, ...);
+
+static inline void show_val_meminfo(struct seq_file *m,
+				    const char *str, long size)
+{
+	char name[17];
+	int len = strlen(str);
+
+	if (len <= 15) {
+		sprintf(name, "%s:", str);
+	} else {
+		strncpy(name, str, 15);
+		name[15] = ':';
+		name[16] = '\0';
+	}
+
+	seq_printf(m, "%-16s%8ld kB\n", name, size);
+}
+
+extern bool am_app_launch;
+extern inline bool need_memory_boosting(void);
+#ifdef CONFIG_RBIN
+#define WAKE_RBIN_PRERECLAIM 1
+#define GET_RBIN_STATS 2
+
+enum rbin_stat_item {
+	RBIN_ALLOCATED,
+	RBIN_CACHED,
+	RBIN_FREE,
+	RBIN_POOL,
+	NR_RBIN_STAT_ITEMS
+};
+extern int rbin_oem_func(int cmd, int *stats);
+extern unsigned long rbin_total;
+#endif
 
 #endif /* __KERNEL__ */
 #endif /* _LINUX_MM_H */
