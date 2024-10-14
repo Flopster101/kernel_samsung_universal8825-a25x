@@ -1638,17 +1638,8 @@ void security_cred_free(struct cred *cred)
 
 	call_void_hook(cred_free, cred);
 
-#ifdef CONFIG_KDP_CRED
-	if (is_kdp_protect_addr((unsigned long)cred)) {
-		kdp_free_security((unsigned long)cred->security);
-		uh_call(UH_APP_KDP, SELINUX_CRED_FREE, (u64) &cred->security, 0, 0, 0);
-	} else {
-#endif
 	kfree(cred->security);
 	cred->security = NULL;
-#ifdef CONFIG_KDP_CRED
-	}
-#endif
 }
 
 int security_prepare_creds(struct cred *new, const struct cred *old, gfp_t gfp)
