@@ -5943,9 +5943,6 @@ static void rt5665_remove(struct snd_soc_component *component)
 	regmap_write(rt5665->regmap, RT5665_RESET, 0);
 	device_remove_file(component->dev, &dev_attr_codec_reg);
 	device_remove_file(component->dev, &dev_attr_codec_reg_adb);
-
-	
-	regulator_bulk_disable(ARRAY_SIZE(rt5665->supplies), rt5665->supplies);
 }
 
 #ifdef CONFIG_PM
