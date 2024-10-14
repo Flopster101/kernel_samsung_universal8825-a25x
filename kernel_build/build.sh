@@ -82,10 +82,15 @@ export CCACHE_DIR=$WP/.ccache
 ccache -M 10G
 
 # Toolchain
-TCDIR="$WP/toolchain/clang/host/linux-x86/clang-r416183b"
+TCDIR="$WP/aospclang"
+if [ ! -d $TCDIR ]; then
+    echo -e "\nToolchain not found! Aborting..."
+    exit 1
+fi
+GCC64_DIR="$WP/gcc64"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
-export PATH="$WP/toolchain/prebuilts/build-tools/linux-x86:$TCDIR/bin:$PATH"
+export PATH="$GCC64_DIR/bin:$TCDIR/bin:$PATH"
 
 # Platform vars
 export PLATFORM_VERSION=12
