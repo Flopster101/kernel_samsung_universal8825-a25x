@@ -16,9 +16,6 @@
  *
  */
 #include <linux/sti/abc_spec_manager.h>
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-#include <linux/sti/abc_kunit.h>
-#endif
 struct list_head abc_spec_list;
 EXPORT_SYMBOL_KUNIT(abc_spec_list);
 

@@ -20,9 +20,6 @@
 
 #include <linux/sti/abc_hub.h>
 #include <linux/workqueue.h>
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-#include <linux/sti/abc_kunit.h>
-#endif
 
 char bootc_offset_module[BOOTC_OFFSET_DATA_CNT][BOOTC_OFFSET_STR_MAX] = {"fsck"};
 EXPORT_SYMBOL_KUNIT(bootc_offset_module);

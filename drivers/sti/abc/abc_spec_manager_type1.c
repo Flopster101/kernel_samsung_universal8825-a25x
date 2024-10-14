@@ -16,9 +16,6 @@
  *
  */
 #include <linux/sti/abc_spec_manager.h>
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-#include <linux/sti/abc_kunit.h>
-#endif
 int abc_alloc_memory_to_buffer_type1(struct spec_data_type1 *spec_type1, int size)
 {
 	struct abc_fault_info *temp_abc_elements;
