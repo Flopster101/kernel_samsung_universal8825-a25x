@@ -72,7 +72,6 @@ obj-$(CONFIG_DRM_PANEL_MCD_COMMON)	+= panel/
 else
 obj-$(CONFIG_DRM_PANEL_SAMSUNG_COMMON)	+= panel/
 endif
-ifneq ($(filter y m,$(CONFIG_SEC_KUNIT)),)
 subdir-ccflags-y += \
     -Wframe-larger-than=8192 \
     -Wno-unused-result \
@@ -81,6 +80,5 @@ subdir-ccflags-y += \
     -Wno-missing-braces \
     -Wno-implicit-fallthrough \
     -Wno-format
-endif
 
 obj-$(CONFIG_SEC_DISPLAYPORT_EXT_FUNCTION)	+= dp_ext_func/

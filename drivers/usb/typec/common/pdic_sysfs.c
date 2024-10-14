@@ -24,11 +24,7 @@
 #include <linux/device.h>
 #include <linux/usb/typec/common/pdic_core.h>
 #include <linux/usb/typec/common/pdic_sysfs.h>
-#if defined(CONFIG_SEC_KUNIT)
-#include "kunit_test/pdic_sysfs_test.h"
-#else
 #define __visible_for_testing static
-#endif
 
 static ssize_t pdic_sysfs_show_property(struct device *dev,
 				struct device_attribute *attr, char *buf);

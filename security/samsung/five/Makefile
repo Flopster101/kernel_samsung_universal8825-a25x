@@ -27,10 +27,3 @@ else
     five-y += five_main.o five_appraise.o five_tee_interface.o
   endif
 endif
-
-# kunit tests options:
-ifeq ($(CONFIG_SEC_KUNIT)$(CONFIG_UML), yy)
-  GCOV_PROFILE := y
-  five-$(CONFIG_FIVE) += five_dsms.o
-  EXTRA_CFLAGS += -DFIVE_KUNIT_ENABLED
-endif

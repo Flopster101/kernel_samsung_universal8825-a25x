@@ -14,9 +14,6 @@
 #include "sec_adc.h"
 
 #define DEBUG
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#endif
 
 struct adc_list {
 	const char *name;
@@ -46,11 +43,7 @@ static struct adc_list batt_adc_list[SEC_BAT_ADC_CHANNEL_NUM] = {
 
 static int adc_init_count;
 
-#if defined(CONFIG_SEC_KUNIT)
-int __mockable adc_read_type(struct device *dev, int channel, int batt_adc_type)
-#else
 int adc_read_type(struct device *dev, int channel, int batt_adc_type)
-#endif
 {
 	int adc = -1;
 	int ret = 0;

@@ -11,11 +11,7 @@
  */
 #include "sec_battery.h"
 #include "sec_battery_dt.h"
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#else
 #define __visible_for_testing static
-#endif
 
 #ifdef CONFIG_OF
 #define PROPERTY_NAME_SIZE 128

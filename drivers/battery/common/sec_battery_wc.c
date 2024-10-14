@@ -12,11 +12,7 @@
 #include "sec_battery.h"
 #include "sb_tx.h"
 
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#else
 #define __visible_for_testing static
-#endif
 
 #if defined(CONFIG_WIRELESS_FIRMWARE_UPDATE)
 bool sec_bat_check_boost_mfc_condition(struct sec_battery_info *battery, int mode)

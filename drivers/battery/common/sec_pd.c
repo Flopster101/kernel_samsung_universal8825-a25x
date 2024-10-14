@@ -16,14 +16,7 @@
 #include <linux/notifier.h>
 #include <linux/battery/sec_pd.h>
 
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-
-SEC_PD_SINK_STATUS *g_psink_status;
-EXPORT_SYMBOL(g_psink_status);
-#else
 static SEC_PD_SINK_STATUS *g_psink_status;
-#endif
 
 #if defined(CONFIG_ARCH_MTK_PROJECT) || IS_ENABLED(CONFIG_SEC_MTK_CHARGER)
 struct pdic_notifier_struct pd_noti;

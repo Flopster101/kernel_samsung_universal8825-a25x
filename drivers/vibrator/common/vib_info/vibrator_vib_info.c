@@ -18,11 +18,7 @@
 #include <linux/err.h>
 #include <linux/slab.h>
 #include <linux/fs.h>
-#if defined(CONFIG_SEC_KUNIT)
-#include "kunit_test/vibrator_vib_info_test.h"
-#else
 #define __visible_for_testing static
-#endif
 #define MAX_INTENSITY_VALUE 10000
 #define MAX_FUNCTION_NUM 64
 

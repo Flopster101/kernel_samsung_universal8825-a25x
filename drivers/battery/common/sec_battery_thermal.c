@@ -17,11 +17,7 @@
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER) && !defined(CONFIG_SEC_FACTORY)
 extern int muic_set_hiccup_mode(int on_off);
 #endif
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#else
 #define __visible_for_testing static
-#endif
 
 char *sec_bat_thermal_zone[] = {
 	"COLD",

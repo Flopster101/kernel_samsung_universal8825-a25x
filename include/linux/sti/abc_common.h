@@ -43,12 +43,7 @@ extern struct class *sec_class;
 #include <linux/workqueue.h>
 #include <linux/rtc.h>
 #include <linux/version.h>
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-#include <kunit/test.h>
-#include <kunit/mock.h>
-#else
 #define __visible_for_testing static
-#endif
 #if (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE)
 #include <linux/sched/clock.h>
 #else
@@ -197,10 +192,6 @@ struct abc_info {
 	struct abc_event_work event_work_data[ABC_WORK_MAX];
 	struct completion enable_done;
 	struct delayed_work clear_pre_events;
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-	struct completion test_work_done;
-	struct completion test_uevent_done;
-#endif
 	struct abc_platform_data *pdata;
 	struct mutex work_mutex;
 	struct mutex spec_mutex;
@@ -221,22 +212,7 @@ extern int REGISTERED_ABC_EVENT_TOTAL;
 #define ABC_PRINT(format, ...) pr_info("[sec_abc] %s : " format, __func__, ##__VA_ARGS__)
 #define ABC_DEBUG(format, ...) pr_debug("[sec_abc] %s : " format, __func__, ##__VA_ARGS__)
 
-#ifdef CONFIG_SEC_KUNIT
-#define ABC_PRINT_KUNIT(format, ...) do { \
-	char temp[ABC_TEST_STR_MAX]; \
-	ABC_PRINT(format, ##__VA_ARGS__); \
-	snprintf(temp, ABC_TEST_STR_MAX, format, ##__VA_ARGS__); \
-	abc_common_test_get_log_str(temp); \
-} while (0)
-#define ABC_DEBUG_KUNIT(format, ...) do { \
-	char temp[ABC_TEST_STR_MAX]; \
-	ABC_PRINT(format, ##__VA_ARGS__); \
-	snprintf(temp, ABC_TEST_STR_MAX, format, ##__VA_ARGS__); \
-	abc_common_test_get_log_str(temp); \
-} while (0)
-#else
 #define ABC_PRINT_KUNIT(format, ...) ABC_PRINT(format, ##__VA_ARGS__)
 #define ABC_DEBUG_KUNIT(format, ...) ABC_DEBUG(format, ##__VA_ARGS__)
-#endif
 
 #endif

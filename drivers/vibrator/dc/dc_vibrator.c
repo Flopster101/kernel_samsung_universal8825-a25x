@@ -14,11 +14,7 @@
 #include <linux/err.h>
 #include <linux/of_gpio.h>
 #include "dc_vibrator.h"
-#if defined(CONFIG_SEC_KUNIT)
-#include "kunit_test/dc_vibrator_test.h"
-#else
 #define __visible_for_testing static
-#endif
 
 __visible_for_testing int dc_vib_on(struct dc_vib_drvdata *ddata)
 {

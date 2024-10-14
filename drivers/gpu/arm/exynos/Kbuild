@@ -191,18 +191,14 @@ endif
 
 mali_kbase-y += $(BACKEND_DIR)/gpexbe_notifier.o
 
-ifeq (y,$(findstring y,$(CONFIG_KUNIT)$(CONFIG_SEC_KUNIT)))
-	mali_kbase-y += $(BACKEND_DIR)/dummy/gpexbe_notifier_dummy.o
-else
-	mali_kbase-$(CONFIG_SOC_EXYNOS9810) += $(BACKEND_DIR)/gpexbe_notifier_v1.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS9610) += $(BACKEND_DIR)/gpexbe_notifier_v1.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS9820) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS9830) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS9630) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS3830) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
-	mali_kbase-$(CONFIG_SOC_EXYNOS2100) += $(BACKEND_DIR)/gpexbe_notifier_v3.o
-	mali_kbase-$(CONFIG_SOC_S5E8825) += $(BACKEND_DIR)/gpexbe_notifier_v3.o
-endif
+mali_kbase-$(CONFIG_SOC_EXYNOS9810) += $(BACKEND_DIR)/gpexbe_notifier_v1.o
+mali_kbase-$(CONFIG_SOC_EXYNOS9610) += $(BACKEND_DIR)/gpexbe_notifier_v1.o
+mali_kbase-$(CONFIG_SOC_EXYNOS9820) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
+mali_kbase-$(CONFIG_SOC_EXYNOS9830) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
+mali_kbase-$(CONFIG_SOC_EXYNOS9630) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
+mali_kbase-$(CONFIG_SOC_EXYNOS3830) += $(BACKEND_DIR)/gpexbe_notifier_v2.o
+mali_kbase-$(CONFIG_SOC_EXYNOS2100) += $(BACKEND_DIR)/gpexbe_notifier_v3.o
+mali_kbase-$(CONFIG_SOC_S5E8825) += $(BACKEND_DIR)/gpexbe_notifier_v3.o
 
 ifeq ($(CONFIG_MALI_EXYNOS_PM), y)
 	mali_kbase-y += $(BACKEND_DIR)/gpexbe_pm.o

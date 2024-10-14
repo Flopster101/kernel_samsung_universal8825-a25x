@@ -52,29 +52,13 @@
 #include <linux/sysfs.h>
 #endif
 
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#include <kunit/test.h>
-
-int event_index;
-EXPORT_SYMBOL_KUNIT(event_index);
-MANAGER_NOTI_TYPEDEF_REF verify_event[5];
-EXPORT_SYMBOL_KUNIT(verify_event);
-int flag_kunit_test;
-EXPORT_SYMBOL_KUNIT(flag_kunit_test);
-
-#else
 #define __visible_for_testing static
-#endif
 
 static int manager_notifier_init_done;
 #if IS_ENABLED(CONFIG_DRV_SAMSUNG) && defined(CONFIG_SEC_FACTORY)
 static struct device *manager_device;
 #endif
 __visible_for_testing manager_data_t typec_manager;
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(typec_manager);
-#endif
 static bool is_hiccup_event_saved;
 static bool manager_notify_pdic_battery_init;
 
@@ -141,20 +125,6 @@ void manager_dp_state_update(MANAGER_NOTI_TYPEDEF event)
 	}
 }
 
-#if defined(CONFIG_SEC_KUNIT)
-__visible_for_testing void manager_event_save(struct typec_manager_event_work *event_work)
-{
-	verify_event[event_index].src = event_work->event.src;
-	verify_event[event_index].dest = event_work->event.dest;
-	verify_event[event_index].id = event_work->event.id;
-	verify_event[event_index].sub1 = event_work->event.sub1;
-	verify_event[event_index].sub2 = event_work->event.sub2;
-	verify_event[event_index].sub3 = event_work->event.sub3;
-	event_index++;
-}
-EXPORT_SYMBOL_KUNIT(manager_event_save);
-#endif
-
 static void manager_event_notify(struct work_struct *data)
 {
 	struct typec_manager_event_work *event_work =
@@ -193,13 +163,6 @@ static void manager_event_notify(struct work_struct *data)
 	default:
 		break;
 	}
-
-#if defined(CONFIG_SEC_KUNIT)
-	if (flag_kunit_test) {
-		manager_event_save(event_work);
-		return;
-	}
-#endif
 
 #ifdef CONFIG_USB_NOTIFY_PROC_LOG
 	if (event_work->event.id != PDIC_NOTIFY_ID_POWER_STATUS)
@@ -249,12 +212,6 @@ static void manager_muic_event_notify(struct work_struct *data)
 	utmanager_info("%s: id:%s sub1:%d sub2:%d sub3:%d\n", __func__,
 		pdic_event_id_string(event_work->event.id),
 		event_work->event.sub1, event_work->event.sub2, event_work->event.sub3);
-#if defined(CONFIG_SEC_KUNIT)
-	if (flag_kunit_test) {
-		manager_event_save(event_work);
-		return;
-	}
-#endif
 
 #ifdef CONFIG_USB_NOTIFY_PROC_LOG
 	store_usblog_notify(NOTIFY_MANAGER, (void *)&(event_work->event), NULL);
@@ -479,9 +436,6 @@ __visible_for_testing void manager_usb_enum_state_check(uint time_ms)
 			typec_manager.usb_enum_check.pending = false;
 	}
 }
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(manager_usb_enum_state_check);
-#endif
 
 bool get_usb_enumeration_state(void)
 {
@@ -764,9 +718,6 @@ __visible_for_testing void manager_water_status_update(int status)
 					PDIC_NOTIFY_ID_WATER, status, 0, typec_manager.water.report_type);
 		}
 }
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(manager_water_status_update);
-#endif
 __visible_for_testing int manager_handle_pdic_notification(struct notifier_block *nb,
 				unsigned long action, void *data)
 {
@@ -900,9 +851,6 @@ __visible_for_testing int manager_handle_pdic_notification(struct notifier_block
 
 	return ret;
 }
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(manager_handle_pdic_notification);
-#endif
 
 #if !IS_ENABLED(CONFIG_CABLE_TYPE_NOTIFIER)
 static void manager_handle_dedicated_muic(PD_NOTI_ATTACH_TYPEDEF muic_evt)
@@ -1189,9 +1137,6 @@ __visible_for_testing int manager_handle_muic_notification(struct notifier_block
 
 	return 0;
 }
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(manager_handle_muic_notification);
-#endif
 #endif
 
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
@@ -1228,9 +1173,6 @@ __visible_for_testing int manager_handle_vbus_notification(struct notifier_block
 	mutex_unlock(&typec_manager.mo_lock);
 	return 0;
 }
-#if defined(CONFIG_SEC_KUNIT)
-EXPORT_SYMBOL_KUNIT(manager_handle_vbus_notification);
-#endif
 #endif
 
 #if IS_ENABLED(CONFIG_CABLE_TYPE_NOTIFIER)

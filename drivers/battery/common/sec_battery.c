@@ -29,11 +29,7 @@
 #endif
 #include <linux/sec_debug.h>
 
-#if defined(CONFIG_SEC_KUNIT)
-#include <kunit/mock.h>
-#else
 #define __visible_for_testing static
-#endif
 
 #if defined(CONFIG_UML)
 #include "kunit_test/uml_dummy.h"
@@ -1858,11 +1854,7 @@ ovp_uvlo_check_error:
 	/* Need to not display HEALTH UNKNOWN if driver cannot be read */
 	return ((ret == 0) ? value.intval : POWER_SUPPLY_HEALTH_GOOD);
 }
-#if defined(CONFIG_SEC_KUNIT)
-int __mockable chk_ap_wake_chg(void)
-#else
 static int chk_ap_wake_chg(void)
-#endif
 {
 	static int en = -1;
 
@@ -2601,13 +2593,6 @@ bool sec_bat_check_full(struct sec_battery_info *battery, int full_check_type)
 			battery->pdata->adc_read_type);
 
 		dev_dbg(battery->dev, "%s: Current ADC (%d)\n", __func__, current_adc);
-
-#if !defined(CONFIG_SEC_KUNIT) /* In Kunit test, battery->current_adc is changed by KUNIT TC */
-		if (current_adc < 0)
-			break;
-
-		battery->current_adc = current_adc;
-#endif
 
 		if (battery->current_adc < battery->topoff_condition) {
 			battery->full_check_cnt++;
