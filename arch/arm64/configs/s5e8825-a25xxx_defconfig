@@ -2,13 +2,13 @@
 # Automatically generated file; DO NOT EDIT.
 # Linux/arm64 5.10.177 Kernel Configuration
 #
-CONFIG_CC_VERSION_TEXT="Android (7211189, based on r416183) clang version 12.0.4 (https://android.googlesource.com/toolchain/llvm-project c935d99d7cf2016289302412d708641d52d2f7ee)"
+CONFIG_CC_VERSION_TEXT="Android (7284624, based on r416183b) clang version 12.0.5 (https://android.googlesource.com/toolchain/llvm-project c935d99d7cf2016289302412d708641d52d2f7ee)"
 CONFIG_GCC_VERSION=0
 CONFIG_LD_VERSION=0
 CONFIG_CC_IS_CLANG=y
 CONFIG_LD_IS_LLD=y
-CONFIG_CLANG_VERSION=120004
-CONFIG_LLD_VERSION=120004
+CONFIG_CLANG_VERSION=120005
+CONFIG_LLD_VERSION=120005
 CONFIG_CC_HAS_ASM_GOTO=y
 CONFIG_CC_HAS_ASM_GOTO_OUTPUT=y
 CONFIG_TOOLS_SUPPORT_RELR=y
@@ -521,16 +521,6 @@ CONFIG_EFI=y
 CONFIG_ARCH_ENABLE_THP_MIGRATION=y
 
 #
-# Hypervisor
-#
-CONFIG_UH=y
-CONFIG_RKP=y
-CONFIG_KDP=y
-CONFIG_KDP_CRED=y
-CONFIG_KDP_NS=y
-# end of Hypervisor
-
-#
 # Power management options
 #
 CONFIG_SUSPEND=y
@@ -824,6 +814,7 @@ CONFIG_MODULE_SCMVERSION=y
 # CONFIG_UNUSED_SYMBOLS is not set
 CONFIG_TRIM_UNUSED_KSYMS=y
 CONFIG_UNUSED_KSYMS_WHITELIST="gki/abi_symbollist.raw"
+CONFIG_KMI_SYMBOL_LISTS=""
 CONFIG_MODULES_TREE_LOOKUP=y
 CONFIG_BLOCK=y
 CONFIG_BLK_RQ_ALLOC_TIME=y
@@ -851,11 +842,6 @@ CONFIG_BLK_SEC_STATS=m
 # CONFIG_PARTITION_ADVANCED is not set
 CONFIG_MSDOS_PARTITION=y
 CONFIG_EFI_PARTITION=y
-
-#
-# Block kunit
-#
-# end of Block kunit
 # end of Partition Types
 
 CONFIG_BLOCK_COMPAT=y
@@ -7080,7 +7066,6 @@ CONFIG_SEC_INPUT_BOOSTER_SLSI=y
 # Samsung STI Options
 #
 CONFIG_SEC_STI=y
-CONFIG_SEC_AUTO_INPUT=m
 
 #
 # MUIC platform configs
@@ -7108,14 +7093,6 @@ CONFIG_SB_VOTE=y
 # end of SB Core configs
 
 CONFIG_SEC_KQ_MESH=m
-
-#
-# samsung Performace manager
-#
-CONFIG_KPERFMON=y
-CONFIG_KPERFMON_BUILD=m
-# end of samsung Performace manager
-
 CONFIG_SENSORS_FINGERPRINT=m
 CONFIG_FINGERPRINT_SECURE=y
 # CONFIG_SENSORS_FPRINT_SECURE is not set
@@ -7590,12 +7567,6 @@ CONFIG_NLS_UTF8=y
 # CONFIG_DLM is not set
 CONFIG_UNICODE=y
 # CONFIG_UNICODE_NORMALIZATION_SELFTEST is not set
-
-#
-# File systems kunit
-#
-# end of File systems kunit
-
 CONFIG_IO_WQ=y
 # end of File systems
 
@@ -7667,30 +7638,6 @@ CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
 # CONFIG_INIT_ON_FREE_DEFAULT_ON is not set
 # end of Memory initialization
 # end of Kernel hardening options
-
-CONFIG_SECURITY_DEFEX=y
-# CONFIG_DEFEX_KERNEL_ONLY is not set
-# CONFIG_SECURITY_DEFEX_USER is not set
-CONFIG_PROCA=y
-CONFIG_PROCA_GKI_10=y
-CONFIG_PROCA_S_OS=y
-CONFIG_GAF=y
-# CONFIG_GAF_V3 is not set
-# CONFIG_GAF_V4 is not set
-# CONFIG_GAF_V5 is not set
-CONFIG_GAF_V6=y
-# CONFIG_MEMORY_ZEROISATION is not set
-# CONFIG_MZ_PAGE_V2 is not set
-CONFIG_FIVE=y
-CONFIG_FIVE_GKI_10=y
-# CONFIG_FIVE_GKI_20 is not set
-# CONFIG_FIVE_DEBUG is not set
-CONFIG_FIVE_CERT_USER="x509_five_user.der"
-CONFIG_FIVE_DEFAULT_HASH_SHA1=y
-# CONFIG_FIVE_DEFAULT_HASH_SHA256 is not set
-# CONFIG_FIVE_DEFAULT_HASH_SHA512 is not set
-CONFIG_FIVE_DEFAULT_HASH="sha1"
-CONFIG_FIVE_TRUSTED_KEYRING=y
 # end of Security options
 
 CONFIG_CRYPTO=y
@@ -8326,9 +8273,3 @@ CONFIG_CC_HAS_SANCOV_TRACE_PC=y
 # CONFIG_MEMTEST is not set
 # end of Kernel Testing and Coverage
 # end of Kernel hacking
-
-#
-# KUnit support
-#
-# CONFIG_SEC_KUNIT is not set
-# end of KUnit support
