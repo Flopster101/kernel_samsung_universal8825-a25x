@@ -5945,8 +5945,8 @@
 		phandle = <0xcb>;
 	};
 
-	origin_usb_notifier {
-		compatible = "samsung,origin-usb-notifier";
+	usb_notifier {
+		compatible = "samsung,usb-notifier";
 		udc = <0xcc>;
 		status = "okay";
 		disable_host_wakelock;
@@ -11730,7 +11730,7 @@
 			power-domains = <0x00>;
 		};
 
-		origin_usb_notifier {
+		usb_notifier {
 			udc = <0x00>;
 		};
 
