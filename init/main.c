@@ -97,6 +97,7 @@
 #include <linux/rodata_test.h>
 #include <linux/jump_label.h>
 #include <linux/mem_encrypt.h>
+#include <linux/memblock.h>
 #include <linux/kcsan.h>
 #include <linux/init_syscalls.h>
 #include <linux/stackdepot.h>
@@ -215,8 +216,15 @@ static bool __init obsolete_checksetup(char *line)
 				pr_warn("Parameter %s is obsolete, ignored\n",
 					p->str);
 				return true;
-			} else if (p->setup_func(line + n))
-				return true;
+			} else {
+				int ret;
+
+				memblock_memsize_set_name(p->str);
+				ret = p->setup_func(line + n);
+				memblock_memsize_unset_name();
+				if (ret)
+					return true;
+			}
 		}
 		p++;
 	} while (p < __setup_end);
@@ -725,11 +733,14 @@ static int __init do_early_param(char *param, char *val,
 		    (strcmp(param, "console") == 0 &&
 		     strcmp(p->str, "earlycon") == 0)
 		) {
+			memblock_memsize_set_name(p->str);
 			if (p->setup_func(val) != 0)
 				pr_warn("Malformed early option '%s'\n", param);
+			memblock_memsize_unset_name();
 		}
 	}
 	/* We accept everything at this stage. */
+
 	return 0;
 }
 
@@ -1427,8 +1438,9 @@ static int __ref kernel_init(void *unused)
 
 	if (ramdisk_execute_command) {
 		ret = run_init_process(ramdisk_execute_command);
-		if (!ret)
+		if (!ret) {
 			return 0;
+		}
 		pr_err("Failed to execute %s (error %d)\n",
 		       ramdisk_execute_command, ret);
 	}
