@@ -153,12 +153,6 @@ struct integrity_iint_cache {
 	enum integrity_status ima_creds_status:4;
 	enum integrity_status evm_status:4;
 	struct ima_digest_data *ima_hash;
-#ifdef CONFIG_FIVE
-	unsigned long five_flags;
-	enum five_file_integrity five_status;
-	struct integrity_label *five_label;
-	bool five_signing;
-#endif
 };
 
 /* rbtree tree calls to lookup, insert, delete

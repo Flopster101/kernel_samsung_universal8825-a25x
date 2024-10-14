@@ -28,7 +28,6 @@
 #include <linux/backing-dev.h>
 #include <linux/string.h>
 #include <linux/msg.h>
-#include <linux/task_integrity.h>
 #include <net/flow.h>
 
 #define MAX_LSM_EVM_XATTR	2
@@ -666,18 +665,10 @@ static void __init lsm_early_task(struct task_struct *task)
  *	This is a hook that returns a value.
  */
 
-/*
- * security_integrity_current() is added,
-
- * which has a dependency of CONFIG_KDP_CRED.
- * security_integrity_current is added to check integrity of credential context.
- * if CONFIG_KDP_CRED is disabled, it will always return 0.
- */
 #define call_void_hook(FUNC, ...)				\
 	do {							\
 		struct security_hook_list *P;			\
 								\
-		if(security_integrity_current()) break;		\
 		hlist_for_each_entry(P, &security_hook_heads.FUNC, list) \
 			P->hook.FUNC(__VA_ARGS__);		\
 	} while (0)
@@ -687,9 +678,6 @@ static void __init lsm_early_task(struct task_struct *task)
 	do {							\
 		struct security_hook_list *P;			\
 								\
-		RC = security_integrity_current();		\
-		if (RC != 0)					\
-			break;					\
 		hlist_for_each_entry(P, &security_hook_heads.FUNC, list) { \
 			RC = P->hook.FUNC(__VA_ARGS__);		\
 			if (RC != 0)				\
@@ -1297,9 +1285,6 @@ int security_inode_setxattr(struct dentry *dentry, const char *name,
 		ret = cap_inode_setxattr(dentry, name, value, size, flags);
 	if (ret)
 		return ret;
-	ret = five_inode_setxattr(dentry, name, value, size);
-	if (ret)
-		return ret;
 	ret = ima_inode_setxattr(dentry, name, value, size);
 	if (ret)
 		return ret;
@@ -1342,9 +1327,6 @@ int security_inode_removexattr(struct dentry *dentry, const char *name)
 	ret = call_int_hook(inode_removexattr, 1, dentry, name);
 	if (ret == 1)
 		ret = cap_inode_removexattr(dentry, name);
-	if (ret)
-		return ret;
-	ret = five_inode_removexattr(dentry, name);
 	if (ret)
 		return ret;
 	ret = ima_inode_removexattr(dentry, name);
@@ -1530,9 +1512,6 @@ int security_mmap_file(struct file *file, unsigned long prot,
 	ret = call_int_hook(mmap_file, 0, file, prot, prot_adj, flags);
 	if (ret)
 		return ret;
-	ret = five_file_mmap(file, prot);
-	if (ret)
-		return ret;
 	return ima_file_mmap(file, prot, prot_adj, flags);
 }
 
@@ -1586,11 +1565,7 @@ int security_file_open(struct file *file)
 	if (ret)
 		return ret;
 
-	ret = fsnotify_perm(file, MAY_OPEN);
-	if (ret)
-		return ret;
-
-	return five_file_open(file);
+	return fsnotify_perm(file, MAY_OPEN);
 }
 
 int security_task_alloc(struct task_struct *task, unsigned long clone_flags)
@@ -1608,7 +1583,6 @@ int security_task_alloc(struct task_struct *task, unsigned long clone_flags)
 void security_task_free(struct task_struct *task)
 {
 	call_void_hook(task_free, task);
-	five_task_free(task);
 
 	kfree(task->security);
 	task->security = NULL;

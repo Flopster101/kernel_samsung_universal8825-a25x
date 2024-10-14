@@ -27,7 +27,6 @@
 #include <linux/task_work.h>
 #include <linux/ima.h>
 #include <linux/swap.h>
-#include <linux/task_integrity.h>
 
 #include <linux/atomic.h>
 
@@ -274,7 +273,6 @@ static void __fput(struct file *file)
 	locks_remove_file(file);
 
 	ima_file_free(file);
-	five_file_free(file);
 	if (unlikely(file->f_flags & FASYNC)) {
 		if (file->f_op->fasync)
 			file->f_op->fasync(-1, file, 0);
