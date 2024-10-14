@@ -39,6 +39,12 @@ extern int reboot_default;
 extern int reboot_cpu;
 extern int reboot_force;
 
+#ifdef CONFIG_DEBUG_NOTIFIERS
+extern struct atomic_notifier_head restart_handler_list;
+#ifdef CONFIG_PM_SLEEP
+extern struct blocking_notifier_head pm_chain_head;
+#endif
+#endif
 
 extern int register_reboot_notifier(struct notifier_block *);
 extern int unregister_reboot_notifier(struct notifier_block *);
