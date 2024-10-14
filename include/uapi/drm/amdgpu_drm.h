@@ -3,7 +3,7 @@
  * Copyright 2000 Precision Insight, Inc., Cedar Park, Texas.
  * Copyright 2000 VA Linux Systems, Inc., Fremont, California.
  * Copyright 2002 Tungsten Graphics, Inc., Cedar Park, Texas.
- * Copyright 2014 Advanced Micro Devices, Inc.
+ * Copyright 2014 - 2020 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -54,6 +54,8 @@ extern "C" {
 #define DRM_AMDGPU_VM			0x13
 #define DRM_AMDGPU_FENCE_TO_HANDLE	0x14
 #define DRM_AMDGPU_SCHED		0x15
+/* not upstream */
+#define DRM_AMDGPU_WGP_GATING		0x5e
 
 #define DRM_IOCTL_AMDGPU_GEM_CREATE	DRM_IOWR(DRM_COMMAND_BASE + DRM_AMDGPU_GEM_CREATE, union drm_amdgpu_gem_create)
 #define DRM_IOCTL_AMDGPU_GEM_MMAP	DRM_IOWR(DRM_COMMAND_BASE + DRM_AMDGPU_GEM_MMAP, union drm_amdgpu_gem_mmap)
@@ -71,6 +73,7 @@ extern "C" {
 #define DRM_IOCTL_AMDGPU_VM		DRM_IOWR(DRM_COMMAND_BASE + DRM_AMDGPU_VM, union drm_amdgpu_vm)
 #define DRM_IOCTL_AMDGPU_FENCE_TO_HANDLE DRM_IOWR(DRM_COMMAND_BASE + DRM_AMDGPU_FENCE_TO_HANDLE, union drm_amdgpu_fence_to_handle)
 #define DRM_IOCTL_AMDGPU_SCHED		DRM_IOW(DRM_COMMAND_BASE + DRM_AMDGPU_SCHED, union drm_amdgpu_sched)
+#define DRM_IOCTL_AMDGPU_WGP_GATING   DRM_IOWR(DRM_COMMAND_BASE + DRM_AMDGPU_WGP_GATING, union drm_amdgpu_wgp_gating)
 
 /**
  * DOC: memory domains
@@ -138,6 +141,7 @@ extern "C" {
  * accessing it with various hw blocks
  */
 #define AMDGPU_GEM_CREATE_ENCRYPTED		(1 << 10)
+#define AMDGPU_GEM_CREATE_UNCACHED		(1 << 11)
 
 struct drm_amdgpu_gem_create_in  {
 	/** the requested memory size */
@@ -235,6 +239,8 @@ union drm_amdgpu_bo_list {
 */
 #define AMDGPU_CTX_PRIORITY_HIGH        512
 #define AMDGPU_CTX_PRIORITY_VERY_HIGH   1023
+
+#define AMDGPU_CTX_FLAGS_IFH            (1 << 0)
 
 struct drm_amdgpu_ctx_in {
 	/** AMDGPU_CTX_OP_* */
@@ -551,6 +557,10 @@ struct drm_amdgpu_gem_va {
 #define AMDGPU_CHUNK_ID_SCHEDULED_DEPENDENCIES	0x07
 #define AMDGPU_CHUNK_ID_SYNCOBJ_TIMELINE_WAIT    0x08
 #define AMDGPU_CHUNK_ID_SYNCOBJ_TIMELINE_SIGNAL  0x09
+#define AMDGPU_CHUNK_ID_MEMTRACK_HTILE_WA	0xA
+#define AMDGPU_CHUNK_ID_TIME		0x10
+#define AMDGPU_CHUNK_ID_MIN_FREQ_LOCK	0x12
+#define AMDGPU_CHUNK_ID_MODE1		0x13
 
 struct drm_amdgpu_cs_chunk {
 	__u32		chunk_id;
@@ -576,6 +586,10 @@ struct drm_amdgpu_cs_out {
 union drm_amdgpu_cs {
 	struct drm_amdgpu_cs_in in;
 	struct drm_amdgpu_cs_out out;
+};
+
+struct drm_amdgpu_cs_chunk_memtrack_htile_wa {
+	__u64 mem_size;
 };
 
 /* Specify flags to be used for IB */
@@ -605,6 +619,21 @@ union drm_amdgpu_cs {
 /* Tell KMD to flush and invalidate caches
  */
 #define AMDGPU_IB_FLAG_EMIT_MEM_SYNC  (1 << 6)
+
+/* 1 - Perfcounter is active, 0 - Perfcounter is inactive */
+#define AMDGPU_IB_FLAG_PERF_COUNTER (1 << 7)
+
+/* 1 - SQTT is active, 0 - SQTT is inactive */
+#define AMDGPU_IB_FLAG_SQ_THREAD_TRACE (1 << 8)
+
+struct drm_amdgpu_cs_chunk_time {
+	/** draw start time */
+	__u64 start;
+	/** draw end time */
+	__u64 end;
+	/** total time */
+	__u64 total;
+};
 
 struct drm_amdgpu_cs_chunk_ib {
 	__u32 _pad;
@@ -643,6 +672,14 @@ struct drm_amdgpu_cs_chunk_syncobj {
        __u32 handle;
        __u32 flags;
        __u64 point;
+};
+
+struct drm_amdgpu_cs_chunk_min_freq_lock {
+	__u32 start_offset_ms;
+	/* min lock duration (ms) */
+	__u32 duration_ms;
+	/* min lock clock (kHz) */
+	__u32 clock;
 };
 
 #define AMDGPU_FENCE_TO_HANDLE_GET_SYNCOBJ	0
@@ -1083,6 +1120,40 @@ struct drm_amdgpu_info_vce_clock_table {
 #define AMDGPU_FAMILY_AI			141 /* Vega10 */
 #define AMDGPU_FAMILY_RV			142 /* Raven */
 #define AMDGPU_FAMILY_NV			143 /* Navi10 */
+#define AMDGPU_FAMILY_VGH			144 /* VANGOGH */
+#define AMDGPU_FAMILY_MGFX			147 /* FAMILY_MGFX */
+
+#define AMDGPU_WGP_GATING_WGP_CLOCK_ON		1
+#define AMDGPU_WGP_GATING_WGP_AON		2
+#define AMDGPU_WGP_GATING_WGP_STATUS		3
+
+struct drm_amdgpu_wgp_gating_in {
+	/** AMDGPU_WGP_GATING_* */
+	__u32	op;
+	__u32	flags;
+	/** input value */
+	__u32	value;
+};
+
+union drm_amdgpu_wgp_gating_out {
+	struct {
+		__u32	number;
+	} wgp_clock_on;
+
+	struct {
+		__u32	number;
+		__u32	bitmap[4][4];
+	} wgp_aon;
+
+	struct {
+		__u32	bitmap[4][4];
+	} wgp_status;
+};
+
+union drm_amdgpu_wgp_gating {
+	struct drm_amdgpu_wgp_gating_in in;
+	union drm_amdgpu_wgp_gating_out out;
+};
 
 #if defined(__cplusplus)
 }

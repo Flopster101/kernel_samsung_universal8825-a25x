@@ -664,7 +664,7 @@ static inline int split_swap_cluster(swp_entry_t entry)
 }
 #endif
 
-#ifdef CONFIG_MEMCG
+#if defined(CONFIG_MEMCG) && !defined(CONFIG_MEMCG_FORCE_USE_VM_SWAPPINESS)
 static inline int mem_cgroup_swappiness(struct mem_cgroup *memcg)
 {
 	/* Cgroup2 doesn't have per-cgroup swappiness */
@@ -745,5 +745,25 @@ static inline bool mem_cgroup_swap_full(struct page *page)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_ZRAM)
+enum zram_oem_func_cmds {
+	ZRAM_APP_LAUNCH_NOTIFY,
+	ZRAM_ADD_TO_WRITEBACK_LIST,
+	ZRAM_WRITEBACK_LIST,
+	ZRAM_FLUSH_WRITEBACK_BUFFER,
+	ZRAM_GET_ENTRY_TYPE,
+	ZRAM_MARK_ENTRY_NON_LRU,
+	ZRAM_PREFETCH_ENTRY,
+};
+
+enum zram_entry_type {
+	ZRAM_WB_TYPE = 1,
+	ZRAM_WB_HUGE_TYPE,
+	ZRAM_SAME_TYPE,
+	ZRAM_HUGE_TYPE,
+};
+typedef unsigned long (*zram_oem_func)(int, void *, unsigned long);
+extern zram_oem_func zram_oem_fn;
+#endif
 #endif /* __KERNEL__*/
 #endif /* _LINUX_SWAP_H */

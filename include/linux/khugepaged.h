@@ -26,10 +26,14 @@ static inline void collapse_pte_mapped_thp(struct mm_struct *mm,
 }
 #endif
 
+#ifdef CONFIG_HUGEPAGE_POOL
+#define khugepaged_enabled() (0)
+#else
 #define khugepaged_enabled()					       \
 	(transparent_hugepage_flags &				       \
 	 ((1<<TRANSPARENT_HUGEPAGE_FLAG) |		       \
 	  (1<<TRANSPARENT_HUGEPAGE_REQ_MADV_FLAG)))
+#endif
 #define khugepaged_always()				\
 	(transparent_hugepage_flags &			\
 	 (1<<TRANSPARENT_HUGEPAGE_FLAG))
