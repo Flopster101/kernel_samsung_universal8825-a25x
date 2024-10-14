@@ -19,9 +19,6 @@
  */
 
 #include <linux/sti/abc_hub.h>
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-#include <linux/sti/abc_kunit.h>
-#endif
 
 __visible_for_testing
 struct device *abc_hub_dev;
@@ -271,10 +268,6 @@ void abc_hub_send_event(char *str)
 		ABC_PRINT_KUNIT("ABC Hub is disabled!\n");
 		return;
 	}
-#if IS_ENABLED(CONFIG_SEC_KUNIT)
-	ABC_PRINT_KUNIT("%s", str);
-	return;
-#endif
 	/* It just sends event to abc driver. The function will be added for gathering hw param big data. */
 	sec_abc_send_event(str);
 }
