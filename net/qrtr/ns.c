@@ -298,7 +298,7 @@ err:
 	return NULL;
 }
 
-static int server_del(struct qrtr_node *node, unsigned int port)
+static int server_del(struct qrtr_node *node, unsigned int port, bool bcast)
 {
 	struct qrtr_lookup *lookup;
 	struct qrtr_server *srv;
@@ -311,7 +311,7 @@ static int server_del(struct qrtr_node *node, unsigned int port)
 	xa_erase(&node->servers, port);
 
 	/* Broadcast the removal of local servers */
-	if (srv->node == qrtr_ns.local_node)
+	if (srv->node == qrtr_ns.local_node && bcast)
 		service_announce_del(&qrtr_ns.bcast_sq, srv);
 
 	/* Announce the service's disappearance to observers */
@@ -384,9 +384,22 @@ static int ctrl_cmd_bye(struct sockaddr_qrtr *from)
 	if (!node)
 		return 0;
 
+	rcu_read_lock()
 	/* Advertise removal of this client to all servers of remote node */
-	xa_for_each(&node->servers, index, srv)
-		server_del(node, srv->port);
+	radix_tree_for_each_slot(slot, &node->servers, &iter, 0) {
+		srv = radix_tree_deref_slot(slot);
+		if (!srv)
+			continue;
+		if (radix_tree_deref_retry(srv)) {
+			slot = radix_tree_iter_retry(&iter);
+			continue;
+		}
+		slot = radix_tree_iter_resume(slot, &iter);
+		rcu_read_unlock();
+		server_del(node, srv->port, true);
+		rcu_read_lock();
+	}
+	rcu_read_unlock();
 
 	/* Advertise the removal of this client to all local servers */
 	local_node = node_get(qrtr_ns.local_node);
@@ -450,10 +463,13 @@ static int ctrl_cmd_del_client(struct sockaddr_qrtr *from,
 		kfree(lookup);
 	}
 
-	/* Remove the server belonging to this port */
+	/* Remove the server belonging to this port but don't broadcast
+	 * DEL_SERVER. Neighbours would've already removed the server belonging
+	 * to this port due to the DEL_CLIENT broadcast from qrtr_port_remove().
+	 */
 	node = node_get(node_id);
 	if (node)
-		server_del(node, port);
+		server_del(node, port, false);
 
 	/* Advertise the removal of this client to all local servers */
 	local_node = node_get(qrtr_ns.local_node);
@@ -544,7 +560,7 @@ static int ctrl_cmd_del_server(struct sockaddr_qrtr *from,
 	if (!node)
 		return -ENOENT;
 
-	return server_del(node, port);
+	return server_del(node, port, true);
 }
 
 static int ctrl_cmd_new_lookup(struct sockaddr_qrtr *from,

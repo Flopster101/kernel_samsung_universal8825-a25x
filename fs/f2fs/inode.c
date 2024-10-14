@@ -407,11 +407,6 @@ static int do_read_inode(struct inode *inode)
 		fi->i_inline_xattr_size = 0;
 	}
 
-	if (!sanity_check_inode(inode, node_page)) {
-		f2fs_put_page(node_page, 1);
-		return -EFSCORRUPTED;
-	}
-
 	/* check data exist */
 	if (f2fs_has_inline_data(inode) && !f2fs_exist_data(inode))
 		__recover_inline_status(inode, node_page);
@@ -481,6 +476,11 @@ static int do_read_inode(struct inode *inode)
 		print_block_data(sbi->sb, inode->i_ino, page_address(node_page),
 				0, F2FS_BLKSIZE);
 		f2fs_bug_on(sbi, 1);
+	}
+	
+	if (!sanity_check_inode(inode, node_page)) {
+		f2fs_put_page(node_page, 1);
+		return -EFSCORRUPTED;
 	}
 
 	f2fs_put_page(node_page, 1);
