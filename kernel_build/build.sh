@@ -53,8 +53,8 @@ DLKM_RAMDISK_DIR="$TMPDIR/ramdisk_dlkm"
 PREBUILT_RAMDISK="$(pwd)/kernel_build/boot/ramdisk"
 MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FlopKernel-${K_VER}_a25x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FlopKernel-${K_VER}_a25x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/RECOVERYONLY-${K_VER}_a25x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/RECOVERYONLY-${K_VER}_a25x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
@@ -216,4 +216,3 @@ fi
 # Cleanup
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
-kfinish
