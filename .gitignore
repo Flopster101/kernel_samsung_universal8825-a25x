@@ -161,3 +161,5 @@ sphinx_*/
 /kernel_build/tmp
 *__pycache__*
 *.br
+/kernel_build/*.zip
+/kernel_build/*.img
