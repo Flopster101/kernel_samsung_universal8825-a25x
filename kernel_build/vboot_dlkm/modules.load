@@ -288,6 +288,5 @@ exynos8825_rt5665.ko
 exynos8825_rt5691.ko
 sec_audio_sysfs.ko
 sec_audio_debug.ko
-tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko
