@@ -311,6 +311,9 @@ build() {
     export LLVM=1 LLVM_IAS=1
     export ARCH=arm64
 
+    # Delete leftovers
+    rm -f $OUT_KERNEL
+
     make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="$CCARM64_PREFIX" $DEFCONFIG 2>&1 | tee log.txt
 
     if [ $DO_MENUCONFIG = "1" ]; then
