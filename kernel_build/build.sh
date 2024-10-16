@@ -55,7 +55,7 @@ export PATH="$(pwd)/kernel_build/bin:$PATH"
 
 # Configs
 OUTDIR="$(pwd)/out"
-MODULES_OUTDIR="$(pwd)/modules_out"
+MOD_OUTDIR="$(pwd)/modules_out"
 TMPDIR="$(pwd)/kernel_build/tmp"
 
 # Device
@@ -94,7 +94,7 @@ kfinish() {
     rm -rf "$TMPDIR"
     # DON'T delete output directory, ugh...
     #rm -rf "$OUTDIR"
-    rm -rf "$MODULES_OUTDIR"
+    rm -rf "$MOD_OUTDIR"
 }
 
 kfinish
@@ -139,7 +139,7 @@ if [ $USE_CCACHE = "1" ]; then
 else
     make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-"
 fi
-make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
+make -j$(nproc --all) O=out CC="clang" CROSS_COMPILE="aarch64-linux-gnu-" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MOD_OUTDIR" modules_install
 
 # Post build
 rm -rf "$TMPDIR"
@@ -153,7 +153,7 @@ cp -rf "$IN_PLATFORM"/* "$PLATFORM_RAMDISK_DIR/"
 mkdir "$PLATFORM_RAMDISK_DIR/first_stage_ramdisk"
 cp -f "$PLATFORM_RAMDISK_DIR/fstab.s5e8825" "$PLATFORM_RAMDISK_DIR/first_stage_ramdisk/fstab.s5e8825"
 
-if ! find "$MODULES_OUTDIR/lib/modules" -mindepth 1 -type d | read; then
+if ! find "$MOD_OUTDIR/lib/modules" -mindepth 1 -type d | read; then
     echo -e "\nERROR: Unknown error!\n"
     exit 1
 fi
@@ -161,7 +161,7 @@ fi
 missing_modules=""
 
 for module in $(cat "$IN_DLKM/modules.load"); do
-    i=$(find "$MODULES_OUTDIR/lib/modules" -name $module);
+    i=$(find "$MOD_OUTDIR/lib/modules" -name $module);
     if [ -f "$i" ]; then
         cp -f "$i" "$MODULES_DIR/0.0/$module"
     else
