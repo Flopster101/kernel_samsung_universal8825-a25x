@@ -163,3 +163,4 @@ sphinx_*/
 *.br
 /kernel_build/*.zip
 /kernel_build/*.img
+log.txt
