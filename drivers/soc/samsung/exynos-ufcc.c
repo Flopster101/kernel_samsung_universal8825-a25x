@@ -968,40 +968,6 @@ static void freq_qos_release(struct work_struct *work)
 	}
 }
 
-static int ufc_update_little_min_limit(int target_freq)
-{
-	struct ufc_domain *ufc_dom;
-
-	list_for_each_entry(ufc_dom, &ufc.ufc_domain_list, list) {
-		unsigned int col_idx = ufc_dom->table_col_idx;
-
-		if (col_idx != ufc.col_lit)
-			continue;
-
-		if (target_freq) {
-			freq_qos_update_request(&ufc_dom->hold_lit_max_qos_req, ufc_dom->max_freq);
-			freq_qos_update_request(&ufc_dom->user_lit_min_qos_req, target_freq);
-
-			if (!ufc_dom->little_min_timeout)
-				break;
-
-			/* set a boosting timeout */
-			if (delayed_work_pending(&ufc_dom->work))
-				cancel_delayed_work_sync(&ufc_dom->work);
-
-			schedule_delayed_work(&ufc_dom->work,
-				msecs_to_jiffies(ufc_dom->little_min_timeout));
-		} else {
-			freq_qos_update_request(&ufc_dom->hold_lit_max_qos_req, ufc_dom->hold_freq);
-			freq_qos_update_request(&ufc_dom->user_lit_min_qos_req, ufc_dom->min_freq);
-		}
-
-		break;
-	}
-
-	return 0;
-}
-
 static void ufc_update_max_limit(void)
 {
 	struct ufc_domain *ufc_dom;
@@ -1044,42 +1010,6 @@ static void ufc_update_max_limit(void)
 	}
 }
 
-static void ufc_update_min_limit_wo_boost(void)
-{
-	struct ufc_domain *ufc_dom;
-	struct ufc_table_info *table_info;
-	int target_freq, target_idx;
-
-	table_info = get_table_info(PM_QOS_MIN_LIMIT);
-	if (!table_info) {
-		pr_err("failed to find target table\n");
-		return;
-	}
-
-	target_freq = ufc.last_min_wo_boost_input;
-
-	/* clear min limit */
-	if (target_freq == RELEASE) {
-		ufc_release_freq(PM_QOS_MIN_LIMIT_WO_BOOST);
-		return;
-	}
-
-	target_idx = ufc_get_proper_table_index(target_freq,
-				table_info, PM_QOS_MIN_LIMIT_WO_BOOST);
-
-	/* Big ----> Lit */
-	list_for_each_entry(ufc_dom, &ufc.ufc_domain_list, list) {
-		unsigned int col_idx = ufc_dom->table_col_idx;
-
-		target_freq = table_info->ufc_table[col_idx][target_idx];
-		target_freq = ufc_adjust_freq(target_freq, ufc_dom,
-						PM_QOS_MIN_LIMIT_WO_BOOST);
-
-		freq_qos_update_request(&ufc_dom->user_min_qos_wo_boost_req,
-						target_freq);
-	}
-}
-
 /*
  * sysfs function
  */
@@ -1111,12 +1041,6 @@ static ssize_t cpufreq_max_limit_show(struct kobject *kobj, char *buf)
 static ssize_t cpufreq_max_limit_store(struct kobject *kobj,
 					const char *buf, size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-	ufc_update_request(USERSPACE, PM_QOS_MAX_LIMIT, input);
-
 	return count;
 }
 
@@ -1166,13 +1090,6 @@ static ssize_t limit_stat_show(struct kobject *kobj, char *buf)
 static ssize_t cpufreq_min_limit_store(struct kobject *kobj,
 				const char *buf, size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-
-	ufc_update_request(USERSPACE, PM_QOS_MIN_LIMIT, input);
-
 	return count;
 }
 
@@ -1184,14 +1101,6 @@ static ssize_t cpufreq_min_limit_wo_boost_show(struct kobject *kobj, char *buf)
 static ssize_t cpufreq_min_limit_wo_boost_store(struct kobject *kobj,
 		                                        const char *buf, size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-
-	ufc.last_min_wo_boost_input = input;
-	ufc_update_min_limit_wo_boost();
-
 	return count;
 }
 
@@ -1203,13 +1112,6 @@ static ssize_t little_max_limit_show(struct kobject *kobj, char *buf)
 static ssize_t little_max_limit_store(struct kobject *kobj, const char *buf,
 								size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-
-	ufc_update_request(USERSPACE, PM_QOS_LITTLE_MAX_LIMIT, input);
-
 	return count;
 }
 
@@ -1221,13 +1123,6 @@ static ssize_t little_min_limit_show(struct kobject *kobj, char *buf)
 static ssize_t little_min_limit_store(struct kobject *kobj, const char *buf,
 								size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-
-	ufc.prio_vfreq[PM_QOS_LITTLE_MIN_LIMIT] = input;
-	ufc_update_little_min_limit(input);
 	return count;
 }
 
@@ -1240,14 +1135,6 @@ static ssize_t over_limit_show(struct kobject *kobj, char *buf)
 static ssize_t over_limit_store(struct kobject *kobj, const char *buf,
 								size_t count)
 {
-	int input;
-
-	if (!sscanf(buf, "%8d", &input))
-		return -EINVAL;
-
-	ufc.prio_vfreq[PM_QOS_OVER_LIMIT] = input;
-	ufc_update_request(USERSPACE, PM_QOS_OVER_LIMIT, input);
-
 	return count;
 }
 

@@ -2120,6 +2120,19 @@ static int exynos_tmu_parse_ect(struct exynos_tmu_data *data)
 
 		for (i = 0; i < function->num_of_range; ++i) {
 			temperature = function->range_list[i].lower_bound_temperature;
+
+			if (function->range_list[i].max_frequency == 2600000 ||
+				function->range_list[i].max_frequency == 2496000 || function->range_list[i].max_frequency == 2400000 ||
+				function->range_list[i].max_frequency == 2288000 || function->range_list[i].max_frequency == 2112000 ||
+				function->range_list[i].max_frequency == 2016000 || function->range_list[i].max_frequency == 1920000) {
+				function->range_list[i].max_frequency = 2704000;
+			} else if (function->range_list[i].max_frequency == 2002000 || function->range_list[i].max_frequency == 1536000) {
+				function->range_list[i].max_frequency = 2210000;
+			} else if (function->range_list[i].max_frequency == 960000) {
+				function->range_list[i].max_frequency = 2002000;
+			}
+
+
 			freq = function->range_list[i].max_frequency;
 			tz->ops->set_trip_temp(tz, i, temperature  * MCELSIUS);
 

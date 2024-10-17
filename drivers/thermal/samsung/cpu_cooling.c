@@ -738,6 +738,17 @@ static struct thermal_zone_device* parse_ect_cooling_level(struct thermal_coolin
 		unsigned long max_level = 0;
 		int level;
 
+		if (function->range_list[i].max_frequency == 2600000 ||
+			function->range_list[i].max_frequency == 2496000 || function->range_list[i].max_frequency == 2400000 ||
+			function->range_list[i].max_frequency == 2288000 || function->range_list[i].max_frequency == 2112000 ||
+			function->range_list[i].max_frequency == 2016000 || function->range_list[i].max_frequency == 1920000) {
+			function->range_list[i].max_frequency = 2704000;
+		} else if (function->range_list[i].max_frequency == 2002000 || function->range_list[i].max_frequency == 1536000) {
+			function->range_list[i].max_frequency = 2210000;
+		} else if (function->range_list[i].max_frequency == 960000) {
+			function->range_list[i].max_frequency = 2002000;
+		}
+
 		temperature = function->range_list[i].lower_bound_temperature;
 		freq = function->range_list[i].max_frequency;
 
