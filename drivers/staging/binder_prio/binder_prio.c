@@ -14,6 +14,7 @@ static const char *task_name[] = {
 	"ndroid.systemui",  // com.android.systemui
 	"surfaceflinger",
 	"com.tencent.mm",
+	"com.sec.android.app.launcher",
 };
 
 static int to_userspace_prio(int policy, int kernel_priority) {
