@@ -3779,8 +3779,6 @@ static int zram_remove(struct zram *zram)
 		return -EBUSY;
 	}
 
-	unregister_trace_android_vh_show_mem(zram_show_mem, zram);
-	unregister_trace_android_vh_meminfo_proc_show(zram_meminfo, zram);
 	zram->claim = true;
 	mutex_unlock(&bdev->bd_mutex);
 
