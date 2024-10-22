@@ -27,7 +27,6 @@
 #include <linux/suspend.h>
 
 #include "smpboot.h"
-#include "sched/features.h"
 #include "sched/smp.h"
 
 #define CSD_TYPE(_csd)	((_csd)->flags & CSD_FLAG_TYPE_MASK)
