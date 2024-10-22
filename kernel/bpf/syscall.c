@@ -1130,12 +1130,12 @@ static int map_update_elem(union bpf_attr *attr)
 
 	if (map->key_size && map->key_size <= sizeof(key_onstack)) {
 		key = key_onstack;
-		if (copy_from_user(key, ukey.user, map->key_size)) {
+		if (copy_from_user(key, ukey, map->key_size)) {
 			err = -EFAULT;
 			goto err_put;
 		}
 	} else {
-		key = ___bpf_copy_key(ukey, map->key_size);
+		key = __bpf_copy_key(ukey, map->key_size);
 		if (IS_ERR(key)) {
 			err = PTR_ERR(key);
 			goto err_put;
