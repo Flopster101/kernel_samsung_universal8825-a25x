@@ -1827,15 +1827,12 @@ config CRYPTO_LZ4
 	select CRYPTO_ACOMP2
 	select LZ4_COMPRESS
 	select LZ4_DECOMPRESS
+	select CRYPTO_LZ4FAST
 	help
 	  This is the LZ4 algorithm.
 
 config CRYPTO_LZ4FAST
         tristate "LZ4FAST compression algorithm"
-        select CRYPTO_ALGAPI
-        select CRYPTO_ACOMP2
-        select LZ4_COMPRESS
-        select LZ4_DECOMPRESS
         help
           This is the LZ4 fast mode algorithm.
 
