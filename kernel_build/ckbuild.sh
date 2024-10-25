@@ -15,6 +15,8 @@ LZ_REPO="https://gitlab.com/Jprimero15/lolz_clang.git"
 # Other
 DEFAULT_DEFCONFIG="s5e8825-a25xdxx_defconfig"
 KERNEL_URL="https://github.com/Flopster101/a25x-oss-sec"
+AK3_URL="https://github.com/Flopster101/AnyKernel3-A25"
+AK3_TEST=0
 SECONDS=0 # builtin bash timer
 DATE="$(date '+%Y%m%d-%H%M')"
 
@@ -46,22 +48,23 @@ export PATH="$(pwd)/kernel_build/bin:$PATH"
 AC_DIR="$WP/aospclang"
 PC_DIR="$WP/protonclang"
 LZ_DIR="$WP/lolzclang"
+AK3_DIR="$WP/AK3-a25x"
 KDIR="$(readlink -f .)"
 
 ## Inherited paths
-OUTDIR="$(pwd)/out"
-MOD_OUTDIR="$(pwd)/modules_out"
-TMPDIR="$(pwd)/kernel_build/tmp"
-IN_PLATFORM="$(pwd)/kernel_build/vboot_platform"
-IN_DLKM="$(pwd)/kernel_build/vboot_dlkm"
+OUTDIR="$KDIR/out"
+MOD_OUTDIR="$KDIR/modules_out"
+TMPDIR="$KDIR/kernel_build/tmp"
+IN_PLATFORM="$KDIR/kernel_build/vboot_platform"
+IN_DLKM="$KDIR/kernel_build/vboot_dlkm"
 IN_DTB="$OUTDIR/arch/arm64/boot/dts/exynos/s5e8825.dtb"
 PLATFORM_RAMDISK_DIR="$TMPDIR/ramdisk_platform"
 DLKM_RAMDISK_DIR="$TMPDIR/ramdisk_dlkm"
-PREBUILT_RAMDISK="$(pwd)/kernel_build/boot/ramdisk"
+PREBUILT_RAMDISK="$KDIR/kernel_build/boot/ramdisk"
 MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
-OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
-OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
+OUT_BOOTIMG="$KDIR/kernel_build/zip/boot.img"
+OUT_VENDORBOOTIMG="$KDIR/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 # Tools
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
@@ -84,9 +87,6 @@ FK_VER="v1.0"
 USE_CCACHE=1
 DO_TAR="1"
 DO_ZIP="1"
-
-TEST_CHANNEL=1
-#TEST_BUILD=0
 
 # Upload build log
 BUILD_LOG=1
@@ -307,17 +307,43 @@ build() {
 }
 
 packing() {
-    # Build zip
+    # # Build zip
+    # if [ $DO_ZIP = 1 ]; then
+    #     echo -e "\nINFO: Building zip..."
+    #     cd "$(pwd)/kernel_build/zip"
+    #     rm -f "$ZIP_PATH"
+    #     brotli --quality=3 -c boot.img > boot.br
+    #     brotli --quality=3 -c vendor_boot.img > vendor_boot.br
+    #     zip -r9 -q "$ZIP_PATH" META-INF boot.br vendor_boot.br
+    #     rm -f boot.br vendor_boot.br
+    #     cd "$KDIR"
+    #     echo -e "INFO: Done! \nINFO: Output: $ZIP_PATH\n"
+    # fi
+
+    # Make an AnyKernel3-based zip
     if [ $DO_ZIP = 1 ]; then
+        if [ -d $AK3_DIR ]; then
+            AK3_TEST=1
+            echo -e "\nINFO: AK3_TEST flag set because local AnyKernel3 dir was found"
+        else
+            if ! git clone -q --depth=1 $AK3_URL $AK3_DIR; then
+                echo -e "\nERROR: Failed to clone AnyKernel3!"
+                exit 1
+            fi
+        fi
         echo -e "\nINFO: Building zip..."
-        cd "$(pwd)/kernel_build/zip"
-        rm -f "$ZIP_PATH"
-        brotli --quality=3 -c boot.img > boot.br
-        brotli --quality=3 -c vendor_boot.img > vendor_boot.br
-        zip -r9 -q "$ZIP_PATH" META-INF boot.br vendor_boot.br
-        rm -f boot.br vendor_boot.br
+        cd "$AK3_DIR"
+        cp -f "$OUT_VENDORBOOTIMG" vendor_boot.img
+        cp -f "$OUT_DTBIMAGE" dtb
+        cp -f "$OUT_KERNEL" .
+        zip -r9 -q "$ZIP_PATH" * -x .git .github README.md
         cd "$KDIR"
         echo -e "INFO: Done! \nINFO: Output: $ZIP_PATH\n"
+        if [ $AK3_TEST = 1 ]; then
+            echo -e "\nINFO: Skipping deletion of AnyKernel3 dir because test flag is set"
+        else
+            rm -rf $AK3_DIR
+        fi
     fi
 
     # Build tar
