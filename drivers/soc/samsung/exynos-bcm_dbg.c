@@ -84,7 +84,7 @@ static int __exynos_bcm_dbg_ipc_send_data(enum exynos_bcm_dbg_ipc_type ipc_type,
 	int i = 0;
 	struct cmd_data config;
 #endif
-	enum exynos_bcm_err_code ipc_err;
+	enum exynos_bcm_err_code ipc_err = -1;
 	unsigned int *bcm_cmd;
 
 	if ((ipc_type < IPC_BCM_DBG_EVENT) ||
@@ -128,7 +128,7 @@ static int __exynos_bcm_dbg_ipc_send_data(enum exynos_bcm_dbg_ipc_type ipc_type,
 
 	ipc_err = exynos_bcm_dbg_ipc_err_handle(config.raw_cmd);
 #endif
-	if (ipc_err) {
+	if (ipc_err != -1) {
 		ret = -EBADMSG;
 		return ret;
 	}
