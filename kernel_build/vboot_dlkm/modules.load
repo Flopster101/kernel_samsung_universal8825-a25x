@@ -24,7 +24,6 @@ dss.ko
 debug-snapshot-debug-kinfo.ko
 debug-snapshot-sfrdump.ko
 debug-snapshot-qd.ko
-exynos-coresight.ko
 exynos-ecc-handler.ko
 hardlockup-watchdog.ko
 exynos-itmon.ko
