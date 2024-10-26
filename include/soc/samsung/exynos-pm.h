@@ -43,11 +43,9 @@ extern u64 exynos_get_eint_wake_mask(void);
 static inline u64 exynos_get_eint_wake_mask(void) { return ULLONG_MAX; }
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PM_DEBUG)
 struct wakeup_stat_name {
 	const char *name[32];
 };
-#endif /* CONFIG_SEC_PM_DEBUG */
 
 struct exynos_pm_info {
 	void __iomem *eint_base;		/* GPIO_ALIVE base to check wkup reason */
@@ -88,9 +86,7 @@ struct exynos_pm_info {
 	u8 num_dbg_subsystem;
 	const char **dbg_subsystem_name;
 	u32 *dbg_subsystem_offset;
-#if IS_ENABLED(CONFIG_SEC_PM_DEBUG)
 	struct wakeup_stat_name *ws_names;	/* Names of each bits of wakeup_stat */
-#endif /* CONFIG_SEC_PM_DEBUG */
 };
 
 struct exynos_pm_dbg {
