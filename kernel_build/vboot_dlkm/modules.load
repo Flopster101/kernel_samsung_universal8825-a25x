@@ -234,7 +234,6 @@ nanohub.ko
 exynos_devfreq.ko
 s2mpu13_adc.ko
 npu.ko
-sec_pm_debug.ko
 sec_thermistor.ko
 sec_wakeup_cpu_allocator.ko
 sec_reboot.ko
