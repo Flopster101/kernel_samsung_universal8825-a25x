@@ -543,6 +543,7 @@ static int __exynos_cm_itmon_notifier(struct notifier_block *nb,
 }
 #endif
 
+#ifdef CONFIG_DEBUG_SNAPSHOT
 static int exynos_cm_debug_handler(struct cm_device *cmdev)
 {
 	/* If SSS HW_SEMA is not enabled, return */
@@ -584,6 +585,7 @@ static int exynos_cm_die_handler(struct notifier_block *nb, unsigned long l, voi
 
 	return exynos_cm_debug_handler(cmdev);
 }
+#endif
 
 static int exynos_cm_probe(struct platform_device *pdev)
 {
@@ -691,12 +693,14 @@ static int exynos_cm_probe(struct platform_device *pdev)
 	if (cmdev->cm_debug_mem_addr)
 		cmdev->cm_debug_mem_va_addr = (u64)phys_to_virt(cmdev->cm_debug_mem_addr);
 
+#ifdef CONFIG_DEBUG_SNAPSHOT
 	/* register notifiers */
 	cmdev->panic_nb.notifier_call = exynos_cm_panic_handler;
 	atomic_notifier_chain_register(&panic_notifier_list, &cmdev->panic_nb);
 
 	cmdev->die_nb.notifier_call = exynos_cm_die_handler;
 	register_die_notifier(&cmdev->die_nb);
+#endif
 #if IS_ENABLED(CONFIG_EXYNOS_SEH)
 	exynos_seh_set_cm_debug_function((unsigned long)exynos_cm_set_sss_debug_mem);
 #endif

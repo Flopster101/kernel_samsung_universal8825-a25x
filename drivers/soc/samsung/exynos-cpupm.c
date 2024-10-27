@@ -40,6 +40,10 @@ static void exynos_cpupm_muic_notifier_init(void);
 static inline void exynos_cpupm_muic_notifier_init(void) {}
 #endif /* !CONFIG_SEC_PM && !CONFIG_MUIC_NOTIFIER */
 
+#ifndef CONFIG_DEBUG_SNAPSHOT
+#include <linux/sched/clock.h>
+#endif
+
 /*
  * State of CPUPM objects
  * All CPUPM objects have 2 states, BUSY and IDLE.
