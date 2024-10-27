@@ -653,8 +653,10 @@ int cal_if_init(void *dev)
 	if (of_address_to_resource(dev, 1, &res) == 0)
 		cmucal_dbg_set_cmu_aud_base(res.start);
 
+#if defined(CONFIG_CMUCAL_DEBUG)
 	if (of_address_to_resource(dev, 2, &res) == 0)
 		cmucal_dbg_set_cmu_nocl0_base(res.start);
+#endif
 
 	if (of_address_to_resource(dev, 3, &res) == 0)
 		cmucal_dbg_set_cmu_cpucl0_base(res.start);
