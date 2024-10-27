@@ -21,7 +21,25 @@ enum clk_info_type {
 	TOP_CMU_INFO,
 };
 
+#if defined(CONFIG_CMUCAL_DEBUG)
 static struct dentry *rootdir;
+static unsigned int cmu_aud_base = 0x0;
+static unsigned int cmu_nocl0_base = 0x0;
+static unsigned int cmu_cpucl0_base = 0x0;
+static unsigned int cmu_cpucl1_base = 0x0;
+static unsigned int cmu_cpucl2_base = 0x0;
+static unsigned int cmu_dsu_base = 0x0;
+static unsigned int cmu_peris_base = 0x0;
+#endif
+static unsigned int cmu_top_base = 0x0;
+void __iomem *cmu_aud;
+void __iomem *cmu_nocl0;
+void __iomem *cmu_cpucl0;
+void __iomem *cmu_cpucl1;
+void __iomem *cmu_cpucl2;
+void __iomem *cmu_dsu;
+void __iomem *cmu_peris;
+
 static struct cmucal_clk *clk_info;
 static struct vclk *dvfs_domain;
 static u32 cmu_id;
@@ -32,21 +50,6 @@ static unsigned int margin;
 static unsigned int debug_freq;
 
 extern unsigned int dbg_offset;
-static unsigned int cmu_top_base = 0x0;
-static unsigned int cmu_aud_base = 0x0;
-void __iomem *cmu_aud;
-static unsigned int cmu_nocl0_base = 0x0;
-void __iomem *cmu_nocl0;
-static unsigned int cmu_cpucl0_base = 0x0;
-void __iomem *cmu_cpucl0;
-static unsigned int cmu_cpucl1_base = 0x0;
-void __iomem *cmu_cpucl1;
-static unsigned int cmu_cpucl2_base = 0x0;
-void __iomem *cmu_cpucl2;
-static unsigned int cmu_dsu_base = 0x0;
-void __iomem *cmu_dsu;
-static unsigned int cmu_peris_base = 0x0;
-void __iomem *cmu_peris;
 
 extern bool is_ignore_cmu_dbg(u32 addr);
 
@@ -645,6 +648,7 @@ static const struct file_operations dsu_stepup_run_fops = {
 };
 #endif
 
+#if defined(CONFIG_CMUCAL_DEBUG)
 /* caller must hold prepare_lock */
 static int vclk_debug_create_one(struct vclk *vclk, struct dentry *pdentry)
 {
@@ -681,6 +685,9 @@ static int vclk_debug_create_one(struct vclk *vclk, struct dentry *pdentry)
 out:
 	return ret;
 }
+#endif
+
+#if defined(CONFIG_CMUCAL_DEBUG)
 
 unsigned int vclk_debug_clk_get_rate(unsigned int id)
 {
@@ -874,6 +881,7 @@ int vclk_debug_init(void)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(vclk_debug_init);
+#endif
 #endif
 
 MODULE_LICENSE("GPL");
