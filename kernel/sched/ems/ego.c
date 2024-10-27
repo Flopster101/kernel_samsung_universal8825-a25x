@@ -1114,7 +1114,7 @@ struct cpufreq_governor energy_aware_gov;
 static int ego_kthread_create(struct ego_policy *egp)
 {
 	struct task_struct *thread;
-	struct sched_param param = { .sched_priority = MAX_RT_PRIO / 2 };
+	struct sched_param param = { .sched_priority = MAX_USER_RT_PRIO - 1 };
 	struct cpufreq_policy *policy = egp->policy;
 	int ret;
 
