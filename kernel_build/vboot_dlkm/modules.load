@@ -85,7 +85,6 @@ mcd-panel-samsung-drv.ko
 mcd-panel-samsung-helper.ko
 mali_kbase.ko
 zram.ko
-scsc_log_collection.ko
 scsc_logring.ko
 scsc_platform_mif.ko
 scsc_mx.ko
@@ -108,7 +107,6 @@ spidev.ko
 spi-s3c64xx.ko
 smsc.ko
 scsc_wlan.ko
-scsc_wifilogger.ko
 asix.ko
 ax88179_178a.ko
 smsc75xx.ko
