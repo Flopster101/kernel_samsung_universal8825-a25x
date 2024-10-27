@@ -29,7 +29,9 @@
 #include <linux/slab.h>
 #include "sec_bootstat.h"
 
+#if defined(CONFIG_DEBUG_SNAPSHOT)
 extern void register_hook_bootstat(void (*func)(const char *buf));
+#endif
 extern void sec_bootstat_get_cpuinfo(int *freq, int *online);
 extern void sec_bootstat_get_thermal(int *temp);
 extern u64 exynos_get_mct_start(void);
@@ -426,7 +428,9 @@ static int __init_or_module sec_bootstat_init(void)
 	if (device_create_file(dev, &dev_attr_boot_stat) < 0)
 		pr_err("%s: Failed to create device file\n", __func__);
 
+#if defined(CONFIG_DEBUG_SNAPSHOT)
 	register_hook_bootstat(sec_bootstat_add);
+#endif
 	return 0;
 }
 

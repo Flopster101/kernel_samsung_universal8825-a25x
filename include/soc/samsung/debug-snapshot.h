@@ -7,6 +7,8 @@
 #ifndef DEBUG_SNAPSHOT_H
 #define DEBUG_SNAPSHOT_H
 
+#include <asm/barrier.h>
+
 #include <dt-bindings/soc/samsung/debug-snapshot-def.h>
 #if IS_ENABLED(CONFIG_DEBUG_SNAPSHOT)
 #include <linux/sched/clock.h>
@@ -113,7 +115,7 @@ extern unsigned long dss_get_vaddr_##item##_log(void)
 
 #define dbg_snapshot_do_dpm_policy(a)		do { } while (0)
 
-#define dbg_snapshot_get_sjtag_status()		do { } while (0)
+#define dbg_snapshot_get_sjtag_status()		(-1)
 #define dbg_snapshot_ecc_dump(a)		do { } while (0)
 #define dbg_snapshot_register_wdt_ops(a, b, c)	do { } while (0)
 #define dbg_snapshot_register_debug_ops(a, b, c, d)	do { } while (0)
