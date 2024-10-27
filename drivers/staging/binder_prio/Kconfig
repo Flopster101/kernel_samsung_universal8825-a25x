@@ -1,4 +1,0 @@
-config BINDER_PRIO
-	tristate "Xiaomi binder prio"
-	depends on ANDROID_BINDER_IPC
-	default y
