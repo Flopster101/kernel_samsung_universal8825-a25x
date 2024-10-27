@@ -3938,12 +3938,6 @@
 			phandle = <0xc3>;
 		};
 
-		log_itmon {
-			reg = <0x00 0xeffef000 0x10000>;
-			no-map;
-			phandle = <0xa0>;
-		};
-
 		debug_snapshot {
 			#address-cells = <0x02>;
 			#size-cells = <0x01>;
@@ -4007,11 +4001,6 @@
 			};
 		};
 
-		debug_kinfo_reserved@effff000 {
-			reg = <0x00 0xeffff000 0x1000>;
-			phandle = <0x9f>;
-		};
-
 		log_backtrace {
 			compatible = "log_backtrace";
 			alloc-ranges = <0x00 0x80000000 0x78000000>;
@@ -4053,20 +4042,6 @@
 			phandle = <0xb2>;
 		};
 
-		abox-rmem {
-			compatible = "exynos,abox_rmem";
-			size = <0x2800000>;
-			alloc-ranges = <0x00 0xc0000000 0x20000000>;
-			phandle = <0xb5>;
-		};
-
-		abox-dbg {
-			compatible = "exynos,abox_dbg";
-			size = <0x2900000>;
-			alloc-ranges = <0x00 0xc0000000 0x20000000>;
-			phandle = <0xbe>;
-		};
-
 		abox-slog {
 			compatible = "exynos,abox_slog";
 			size = <0x2800000>;
@@ -4087,12 +4062,6 @@
 			alignment = <0x00 0x10000>;
 			reusable;
 			phandle = <0xf2>;
-		};
-
-		seclog_mem {
-			compatible = "exynos,seclog";
-			reg = <0x00 0xc3000000 0x80000>;
-			phandle = <0xb3>;
 		};
 
 		log_bcm {
