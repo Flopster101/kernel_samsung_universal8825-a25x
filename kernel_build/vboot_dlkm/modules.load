@@ -20,10 +20,6 @@ pwm-samsung.ko
 clk-exynos-audss.ko
 pl330.ko
 samsung-dma.ko
-exynos-itmon.ko
-exynos-adv-tracer.ko
-exynos-adv-tracer-s2d.ko
-exynos-ssld.ko
 exynos-pmu-if.ko
 exynos-flexpmu-dbg.ko
 exynos-pd.ko
