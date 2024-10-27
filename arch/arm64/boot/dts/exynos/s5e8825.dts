@@ -4346,11 +4346,13 @@
 
 	debug-kinfo {
 		compatible = "google,debug-kinfo";
+		status = "disabled";
 		memory-region = <0x9f>;
 	};
 
 	exynos-itmon {
 		compatible = "samsung,exynos-itmon";
+		status = "disabled";
 		memory-region = <0xa0>;
 		interrupts = <0x00 0x3a 0x04 0x00 0x132 0x04 0x00 0x1da 0x04 0x00 0x1d8 0x04 0x00 0x1d9 0x04>;
 		panic_count = <0x05>;
@@ -4359,10 +4361,12 @@
 
 	hardlockup-watchdog {
 		compatible = "samsung,hardlockup-watchdog";
+		status = "disabled";
 	};
 
 	exynos-debug-test {
 		compatible = "samsung,exynos-debug-test";
+		status = "disabled";
 		ps_hold_control_offset = <0x30c>;
 		scratch-offset = <0x810>;
 		dram-init-bit = <0x04>;
@@ -4377,6 +4381,7 @@
 
 	exynos-ecc-handler {
 		compatible = "samsung,exynos-ecc-handler";
+		status = "disabled";
 		interrupts = <0x00 0x8b 0x04 0x00 0x8c 0x04 0x00 0x8d 0x04 0x00 0x8e 0x04 0x00 0x8f 0x04 0x00 0x90 0x04 0x00 0x91 0x04 0x00 0x92 0x04 0x00 0x93 0x04>;
 		interrupt-names = "Uncorrectable errors Cache(L3) tag RAMs or SCU snoop filter RAMs", "Core0, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core1, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core2, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core3, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core4, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core5, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core6, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs", "Core7, Uncorrectable errors in the L1 tag or dirty or L2 tag RAMs";
 		interrupt-affinity = <0xff 0x01 0x02 0x04 0x08 0x10 0x20 0x40 0x80>;
@@ -4399,7 +4404,7 @@
 		reg = <0x00 0x118c0000 0x1000>;
 		reg-names = "mailbox";
 		interrupts = <0x00 0x24 0x04>;
-		status = "ok";
+		status = "disabled";
 	};
 
 	exynos_adv_tracer_s2d {
@@ -4411,7 +4416,7 @@
 		dbgsel-sw-bit = <0x04>;
 		pmu-rst-seq = <0x500>;
 		pmu-rst-seq-safe-mode-bit = <0x1f>;
-		status = "ok";
+		status = "disabled";
 		phandle = <0x1dd>;
 	};
 
@@ -4419,6 +4424,7 @@
 		compatible = "samsung,exynos-ehld";
 		reg = <0x00 0x10880000 0x1000 0x00 0x10890000 0x1000 0x00 0x10860000 0x1000 0x00 0x10870000 0x1000>;
 		cs_base = <0x1e810000>;
+		status = "disabled";
 
 		cpu0 {
 			dbg-offset = <0x00>;
