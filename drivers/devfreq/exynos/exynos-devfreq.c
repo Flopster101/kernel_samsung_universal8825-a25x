@@ -2732,11 +2732,15 @@ static int exynos_devfreq_probe(struct platform_device *pdev)
 
 	// Update all pm_qos handles
 	exynos_pm_qos_update_request(&data->sys_pm_qos_min, data->min_freq);
+#if defined(CONFIG_ARM_EXYNOS_DEVFREQ_DEBUG)
 	exynos_pm_qos_update_request(&data->debug_pm_qos_min, data->min_freq);
+#endif
 	exynos_pm_qos_update_request(&data->default_pm_qos_min, data->default_qos);
 	if (data->pm_qos_class_max) {
 		exynos_pm_qos_update_request(&data->default_pm_qos_max, data->max_freq);
+#if defined(CONFIG_ARM_EXYNOS_DEVFREQ_DEBUG)
 		exynos_pm_qos_update_request(&data->debug_pm_qos_max, data->max_freq);
+#endif
 	}
 
 #if IS_ENABLED(CONFIG_EXYNOS_THERMAL_V2) && IS_ENABLED(CONFIG_DEV_THERMAL)
