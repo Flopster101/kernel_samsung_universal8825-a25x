@@ -59,7 +59,7 @@ static DEFINE_IDR(zram_index_idr);
 static DEFINE_MUTEX(zram_index_mutex);
 
 static int zram_major;
-static const char *default_compressor = "lzo-rle";
+static const char *default_compressor = "lz4";
 
 static bool is_lzorle;
 #ifdef CONFIG_ZRAM_LRU_WRITEBACK
