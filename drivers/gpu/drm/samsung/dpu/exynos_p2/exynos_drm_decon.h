@@ -41,7 +41,11 @@
 
 #include <decon_cal.h>
 
+#if IS_ENABLED(CONFIG_DEBUG_SNAPSHOT)
 extern int dbg_snapshot_expire_watchdog(void);
+#else
+static inline int dbg_snapshot_expire_watchdog(void) { return 0; }
+#endif
 
 /* Out FIFO SIZE : 4K */
 #define OUTFIFO_PIXEL_NUM 4096
