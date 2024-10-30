@@ -59,6 +59,8 @@ config SND_SOC_ALL_CODECS
 	imply SND_SOC_CS35L34
 	imply SND_SOC_CS35L35
 	imply SND_SOC_CS35L36
+	imply SND_SOC_CS35L41_I2C
+	imply SND_SOC_CS35L41_SPI
 	imply SND_SOC_CS42L42
 	imply SND_SOC_CS42L51_I2C
 	imply SND_SOC_CS42L52
@@ -174,6 +176,7 @@ config SND_SOC_ALL_CODECS
 	imply SND_SOC_RT5677
 	imply SND_SOC_RT5682_I2C
 	imply SND_SOC_RT5682_SDW
+	imply SND_SOC_RT5691
 	imply SND_SOC_RT700_SDW
 	imply SND_SOC_RT711_SDW
 	imply SND_SOC_RT715_SDW
@@ -183,6 +186,7 @@ config SND_SOC_ALL_CODECS
 	imply SND_SOC_SIMPLE_AMPLIFIER
 	imply SND_SOC_SIRF_AUDIO_CODEC
 	imply SND_SOC_SPDIF
+	imply SND_SOC_S5M3700X
 	imply SND_SOC_SSM2305
 	imply SND_SOC_SSM2518
 	imply SND_SOC_SSM2602_SPI
@@ -202,6 +206,7 @@ config SND_SOC_ALL_CODECS
 	imply SND_SOC_TAS5720
 	imply SND_SOC_TAS6424
 	imply SND_SOC_TDA7419
+	imply SND_SOC_TFA9878
 	imply SND_SOC_TFA9879
 	imply SND_SOC_TLV320ADCX140
 	imply SND_SOC_TLV320AIC23_I2C
@@ -325,6 +330,7 @@ config SND_SOC_WM_ADSP
 	default m if SND_SOC_WM5102=m
 	default m if SND_SOC_WM5110=m
 	default m if SND_SOC_WM2200=m
+	default y if SND_SOC_CS35L41=y
 
 config SND_SOC_AB8500_CODEC
 	tristate
@@ -534,6 +540,14 @@ config SND_SOC_BD28623
 config SND_SOC_BT_SCO
 	tristate "Dummy BT SCO codec driver"
 
+config SND_SOC_CIRRUS_AMP
+	tristate "Cirrus Logic Amp Feature drivers"
+	help
+	  Enable support for Cirrus Logic smart speaker amplifier factory
+	  driver. Supports various smart amp functions, such as firmware
+	  calibration, data logging, etc. Compatible with CS35L40 and CS35L46
+	  amplifiers.
+
 config SND_SOC_CPCAP
 	tristate "Motorola CPCAP codec"
 	depends on MFD_CPCAP
@@ -569,6 +583,25 @@ config SND_SOC_CS35L35
 config SND_SOC_CS35L36
 	tristate "Cirrus Logic CS35L36 CODEC"
 	depends on I2C
+
+config SND_SOC_CS35L41
+	tristate "Cirrus Logic CS35L41 CODEC"
+	select SND_SOC_WM_ADSP
+
+config SND_SOC_CS35L41_SPI
+	tristate "Cirrus Logic CS35L41 CODEC (SPI)"
+	depends on SPI_MASTER
+	select SND_SOC_CS35L41
+	select REGMAP_SPI
+
+config SND_SOC_CS35L41_I2C
+	tristate "Cirrus Logic CS35L41 CODEC (I2C)"
+	depends on I2C
+	select SND_SOC_CS35L41
+	select REGMAP_I2C
+
+config SND_SOC_CIRRUS_REINIT_SYSFS
+	tristate "Cirrus Logic Amp SysFS Reinit"
 
 config SND_SOC_CS42L42
 	tristate "Cirrus Logic CS42L42 CODEC"
@@ -1043,6 +1076,7 @@ config SND_SOC_RL6231
 	default y if SND_SOC_RT5670=y
 	default y if SND_SOC_RT5677=y
 	default y if SND_SOC_RT5682=y
+	default y if SND_SOC_RT5691=y
 	default y if SND_SOC_RT1011=y
 	default y if SND_SOC_RT1015=y
 	default y if SND_SOC_RT1015P=y
@@ -1061,6 +1095,7 @@ config SND_SOC_RL6231
 	default m if SND_SOC_RT5670=m
 	default m if SND_SOC_RT5677=m
 	default m if SND_SOC_RT5682=m
+	default m if SND_SOC_RT5691=m
 	default m if SND_SOC_RT1011=m
 	default m if SND_SOC_RT1015=m
 	default m if SND_SOC_RT1015P=m
@@ -1192,6 +1227,10 @@ config SND_SOC_RT5682_SDW
 	select SND_SOC_RT5682
 	select REGMAP_SOUNDWIRE
 
+config SND_SOC_RT5691
+	tristate
+	depends on I2C
+
 config SND_SOC_RT700
 	tristate
 
@@ -1250,6 +1289,18 @@ config SND_SOC_SIRF_AUDIO_CODEC
 config SND_SOC_SPDIF
 	tristate "S/PDIF CODEC"
 
+config SND_SOC_S5M3700X
+	tristate "S5M3700X CODEC"
+
+config SND_SOC_S5M3700X_DUMP
+	tristate "S5M3700X CODEC DUMP"
+
+config SND_SOC_S5M3700X_VTS
+	tristate "S5M3700X CODEC VTS"
+
+config SND_SOC_S5M3700X_HIFI
+	tristate "S5M3700X CODEC HIFI"
+
 config SND_SOC_SSM2305
 	tristate "Analog Devices SSM2305 Class-D Amplifier"
 	help
@@ -1305,8 +1356,11 @@ config SND_SOC_TAS2552
 	depends on I2C
 
 config SND_SOC_TAS2562
-	tristate "Texas Instruments TAS2562 Mono Audio amplifier"
+	tristate "Texas Instruments TAS2562 SmartAmp(R)"
 	depends on I2C
+	select TAS2562_REGMAP
+	select TAS2562_CODEC
+	select TAS25XX_ALGO
 
 config SND_SOC_TAS2764
 	tristate "Texas Instruments TAS2764 Mono Audio amplifier"
@@ -1345,6 +1399,10 @@ config SND_SOC_TDA7419
 	tristate "ST TDA7419 audio processor"
 	depends on I2C
 	select REGMAP_I2C
+
+config SND_SOC_TFA9878
+	tristate "Goodix TFA9878 amplifier"
+	depends on I2C
 
 config SND_SOC_TFA9879
 	tristate "NXP Semiconductors TFA9879 amplifier"
@@ -1787,5 +1845,14 @@ config SND_SOC_NAU8825
 config SND_SOC_TPA6130A2
 	tristate "Texas Instruments TPA6130A2 headphone amplifier"
 	depends on I2C
+
+# TAS2562
+source "sound/soc/codecs/tas2562/Kconfig"
+
+# TFA9878
+source "sound/soc/codecs/tfa9878/Kconfig"
+
+# DBMDx
+source "sound/soc/codecs/dbmdx/Kconfig"
 
 endmenu
