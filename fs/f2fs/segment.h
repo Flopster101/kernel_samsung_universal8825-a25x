@@ -304,6 +304,9 @@ struct dirty_seglist_info {
 	unsigned long *pinned_secmap;		/* pinned victims from foreground GC */
 	unsigned int pinned_secmap_cnt;		/* count of victims which has pinned data */
 	bool enable_pin_section;		/* enable pinning section */
+
+	/* W/A for FG_GC failure due to Atomic Write File and Pinned File */
+	unsigned long *unable_victim_secmap; /* GC Failed Bitmap */
 };
 
 /* victim selection function for cleaning and SSR */
