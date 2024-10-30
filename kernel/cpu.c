@@ -36,6 +36,7 @@
 #include <linux/cpuset.h>
 #include <linux/random.h>
 #include <uapi/linux/sched/types.h>
+#include <linux/sec_debug.h>
 
 #include <trace/events/power.h>
 #define CREATE_TRACE_POINTS
@@ -251,7 +252,9 @@ static bool cpuhp_is_ap_state(enum cpuhp_state state)
 static inline void wait_for_ap_thread(struct cpuhp_cpu_state *st, bool bringup)
 {
 	struct completion *done = bringup ? &st->done_up : &st->done_down;
+	secdbg_dtsk_built_set_data(DTYPE_CPUHP, (void *)st->thread);
 	wait_for_completion(done);
+	secdbg_dtsk_built_clear_data();
 }
 
 static inline void complete_ap_thread(struct cpuhp_cpu_state *st, bool bringup)
@@ -1697,6 +1700,7 @@ void bringup_nonboot_cpus(unsigned int setup_max_cpus)
 #ifdef CONFIG_PM_SLEEP_SMP
 static cpumask_var_t frozen_cpus;
 
+bool freezing_32bit_capable_cpus;
 int freeze_secondary_cpus(int primary)
 {
 	int cpu, error = 0;
@@ -1726,6 +1730,19 @@ int freeze_secondary_cpus(int primary)
 			pr_info("Wakeup pending. Abort CPU freeze\n");
 			error = -EBUSY;
 			break;
+		}
+
+		if (cpumask_test_cpu(cpu, system_32bit_el0_cpumask())) {
+			struct cpumask mask;
+
+			cpumask_and(&mask, cpu_online_mask,
+					system_32bit_el0_cpumask());
+			/*
+			 * Set freezing_32bit_capable_cpus before last 32bit
+			 * capable cpu goes out.
+			 */
+			if (cpumask_weight(&mask) == 1)
+				freezing_32bit_capable_cpus = true;
 		}
 
 		trace_suspend_resume(TPS("CPU_OFF"), cpu, true);
@@ -1790,6 +1807,11 @@ void thaw_secondary_cpus(void)
 				       __func__, cpu);
 			else
 				kobject_uevent(&cpu_device->kobj, KOBJ_ONLINE);
+
+			if (freezing_32bit_capable_cpus &&
+			    cpumask_test_cpu(cpu, system_32bit_el0_cpumask()))
+				freezing_32bit_capable_cpus = false;
+
 			continue;
 		}
 		pr_warn("Error taking CPU%d up: %d\n", cpu, error);
