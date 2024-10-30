@@ -3200,6 +3200,10 @@ static bool swap_discardable(struct swap_info_struct *si)
 	return true;
 }
 
+#if IS_ENABLED(CONFIG_ZRAM)
+zram_oem_func zram_oem_fn;
+#endif
+
 SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 {
 	struct swap_info_struct *p;
@@ -3463,6 +3467,15 @@ out:
 		inode_unlock(inode);
 	if (!error)
 		enable_swap_slots_cache();
+#if IS_ENABLED(CONFIG_ZRAM)
+	if (!error && !zram_oem_fn) {
+		const struct block_device_operations *ops;
+
+		ops = p->bdev->bd_disk->fops;
+		if (ops->android_oem_data1)
+			zram_oem_fn = (zram_oem_func)ops->android_oem_data1;
+	}
+#endif
 	return error;
 }
 
