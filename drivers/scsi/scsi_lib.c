@@ -1521,6 +1521,13 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 	}
 
 	trace_scsi_dispatch_cmd_start(cmd);
+#ifdef CONFIG_SEC_FACTORY
+	if (cmd && cmd->device &&
+		cmd->device->removable && cmd->cmnd &&
+			cmd->cmnd[0] == TEST_UNIT_READY) {
+		pr_info("%s TEST_UNIT_READY +\n", __func__);
+	}
+#endif
 	rtn = host->hostt->queuecommand(host, cmd);
 	if (rtn) {
 		atomic_dec(&cmd->device->iorequest_cnt);
@@ -1532,6 +1539,13 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 		SCSI_LOG_MLQUEUE(3, scmd_printk(KERN_INFO, cmd,
 			"queuecommand : request rejected\n"));
 	}
+#ifdef CONFIG_SEC_FACTORY
+	if (cmd && cmd->device &&
+		cmd->device->removable && cmd->cmnd &&
+			cmd->cmnd[0] == TEST_UNIT_READY) {
+		pr_info("%s TEST_UNIT_READY -\n", __func__);
+	}
+#endif
 
 	return rtn;
  done:
@@ -1594,12 +1608,42 @@ static blk_status_t scsi_prepare_cmd(struct request *req)
 
 static void scsi_mq_done(struct scsi_cmnd *cmd)
 {
-	if (unlikely(blk_should_fake_timeout(cmd->request->q)))
+#ifdef CONFIG_SEC_FACTORY
+	if (cmd && cmd->device &&
+		cmd->device->removable && cmd->cmnd &&
+			cmd->cmnd[0] == TEST_UNIT_READY) {
+		pr_info("%s TEST_UNIT_READY +\n", __func__);
+	}
+#endif
+	if (unlikely(blk_should_fake_timeout(cmd->request->q))) {
+#ifdef CONFIG_SEC_FACTORY
+		if (cmd && cmd->device &&
+			cmd->device->removable && cmd->cmnd &&
+				cmd->cmnd[0] == TEST_UNIT_READY) {
+			pr_info("%s TEST_UNIT_READY fake timeout ret -\n", __func__);
+		}
+#endif
 		return;
-	if (unlikely(test_and_set_bit(SCMD_STATE_COMPLETE, &cmd->state)))
+	}
+	if (unlikely(test_and_set_bit(SCMD_STATE_COMPLETE, &cmd->state))) {
+#ifdef CONFIG_SEC_FACTORY
+		if (cmd && cmd->device &&
+			cmd->device->removable && cmd->cmnd &&
+				cmd->cmnd[0] == TEST_UNIT_READY) {
+			pr_info("%s TEST_UNIT_READY unlikely ret -\n", __func__);
+		}
+#endif
 		return;
+	}
 	trace_scsi_dispatch_cmd_done(cmd);
 	blk_mq_complete_request(cmd->request);
+#ifdef CONFIG_SEC_FACTORY
+	if (cmd && cmd->device &&
+		cmd->device->removable && cmd->cmnd &&
+			cmd->cmnd[0] == TEST_UNIT_READY) {
+		pr_info("%s TEST_UNIT_READY -\n", __func__);
+	}
+#endif
 }
 
 static void scsi_mq_put_budget(struct request_queue *q)
@@ -1725,12 +1769,21 @@ out_put_budget:
 		scsi_run_queue_async(sdev);
 		break;
 	}
+#ifdef CONFIG_SEC_FACTORY
+	if (sdev && sdev->removable) {
+		sdev_printk(KERN_INFO, sdev, "%s error\n",
+			__func__);
+	}
+#endif
 	return ret;
 }
 
 static enum blk_eh_timer_return scsi_timeout(struct request *req,
 		bool reserved)
 {
+#ifdef CONFIG_USB_DEBUG_DETAILED_LOG
+	pr_info("%s reserved=%d\n", __func__, reserved);
+#endif
 	if (reserved)
 		return BLK_EH_RESET_TIMER;
 	return scsi_times_out(req);
@@ -2197,6 +2250,11 @@ scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
 	};
 	int result;
 
+#ifdef CONFIG_SEC_FACTORY
+	if (sdev->removable)
+		sdev_printk(KERN_INFO, sdev, "%s +\n", __func__);
+#endif
+
 	/* try to eat the UNIT_ATTENTION if there are enough retries */
 	do {
 		result = scsi_execute_req(sdev, cmd, DMA_NONE, NULL, 0, sshdr,
@@ -2206,7 +2264,10 @@ scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
 			sdev->changed = 1;
 	} while (scsi_sense_valid(sshdr) &&
 		 sshdr->sense_key == UNIT_ATTENTION && --retries);
-
+#ifdef CONFIG_SEC_FACTORY
+	if (sdev->removable)
+		sdev_printk(KERN_INFO, sdev, "%s -\n", __func__);
+#endif
 	return result;
 }
 EXPORT_SYMBOL(scsi_test_unit_ready);
