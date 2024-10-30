@@ -149,7 +149,10 @@ int usb_control_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
 	dr->wValue = cpu_to_le16(value);
 	dr->wIndex = cpu_to_le16(index);
 	dr->wLength = cpu_to_le16(size);
-
+#if defined(CONFIG_USB_HOST_SAMSUNG_FEATURE)
+	if (dev && dev->reset_resume == 1)
+		timeout = 500;
+#endif
 	ret = usb_internal_control_msg(dev, pipe, dr, data, size, timeout);
 
 	/* Linger a bit, prior to the next control message. */
@@ -1408,7 +1411,13 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 			dev_dbg(&dev->dev, "unregistering interface %s\n",
 				dev_name(&interface->dev));
 			remove_intf_ep_devs(interface);
+#ifdef CONFIG_USB_DEBUG_DETAILED_LOG
+			dev_info(&dev->dev, "%s device del+\n", __func__);
+#endif
 			device_del(&interface->dev);
+#ifdef CONFIG_USB_DEBUG_DETAILED_LOG
+			dev_info(&dev->dev, "%s device del-\n", __func__);
+#endif
 		}
 
 		/* Now that the interfaces are unbound, nobody should
@@ -1430,8 +1439,14 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 
 	dev_dbg(&dev->dev, "%s nuking %s URBs\n", __func__,
 		skip_ep0 ? "non-ep0" : "all");
+#ifdef CONFIG_USB_DEBUG_DETAILED_LOG
+	dev_info(&dev->dev, "%s official+\n", __func__);
+#endif
 
 	usb_disable_device_endpoints(dev, skip_ep0);
+#ifdef CONFIG_USB_DEBUG_DETAILED_LOG
+	dev_info(&dev->dev, "%s official-\n", __func__);
+#endif
 }
 
 /**
