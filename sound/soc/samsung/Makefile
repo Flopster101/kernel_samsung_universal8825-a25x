@@ -8,6 +8,7 @@ snd-soc-s3c-i2s-v2-objs := s3c-i2s-v2.o
 snd-soc-samsung-spdif-objs := spdif.o
 snd-soc-pcm-objs := pcm.o
 snd-soc-i2s-objs := i2s.o
+snd-soc-dp_dma-objs := dp_dma.o
 
 obj-$(CONFIG_SND_SOC_SAMSUNG) += snd-soc-s3c-dma.o
 obj-$(CONFIG_SND_S3C24XX_I2S) += snd-soc-s3c24xx-i2s.o
@@ -17,6 +18,10 @@ obj-$(CONFIG_SND_SAMSUNG_SPDIF) += snd-soc-samsung-spdif.o
 obj-$(CONFIG_SND_SAMSUNG_PCM) += snd-soc-pcm.o
 obj-$(CONFIG_SND_SAMSUNG_I2S) += snd-soc-i2s.o
 obj-$(CONFIG_SND_SAMSUNG_I2S) += snd-soc-idma.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_DISPLAYPORT) += snd-soc-dp_dma.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_ABOX) += abox/
+obj-$(CONFIG_SND_SOC_SAMSUNG_MAILBOX) += vts/
+obj-$(CONFIG_SND_SOC_SAMSUNG_SLIF) += slif/
 
 # S3C24XX Machine Support
 snd-soc-jive-wm8750-objs := jive_wm8750.o
@@ -68,3 +73,11 @@ obj-$(CONFIG_SND_SOC_ARNDALE) += snd-soc-arndale.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_TM2_WM5110) += snd-soc-tm2-wm5110.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_ARIES_WM8994) += snd-soc-aries-wm8994.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_MIDAS_WM1811) += snd-soc-midas-wm1811.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS9925_SOUND) += exynos9925_sound.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_SOUND) += exynos8825_sound.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_AUDIO) += exynos8825_audio.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5665) += exynos8825_rt5665.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5665_DBMDX) += exynos8825_rt5665.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5691) += exynos8825_rt5691.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_RAINBOW_PRINCE) += rainbow_prince.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_AUDIO) += sec_audio_sysfs.o sec_audio_debug.o
