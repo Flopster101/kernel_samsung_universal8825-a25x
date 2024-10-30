@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-2.0
+
+source "drivers/input/touchscreen/stm/fts5cu56a/Kconfig"
+
+source "drivers/input/touchscreen/sec_input/Kconfig"
+
+source "drivers/input/touchscreen/stm/stm_spi/Kconfig"
+

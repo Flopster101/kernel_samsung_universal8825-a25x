@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# STM TOUCH driver configuration
+#
+
+config TOUCHSCREEN_STM_SPI
+    tristate "STM SPI Touchscreen"
+    depends on SPI
+    help
+      Say Y here if you want support for STM SPI touchscreen controllers.
+      If unsure, say N.
+
+config TOUCHSCREEN_STM_SPI_FTS2BA61Y
+    bool "STM SPI Touchscreen FTS2BA61Y"
+    depends on TOUCHSCREEN_STM_SPI
+    help
+      Say Y here if you want support for STM SPI FTS2BA61Y touchscreen controllers.
+      If unsure, say N.
+
