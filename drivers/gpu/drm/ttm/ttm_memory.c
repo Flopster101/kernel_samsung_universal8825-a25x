@@ -311,7 +311,7 @@ static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
 
 	zone->name = "kernel";
 	zone->zone_mem = mem;
-	zone->max_mem = mem >> 1;
+	zone->max_mem = mem;
 	zone->emer_mem = (mem >> 1) + (mem >> 2);
 	zone->swap_limit = zone->max_mem - (mem >> 3);
 	zone->used_mem = 0;

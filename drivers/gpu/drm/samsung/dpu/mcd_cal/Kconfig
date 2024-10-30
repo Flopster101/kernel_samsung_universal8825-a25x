@@ -1,0 +1,10 @@
+config DRM_MCD_COMMON
+	bool "Support Samsung MCD DPU Driver base on DRM"
+	depends on DRM_SAMSUNG_DPU
+
+config DRM_MCD_HDR
+	bool "Support MCD HDR Driver base on DRM"
+	depends on DRM_MCD_COMMON
+	default n
+	help
+	   This enables support for wcg/hdr using hardware ip designed by mcd.
