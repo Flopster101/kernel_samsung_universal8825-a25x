@@ -1,0 +1,118 @@
+config SHUB
+	tristate "shub"
+	default y
+	help
+	  shub driver for sensor hub.
+	  If you say yes here you get shub support for sensor hub.
+	  To compile this driver as a module, choose M here: the module will be called shub.
+
+config SHUB_PM_WAKEUP_LINUX_VER_5_4
+	tristate "pm wakeup linux version 5.4"
+	default y
+	help
+	  ssp driver for sensor hub.
+	  If you say yes here, the code of pm_wakeup is applied over linux version 5.4.
+	  To compile this driver as a module, choose M here: the
+	  module will be called ssp.
+
+config SHUB_AOIS
+	tristate "SHUB_AOIS"
+	default n
+	help
+	  This is AOIS driver for camera
+	  Set as y if the driver is used in this project
+	  use CONFIG_SHUB_AOIS
+
+config SHUB_PANEL_NOTIFY
+	tristate "SHUB_PANEL_NOTI"
+	default n
+	help
+	  This is panel notify for chub
+	  Set as y if the driver is used in this project
+
+config SHUB_KUNIT
+	tristate "Kunit test for SHUB"
+	depends on KUNIT
+	default n
+	help
+	  Kunit test for SHUB.
+
+config SHUB_TEST_FOR_ON_DEVICE
+	tristate "KUnit test for shub_test"
+	depends on KUNIT
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  If you run this test driver on device, SHOULD set this config as 'm' to build test driver modulraly.
+
+config SHUB_TEST_FOR_ONLY_UML
+	tristate "KUnit test for shub_test"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_ACCELEROMETER_TEST
+	tristate "KUnit test for shub_accelerometer"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_GYROSCOPE_TEST
+	tristate "KUnit test for shub_gyroscope"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_PROXIMITY_TEST
+	tristate "KUnit test for shub_proximity"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+    TODO: Describe config fully.
+    This CONFIG is recommended to set to y
+
+config SHUB_LIGHT_TEST
+	tristate "KUnit test for shub_light"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_PRESSURE_TEST
+	tristate "KUnit test for shub_pressure"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_MAGNETOMETER_TEST
+	tristate "KUnit test for shub_magnetometer"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
+
+config SHUB_SCONTEXT_TEST
+	tristate "KUnit test for shub_scontext"
+	depends on KUNIT
+	depends on UML
+	depends on SHUB
+	help
+	  TODO: Describe config fully.
+	  This CONFIG is recommended to set to y.
