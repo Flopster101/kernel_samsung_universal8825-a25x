@@ -601,4 +601,8 @@ config MST_IRQ
 	help
 	  Support MStar Interrupt Controller.
 
+config ARM_GIC_V3_VENDORHOOK
+	tristate "Vendor hook for ARM GIC V3"
+	depends on ARM_GIC_V3
+
 endmenu
