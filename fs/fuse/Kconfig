@@ -52,3 +52,8 @@ config FUSE_DAX
 
 	  If you want to allow mounting a Virtio Filesystem with the "dax"
 	  option, answer Y.
+
+config FUSE_SUPPORT_STLOG
+	bool "Enable storage log"
+	default y
+	depends on FUSE_FS && PROC_STLOG

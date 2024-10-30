@@ -16,6 +16,9 @@
 #include <linux/posix_acl_xattr.h>
 #include <linux/exportfs.h>
 #include "overlayfs.h"
+#ifdef CONFIG_KDP_NS
+#include <linux/kdp.h>
+#endif
 
 MODULE_AUTHOR("Miklos Szeredi <miklos@szeredi.hu>");
 MODULE_DESCRIPTION("Overlay filesystem");
@@ -1175,7 +1178,11 @@ static int ovl_get_upper(struct super_block *sb, struct ovl_fs *ofs,
 	}
 
 	/* Don't inherit atime flags */
+#ifdef CONFIG_KDP_NS
+	kdp_clear_mnt_flags(upper_mnt, (MNT_NOATIME | MNT_NODIRATIME | MNT_RELATIME));
+#else
 	upper_mnt->mnt_flags &= ~(MNT_NOATIME | MNT_NODIRATIME | MNT_RELATIME);
+#endif
 	upper_layer->mnt = upper_mnt;
 	upper_layer->idx = 0;
 	upper_layer->fsid = 0;
@@ -1678,7 +1685,11 @@ static int ovl_get_layers(struct super_block *sb, struct ovl_fs *ofs,
 		 * Make lower layers R/O.  That way fchmod/fchown on lower file
 		 * will fail instead of modifying lower fs.
 		 */
+#ifdef CONFIG_KDP_NS
+		kdp_set_mnt_flags(mnt, MNT_READONLY|MNT_NOATIME);
+#else
 		mnt->mnt_flags |= MNT_READONLY | MNT_NOATIME;
+#endif
 
 		layers[ofs->numlayer].trap = trap;
 		layers[ofs->numlayer].mnt = mnt;
