@@ -440,7 +440,13 @@ config ATMEL_TCB_CLKSRC
 	  Support for Timer Counter Blocks on Atmel SoCs.
 
 config CLKSRC_EXYNOS_MCT
-	bool "Exynos multi core timer driver" if COMPILE_TEST
+	tristate "Exynos multi core timer driver"
+	depends on ARM || ARM64
+	help
+	  Support for Multi Core Timer controller on Exynos SoCs.
+
+config CLKSRC_EXYNOS_MCT_V2
+	tristate "Exynos multi core timer (ver 2) driver"
 	depends on ARM || ARM64
 	help
 	  Support for Multi Core Timer controller on Exynos SoCs.
