@@ -855,6 +855,7 @@ static inline int pmdp_test_and_clear_young(struct vm_area_struct *vma,
 static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
 				       unsigned long address, pte_t *ptep)
 {
+	READ_ONCE(*ptep);
 	return __pte(xchg_relaxed(&pte_val(*ptep), 0));
 }
 

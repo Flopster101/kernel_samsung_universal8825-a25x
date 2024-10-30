@@ -15,7 +15,6 @@ config UML
 	select HAVE_FUTEX_CMPXCHG if FUTEX
 	select HAVE_DEBUG_KMEMLEAK
 	select HAVE_DEBUG_BUGVERBOSE
-	select NO_DMA
 	select GENERIC_IRQ_SHOW
 	select GENERIC_CPU_DEVICES
 	select GENERIC_CLOCKEVENTS
@@ -28,7 +27,13 @@ config MMU
 	default y
 
 config NO_IOMEM
-	def_bool y
+	bool
+	default y if !SEC_KUNIT
+
+config HAS_IOMEM
+	bool "Turns on fake IOMEM support for KUnit"
+	depends on SEC_KUNIT
+	select MOCK_IOMEM
 
 config ISA
 	bool
@@ -189,6 +194,11 @@ config UML_TIME_TRAVEL_SUPPORT
 	  line help for more details.
 
 	  It is safe to say Y, but you probably don't need this.
+
+config PLATFORM_MOCK
+	bool "Enable a mock architecture used for unit testing."
+	depends on SEC_KUNIT && OF
+	default n
 
 endmenu
 
