@@ -8,7 +8,7 @@
 // Binse Park <unsang.park@samsung.com>
 
 #define KPERFMON_KERNEL
-#include <linux/ologk.h>
+//#include <linux/ologk.h>
 #undef KPERFMON_KERNEL
 
 #include <linux/version.h>
