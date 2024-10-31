@@ -13,7 +13,7 @@ PC_REPO="https://github.com/kdrag0n/proton-clang"
 LZ_REPO="https://gitlab.com/Jprimero15/lolz_clang.git"
 
 # Other
-DEFAULT_DEFCONFIG="s5e8825-a25xxx-custom_defconfig"
+DEFAULT_DEFCONFIG="s5e8825-a25xdxx_defconfig"
 export ARCH=arm64
 KERNEL_URL="https://github.com/Flopster101/a25x-oss-sec"
 AK3_URL="https://github.com/Flopster101/AnyKernel3-A25"
@@ -154,7 +154,7 @@ LINUX_VER=$(make kernelversion 2>/dev/null)
 FK_TYPE=""
 if [ $DO_KSU -eq 1 ]; then
     FK_TYPE="KSU"
-    DEFCONFIG="s5e8825-a25xxx-customksu_defconfig"
+    DEFCONFIG="s5e8825-a25xdxx-ksu_defconfig"
 else
     FK_TYPE="Vanilla"
 fi
