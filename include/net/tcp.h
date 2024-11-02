@@ -40,6 +40,9 @@
 #include <net/inet_ecn.h>
 #include <net/dst.h>
 #include <net/mptcp.h>
+#ifdef CONFIG_SKB_TRACER
+#include <net/skb_tracer.h>
+#endif
 
 #include <linux/seq_file.h>
 #include <linux/memcontrol.h>
@@ -1877,6 +1880,10 @@ static inline void tcp_rtx_queue_unlink(struct sk_buff *skb, struct sock *sk)
 {
 	tcp_skb_tsorted_anchor_cleanup(skb);
 	rb_erase(&skb->rbnode, &sk->tcp_rtx_queue);
+
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_unmask(skb, sk->tcp_rtx_queue.mask);
+#endif
 }
 
 static inline void tcp_rtx_queue_unlink_and_free(struct sk_buff *skb, struct sock *sk)

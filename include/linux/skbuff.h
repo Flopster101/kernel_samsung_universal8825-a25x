@@ -42,6 +42,9 @@
 #endif
 #include <linux/android_kabi.h>
 #include <linux/android_vendor.h>
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+#include <net/skb_tracer.h>
+#endif
 
 /* The interface for checksum offload between the stack and networking drivers
  * is as follows...
@@ -298,6 +301,10 @@ struct sk_buff_head {
 
 	__u32		qlen;
 	spinlock_t	lock;
+
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	u64		mask;
+#endif
 };
 
 struct sk_buff;
@@ -1963,6 +1970,10 @@ static inline void __skb_insert(struct sk_buff *newsk,
 	WRITE_ONCE(next->prev, newsk);
 	WRITE_ONCE(prev->next, newsk);
 	WRITE_ONCE(list->qlen, list->qlen + 1);
+
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	skb_tracer_mask(newsk, list->mask);
+#endif
 }
 
 static inline void __skb_queue_splice(const struct sk_buff_head *list,
@@ -2119,6 +2130,10 @@ static inline void __skb_unlink(struct sk_buff *skb, struct sk_buff_head *list)
 	skb->next  = skb->prev = NULL;
 	WRITE_ONCE(next->prev, prev);
 	WRITE_ONCE(prev->next, next);
+
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	skb_tracer_unmask(skb, list->mask);
+#endif
 }
 
 /**
@@ -4212,6 +4227,9 @@ enum skb_ext_id {
 #endif
 #if IS_ENABLED(CONFIG_MPTCP)
 	SKB_EXT_MPTCP,
+#endif
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	SKB_TRACER,
 #endif
 	SKB_EXT_NUM, /* must be last */
 };
