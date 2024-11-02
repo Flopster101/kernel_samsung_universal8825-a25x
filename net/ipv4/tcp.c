@@ -275,6 +275,9 @@
 #include <net/xfrm.h>
 #include <net/ip.h>
 #include <net/sock.h>
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+#include <net/skb_tracer.h>
+#endif
 
 #include <linux/uaccess.h>
 #include <asm/ioctls.h>
@@ -4139,6 +4142,10 @@ EXPORT_SYMBOL(tcp_md5_hash_key);
 void tcp_done(struct sock *sk)
 {
 	struct request_sock *req;
+
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	skb_tracer_return_mask(sk);
+#endif
 
 	/* We might be called with a new socket, after
 	 * inet_csk_prepare_forced_close() has been called
