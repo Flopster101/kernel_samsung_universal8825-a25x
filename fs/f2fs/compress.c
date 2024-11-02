@@ -901,10 +901,6 @@ static int __f2fs_cluster_blocks(struct inode *inode,
 					ret++;
 			}
 		}
-
-		f2fs_bug_on(F2FS_I_SB(inode),
-			!compr && ret != cluster_size &&
-			!is_inode_flag_set(inode, FI_COMPRESS_RELEASED));
 	}
 fail:
 	f2fs_put_dnode(&dn);
@@ -1748,7 +1744,7 @@ unsigned int f2fs_cluster_blocks_are_contiguous(struct dnode_of_data *dn)
 		block_t blkaddr = data_blkaddr(dn->inode, dn->node_page,
 						dn->ofs_in_node + i);
 
-		if (!__is_valid_data_blkaddr(blkaddr))
+		if (compressed && !__is_valid_data_blkaddr(blkaddr))
 			break;
 		if (first_blkaddr + i - (compressed ? 1 : 0) != blkaddr)
 			return 0;

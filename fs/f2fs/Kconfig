@@ -77,11 +77,32 @@ config F2FS_FS_SECURITY
 
 config F2FS_CHECK_FS
 	bool "F2FS consistency checking feature"
-	depends on F2FS_FS
+	depends on F2FS_FS && SEC_FACTORY
+	default y
 	help
 	  Enables BUG_ONs which check the filesystem consistency in runtime.
 
 	  If you want to improve the performance, say N.
+
+config F2FS_ML_BASED_STREAM_SEPARATION
+	bool "F2FS STREAMID"
+	depends on F2FS_FS
+	default n
+
+config F2FS_ML_STREAMID_FORCE_COLD
+	bool "F2FS STREAMID force cold feature"
+	depends on F2FS_FS && F2FS_ML_BASED_STREAM_SEPARATION
+	default n
+
+config F2FS_STRICT_BUG_ON
+	bool "F2FS consistency checking feature"
+	depends on F2FS_FS
+	default y
+	help
+	  Use BUG_ON() instead of WARN_ON(), when there is an error
+	  in the filesystem consistency.
+
+	  Default Y.
 
 config F2FS_FAULT_INJECTION
 	bool "F2FS fault injection facility"
@@ -135,3 +156,29 @@ config F2FS_FS_LZORLE
 	default y
 	help
 	  Support LZO-RLE compress algorithm, if unsure, say Y.
+
+config F2FS_SEC_DEBUG_NODE
+	bool "SEC DEBUG NODE"
+	depends on F2FS_FS && DEBUG_FS
+	default y
+	help
+	  Sys nodes for SEC debugging
+
+	  If unsure, say N.
+
+config F2FS_SEC_BLOCK_OPERATIONS_DEBUG
+	bool "SEC Collect logs for debugging block_operations()"
+	depends on F2FS_FS
+	default y
+	help
+	  Collect block_operations() log for debugging
+
+	  If unsure, say N.
+
+config F2FS_SEC_SUPPORT_DNODE_RELOCATION
+	bool "DNODE relocation support"
+	depends on F2FS_FS_COMPRESSION
+	default y
+	help
+	  Support DNODE relocation for supporting inline compresseion
+	  on existing files.
