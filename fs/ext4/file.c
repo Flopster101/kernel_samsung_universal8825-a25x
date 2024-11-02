@@ -54,7 +54,8 @@ static bool ext4_dio_supported(struct kiocb *iocb, struct iov_iter *iter)
 static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
 	ssize_t ret;
-	struct inode *inode = file_inode(iocb->ki_filp);
+	struct file *filp = iocb->ki_filp;
+	struct inode *inode = file_inode(filp);
 
 	if (iocb->ki_flags & IOCB_NOWAIT) {
 		if (!inode_trylock_shared(inode))
@@ -80,7 +81,7 @@ static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
 			   is_sync_kiocb(iocb));
 	inode_unlock_shared(inode);
 
-	file_accessed(iocb->ki_filp);
+	file_accessed(filp);
 	return ret;
 }
 
