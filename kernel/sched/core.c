@@ -3424,7 +3424,7 @@ static inline void inherit_burst(struct task_struct *p) {
 }
 
 static void sched_post_fork_bore(struct task_struct *p) {
-	if (p->sched_class == &fair_sched_class)
+	if (p->sched_class == &fair_sched_class && likely(sched_bore))
 		inherit_burst(p);
 	p->se.burst_penalty = p->se.prev_burst_penalty;
 }
