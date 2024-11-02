@@ -815,7 +815,6 @@ CONFIG_MODULE_UNLOAD=y
 CONFIG_MODVERSIONS=y
 CONFIG_ASM_MODVERSIONS=y
 # CONFIG_MODULE_SRCVERSION_ALL is not set
-CONFIG_MODULE_SCMVERSION=y
 # CONFIG_MODULE_SIG is not set
 # CONFIG_MODULE_COMPRESS is not set
 # CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS is not set
@@ -4139,7 +4138,6 @@ CONFIG_VIDEO_IR_I2C=y
 # CONFIG_MALI_DDK_NONE is not set
 # CONFIG_MALI_DDK_VALHALL_R26P0 is not set
 CONFIG_MALI_DDK_VALHALL_R32P1=y
-# CONFIG_MALI_DDK_VALHALL_R38P1 is not set
 CONFIG_MALI_MIDGARD=m
 # CONFIG_MALI_GATOR_SUPPORT is not set
 # CONFIG_MALI_MIDGARD_DVFS is not set
@@ -7091,14 +7089,13 @@ CONFIG_SUPPORT_HV_CTRL=y
 # CONFIG_BATTERY_SAMSUNG_REBOOT is not set
 # CONFIG_SBP_FG is not set
 # end of Samsung Battery Common drivers
-# end of Device Drivers
 
 #
 # KernelSU
 #
 # CONFIG_KSU is not set
-# CONFIG_KSU_DEBUG is not set
 # end of KernelSU
+# end of Device Drivers
 
 #
 # File systems
@@ -7425,7 +7422,6 @@ CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
 # end of Memory initialization
 # end of Kernel hardening options
 
-# CONFIG_SECURITY_DEFEX is not set
 # CONFIG_GAF is not set
 # CONFIG_MEMORY_ZEROISATION is not set
 # CONFIG_MZ_PAGE_V2 is not set
