@@ -111,19 +111,21 @@ if [ "$USE_CCACHE" = "1" ]; then
 fi
 
 # Toolchain
-TCDIR="$WP/toolchain/clang/host/linux-x86/clang-r416183b"
+TCDIR="$WP/toolchain"
 if [ ! -d $TCDIR ]; then
     echo -e "INFO: Toolchain not found! Aborting..."
     exit 1
 fi
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
-export PATH="$WP/toolchain/prebuilts/build-tools/linux-x86:$TCDIR/bin:$PATH"
+export PATH="$TCDIR/clang/host/linux-x86/clang-r416183b/bin:$PATH"
+export PATH="$TCDIR/build/build-tools/path/linux-x86:$TCDIR/prebuilts/gas/linux-x86:$PATH"
 
 # Platform vars
-export PLATFORM_VERSION=12
-export ANDROID_MAJOR_VERSION=s
-export TARGET_SOC=s5e8825
+export PLATFORM_VERSION="12"
+export ANDROID_PLATFORM_VERSION="12"
+export ANDROID_MAJOR_VERSION="s"
+export TARGET_SOC="s5e8825"
 
 # Run build
 echo -e "INFO: Build start\n"
