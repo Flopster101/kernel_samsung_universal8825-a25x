@@ -1,0 +1,151 @@
+#
+# grip sensors configuration
+#
+config SENSORS_A96T396
+	depends on I2C
+	tristate "A96T396 driver for grip"
+	default n
+	help
+	  If you say yes here if you use A96T396 for grip.
+	  This option enables grip sensors using
+	  Above A96T396 device driver for grip.
+
+config SENSORS_A96T396_SUB
+	depends on I2C
+	tristate "A96T396_SUB driver for grip"
+	default n
+	help
+	  Say Y here if you use A96T396_SUB for grip.
+	  This option enables grip sensors using
+	  Above A96T396_SUB device driver for grip.
+
+config SENSORS_A96T396_SUB2
+	depends on I2C
+	tristate "A96T396_SUB2 driver for grip"
+	default n
+	help
+	  Say Y here if you use A96T396_SUB2 for grip.
+	  This option enables grip sensors using
+	  Above A96T396_SUB2 device driver for grip.
+
+config SENSORS_A96T396_WIFI
+	depends on I2C
+	tristate "A96T396_WIFI driver for grip"
+	default n
+	help
+	  Say Y here if you use A96T396_WIFI for grip.
+	  This option enables grip sensors using
+	  Above A96T396_WIFI device driver for grip.
+
+config SENSORS_A96T396_LDO_SHARE
+	depends on I2C
+	tristate "SENSOR_A96T396_LDO_SHARE driver for grip"
+	default n
+	help
+	  Say Y here if you use SENSOR_A96T396_LDO_SHARE for grip.
+	  This option enables grip sensors using
+	  Above SENSOR_A96T396_LDO_SHARE device driver for grip.
+
+config SENSORS_A96T396_CRC_CHECK
+	bool "check crc check instead of checksum compare"
+	default n
+	help
+	  Say Y here if you use crc check instead of checksum compare
+
+config SENSORS_A96T396_A13X
+	depends on I2C
+	tristate "SENSORS_A96T396_A13X driver for grip firmware"
+	default n
+	help
+	  Say Y here if you use A13X model grip firmware.
+
+config SENSORS_A96T396_A13X_EUR
+	depends on I2C
+	tristate "SENSORS_A96T396_A13X_EUR driver for grip firmware"
+	default n
+	help
+	  Say Y here if you use A13X_EUR model grip firmware.
+
+config SENSORS_A96T396_A13X_KOR
+	depends on I2C
+	tristate "SENSORS_A96T396_A13X_KOR driver for grip firmware"
+	default n
+	help
+	  Say Y here if you use A13X_KOR model grip firmware.
+
+config SENSORS_A96T396_BENZ2
+	depends on I2C
+	tristate "benz2 driver for grip firmware and 'sensor_core'"
+	default n
+	help
+	Say Y here if you use Benz2 grip firmware.
+
+config SENSORS_A96T396_A13
+	depends on I2C
+	tristate "for grip sensor firmware of A13_LTE"
+	default n
+	help
+	Say Y here if you use A13_LTE grip firmware.
+
+config SENSORS_A96T396_A13_KOR
+	depends on I2C
+	tristate "for grip sensor firmware of A13_LTE_KOR"
+	default n
+	help
+	Say Y here if you use A13_LTE grip firmware to separate for KOR.
+
+config SENSORS_A96T396_BIRDIE
+	depends on I2C
+	tristate "for grip sensor firmware of birdie"
+	default n
+	help
+	Say Y here if you use BIRDIE grip firmware.
+
+config SENSORS_FW_VENDOR
+	depends on I2C
+	tristate "for grip sensor firmware in vendor"
+	default n
+	help
+	Say Y here if you use firmware in vendor.
+
+config SENSORS_CORE_AP
+	tristate "Need to use Sensors core ap version"
+	default n
+	help
+	  Say Y here if you using sensors_core.c included under drivers/sensors etc.
+
+config SENSORS_A96T396_2CH
+	depends on I2C
+	tristate "SENSORS_A96T396_2CH driver for grip 2ch"
+	default n
+	help
+	  Say Y here if you use model grip 2ch.
+
+config SENSORS_A96T396_SUB_2CH
+	depends on I2C
+	tristate "SENSORS_A96T396_SUB_2CH driver for grip sub 2ch"
+	default n
+	help
+	Say Y here if you use model grip_sub 2ch.
+
+config SENSORS_DUMP_DATA
+	tristate "Grip sensor dump log"
+	default n
+	help
+	  Enable grip dump log data
+	  This option activates log output of grip error data using sensordump_notifier.
+
+config SENSORS_GRIP_FAILURE_DEBUG
+	bool "Grip failure debug"
+	help
+	  Say Y here, Enable Grip failure debug flag.
+
+config SENSORS_LOW_TEMP_COMP
+	bool "Grip condition for low temperature"
+	help
+	  Say Y here, if you need low temperature compensation.
+
+config SENSORS_SUPPORT_LOGIC_PARAMETER
+	bool "support grip logic fw"
+	help
+	  Say Y here, if the model support logic firmware.

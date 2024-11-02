@@ -1,0 +1,30 @@
+config NPU_INTERFACE
+	bool "Select Interface"
+	help
+	  This is NPU interface
+
+config NPU_LOOPBACK
+	bool "Use Loopback"
+	depends on NPU_INTERFACE
+	help
+	  This is loopback device
+
+config NPU_HARDWARE
+	bool "Use Hardware"
+	depends on NPU_INTERFACE
+	help
+	  This is hardware device
+
+config NPU_MAILBOX_VERSION
+	int "NPU Mailbox Version"
+	range 4 9
+	default 7
+	help
+	  NPU Mailbox Version
+
+config NPU_COMMAND_VERSION
+	int "NPU Command Version"
+	range 7 10
+	default 8
+	help
+	  NPU Command Version

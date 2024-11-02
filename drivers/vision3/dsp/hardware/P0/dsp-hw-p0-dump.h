@@ -1,0 +1,46 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Samsung Exynos SoC series dsp driver
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *              http://www.samsung.com/
+ */
+
+#ifndef __HW_P0_DSP_HW_P0_DUMP_H__
+#define __HW_P0_DSP_HW_P0_DUMP_H__
+
+#include "dsp-hw-dump.h"
+
+enum dsp_dump_value {
+	DSP_P0_DUMP_VALUE_MBOX_ERROR,
+	DSP_P0_DUMP_VALUE_MBOX_DEBUG,
+	DSP_P0_DUMP_VALUE_DL_LOG_ON,
+	DSP_P0_DUMP_VALUE_DL_LOG_RESERVED,
+	DSP_P0_DUMP_VALUE_DNCC_NS,
+	DSP_P0_DUMP_VALUE_CPU_SS,
+	DSP_P0_DUMP_VALUE_DSP0_CTRL,
+	DSP_P0_DUMP_VALUE_DSP1_CTRL,
+	DSP_P0_DUMP_VALUE_DHCP,
+	DSP_P0_DUMP_VALUE_USERDEFINED,
+	DSP_P0_DUMP_VALUE_FW_INFO,
+	DSP_P0_DUMP_VALUE_PC,
+	DSP_P0_DUMP_VALUE_TASK_COUNT,
+	DSP_P0_DUMP_VALUE_END,
+};
+
+#define DSP_P0_DUMP_DEFAULT_VALUE			\
+	(1 << DSP_P0_DUMP_VALUE_MBOX_ERROR |		\
+	 1 << DSP_P0_DUMP_VALUE_DL_LOG_ON |		\
+	 1 << DSP_P0_DUMP_VALUE_DNCC_NS |		\
+	 1 << DSP_P0_DUMP_VALUE_CPU_SS |		\
+	 1 << DSP_P0_DUMP_VALUE_DSP0_CTRL |		\
+	 1 << DSP_P0_DUMP_VALUE_DSP1_CTRL |		\
+	 1 << DSP_P0_DUMP_VALUE_DHCP |			\
+	 1 << DSP_P0_DUMP_VALUE_USERDEFINED |		\
+	 1 << DSP_P0_DUMP_VALUE_FW_INFO |		\
+	 1 << DSP_P0_DUMP_VALUE_PC |			\
+	 1 << DSP_P0_DUMP_VALUE_TASK_COUNT)
+
+int dsp_hw_p0_dump_register_ops(void);
+
+#endif

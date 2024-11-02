@@ -15,6 +15,10 @@
 #include "xhci.h"
 #include "xhci-trace.h"
 
+#if IS_ENABLED(CONFIG_PHY_EXYNOS_USBDRD_EUSB)
+#define DWC3_GUSB2PHYCFG_EUSB2OPMODE	BIT(14)
+#endif
+
 #define	PORT_WAKE_BITS	(PORT_WKOC_E | PORT_WKDISC_E | PORT_WKCONN_E)
 #define	PORT_RWC_BITS	(PORT_CSC | PORT_PEC | PORT_WRC | PORT_OCC | \
 			 PORT_RC | PORT_PLC | PORT_PE)
@@ -606,6 +610,35 @@ static void xhci_set_port_power(struct xhci_hcd *xhci, struct usb_hcd *hcd,
 	spin_lock_irqsave(&xhci->lock, *flags);
 }
 
+/*  Temporarily patch to avoid abi check */
+#if IS_ENABLED(CONFIG_PHY_EXYNOS_USBDRD_EUSB)
+static int xhci_dwusb_exynos_test_set(void)
+{
+	void __iomem *sfr_base;
+	u32 reg;
+
+	sfr_base = ioremap(0x10B0C200, 0x4);
+	reg = __raw_readl(sfr_base);
+
+	reg |= DWC3_GUSB2PHYCFG_EUSB2OPMODE;
+	__raw_writel(reg, sfr_base);
+	pr_info("%s: phycfg = 0x%x\n", __func__, reg);
+	iounmap(sfr_base);
+
+	return 0;
+}
+
+int xhci_halt_nohandshake(struct xhci_hcd *xhci)
+{
+	xhci_dbg_trace(xhci, trace_xhci_dbg_init, "// Halt the HC");
+	xhci_quiesce(xhci);
+
+	xhci->xhc_state |= XHCI_STATE_HALTED;
+	xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+	return 0;
+}
+#endif
+
 static void xhci_port_set_test_mode(struct xhci_hcd *xhci,
 	u16 test_mode, u16 wIndex)
 {
@@ -617,6 +650,7 @@ static void xhci_port_set_test_mode(struct xhci_hcd *xhci,
 	temp = readl(port->addr + PORTPMSC);
 	temp |= test_mode << PORT_TEST_MODE_SHIFT;
 	writel(temp, port->addr + PORTPMSC);
+
 	xhci->test_mode = test_mode;
 	if (test_mode == USB_TEST_FORCE_ENABLE)
 		xhci_start(xhci);
@@ -642,6 +676,10 @@ static int xhci_enter_test_mode(struct xhci_hcd *xhci,
 				 i, retval);
 	}
 	spin_lock_irqsave(&xhci->lock, *flags);
+
+#if IS_ENABLED(CONFIG_PHY_EXYNOS_USBDRD_EUSB)
+	xhci_dwusb_exynos_test_set();
+#else
 	/* Put all ports to the Disable state by clear PP */
 	xhci_dbg(xhci, "Disable all port (PP = 0)\n");
 	/* Power off USB3 ports*/
@@ -650,16 +688,22 @@ static int xhci_enter_test_mode(struct xhci_hcd *xhci,
 	/* Power off USB2 ports*/
 	for (i = 0; i < xhci->usb2_rhub.num_ports; i++)
 		xhci_set_port_power(xhci, xhci->main_hcd, i, false, flags);
+#endif
 	/* Stop the controller */
-	xhci_dbg(xhci, "Stop controller\n");
+	xhci_info(xhci, "Stop controller\n");
+#if IS_ENABLED(CONFIG_PHY_EXYNOS_USBDRD_EUSB)
+	retval = xhci_halt_nohandshake(xhci);
+#else
 	retval = xhci_halt(xhci);
+#endif
 	if (retval)
 		return retval;
+
 	/* Disable runtime PM for test mode */
 	pm_runtime_forbid(xhci_to_hcd(xhci)->self.controller);
 	/* Set PORTPMSC.PTC field to enter selected test mode */
 	/* Port is selected by wIndex. port_id = wIndex + 1 */
-	xhci_dbg(xhci, "Enter Test Mode: %d, Port_id=%d\n",
+	xhci_info(xhci, "Enter Test Mode: %d, Port_id=%d\n",
 					test_mode, wIndex + 1);
 	xhci_port_set_test_mode(xhci, test_mode, wIndex);
 	return retval;

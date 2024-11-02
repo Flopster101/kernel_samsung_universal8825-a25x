@@ -776,4 +776,110 @@ config RN5T618_POWER
 	  This driver can also be built as a module. If so, the module will be
 	  called rn5t618_power.
 
+config FUELGAUGE_S2MU106
+       tristate "S2MU106 fuelgauge driver"
+       default n
+       depends on I2C
+       help
+        say y to include support
+        for s.lsi S2MU106 fuelgauge driver.
+
+config CHARGER_S2MU106
+	tristate "S2MU106 charger support"
+	depends on (MFD_S2MU106) && I2C
+	help
+	 Say Y here to enable support for the S2MU106 charger
+	 S2MU106 incluse pmic, led driver.
+	 You have to define MFD_S2MU106
+
+config PM_S2MU106
+	tristate "S2MU106 power meter support"
+	depends on (MFD_S2MU106) && I2C
+	help
+	 Say Y here to enable support for the S2MU106 power meter.
+	 S2MU106 power meter is dependent on MFD_S2MU106
+	 so it needs to be defined.
+
+config CHARGER_S2MC501
+	tristate "S2MC501 charger support"
+	depends on I2C && (DIRECT_CHARGER)
+	help
+	 Say Y here to enable support for the S2MC501 direct charger
+
+config CHARGER_S2MF301
+	tristate "S2MF301 charger support"
+	depends on (MFD_S2MF301) && I2C
+	help
+	 Say Y here to enable support for the S2MF301 charger
+	 S2MF301 incluse pmic, led driver.
+	 You have to define MFD_S2MF301
+
+config FUELGAUGE_S2MF301
+	tristate "S2MF301 fuelgauge driver"
+	depends on (MFD_S2MF301) && I2C
+	help
+	 say y to include support
+	 for s.lsi S2MF301 fuelgauge driver.
+	 You have to define MFD_S2MF301
+
+config PM_S2MF301
+	tristate "S2MF301 power meter support"
+	depends on (MFD_S2MF301) && I2C
+	help
+	 Say Y here to enable support for the S2MF301 power meter.
+	 S2MF301 power meter is dependent on MFD_S2MF301
+	 so it needs to be defined.
+
+config TOP_S2MF301
+	tristate "S2MF301 top support"
+	depends on (MFD_S2MF301) && I2C
+	help
+	 Say Y here to enable support for the S2MF301 top.
+
+config TOP_S2MF301_SUPPORT_S2MC501
+	bool "S2MF301 top supports s2mc501 dc"
+	depends on TOP_S2MF301
+	help
+	 Say Y here to enable support for s2mc501 dc functions
+
+config FAKE_BATT
+	tristate "SMDK board only support"
+	help
+	  Say Y here to enable support for S2MXXXX charging manager driver on SMDK board.
+
+config DIRECT_CHARGER
+       tristate "S2M Direct charging battery driver"
+       help
+         Say Y here to enable support for S2MXXXX charging manager driver.
+         This direct charging manager driver supports only the basic functions.
+
+config MANAGER_S2M_CHARGER
+	tristate "S2M_CHG_MANAGER battery driver"
+	help
+	  Say Y here to enable support for S2MXXXX charging manager driver.
+	  This charging manager driver supports only the basic functions.
+
+config SWITCHING_S2ASL01
+    tristate "S2ASL01 SWITCHING IC support"
+    depends on I2C
+    help
+	  Say Y here to enable support for S2ASL01 switching driver.
+
+config BLOCK_CHG_SMDK_S2MU106
+	tristate "S2ASL01 SWITCHING IC support"
+	depends on I2C
+	help
+	 Say Y here to block charging mode for S2MU106 charger.
+
+config S2M_THERMAL
+	tristate "PMIC Thermal Function"
+	depends on MANAGER_S2M_CHARGER
+	help
+	  Say Y here to enable PMIC thermal function.
+
+config SYSFS_S2MF301
+	tristate "ifpmic sysfs system"
+	depends on I2C
+	help
+	 This driver supports a ifpmic sysfs.
 endif # POWER_SUPPLY

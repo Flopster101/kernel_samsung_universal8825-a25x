@@ -1,0 +1,67 @@
+#ifndef IS_VENDOR_CONFIG_AAV_V33X_H
+#define IS_VENDOR_CONFIG_AAV_V33X_H
+
+
+#define USE_AP_PDAF						/* Support sensor PDAF SW Solution */
+
+#define DISABLE_DUAL_SYNC
+
+/***** HW DEFENDANT DEFINE *****/
+#define VENDER_PATH
+
+#define USE_CAMERA_HEAP
+#ifdef USE_CAMERA_HEAP
+#define CAMERA_HEAP_NAME	"camera"
+#define CAMERA_HEAP_NAME_LEN	6
+#define CAMERA_HEAP_UNCACHED_NAME	"camera-uncached"
+#define CAMERA_HEAP_UNCACHED_NAME_LEN	15
+#endif
+
+#define CAMERA_REAR2
+#define CAMERA_REAR3
+#define CAMERA_REAR4
+
+#define CAMERA_REAR2_MODULEID
+#define CAMERA_REAR3_MODULEID
+#define CAMERA_REAR4_MODULEID
+#define CAMERA_REAR_DUAL_CAL
+#define CAMERA_FRONT_FIXED_FOCUS
+
+#define READ_DUAL_CAL_FIRMWARE_DATA
+
+#ifdef USE_KERNEL_VFS_READ_WRITE
+#define DUAL_CAL_DATA_PATH "/vendor/firmware/SetMultiCalInfo.bin"
+#else
+#define DUAL_CAL_DATA_PATH "/vendor/firmware/"
+#define DUAL_CAL_DATA_BIN_NAME "SetMultiCalInfo.bin"
+#endif
+
+#define DUAL_CAL_DATA_SIZE_DEFAULT (0x080C)
+
+#define USE_IMX258_13MP_FULL_SIZE
+
+#define CONFIG_SEC_CAL_ENABLE
+#define IS_REAR_MAX_CAL_SIZE (0x4190)
+#define IS_FRONT_MAX_CAL_SIZE (0x1CA8)
+#define IS_REAR3_MAX_CAL_SIZE (0x1CA8)
+#define IS_REAR4_MAX_CAL_SIZE (0x1A50)
+
+#define WIDE_OIS_ROM_ID ROM_ID_REAR
+
+#define CONFIG_SECURE_CAMERA_USE 1
+
+#define CAMERA_EEPROM_SUPPORT_FRONT
+
+#define CAMERA_STANDARD_CAL_ISP_VERSION 'E'
+
+#define CAMERA_UWIDE_DUALIZED SENSOR_NAME_S5K4HA
+
+#define USES_STANDARD_CAL_RELOAD
+#define USE_PERSISTENT_DEVICE_PROPERTIES_FOR_CAL /* For cal reload */
+
+#define USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL /* Flash config */
+/* Although hw version is different, allow to upload MCU firmware temporarily */
+#define CONFIG_CHECK_HW_VERSION_FOR_MCU_FW_UPLOAD
+
+#define USE_OIS_HALL_DATA_FOR_VDIS
+#endif /* IS_VENDOR_CONFIG_AAV_V33X_H */

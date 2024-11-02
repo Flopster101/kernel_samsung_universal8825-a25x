@@ -1,0 +1,7 @@
+config SHUB_MTK
+	tristate "Mediatek project"
+	default n
+
+config SHUB_LSI
+	tristate "lsi sensorhub"
+	default y

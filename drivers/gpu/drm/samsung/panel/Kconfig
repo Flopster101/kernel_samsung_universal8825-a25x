@@ -1,0 +1,288 @@
+config USDM_PANEL
+	tristate "Samsung MX Panel Driver"
+	select BACKLIGHT_CLASS_DEVICE
+	default n
+	help
+		Enable USDM Panel Driver.
+
+config USDM_MDNIE
+	bool "Support MDNIE LITE"
+	depends on USDM_PANEL
+	default n
+
+config USDM_MDNIE_AFC
+	bool "Support AFC"
+	depends on USDM_PANEL && USDM_MDNIE
+	default n
+
+config USDM_PANEL_SYSFS
+	bool "Support LCD SYSFS"
+	depends on USDM_PANEL
+	default y
+
+config USDM_COPR_SPI
+	bool "Support LCD SPI"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_COPR
+	bool "Support COPR"
+	depends on USDM_PANEL
+	default n
+
+config USDM_MDNIE_TUNING
+	bool "Support LCD TUNING"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_DIMMING
+	bool "Support AID Dimming"
+	depends on USDM_PANEL
+	default y
+
+config USDM_PANEL_MULTI_RESOLUTION
+	bool "Support DSU(Multi Resolution)"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_HMD
+	bool "Support HMD(Head Mount Display - VR)"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_LPM
+	bool "Support LPM(Low Power Mode) Driver"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_SELF_DISPLAY
+	bool "Support Extend Live Clock Functions(For Always On Display)"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_AOD_BL
+	bool "Support AOD(Always On Display) BL(BackLight) Driver"
+	depends on USDM_PANEL && USDM_PANEL_LPM
+	default n
+
+config USDM_PANEL_DDI_FLASH
+	bool "Support display ddi flash"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_POC_FLASH
+	bool "Support display poc flash"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_MAFPC
+	bool "SUPPORT MAFPC function"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_MAFPC_CRC
+	bool "SUPPORT MAFPC CRC function"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_DIM_FLASH
+	bool "Support display dimming flash"
+	depends on USDM_PANEL && USDM_PANEL_DDI_FLASH
+	default n
+
+config USDM_FACTORY_GCT_TEST
+	bool "Support GRAM Checksum"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_CCD_TEST
+	bool "Support CCD TEST"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_SSR_TEST
+	bool "Support SSR TEST"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_ECC_TEST
+	bool "Support ECC TEST"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_BACKLIGHT_PAC_3_0
+	bool "Support baclight PAC 3.0"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_DPUI
+	bool "Support display use info logging"
+	depends on USDM_PANEL
+	default n
+
+config USDM_POC_SPI
+	bool "Support poc SPI connection"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_GM2_FLASH
+	bool "Support to get Gamma-mode2 panel info from flash"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_FREQ_HOP
+	bool "Support Panel Frequency Hopping"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_DISPLAY_MODE
+	bool "Support panel display mode"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY
+	bool "mcd-panel for factory binary"
+	depends on USDM_PANEL
+	default SEC_FACTORY
+
+config USDM_FACTORY_FAST_DISCHARGE
+	bool "Support fast discharge function"
+	depends on USDM_PANEL && USDM_FACTORY
+	default n
+
+config USDM_PANEL_DEBUG
+	bool "Support panel debug"
+	depends on USDM_PANEL
+	default y
+
+config USDM_PANEL_MASK_LAYER
+	bool "Support FP mask layer function"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_ERRFG_RECOVERY
+	bool "Support ERRFG recovery"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_MST_TEST
+	bool "Support MST Test"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_BRIGHTDOT_TEST
+	bool "Support Brightdot Test"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_VGLHIGHDOT_TEST
+	bool "Support VGL Highdot Test"
+	depends on USDM_PANEL
+	default n
+
+config USDM_FACTORY_DSC_CRC_TEST
+	bool "Support panel decoder test"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_EVASION_DISP_DET
+    bool "Support avoid disp_det interrupt"
+    depends on USDM_PANEL
+    default n
+
+config USDM_DDI_CMDLOG
+	bool "Support DDI Command Log"
+	depends on USDM_PANEL
+	default n
+
+config USDM_BLIC_I2C
+	bool "Support mcd panel i2c"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_BLIC
+	bool "Support mcd panel blic"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_BIG_LOCK
+	bool "Support mcd panel big lock"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_RCD
+	bool "Support mcd panel rcd"
+	depends on USDM_PANEL && !USDM_FACTORY
+	default n
+
+config USDM_PANEL_ID_READ_REG_04
+	bool "Using ID READ Register 04h"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_ID_READ_REG_DADBDC
+	bool "Using ID READ Register DA/DB/DCh"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_ID_READ_REG_ADAEAF
+	bool "Using ID READ Register AD/AE/AFh"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_ID_READ_BY_LPDT
+	bool "Using ID READ by LPDT"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_ID_READ_BY_HSDT
+	bool "Using ID READ by HSDT"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_TESTMODE
+	bool "SUPPORT PANEL TEST MODE"
+	depends on USDM_PANEL && !SAMSUNG_PRODUCT_SHIP
+	default n
+
+config USDM_PANEL_JSON
+	bool "Support mcd panel json parser/writer"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_VCOM_TRIM_TEST
+	bool "Support VCOM TRIM test"
+	depends on USDM_PANEL
+	default n
+
+config USDM_LPD_AUTO_BR
+	bool "Support lpd auto brightness"
+	depends on USDM_PANEL
+	default n
+
+config USDM_ADAPTIVE_MIPI
+	bool "Support Adaptive MIPI"
+	depends on USDM_PANEL
+	default n
+
+config USDM_SDP_ADAPTIVE_MIPI
+	bool "Support SDP Adaptive MIPI"
+	depends on USDM_PANEL
+	depends on SDP
+	default n
+
+config USDM_USE_CUSTOM_SOFTDEP
+	bool "Support Custom softdep"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_UEVENT_RECOVERY
+	bool "Support uevent recovery"
+	depends on USDM_PANEL
+	default n
+
+config USDM_PANEL_LATE_PROBE
+	bool "Support Late Probe"
+	depends on USDM_PANEL
+	default n
+

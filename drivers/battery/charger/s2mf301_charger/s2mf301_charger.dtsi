@@ -1,0 +1,11 @@
+&smd {
+	s2mf301_charger: s2mf301-charger {
+		status = "disable";
+		compatible = "samsung,s2mf301-charger";
+	};
+
+	battery {
+		battery,otg_name = "s2mf301-otg";
+	};
+};
+
