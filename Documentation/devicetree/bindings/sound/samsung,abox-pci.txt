@@ -1,0 +1,21 @@
+PCIE stub of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-pci"
+
+- memory-region = phandle to reserved memory for PCIE
+
+- reg : <0x0 0x0 0x0>.
+
+- pinctrl-names : "pci_on", "sleep"
+
+- pinctrl-0 : phandle to pinctrl for pci on
+
+- pinctrl-1 : phandle to pinctrl for pci off
+
+- s2mpu_mailbox : address of mailbox
+
+Optional properties: no optional property.

@@ -1,0 +1,29 @@
+UAIF of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-uaif", "samsung,abox-dsif", "samsung,abox-spdy"
+
+- reg : address of SFR.
+
+- reg-names : "sfr".
+
+- samsung,id : id of the DMA.
+
+- clocks : phandle to bclk, gate of bclk, mux clk.
+
+- clock-names : "bclk", "bclk_gate", "mux".
+
+- pinctrl-names : "active", "idle".
+
+- pinctrl-0 : phandle to pinctrl for active state.
+
+- pinctrl-1 : phandle to pinctrl for idle state.
+
+- #sound-dai-cells : 0
+
+- sound-name-prefix : "ABOX UAIF0", "ABOX UAIF1", .......
+
+Optional properties: no optional property.
