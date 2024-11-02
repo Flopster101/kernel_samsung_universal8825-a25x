@@ -119,7 +119,7 @@ fi
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 export PATH="$TCDIR/clang/host/linux-x86/clang-r416183b/bin:$PATH"
-export PATH="$TCDIR/build/build-tools/path/linux-x86:$TCDIR/prebuilts/gas/linux-x86:$PATH"
+export PATH="$TCDIR/prebuilts/gas/linux-x86:$PATH"
 
 # Platform vars
 export PLATFORM_VERSION="12"
