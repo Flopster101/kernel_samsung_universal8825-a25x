@@ -1,0 +1,20 @@
+menuconfig CAMERA_LASER_AF_SELECT
+	bool "Laser af select"
+	depends on EXYNOS_DEVICE_CAMERA_MODULE
+	help
+		Say Y here to enable support for platform-specific V4L drivers.
+
+config CAMERA_LASER_AF_TOF8801_OBJ
+	bool "Use TOF8801"
+	depends on CAMERA_LASER_AF_SELECT
+	default n
+	help
+		Use to build TOF8801 driver.
+
+config CAMERA_LASER_AF_VL53L5_OBJ
+	tristate "Use VL53L5"
+	depends on EXYNOS_DEVICE_CAMERA_MODULE
+	depends on SENSORS_VL53L5
+	default n
+	help
+		Use to build VL53L5 driver.

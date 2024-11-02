@@ -97,9 +97,9 @@ config USB_GADGET_DEBUG_FS
 	   to conserve kernel memory, say "N".
 
 config USB_GADGET_VBUS_DRAW
-	int "Maximum VBUS Power usage (2-500 mA)"
-	range 2 500
-	default 2
+	int "Maximum VBUS Power usage (0-900 mA)"
+	range 0 900
+	default 0
 	help
 	   Some devices need to draw power from USB when they are
 	   configured, perhaps to operate circuitry or to recharge
@@ -107,9 +107,11 @@ config USB_GADGET_VBUS_DRAW
 	   such as an AC adapter or batteries.
 
 	   Enter the maximum power your device draws through USB, in
-	   milliAmperes.  The permitted range of values is 2 - 500 mA;
+	   milliAmperes.  The permitted range of values is 0 - 900 mA;
 	   0 mA would be legal, but can make some hosts misbehave.
-
+	   Exceptionally, when connecting to a USB port capable of
+	   PD charging, it should be specified as 0mA.
+	   
 	   This value will be used except for system-specific gadget
 	   drivers that have more specific information.
 
@@ -220,6 +222,12 @@ config USB_F_ACC
 	tristate
 
 config USB_F_AUDIO_SRC
+	tristate
+
+config USB_F_CONN_GADGET
+	tristate
+
+config USB_F_SS_MON_GADGET
 	tristate
 
 # this first set of drivers all depend on bulk-capable hardware.
@@ -384,6 +392,29 @@ config USB_CONFIGFS_F_FS
 	  of composite gadgets such that some of the functions are
 	  implemented in kernel space (for instance Ethernet, serial or
 	  mass storage) and other are implemented in user space.
+
+config USB_CONFIGFS_F_DM
+	tristate "DM gadget"
+	depends on USB_CONFIGFS
+	select USB_F_DM
+	select USB_U_SERIAL
+	help
+	  USB gadget DM(Diagnosis Monitor) support
+
+config USB_CONFIGFS_F_CONN_GADGET
+	tristate "F_CONN gadget"
+	depends on USB_CONFIGFS
+	select USB_F_CONN_GADGET
+	help
+	  USB Sidesync function support
+
+config USB_CONFIGFS_F_SS_MON_GADGET
+	tristate "F_SAMSUNG gadget"
+	depends on USB_CONFIGFS
+	select USB_F_SS_MON_GADGET
+	help
+	 Driver for control to Samsung Usb device layer
+	 For Samung working scenario and saving debug log, etc
 
 config USB_CONFIGFS_F_ACC
 	bool "Accessory gadget"

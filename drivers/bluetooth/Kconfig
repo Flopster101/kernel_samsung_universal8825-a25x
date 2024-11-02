@@ -380,6 +380,17 @@ config BT_ATH3K
 	  Say Y here to compile support for "Atheros firmware download driver"
 	  into the kernel or say M to compile it as module (ath3k).
 
+config BT_WILINK
+	tristate "Texas Instruments WiLink7 driver"
+	depends on TI_ST
+	help
+	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
+	  combo devices. This makes use of shared transport line discipline
+	  core driver to communicate with the BT core of the combo chip.
+
+	  Say Y here to compile support for Texas Instrument's WiLink7 driver
+	  into the kernel or say M to compile it as module (btwilink).
+
 config BT_MTKSDIO
 	tristate "MediaTek HCI SDIO driver"
 	depends on MMC
@@ -424,5 +435,19 @@ config BT_HCIRSI
 
 	  Say Y here to compile support for HCI over Redpine into the
 	  kernel or say M to compile as a module.
+
+config BT_BCM43XX
+	tristate "Enable BCM43XX driver"
+	depends on RFKILL
+	help
+	  Adds BCM43XX RFKILL driver for Broadcom BCM4359 chipset for exynos.
+
+config MSM_BT_POWER
+	tristate "MSM Bluetooth Power Control"
+	help
+	  MSM Bluetooth Power control driver.
+	  This provides a parameter to switch on/off power from PMIC
+	  to Bluetooth device. This will control LDOs/Clock/GPIOs to
+	  control Bluetooth Chipset based on power on/off sequence.
 
 endmenu
