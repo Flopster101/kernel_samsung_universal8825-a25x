@@ -37,6 +37,11 @@
 #include <asm/tlbflush.h>
 #include <asm/pgalloc.h>
 
+#ifdef CONFIG_RKP
+#include <linux/uh.h>
+#include <linux/rkp.h>
+#endif
+
 #define NO_BLOCK_MAPPINGS	BIT(0)
 #define NO_CONT_MAPPINGS	BIT(1)
 
@@ -262,7 +267,13 @@ static void alloc_init_cont_pmd(pud_t *pudp, unsigned long addr,
 	if (pud_none(pud)) {
 		phys_addr_t pmd_phys;
 		BUG_ON(!pgtable_alloc);
+#ifdef CONFIG_RKP
+		pmd_phys = rkp_ro_alloc_phys(PMD_SHIFT);
+		if (!pmd_phys)
+			pmd_phys = pgtable_alloc(PMD_SHIFT);
+#else
 		pmd_phys = pgtable_alloc(PMD_SHIFT);
+#endif
 		__pud_populate(pudp, pmd_phys, PUD_TYPE_TABLE);
 		pud = READ_ONCE(*pudp);
 	}
@@ -611,6 +622,34 @@ static void __init map_kernel_segment(pgd_t *pgdp, void *va_start, void *va_end,
 	vm_area_add_early(vma);
 }
 
+#ifdef CONFIG_RKP
+static void __init map_kernel_text_segment(pgd_t *pgdp, void *va_start, void *va_end,
+				      pgprot_t prot, struct vm_struct *vma,
+				      int flags, unsigned long vm_flags)
+{
+	phys_addr_t pa_start = __pa_symbol(va_start);
+	unsigned long size = va_end - va_start;
+
+	WARN_ON(!PAGE_ALIGNED(pa_start));
+	WARN_ON(!PAGE_ALIGNED(size));
+
+	__create_pgd_mapping(pgdp, pa_start, (unsigned long)va_start, size, prot,
+			     rkp_ro_alloc_phys, flags);
+
+	if (!(vm_flags & VM_NO_GUARD))
+		size += PAGE_SIZE;
+
+	vma->addr	= (void *)((unsigned long)va_start & PMD_MASK);
+	vma->phys_addr	= (phys_addr_t)((unsigned long)pa_start & PMD_MASK);
+	vma->size	= size + (unsigned long)va_start - (unsigned long)vma->addr;
+	vma->flags	= VM_MAP | vm_flags;
+	vma->caller	= __builtin_return_address(0);
+
+	vm_area_add_early(vma);
+}
+#endif
+
+
 static int __init parse_rodata(char *arg)
 {
 	int ret = strtobool(arg, &rodata_enabled);
@@ -707,8 +746,13 @@ static void __init map_kernel(pgd_t *pgdp)
 	 * Only rodata will be remapped with different permissions later on,
 	 * all other segments are allowed to use contiguous mappings.
 	 */
+#ifdef CONFIG_RKP
+	map_kernel_text_segment(pgdp, _text, _etext, text_prot, &vmlinux_text, 0,
+			   VM_NO_GUARD);
+#else
 	map_kernel_segment(pgdp, _text, _etext, text_prot, &vmlinux_text, 0,
 			   VM_NO_GUARD);
+#endif
 	map_kernel_segment(pgdp, __start_rodata, __inittext_begin, PAGE_KERNEL,
 			   &vmlinux_rodata, NO_CONT_MAPPINGS, VM_NO_GUARD);
 	map_kernel_segment(pgdp, __inittext_begin, __inittext_end, text_prot,
@@ -752,6 +796,9 @@ void __init paging_init(void)
 {
 	pgd_t *pgdp = pgd_set_fixmap(__pa_symbol(swapper_pg_dir));
 
+#ifdef CONFIG_RKP
+	rkp_robuffer_init();
+#endif
 	map_kernel(pgdp);
 	map_mem(pgdp);
 

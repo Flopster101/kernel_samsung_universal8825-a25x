@@ -68,6 +68,10 @@
 
 #define R_AARCH64_RELATIVE		1027
 
+#if IS_ENABLED(CONFIG_SEC_DEBUG_COREDUMP)
+#define ARCH_HAVE_EXTRA_ELF_NOTES
+#endif
+
 /*
  * These are used to set parameters in the core dumps.
  */
