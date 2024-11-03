@@ -81,7 +81,7 @@ fi
 
 ## Customizable vars
 # Kernel verison
-FK_VER="v1.0"
+FK_VER="v1.1"
 
 # Toggles
 USE_CCACHE=1
