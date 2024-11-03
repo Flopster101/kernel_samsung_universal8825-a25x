@@ -14,7 +14,6 @@ LZ_REPO="https://gitlab.com/Jprimero15/lolz_clang.git"
 
 # Other
 DEFAULT_DEFCONFIG="s5e8825-a25xdxx_defconfig"
-export ARCH=arm64
 KERNEL_URL="https://github.com/Flopster101/a25x-oss-sec"
 SECONDS=0 # builtin bash timer
 DATE="$(date '+%Y%m%d-%H%M')"
@@ -47,8 +46,6 @@ export PATH="$(pwd)/kernel_build/bin:$PATH"
 AC_DIR="$WP/aospclang"
 PC_DIR="$WP/protonclang"
 LZ_DIR="$WP/lolzclang"
-GCC_DIR="$WP/gcc"
-GCC64_DIR="$WP/gcc64"
 KDIR="$(readlink -f .)"
 
 ## Inherited paths
@@ -71,7 +68,7 @@ MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
 # Dependencies
-UB_DEPLIST="lz4 brotli flex bc cpio kmod ccache zip"
+UB_DEPLIST="lz4 brotli flex bc cpio kmod ccache zip binutils-aarch64-linux-gnu"
 if grep -q "Ubuntu" /etc/os-release; then
     sudo apt install $UB_DEPLIST -y
 else
@@ -174,9 +171,8 @@ echo -e "\nINFO: Build info:
 get_toolchain() {
     # AOSP Clang
     if [[ $1 = "aosp" ]]; then
-        CURRENT_CLANG=$(curl $AOSP_REPO | grep -oE "clang-r[0-9a-f]+" | sort -u | tail -n1)
-        # CURRENT_CLANG=clang-stable
         if ! [ -d "$AC_DIR" ]; then
+        CURRENT_CLANG=$(curl $AOSP_REPO | grep -oE "clang-r[0-9a-f]+" | sort -u | tail -n1)
             echo -e "\nINFO: AOSP Clang not found! Cloning to $AC_DIR..."
             if ! curl -LSsO "$AOSP_ARCHIVE/$CURRENT_CLANG.tar.gz"; then
                 echo -e "\nERROR: Cloning failed! Aborting..."
@@ -210,31 +206,12 @@ get_toolchain() {
             fi
         fi
     fi
-
-    # Clone gcc binutils if needed
-    if [[ $1 = "aosp" ]] || [[ $1 = "sdclang" ]]; then
-        if ! [ -d "$GCC_DIR" ]; then
-            echo -e "\nINFO: GCC not found! Cloning to $GCC_DIR..."
-            if ! git clone -q -b lineage-19.1 --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 $GCC_DIR; then
-                echo -e "\nERROR: Cloning failed! Aborting..."
-                exit 1
-            fi
-        fi
-
-        if ! [ -d "$GCC64_DIR" ]; then
-            echo -e "\nINFO: GCC64 not found! Cloning to $GCC64_DIR..."
-            if ! git clone -q -b lineage-19.1 --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 $GCC64_DIR; then
-                echo -e "\nERROR: Cloning failed! Aborting..."
-                exit 1
-            fi
-        fi
-    fi
 }
 
 prep_toolchain() {
     if [[ $1 = "aosp" ]]; then
         CLANG_DIR="$AC_DIR"
-        CCARM64_PREFIX=aarch64-linux-android-
+        CCARM64_PREFIX=aarch64-linux-gnu-
         echo -e "\nINFO: Using AOSP Clang..."
     elif [[ $1 = "proton" ]]; then
         CLANG_DIR="$PC_DIR"
@@ -246,12 +223,8 @@ prep_toolchain() {
         echo -e "\nINFO: Using Lolz Clang..."
     fi
 
-    ## Set PATH according to toolchain
-    if [[ $1 = "sdclang" ]] || [[ $1 = "aosp" ]] ; then
-        export PATH="${CLANG_DIR}/bin:${GCC64_DIR}/bin:${GCC_DIR}/bin:/usr/bin:${PATH}"
-    elif [[ $1 = "proton" ]] || [[ $1 = "lolz" ]] ; then
-        export PATH="${CLANG_DIR}/bin:${PATH}"
-    fi
+    ## Set PATH
+    export PATH="${CLANG_DIR}/bin:${PATH}"
 
     KBUILD_COMPILER_STRING=$("$CLANG_DIR"/bin/clang -v 2>&1 | head -n 1 | sed 's/(https..*//' | sed 's/ version//')
     export KBUILD_COMPILER_STRING
@@ -304,11 +277,12 @@ prep_build() {
 
 build() {
     # Not that necessary anymore, but still export it just in case.
-    export PLATFORM_VERSION=12
-    export ANDROID_MAJOR_VERSION=s
-    export TARGET_SOC=s5e8825
+    export PLATFORM_VERSION="12"
+    export ANDROID_MAJOR_VERSION="s"
+    export TARGET_SOC="s5e8825"
 
-    export LLVM=1 LLVM_IAS=1
+    export LLVM=1
+    export LLVM_IAS=1
     export ARCH=arm64
 
     # Delete leftovers
