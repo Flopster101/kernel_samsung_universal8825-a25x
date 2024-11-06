@@ -10,7 +10,6 @@
 #include <linux/ioprio.h>
 /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
 #include <linux/blk_types.h>
-#include <linux/uio.h>
 #include <linux/android_kabi.h>
 
 #define BIO_DEBUG
@@ -429,18 +428,6 @@ static inline void bio_wouldblock_error(struct bio *bio)
 	bio_set_flag(bio, BIO_QUIET);
 	bio->bi_status = BLK_STS_AGAIN;
 	bio_endio(bio);
-}
-
-/*
- * Calculate number of bvec segments that should be allocated to fit data
- * pointed by @iter. If @iter is backed by bvec it's going to be reused
- * instead of allocating a new one.
- */
-static inline int bio_iov_vecs_to_alloc(struct iov_iter *iter, int max_segs)
-{
-	if (iov_iter_is_bvec(iter))
-		return 0;
-	return iov_iter_npages(iter, max_segs);
 }
 
 struct request_queue;
