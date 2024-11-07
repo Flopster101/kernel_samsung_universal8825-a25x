@@ -168,6 +168,9 @@ enable_policy_freq_counters(int cpu, cpumask_var_t valid_cpus)
 	return true;
 }
 
+static DEFINE_STATIC_KEY_FALSE(amu_fie_key);
+#define amu_freq_invariant() static_branch_unlikely(&amu_fie_key)
+
 static void amu_scale_freq_tick(void)
 {
 	u64 prev_core_cnt, prev_const_cnt;
