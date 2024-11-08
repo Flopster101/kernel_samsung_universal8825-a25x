@@ -258,7 +258,7 @@ CONFIG_PERF_EVENTS=y
 # end of Kernel Performance Events And Counters
 
 CONFIG_VM_EVENT_COUNTERS=y
-CONFIG_SLUB_DEBUG=y
+# CONFIG_SLUB_DEBUG is not set
 # CONFIG_SLUB_MEMCG_SYSFS_ON is not set
 # CONFIG_COMPAT_BRK is not set
 # CONFIG_SLAB is not set
