@@ -2408,19 +2408,11 @@ static inline bool is_too_low_file(void)
 	return pgdatfile < low_threshold;
 }
 
-#ifdef CONFIG_KSWAPD_CPU
-static int set_kswapd_cpu_affinity_as_config(void);
-static int set_kswapd_cpu_affinity_as_boost(void);
-#endif
-
 inline bool need_memory_boosting(void)
 {
 	if (mem_boost_mode != NO_BOOST &&
 	    time_after(jiffies, last_mode_change + MEM_BOOST_MAX_TIME)) {
 		mem_boost_mode = NO_BOOST;
-#ifdef CONFIG_KSWAPD_CPU
-		set_kswapd_cpu_affinity_as_config();
-#endif
 	}
 	if (mem_boost_mode >= BOOST_HIGH)
 		return true;
@@ -2434,9 +2426,6 @@ static ssize_t mem_boost_mode_show(struct kobject *kobj,
 	if (mem_boost_mode != NO_BOOST &&
 	    time_after(jiffies, last_mode_change + MEM_BOOST_MAX_TIME)) {
 		mem_boost_mode = NO_BOOST;
-#ifdef CONFIG_KSWAPD_CPU
-		set_kswapd_cpu_affinity_as_config();
-#endif
 	}
 	return sprintf(buf, "%d\n", mem_boost_mode);
 }
@@ -2457,12 +2446,6 @@ static ssize_t mem_boost_mode_store(struct kobject *kobj,
 #ifdef CONFIG_RBIN
 	if (mem_boost_mode >= BOOST_HIGH)
 		rbin_oem_func(WAKE_RBIN_PRERECLAIM, NULL);
-#endif
-#ifdef CONFIG_KSWAPD_CPU
-	if (mem_boost_mode >= BOOST_HIGH)
-		set_kswapd_cpu_affinity_as_boost();
-	else if (mem_boost_mode == NO_BOOST)
-		set_kswapd_cpu_affinity_as_config();
 #endif
 	return count;
 }
@@ -4271,65 +4254,6 @@ static void kswapd_try_to_sleep(pg_data_t *pgdat, int alloc_order, int reclaim_o
 	finish_wait(&pgdat->kswapd_wait, &wait);
 }
 
-#ifdef CONFIG_KSWAPD_CPU
-static struct cpumask kswapd_cpumask;
-
-#define KSWAPD_CPU_BIG	0x3F
-static struct cpumask kswapd_cpumask_boost;
-
-static void init_kswapd_cpumask(void)
-{
-	int i;
-
-	cpumask_clear(&kswapd_cpumask);
-	for (i = 0; i < nr_cpu_ids; i++) {
-		if (CONFIG_KSWAPD_CPU & (1 << i))
-			cpumask_set_cpu(i, &kswapd_cpumask);
-	}
-
-	cpumask_clear(&kswapd_cpumask_boost);
-	for (i = 0; i < nr_cpu_ids; i++) {
-		if (KSWAPD_CPU_BIG & (1 << i))
-			cpumask_set_cpu(i, &kswapd_cpumask_boost);
-	}
-}
-
-/* follow like kswapd_cpu_online(unsigned int cpu) */
-static int set_kswapd_cpu_affinity_as_config(void)
-{
-	int nid;
-
-	for_each_node_state(nid, N_MEMORY) {
-		pg_data_t *pgdat = NODE_DATA(nid);
-		const struct cpumask *mask;
-
-		mask = &kswapd_cpumask;
-
-		if (cpumask_any_and(cpu_online_mask, mask) < nr_cpu_ids)
-			/* One of our CPUs online: restore mask */
-			set_cpus_allowed_ptr(pgdat->kswapd, mask);
-	}
-	return 0;
-}
-
-static int set_kswapd_cpu_affinity_as_boost(void)
-{
-	int nid;
-
-	for_each_node_state(nid, N_MEMORY) {
-		pg_data_t *pgdat = NODE_DATA(nid);
-		const struct cpumask *mask;
-
-		mask = &kswapd_cpumask_boost;
-
-		if (cpumask_any_and(cpu_online_mask, mask) < nr_cpu_ids)
-			/* One of our CPUs online: restore mask */
-			set_cpus_allowed_ptr(pgdat->kswapd, mask);
-	}
-	return 0;
-}
-#endif
-
 /*
  * The background pageout daemon, started as a kernel thread
  * from the init process.
@@ -4349,11 +4273,7 @@ static int kswapd(void *p)
 	unsigned int highest_zoneidx = MAX_NR_ZONES - 1;
 	pg_data_t *pgdat = (pg_data_t*)p;
 	struct task_struct *tsk = current;
-#ifdef CONFIG_KSWAPD_CPU
-	const struct cpumask *cpumask = &kswapd_cpumask;
-#else
 	const struct cpumask *cpumask = cpumask_of_node(pgdat->node_id);
-#endif
 
 	if (!cpumask_empty(cpumask))
 		set_cpus_allowed_ptr(tsk, cpumask);
@@ -4606,10 +4526,6 @@ void kswapd_stop(int nid)
 static int __init kswapd_init(void)
 {
 	int nid;
-
-#ifdef CONFIG_KSWAPD_CPU
-	init_kswapd_cpumask();
-#endif
 
 	swap_setup();
 	for_each_node_state(nid, N_MEMORY)
