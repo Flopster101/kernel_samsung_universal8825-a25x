@@ -28,10 +28,6 @@
 
 static struct _clock_info *clk_info;
 
-#define GPU_UNLOCKED_FREQ 1209000
-#define GPU_NORMAL_FREQ 897000
-int gpu_unlock = 1;
-
 /*************************************
  * sysfs node functions
  *************************************/
@@ -145,45 +141,42 @@ GPEX_STATIC ssize_t reset_time_in_state(const char *buf, size_t count)
 }
 CREATE_SYSFS_DEVICE_WRITE_FUNCTION(reset_time_in_state)
 
-void set_max_lock_dvfs(int clock) {
-	int ret;
+GPEX_STATIC ssize_t set_max_lock_dvfs(const char *buf, size_t count)
+{
+	int ret, clock = 0;
 
-	clk_info->user_max_lock_input = clock;
-
-	clock = gpex_get_valid_gpu_clock(clock, false);
-
-	ret = gpex_clock_get_table_idx(clock);
-	if ((ret < gpex_clock_get_table_idx(gpex_clock_get_max_clock())) ||
-	    (ret > gpex_clock_get_table_idx(gpex_clock_get_min_clock()))) {
-		return;
-	}
-
-	if (clock == gpex_clock_get_max_clock()) {
+	if (sysfs_streq("0", buf)) {
+		clk_info->user_max_lock_input = 0;
 		gpex_clock_lock_clock(GPU_CLOCK_MAX_UNLOCK, SYSFS_LOCK, 0);
 	} else {
-		gpex_clock_lock_clock(GPU_CLOCK_MAX_LOCK, SYSFS_LOCK, clock);
-	}
-}
+		ret = kstrtoint(buf, 0, &clock);
+		if (ret) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid value\n", __func__);
+			return -ENOENT;
+		}
 
-GPEX_STATIC ssize_t set_gpu_unlock(const char *buf, size_t count)
-{
-	if (sysfs_streq("0", buf) || sysfs_streq("1", buf)) {
-		gpu_unlock = sysfs_streq("1", buf);
-		set_max_lock_dvfs(gpu_unlock ? GPU_UNLOCKED_FREQ : GPU_NORMAL_FREQ);
-	} else {
-		return -EINVAL;
+		clk_info->user_max_lock_input = clock;
+
+		clock = gpex_get_valid_gpu_clock(clock, false);
+
+		ret = gpex_clock_get_table_idx(clock);
+		if ((ret < gpex_clock_get_table_idx(gpex_clock_get_max_clock())) ||
+		    (ret > gpex_clock_get_table_idx(gpex_clock_get_min_clock()))) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid clock value (%d)\n", __func__,
+				clock);
+			return -ENOENT;
+		}
+
+		if (clock == gpex_clock_get_max_clock())
+			gpex_clock_lock_clock(GPU_CLOCK_MAX_UNLOCK, SYSFS_LOCK, 0);
+		else
+			gpex_clock_lock_clock(GPU_CLOCK_MAX_LOCK, SYSFS_LOCK, clock);
 	}
 
 	return count;
 }
-
-CREATE_SYSFS_KOBJECT_WRITE_FUNCTION(set_gpu_unlock)
-
-GPEX_STATIC ssize_t get_gpu_unlock(char *buf)
-{
-	return snprintf(buf, PAGE_SIZE, "%d\n", gpu_unlock);
-}
-CREATE_SYSFS_KOBJECT_READ_FUNCTION(get_gpu_unlock)
+CREATE_SYSFS_DEVICE_WRITE_FUNCTION(set_max_lock_dvfs)
+CREATE_SYSFS_KOBJECT_WRITE_FUNCTION(set_max_lock_dvfs)
 
 GPEX_STATIC ssize_t show_max_lock_dvfs(char *buf)
 {
@@ -242,6 +235,46 @@ GPEX_STATIC ssize_t show_max_lock_dvfs_kobj(char *buf)
 }
 CREATE_SYSFS_KOBJECT_READ_FUNCTION(show_max_lock_dvfs_kobj)
 
+GPEX_STATIC ssize_t set_min_lock_dvfs(const char *buf, size_t count)
+{
+	int ret, clock = 0;
+
+	if (sysfs_streq("0", buf)) {
+		clk_info->user_min_lock_input = 0;
+		gpex_clock_lock_clock(GPU_CLOCK_MIN_UNLOCK, SYSFS_LOCK, 0);
+	} else {
+		ret = kstrtoint(buf, 0, &clock);
+		if (ret) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid value\n", __func__);
+			return -ENOENT;
+		}
+
+		clk_info->user_min_lock_input = clock;
+
+		clock = gpex_get_valid_gpu_clock(clock, true);
+
+		ret = gpex_clock_get_table_idx(clock);
+		if ((ret < gpex_clock_get_table_idx(gpex_clock_get_max_clock())) ||
+		    (ret > gpex_clock_get_table_idx(gpex_clock_get_min_clock()))) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid clock value (%d)\n", __func__,
+				clock);
+			return -ENOENT;
+		}
+
+		if (clock > gpex_clock_get_max_clock_limit())
+			clock = gpex_clock_get_max_clock_limit();
+
+		if (clock == gpex_clock_get_min_clock())
+			gpex_clock_lock_clock(GPU_CLOCK_MIN_UNLOCK, SYSFS_LOCK, 0);
+		else
+			gpex_clock_lock_clock(GPU_CLOCK_MIN_LOCK, SYSFS_LOCK, clock);
+	}
+
+	return count;
+}
+CREATE_SYSFS_DEVICE_WRITE_FUNCTION(set_min_lock_dvfs)
+CREATE_SYSFS_KOBJECT_WRITE_FUNCTION(set_min_lock_dvfs)
+
 GPEX_STATIC ssize_t show_min_lock_dvfs(char *buf)
 {
 	ssize_t ret = 0;
@@ -298,6 +331,44 @@ GPEX_STATIC ssize_t show_min_lock_dvfs_kobj(char *buf)
 	return ret;
 }
 CREATE_SYSFS_KOBJECT_READ_FUNCTION(show_min_lock_dvfs_kobj)
+
+GPEX_STATIC ssize_t set_mm_min_lock_dvfs(const char *buf, size_t count)
+{
+	int ret, clock = 0;
+
+	if (sysfs_streq("0", buf)) {
+		gpex_clock_lock_clock(GPU_CLOCK_MIN_UNLOCK, MM_LOCK, 0);
+	} else {
+		ret = kstrtoint(buf, 0, &clock);
+		if (ret) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid value\n", __func__);
+			return -ENOENT;
+		}
+
+		clock = gpex_get_valid_gpu_clock(clock, true);
+
+		ret = gpex_clock_get_table_idx(clock);
+		if ((ret < gpex_clock_get_table_idx(gpex_clock_get_max_clock())) ||
+		    (ret > gpex_clock_get_table_idx(gpex_clock_get_min_clock()))) {
+			GPU_LOG(MALI_EXYNOS_WARNING, "%s: invalid clock value (%d)\n", __func__,
+				clock);
+			return -ENOENT;
+		}
+
+		if (clock > gpex_clock_get_max_clock_limit())
+			clock = gpex_clock_get_max_clock_limit();
+
+		gpex_clboost_set_state(CLBOOST_DISABLE);
+
+		if (clock == gpex_clock_get_min_clock())
+			gpex_clock_lock_clock(GPU_CLOCK_MIN_UNLOCK, MM_LOCK, 0);
+		else
+			gpex_clock_lock_clock(GPU_CLOCK_MIN_LOCK, MM_LOCK, clock);
+	}
+
+	return count;
+}
+CREATE_SYSFS_KOBJECT_WRITE_FUNCTION(set_mm_min_lock_dvfs)
 
 GPEX_STATIC ssize_t show_mm_min_lock_dvfs(char *buf)
 {
@@ -415,17 +486,19 @@ int gpex_clock_sysfs_init(struct _clock_info *_clk_info)
 	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD(clock, show_clock, set_clock);
 	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD_RO(asv_table, show_asv_table);
 	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD(time_in_state, show_time_in_state, reset_time_in_state);
-	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD_RO(dvfs_max_lock, show_max_lock_dvfs);
-	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD_RO(dvfs_min_lock, show_min_lock_dvfs);
+	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD(dvfs_max_lock, show_max_lock_dvfs, set_max_lock_dvfs);
+	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD(dvfs_min_lock, show_min_lock_dvfs, set_min_lock_dvfs);
 	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD_RO(dvfs_max_lock_status, show_max_lock_status);
 	GPEX_UTILS_SYSFS_DEVICE_FILE_ADD_RO(dvfs_min_lock_status, show_min_lock_status);
 
-	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD_RO(gpu_max_clock, show_max_lock_dvfs_kobj);
-	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD_RO(gpu_min_clock, show_min_lock_dvfs_kobj);
-	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD_RO(gpu_mm_min_clock, show_mm_min_lock_dvfs);
+	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD(gpu_max_clock, show_max_lock_dvfs_kobj,
+					  set_max_lock_dvfs);
+	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD(gpu_min_clock, show_min_lock_dvfs_kobj,
+					  set_min_lock_dvfs);
+	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD(gpu_mm_min_clock, show_mm_min_lock_dvfs,
+					  set_mm_min_lock_dvfs);
 	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD_RO(gpu_clock, show_clock);
 	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD_RO(gpu_freq_table, show_gpu_freq_table);
-	GPEX_UTILS_SYSFS_KOBJECT_FILE_ADD(gpu_unlock, get_gpu_unlock, set_gpu_unlock);
 
 	return 0;
 }
