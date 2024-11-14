@@ -938,14 +938,6 @@ config HPA
 	help
 	  Turns on High-order Pages Allocator based on page migration.
 
-config MMAP_READAROUND_LIMIT
-	int "Limit mmap readaround upperbound"
-	default 0
-	help
-	  Inappropriate mmap readaround size can hurt device performance
-	  during the sluggish situation. Add the hard upper-limit for
-	  mmap readaround.
-
 config FAULT_AROUND_4KB
 	bool "Fault around bytes 4KB"
 	default n
