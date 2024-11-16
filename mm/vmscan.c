@@ -185,7 +185,7 @@ int vm_swappiness = 100;
 /*
  * Direct reclaim swappiness, exptct 0 - 60. Higher means more swappy and slower.
  */
-int direct_vm_swappiness = 60;
+int direct_vm_swappiness = 20;
 #endif /*CONFIG_OPLUS_MM_HACKS*/
 
 #define DEF_KSWAPD_THREADS_PER_NODE 1
