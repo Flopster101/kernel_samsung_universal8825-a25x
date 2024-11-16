@@ -40,7 +40,7 @@ static inline int __mfc_timespec64_compare(const struct timespec64 *lhs, const s
 static inline void mfc_qos_reset_framerate(struct mfc_ctx *ctx)
 {
 	if (ctx->type == MFCINST_DECODER)
-		ctx->framerate = 60000; // 60fps*100
+		ctx->framerate = DEC_DEFAULT_FPS;
 	else if (ctx->type == MFCINST_ENCODER)
 		ctx->framerate = ENC_DEFAULT_FPS;
 }
