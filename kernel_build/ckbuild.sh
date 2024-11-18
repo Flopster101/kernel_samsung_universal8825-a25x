@@ -13,7 +13,7 @@ PC_REPO="https://github.com/kdrag0n/proton-clang"
 LZ_REPO="https://gitlab.com/Jprimero15/lolz_clang.git"
 
 # Other
-DEFAULT_DEFCONFIG="s5e8825-a25xdxx_defconfig"
+DEFAULT_DEFCONFIG="s5e8825-unified_defconfig"
 KERNEL_URL="https://github.com/Flopster101/a25x-oss-sec"
 AK3_URL="https://github.com/Flopster101/AnyKernel3-A25"
 AK3_TEST=0
@@ -49,6 +49,7 @@ AC_DIR="$WP/aospclang"
 PC_DIR="$WP/protonclang"
 LZ_DIR="$WP/lolzclang"
 AK3_DIR="$WP/AK3-a25x"
+AK3_BRANCH="unity"
 KDIR="$(readlink -f .)"
 
 ## Inherited paths
@@ -81,7 +82,7 @@ fi
 
 ## Customizable vars
 # Kernel verison
-FK_VER="v1.0"
+FK_VER="BETA"
 
 # Toggles
 USE_CCACHE=1
@@ -96,8 +97,8 @@ CLANG_TYPE=aosp
 
 ## Info message
 LINKER=ld.lld
-DEVICE="Samsung Galaxy A25 5G"
-CODENAME="a25x"
+DEVICE="Unified 1280"
+CODENAME="unity1280"
 
 ## Secrets
 TELEGRAM_CHAT_ID="$(cat ../chat_ci)"
@@ -151,7 +152,7 @@ LINUX_VER=$(make kernelversion 2>/dev/null)
 FK_TYPE=""
 if [ $DO_KSU -eq 1 ]; then
     FK_TYPE="KSU"
-    DEFCONFIG="s5e8825-a25xdxx-ksu_defconfig"
+    DEFCONFIG="s5e8825-unified-ksu_defconfig"
 else
     FK_TYPE="Vanilla"
 fi
@@ -159,6 +160,7 @@ ZIP_PATH="$KDIR/kernel_build/FlopKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
 TAR_PATH="$KDIR/kernel_build/FlopKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
 
 echo -e "\nINFO: Build info:
+- Device: $DEVICE ($CODENAME)
 - Addons = $FK_TYPE
 - FlopKernel version: $FK_VER
 - Linux version: $LINUX_VER
@@ -326,7 +328,7 @@ packing() {
             AK3_TEST=1
             echo -e "\nINFO: AK3_TEST flag set because local AnyKernel3 dir was found"
         else
-            if ! git clone -q --depth=1 $AK3_URL $AK3_DIR; then
+            if ! git clone -q -b $AK3_BRANCH --depth=1 $AK3_URL $AK3_DIR; then
                 echo -e "\nERROR: Failed to clone AnyKernel3!"
                 exit 1
             fi
