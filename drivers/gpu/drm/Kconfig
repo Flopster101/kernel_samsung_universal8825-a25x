@@ -496,3 +496,4 @@ config DRM_LIB_RANDOM
 	default n
 
 MCD_PANEL_PATH := drivers/gpu/drm/samsung/panel
+DECON_PANEL_PATH := drivers/gpu/drm/samsung/panel_decon
