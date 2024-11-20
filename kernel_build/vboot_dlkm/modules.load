@@ -108,7 +108,7 @@ tuihw.ko
 tuihw-inf.ko
 s2mpu13_mfd.ko
 s2mpu14_mfd.ko
-nfc_stm_sec.ko
+nfc_sec.ko
 dma-buf-container.ko
 samsung_dma_heap.ko
 ufs-exynos-core.ko
