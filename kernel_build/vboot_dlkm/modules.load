@@ -6,6 +6,7 @@ exynos_tty.ko
 clk_exynos.ko
 i2c-exynos5.ko
 sec_debug_mode.ko
+sec_detect.ko
 ems.ko
 zsmalloc.ko
 lzo.ko
