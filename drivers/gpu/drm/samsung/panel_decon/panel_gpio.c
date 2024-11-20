@@ -341,7 +341,7 @@ int panel_gpio_helper_devm_request_irq(struct panel_gpio *gpio,
 	return call_panel_gpio_func(gpio, devm_request_irq, dev, handler, devname, dev_id);
 }
 
-int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
+int decon_of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
 {
 	struct device_node *pend_np;
 	enum of_gpio_flags flags;
@@ -407,9 +407,9 @@ int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_gpio);
+EXPORT_SYMBOL(decon_of_get_panel_gpio);
 
-struct panel_gpio *panel_gpio_create(void)
+struct panel_gpio *decon_panel_gpio_create(void)
 {
 	struct panel_gpio *gpio;
 
@@ -421,10 +421,10 @@ struct panel_gpio *panel_gpio_create(void)
 
 	return gpio;
 }
-EXPORT_SYMBOL(panel_gpio_create);
+EXPORT_SYMBOL(decon_panel_gpio_create);
 
-void panel_gpio_destroy(struct panel_gpio *gpio)
+void decon_panel_gpio_destroy(struct panel_gpio *gpio)
 {
 	kfree(gpio);
 }
-EXPORT_SYMBOL(panel_gpio_destroy);
+EXPORT_SYMBOL(decon_panel_gpio_destroy);

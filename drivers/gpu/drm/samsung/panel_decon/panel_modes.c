@@ -30,34 +30,34 @@ __visible_for_testing int panel_mode_snprintf(const struct panel_display_mode *m
 	return snprintf(buf, size, "Panel Modeline " PANEL_MODE_FMT "\n", PANEL_MODE_ARG(mode));
 }
 
-void panel_mode_debug_printmodeline(const struct panel_display_mode *mode)
+void decon_panel_mode_debug_printmodeline(const struct panel_display_mode *mode)
 {
 	char buf[128];
 
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_debug("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_debug_printmodeline);
+EXPORT_SYMBOL(decon_panel_mode_debug_printmodeline);
 
-void panel_mode_info_printmodeline(const struct panel_display_mode *mode)
+void decon_panel_mode_info_printmodeline(const struct panel_display_mode *mode)
 {
 	char buf[128];
 
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_info("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_info_printmodeline);
+EXPORT_SYMBOL(decon_panel_mode_info_printmodeline);
 
-const char *refresh_mode_to_str(int refresh_mode)
+const char *decon_refresh_mode_to_str(int refresh_mode)
 {
 	if (refresh_mode >= MAX_REFRESH_MODE)
 		return NULL;
 
 	return refresh_mode_names[refresh_mode];
 }
-EXPORT_SYMBOL(refresh_mode_to_str);
+EXPORT_SYMBOL(decon_refresh_mode_to_str);
 
-int str_to_refresh_mode(const char *str)
+int decon_str_to_refresh_mode(const char *str)
 {
 	int i;
 
@@ -71,9 +71,9 @@ int str_to_refresh_mode(const char *str)
 
 	return -1;
 }
-EXPORT_SYMBOL(str_to_refresh_mode);
+EXPORT_SYMBOL(decon_str_to_refresh_mode);
 
-int panel_mode_vscan(const struct panel_display_mode *mode)
+int decon_panel_mode_vscan(const struct panel_display_mode *mode)
 {
 	if (!mode)
 		return -EINVAL;
@@ -81,7 +81,7 @@ int panel_mode_vscan(const struct panel_display_mode *mode)
 	return max_t(typeof(mode->panel_te_sw_skip_count), mode->panel_te_sw_skip_count + 1, 1) *
 		max_t(typeof(mode->panel_te_hw_skip_count), mode->panel_te_hw_skip_count + 1, 1);
 }
-EXPORT_SYMBOL(panel_mode_vscan);
+EXPORT_SYMBOL(decon_panel_mode_vscan);
 
 /**
  * of_parse_panel_display_mode - parse panel_display_mode entry from device_node
@@ -129,7 +129,7 @@ static int of_parse_panel_display_mode(const struct device_node *np,
 	return 0;
 }
 
-void panel_display_modes_release(struct panel_display_modes *disp)
+void decon_panel_display_modes_release(struct panel_display_modes *disp)
 {
 	if (disp->modes) {
 		unsigned int i;
@@ -140,13 +140,13 @@ void panel_display_modes_release(struct panel_display_modes *disp)
 	}
 	kfree(disp);
 }
-EXPORT_SYMBOL_GPL(panel_display_modes_release);
+EXPORT_SYMBOL_GPL(decon_panel_display_modes_release);
 
 /**
- * of_get_panel_display_modes - parse all panel_display_mode entries from a device_node
+ * decon_of_get_panel_display_modes - parse all panel_display_mode entries from a device_node
  * @np: device_node with the subnodes
  **/
-struct panel_display_modes *of_get_panel_display_modes(const struct device_node *np)
+struct panel_display_modes *decon_of_get_panel_display_modes(const struct device_node *np)
 {
 	struct device_node *entry;
 	struct device_node *native_mode;
@@ -223,7 +223,7 @@ struct panel_display_modes *of_get_panel_display_modes(const struct device_node 
 
 		disp->modes[disp->num_modes] = pdm;
 		disp->num_modes++;
-		panel_mode_info_printmodeline(pdm);
+		decon_panel_mode_info_printmodeline(pdm);
 	}
 	/*
 	 * native_mode points to the device_node returned by of_parse_phandle
@@ -239,23 +239,23 @@ struct panel_display_modes *of_get_panel_display_modes(const struct device_node 
 
 modefail:
 	of_node_put(native_mode);
-	panel_display_modes_release(disp);
+	decon_panel_display_modes_release(disp);
 	disp = NULL;
 entryfail:
 	kfree(disp);
 	return NULL;
 }
-EXPORT_SYMBOL_GPL(of_get_panel_display_modes);
+EXPORT_SYMBOL_GPL(decon_of_get_panel_display_modes);
 
-void panel_mode_set_name(struct panel_display_mode *mode)
+void decon_panel_mode_set_name(struct panel_display_mode *mode)
 {
 	snprintf(mode->name, PANEL_DISPLAY_MODE_NAME_LEN, "%dx%d@%d%s",
 			mode->width, mode->height, mode->refresh_rate,
 			(mode->refresh_mode == REFRESH_MODE_NS) ? "NS" : "HS");
 }
-EXPORT_SYMBOL(panel_mode_set_name);
+EXPORT_SYMBOL(decon_panel_mode_set_name);
 
-struct panel_display_mode *panel_mode_create(void)
+struct panel_display_mode *decon_panel_mode_create(void)
 {
 	struct panel_display_mode *nmode;
 
@@ -265,4 +265,4 @@ struct panel_display_mode *panel_mode_create(void)
 
 	return nmode;
 }
-EXPORT_SYMBOL(panel_mode_create);
+EXPORT_SYMBOL(decon_panel_mode_create);

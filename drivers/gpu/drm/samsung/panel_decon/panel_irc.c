@@ -46,9 +46,9 @@ int __generate_irc_v1(struct brightness_table *brt_tbl, struct panel_irc_info *i
 	int size_ui_lum = brt_tbl->sz_ui_lum;
 	unsigned int *lum_tbl = brt_tbl->lum;
 	int gray = 0, color = 0, i = 0;
-	u64 coef = disp_pow(10, SCALEUP_5);
+	u64 coef = decon_disp_pow(10, SCALEUP_5);
 	int normal_max = lum_tbl[size_ui_lum - 1];
-	u64 scaleup_normal_max = normal_max * disp_pow(10, SCALEUP_4);
+	u64 scaleup_normal_max = normal_max * decon_disp_pow(10, SCALEUP_4);
 	int hbm_max = lum_tbl[brt_tbl->sz_lum - 1];
 	u64 lum_gap = 0, brt_gap = 0, temp_val = 0;
 	int dynamic_offset = info->dynamic_offset;
@@ -60,11 +60,11 @@ int __generate_irc_v1(struct brightness_table *brt_tbl, struct panel_irc_info *i
 	if (is_hbm_800(hbm_max)) {
 		if (is_hbm_zone(brt_tbl, brightness)) {				// is hbm
 			lum_gap = luminance - scaleup_normal_max;
-			lum_gap *= disp_pow(10, SCALEUP_4); // for precision scale up
+			lum_gap *= decon_disp_pow(10, SCALEUP_4); // for precision scale up
 			brt_gap = hbm_max - normal_max;
 			temp_val = (lum_gap * info->hbm_coef) / brt_gap;
-			temp_val = disp_pow_round(temp_val, SCALEUP_4);
-			temp_val /= disp_pow(10, SCALEUP_4); // scanel down
+			temp_val = decon_disp_pow_round(temp_val, SCALEUP_4);
+			temp_val /= decon_disp_pow(10, SCALEUP_4); // scanel down
 			coef = coef - temp_val;
 		}
 	}
@@ -73,9 +73,9 @@ int __generate_irc_v1(struct brightness_table *brt_tbl, struct panel_irc_info *i
 		for (color = 0; color < 3; color++) {
 			for (i = 0, temp_val = 0; i <= gray; i++)
 				temp_val += info->ref_tbl[dynamic_offset + i * 3 + color];
-			temp_val = disp_div64(temp_val * luminance, lum_tbl[size_ui_lum - 1]);
+			temp_val = decon_disp_div64(temp_val * luminance, lum_tbl[size_ui_lum - 1]);
 			temp_val *= coef;
-			info->buffer[dynamic_offset + gray * 3 + color] = (u8)(disp_pow_round(temp_val, 9) / disp_pow(10, SCALEUP_9));
+			info->buffer[dynamic_offset + gray * 3 + color] = (u8)(decon_disp_pow_round(temp_val, 9) / decon_disp_pow(10, SCALEUP_9));
 			for (i = 0; i < gray; i++)
 				info->buffer[dynamic_offset + gray * 3 + color] -= info->buffer[dynamic_offset + i * 3 + color];
 		}
@@ -85,30 +85,30 @@ int __generate_irc_v1(struct brightness_table *brt_tbl, struct panel_irc_info *i
 
 int __generate_irc_v2(struct brightness_table *brt_tbl, struct panel_irc_info *info, u64 luminance, int brightness)
 {
-	u64 coef = disp_pow(10, SCALEUP_5);
+	u64 coef = decon_disp_pow(10, SCALEUP_5);
 	int size_ui_lum = brt_tbl->sz_ui_lum;
 	unsigned int *lum_tbl = brt_tbl->lum;
 	int normal_max = lum_tbl[size_ui_lum - 1];
-	u64 scaleup_normal_max = normal_max * disp_pow(10, SCALEUP_4);
+	u64 scaleup_normal_max = normal_max * decon_disp_pow(10, SCALEUP_4);
 	int hbm_max = lum_tbl[brt_tbl->sz_lum - 1];
 	u64 lum_gap = 0, brt_gap = 0, temp_val = 0;
 	int i = 0;
 
 	if (is_hbm_zone(brt_tbl, brightness)) {				// is hbm
 		lum_gap = luminance - scaleup_normal_max;
-		lum_gap *= disp_pow(10, SCALEUP_4); // for precision scale up
+		lum_gap *= decon_disp_pow(10, SCALEUP_4); // for precision scale up
 		brt_gap = hbm_max - normal_max;
 		temp_val = (lum_gap * info->hbm_coef) / brt_gap;
-		temp_val = disp_pow_round(temp_val, SCALEUP_5);
-		temp_val /= disp_pow(10, SCALEUP_5); // scanel down
+		temp_val = decon_disp_pow_round(temp_val, SCALEUP_5);
+		temp_val /= decon_disp_pow(10, SCALEUP_5); // scanel down
 		coef = coef - temp_val;
 	}
 
 	for (i = info->dynamic_offset; i < info->dynamic_offset + info->dynamic_len; i++) {
 		temp_val = coef;
 		temp_val *= info->ref_tbl[i];
-		temp_val = (u64)disp_pow_round(disp_div64(temp_val * luminance, lum_tbl[size_ui_lum - 1]), SCALEUP_9);
-		info->buffer[i] = (u8)(temp_val / (u64)disp_pow(10, SCALEUP_9));
+		temp_val = (u64)decon_disp_pow_round(decon_disp_div64(temp_val * luminance, lum_tbl[size_ui_lum - 1]), SCALEUP_9);
+		info->buffer[i] = (u8)(temp_val / (u64)decon_disp_pow(10, SCALEUP_9));
 	}
 
 	return 0;
@@ -134,9 +134,9 @@ u64 get_scaleup_luminance(struct brightness_table *brt_tbl, struct panel_irc_inf
 	upper_brt = brt_tbl->brt[upper_idx];
 	lower_brt = brt_tbl->brt[lower_idx];
 
-	current_lum = disp_interpolation64(lower_lum * disp_pow(10, SCALEUP_4), upper_lum * disp_pow(10, SCALEUP_4),
+	current_lum = decon_disp_interpolation64(lower_lum * decon_disp_pow(10, SCALEUP_4), upper_lum * decon_disp_pow(10, SCALEUP_4),
 		(s32)((u64)brightness - lower_brt), (s32)(upper_brt - lower_brt));
-	current_lum = disp_pow_round(current_lum, 2);
+	current_lum = decon_disp_pow_round(current_lum, 2);
 	return current_lum;
 }
 

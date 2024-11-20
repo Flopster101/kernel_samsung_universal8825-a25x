@@ -32,14 +32,14 @@ const char *panel_debugfs_name[] = {
 
 static int panel_debug_log_show(struct seq_file *s)
 {
-	seq_printf(s, "%d\n", panel_log_level);
+	seq_printf(s, "%d\n", decon_panel_log_level);
 
 	return 0;
 }
 
 static int panel_debug_cmd_log_show(struct seq_file *s)
 {
-	seq_printf(s, "%d\n", panel_cmd_log);
+	seq_printf(s, "%d\n", decon_panel_cmd_log);
 
 	return 0;
 }
@@ -81,7 +81,7 @@ static int panel_debug_panel_event_noti(struct panel_device *panel, char *buf)
 #endif
 	evt_data.state = state;
 
-	panel_notifier_call_chain(event, &evt_data);
+	decon_panel_notifier_call_chain(event, &evt_data);
 	panel_info("event:%d state:%d\n", event, evt_data.state);
 
 	return 0;
@@ -198,16 +198,16 @@ static ssize_t panel_debug_simple_write(struct file *file,
 		if (rc)
 			return rc;
 
-		panel_log_level = res;
-		panel_info("panel_log_level: %d\n", panel_log_level);
+		decon_panel_log_level = res;
+		panel_info("decon_panel_log_level: %d\n", decon_panel_log_level);
 		break;
 	case PANEL_DEBUGFS_CMD_LOG:
 		rc = kstrtoint_from_user(buf, count, 10, &res);
 		if (rc)
 			return rc;
 
-		panel_cmd_log = res;
-		panel_info("panel_cmd_log: %d\n", panel_cmd_log);
+		decon_panel_cmd_log = res;
+		panel_info("decon_panel_cmd_log: %d\n", decon_panel_cmd_log);
 		break;
 #if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	case PANEL_DEBUGFS_PANEL_EVENT:

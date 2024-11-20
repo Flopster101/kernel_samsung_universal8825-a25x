@@ -401,7 +401,7 @@ int get_copr_reg_copr_en(struct copr_info *copr)
 	return copr_en;
 }
 
-int get_copr_reg_size(int version)
+int decon_get_copr_reg_size(int version)
 {
 	if (version == COPR_VER_0)
 		return ARRAY_SIZE(copr_reg_v0_list);
@@ -418,9 +418,9 @@ int get_copr_reg_size(int version)
 	else
 		return 0;
 }
-EXPORT_SYMBOL(get_copr_reg_size);
+EXPORT_SYMBOL(decon_get_copr_reg_size);
 
-int get_copr_reg_packed_size(int version)
+int decon_get_copr_reg_packed_size(int version)
 {
 	if (version == COPR_VER_5)
 		return COPR_V5_CTRL_REG_SIZE;
@@ -429,9 +429,9 @@ int get_copr_reg_packed_size(int version)
 	else
 		return 0;
 }
-EXPORT_SYMBOL(get_copr_reg_packed_size);
+EXPORT_SYMBOL(decon_get_copr_reg_packed_size);
 
-const char *get_copr_reg_name(int version, int index)
+const char *decon_get_copr_reg_name(int version, int index)
 {
 	if (version == COPR_VER_0)
 		return copr_reg_v0_list[index].name;
@@ -448,9 +448,9 @@ const char *get_copr_reg_name(int version, int index)
 	else
 		return NULL;
 }
-EXPORT_SYMBOL(get_copr_reg_name);
+EXPORT_SYMBOL(decon_get_copr_reg_name);
 
-int get_copr_reg_offset(int version, int index)
+int decon_get_copr_reg_offset(int version, int index)
 {
 	if (version == COPR_VER_0)
 		return copr_reg_v0_list[index].offset;
@@ -467,11 +467,11 @@ int get_copr_reg_offset(int version, int index)
 	else
 		return -EINVAL;
 }
-EXPORT_SYMBOL(get_copr_reg_offset);
+EXPORT_SYMBOL(decon_get_copr_reg_offset);
 
-u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index)
+u32 *decon_get_copr_reg_ptr(struct copr_reg *reg, int version, int index)
 {
-	int offset = get_copr_reg_offset(version, index);
+	int offset = decon_get_copr_reg_offset(version, index);
 
 	if (offset < 0)
 		return NULL;
@@ -491,9 +491,9 @@ u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index)
 	else
 		return NULL;
 }
-EXPORT_SYMBOL(get_copr_reg_ptr);
+EXPORT_SYMBOL(decon_get_copr_reg_ptr);
 
-int find_copr_reg_by_name(int version, char *s)
+int decon_find_copr_reg_by_name(int version, char *s)
 {
 	int i;
 	const char *name;
@@ -501,8 +501,8 @@ int find_copr_reg_by_name(int version, char *s)
 	if (s == NULL)
 		return -EINVAL;
 
-	for (i = 0; i < get_copr_reg_size(version); i++) {
-		name = get_copr_reg_name(version, i);
+	for (i = 0; i < decon_get_copr_reg_size(version); i++) {
+		name = decon_get_copr_reg_name(version, i);
 		if (name == NULL)
 			continue;
 
@@ -512,9 +512,9 @@ int find_copr_reg_by_name(int version, char *s)
 
 	return -EINVAL;
 }
-EXPORT_SYMBOL(find_copr_reg_by_name);
+EXPORT_SYMBOL(decon_find_copr_reg_by_name);
 
-int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array)
+int decon_copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array)
 {
 	int i, offset = 0;
 
@@ -582,7 +582,7 @@ int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byt
 
 	return 0;
 }
-EXPORT_SYMBOL(copr_reg_to_byte_array);
+EXPORT_SYMBOL(decon_copr_reg_to_byte_array);
 
 ssize_t copr_reg_show(struct copr_info *copr, char *buf)
 {
@@ -591,10 +591,10 @@ ssize_t copr_reg_show(struct copr_info *copr, char *buf)
 	u32 *ptr;
 	u32 version = get_copr_ver(copr);
 
-	size = get_copr_reg_size(version);
+	size = decon_get_copr_reg_size(version);
 	for (i = 0; i < size; i++) {
-		name = get_copr_reg_name(version, i);
-		ptr = get_copr_reg_ptr(&copr->props.reg, version, i);
+		name = decon_get_copr_reg_name(version, i);
+		ptr = decon_get_copr_reg_ptr(&copr->props.reg, version, i);
 		if (name != NULL && ptr != NULL)
 			len += snprintf(buf + len, PAGE_SIZE - len, "%s%d\n", name, *ptr);
 	}
@@ -607,13 +607,13 @@ int copr_reg_store(struct copr_info *copr, int index, u32 value)
 	const char *name;
 	u32 *ptr;
 	u32 version = get_copr_ver(copr);
-	int size = get_copr_reg_size(version);
+	int size = decon_get_copr_reg_size(version);
 
 	if (index >= size)
 		return -EINVAL;
 
-	name = get_copr_reg_name(version, index);
-	ptr = get_copr_reg_ptr(&copr->props.reg, version, index);
+	name = decon_get_copr_reg_name(version, index);
+	ptr = decon_get_copr_reg_ptr(&copr->props.reg, version, index);
 	if (name != NULL && ptr != NULL)
 		*ptr = value;
 	else
@@ -628,7 +628,7 @@ static inline void panel_send_coprstate_notify(u32 state)
 	struct panel_copr_event_data data;
 
 	data.state = state;
-	panel_notifier_call_chain(PANEL_EVENT_COPR_STATE_CHANGED, &data);
+	decon_panel_notifier_call_chain(PANEL_EVENT_COPR_STATE_CHANGED, &data);
 	panel_info("call EVENT_COPR_STATE notifier %d\n", data.state);
 }
 #endif
@@ -741,7 +741,7 @@ static int panel_read_copr_spi(struct copr_info *copr)
 		goto get_copr_error;
 	}
 
-	size = get_resource_size_by_name(panel_data, "copr_spi");
+	size = decon_get_resource_size_by_name(panel_data, "copr_spi");
 	if (size < 0) {
 		panel_err("failed to get copr size (ret %d)\n", size);
 		ret = -EINVAL;
@@ -858,7 +858,7 @@ static int panel_read_copr_dsi(struct copr_info *copr)
 		goto get_copr_error;
 	}
 
-	size = get_resource_size_by_name(panel_data, "copr_dsi");
+	size = decon_get_resource_size_by_name(panel_data, "copr_dsi");
 	if (size < 0) {
 		panel_err("failed to get copr size (ret %d)\n", size);
 		ret = -EINVAL;
@@ -1690,7 +1690,7 @@ int copr_probe(struct panel_device *panel, struct panel_copr_data *copr_data)
 #endif
 
 	for (i = 0; i < copr->nr_maptbl; i++)
-		maptbl_init(&copr->maptbl[i]);
+		decon_maptbl_init(&copr->maptbl[i]);
 
 	if (IS_PANEL_ACTIVE(panel) &&
 			get_copr_reg_copr_en(copr)) {

@@ -19,7 +19,7 @@ __visible_for_testing int __init s6e8fc3_a33x_panel_init(void)
 {
 	if (sec_current_device == SEC_A33) {
 		SEC_DETECT_LOG("Initialized s6e8fc3_a33x panel driver\n");
-		register_common_panel(&s6e8fc3_a33x_panel_info);
+		decon_register_common_panel(&s6e8fc3_a33x_panel_info);
 	} else {
 		SEC_DETECT_LOG("Skipped s6e8fc3_a33x panel driver\n");
 	}
@@ -28,7 +28,7 @@ __visible_for_testing int __init s6e8fc3_a33x_panel_init(void)
 
 __visible_for_testing void __exit s6e8fc3_a33x_panel_exit(void)
 {
-	deregister_common_panel(&s6e8fc3_a33x_panel_info);
+	decon_deregister_common_panel(&s6e8fc3_a33x_panel_info);
 }
 
 module_init(s6e8fc3_a33x_panel_init)

@@ -83,9 +83,9 @@ struct mafpc_info {
 	u32 abc_ctrl_cmd_len;
 };
 
-struct mafpc_device *mafpc_device_create(void);
-int mafpc_device_init(struct mafpc_device *mafpc);
-struct mafpc_device *get_mafpc_device(struct panel_device *panel);
+struct mafpc_device *decon_mafpc_device_create(void);
+int decon_mafpc_device_init(struct mafpc_device *mafpc);
+struct mafpc_device *decon_get_mafpc_device(struct panel_device *panel);
 
 #define MAFPC_IOCTL_MAGIC		'M'
 

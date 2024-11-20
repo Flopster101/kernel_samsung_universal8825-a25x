@@ -261,15 +261,15 @@ int copr_probe(struct panel_device *panel, struct panel_copr_data *copr_data);
 int copr_remove(struct panel_device *panel);
 int copr_res_update(struct copr_info *copr, int index, int cur_value, struct timespec cur_ts);
 int get_copr_reg_copr_en(struct copr_info *copr);
-int get_copr_reg_size(int version);
-int get_copr_reg_packed_size(int version);
-const char *get_copr_reg_name(int version, int index);
-int get_copr_reg_offset(int version, int index);
-u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index);
-int find_copr_reg_by_name(int version, char *s);
+int decon_get_copr_reg_size(int version);
+int decon_get_copr_reg_packed_size(int version);
+const char *decon_get_copr_reg_name(int version, int index);
+int decon_get_copr_reg_offset(int version, int index);
+u32 *decon_get_copr_reg_ptr(struct copr_reg *reg, int version, int index);
+int decon_find_copr_reg_by_name(int version, char *s);
 ssize_t copr_reg_show(struct copr_info *copr, char *buf);
 int copr_reg_store(struct copr_info *copr, int index, u32 value);
-int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array);
+int decon_copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array);
 #else
 static inline bool copr_is_enabled(struct copr_info *copr) { return 0; }
 static inline int copr_enable(struct copr_info *copr) { return 0; }
@@ -284,14 +284,14 @@ static inline int copr_probe(struct panel_device *panel, struct panel_copr_data 
 static inline int copr_remove(struct panel_device *panel) { return 0; }
 static inline int copr_res_update(struct copr_info *copr, int index, int cur_value, struct timespec cur_ts) { return 0; }
 static inline int get_copr_reg_copr_en(struct copr_info *copr) { return 0; }
-static inline int get_copr_reg_size(int version) { return 0; }
-static inline int get_copr_reg_packed_size(int version) { return 0; }
-static inline const char *get_copr_reg_name(int version, int index) { return NULL; }
-static inline int get_copr_reg_offset(int version, int index) { return 0; }
-static inline u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index) { return NULL; }
-static inline int find_copr_reg_by_name(int version, char *s) { return -EINVAL; }
+static inline int decon_get_copr_reg_size(int version) { return 0; }
+static inline int decon_get_copr_reg_packed_size(int version) { return 0; }
+static inline const char *decon_get_copr_reg_name(int version, int index) { return NULL; }
+static inline int decon_get_copr_reg_offset(int version, int index) { return 0; }
+static inline u32 *decon_get_copr_reg_ptr(struct copr_reg *reg, int version, int index) { return NULL; }
+static inline int decon_find_copr_reg_by_name(int version, char *s) { return -EINVAL; }
 static inline ssize_t copr_reg_show(struct copr_info *copr, char *buf) { return 0; }
 static inline int copr_reg_store(struct copr_info *copr, int index, u32 value) { return 0; }
-static inline int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array) { return 0; }
+static inline int decon_copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array) { return 0; }
 #endif
 #endif /* __COPR_H__ */
