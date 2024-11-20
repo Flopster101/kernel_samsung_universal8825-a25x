@@ -68,6 +68,7 @@ exynos-cm.ko
 exynos-el2.ko
 exynos-s2mpu.ko
 exynos-sdm.ko
+exynos-seclog.ko
 exynos-tzasc.ko
 exynos-ppmpu.ko
 exynos-seh.ko
