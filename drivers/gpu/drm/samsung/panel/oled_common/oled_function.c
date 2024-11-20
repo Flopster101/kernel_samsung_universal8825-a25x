@@ -111,13 +111,13 @@ static int __init oled_function_init(void)
 	int ret;
 
 	if (sec_current_device == SEC_A25) {
-		SEC_DETECT_LOG("Initialized USDM OLED driver\n");
+		printk(KERN_INFO "%s Initialized USDM OLED driver\n", sec_detect_label);
 		ret = panel_function_insert_array(oled_function_table,
 				ARRAY_SIZE(oled_function_table));
 		if (ret < 0)
 			panel_err("failed to insert oled_function_table\n");
 	} else {
-		SEC_DETECT_LOG("Skipped USDM OLED driver\n");
+		printk(KERN_INFO "%s Skipped USDM OLED driver\n", sec_detect_label);
 	}
 
 	return 0;
