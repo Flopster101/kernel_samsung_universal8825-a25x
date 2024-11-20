@@ -557,9 +557,7 @@ int dpu_sysmmu_fault_handler(struct iommu_fault *fault, void *data)
 	pr_info("%s +\n", __func__);
 
 	dpu_dump(exynos_crtc);
-#if defined(CONFIG_DEBUG_SNAPSHOT)
 	dbg_snapshot_expire_watchdog();
-#endif
 
 	return 0;
 }

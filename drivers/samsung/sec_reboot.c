@@ -65,9 +65,7 @@ extern void hard_reset_delay(void);
 #define MULTICMD_CLKCHANGE_SHIFT                (MULTICMD_DUMPSINK_SHIFT + 2)
 #define MULTICMD_CLKCHANGE_ON                   (0x1)
 
-#if defined(CONFIG_DEBUG_SNAPSHOT)
 extern void cache_flush_all(void);
-#endif
 extern void exynos_mach_restart(const char *cmd);
 extern struct atomic_notifier_head panic_notifier_list;
 extern struct exynos_reboot_helper_ops exynos_reboot_ops;
@@ -417,9 +415,7 @@ static int sec_reboot(struct notifier_block *this,
 		regmap_write(pmureg, panic_inform, SEC_RESET_REASON_UNKNOWN);
 	}
 
-#if defined(CONFIG_DEBUG_SNAPSHOT)
 	cache_flush_all();
-#endif
 
 	return NOTIFY_DONE;
 }
