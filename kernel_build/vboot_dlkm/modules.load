@@ -255,6 +255,8 @@ vbus_notifier.ko
 sec_common_fn.ko
 dropdump.ko
 mcd-panel-s6e3fc3_a25x.ko
+mcd-panel-s6e3fc3_a33x.ko
+mcd-panel-s6e8fc3_a33x.ko
 usdm-panel-oled-common.ko
 muic_platform.ko
 pdic_s2mf301.ko
@@ -265,6 +267,7 @@ fingerprint_sysfs.ko
 s2m_pdic_notifier_module.ko
 pdic_notifier_module.ko
 mcd-panel.ko
+mcd-panel-decon.ko
 abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
