@@ -239,6 +239,8 @@ vibrator_vib_info.ko
 sec_vibrator.ko
 dev_ril_bridge.ko
 common_muic.ko
+sec_debug_sched_info.ko
+sec_debug_stacktrace.ko
 vbus_notifier.ko
 sec_common_fn.ko
 dropdump.ko
