@@ -44,7 +44,7 @@ struct m_p_l_data {
 };
 
 static struct m_p_l_data *mpl_data;
-struct muic_platform_data muic_pdata;
+extern struct muic_platform_data muic_pdata;
 
 static const char *const pdic_event[] = {
 	[EVENT_PDIC_RPRD] = "RPRD",
@@ -1045,6 +1045,18 @@ void muic_platform_hv_init(struct muic_share_data *sdata)
 EXPORT_SYMBOL_GPL(muic_platform_hv_init);
 #endif
 
+#ifdef CONFIG_HV_MUIC_VOLTAGE_CTRL
+void hv_muic_change_afc_voltage(int tx_data)
+{
+	struct muic_share_data *sdata = mpl_data->sdata;
+	struct muic_ic_data *ic_data = (struct muic_ic_data *)sdata->ic_data;
+
+	if (ic_data->m_ops.change_afc_voltage)
+		ic_data->m_ops.change_afc_voltage(ic_data->drv_data, tx_data);
+}
+EXPORT_SYMBOL_GPL(hv_muic_change_afc_voltage);
+#endif
+
 static int muic_platform_afc_get_voltage(void)
 {
 	struct muic_share_data *sdata = mpl_data->sdata;
@@ -1371,10 +1383,10 @@ int muic_platform_init_gpio_cb(struct muic_share_data *sdata)
 
 #if IS_MODULE(CONFIG_MUIC_NOTIFIER)
 	if (pdata->init_gpio_cb)
-		ret = pdata->init_gpio_cb(pdata, get_switch_sel());
+		ret = pdata->init_gpio_cb(get_switch_sel());
 #else
 	if (pdata->init_gpio_cb)
-		ret = pdata->init_gpio_cb(get_switch_sel());
+		ret = pdata->init_gpio_cb();
 #endif
 
 	if (ret) {

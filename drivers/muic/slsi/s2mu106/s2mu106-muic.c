@@ -30,11 +30,10 @@
 #include <linux/delay.h>
 #include <linux/version.h>
 #include <linux/muic/common/muic.h>
-#include <linux/muic/common/muic_interface.h>
 #include <linux/mfd/slsi/s2mu106/s2mu106.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic.h>
 
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 #include <linux/muic/common/muic_sysfs.h>
 #endif
 #if IS_ENABLED(CONFIG_HV_MUIC_S2MU106_AFC)
@@ -76,9 +75,7 @@ static int s2mu106_muic_detect_dev_bc1p2(struct s2mu106_muic_data *muic_data);
 static void s2mu106_muic_handle_attached_dev(struct s2mu106_muic_data *muic_data);
 void s2mu106_muic_get_detect_info(struct s2mu106_muic_data *muic_data);
 static bool s2mu106_muic_is_opmode_typeC(struct s2mu106_muic_data *muic_data);
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_muic_set_water_state(struct s2mu106_muic_data *muic_data, bool en);
-#endif
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
 static int s2mu106_muic_set_hiccup_mode(struct s2mu106_muic_data *muic_data, bool en);
 static int s2mu106_muic_set_overheat_hiccup_mode(struct s2mu106_muic_data *muic_data, bool en);
@@ -898,16 +895,13 @@ static void s2mu106_if_set_water_state(void *mdata, bool en)
 #endif
 
 #if IS_ENABLED(CONFIG_HV_MUIC_S2MU106_AFC)
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static int s2mu106_muic_get_vdnmon(struct s2mu106_muic_data* muic_data)
 {
 	u8 vdnmon = s2mu106_i2c_read_byte(muic_data->i2c, S2MU106_REG_AFC_STATUS);
 	pr_info("%s(%d) vdnmon(%#x)\n", __func__, __LINE__, vdnmon);
 	return (vdnmon >> S2MU106_VDNMON_SHIFT) & 0x1;
 }
-#endif
 
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_muic_set_dn_ready_for_killer(struct s2mu106_muic_data *muic_data)
 {
 	struct i2c_client *i2c = muic_data->i2c;
@@ -940,9 +934,7 @@ static void s2mu106_muic_set_dn_ready_for_killer(struct s2mu106_muic_data *muic_
 	s2mu106_i2c_write_byte(i2c, S2MU106_REG_AFC_CTRL1,
 			(S2MU106_AFCEN_MASK | S2MU106_DPDNVDEN_MASK));
 }
-#endif
 
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static int s2mu106_muic_detect_usb_killer(struct s2mu106_muic_data *muic_data)
 {
 	struct i2c_client *i2c = muic_data->i2c;
@@ -1015,9 +1007,7 @@ exit_chk:
 
 	return ret;
 }
-#endif
 
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static int s2mu106_if_check_usb_killer(void *mdata)
 {
 	struct s2mu106_muic_data *muic_data = (struct s2mu106_muic_data *)mdata;
@@ -1051,7 +1041,6 @@ static int s2mu106_if_check_usb_killer(void *mdata)
 	return ret;
 }
 #endif
-#endif
 
 static int s2mu106_if_set_bcd_rescan_reg(void *mdata)
 {
@@ -1082,7 +1071,7 @@ static int s2mu106_if_set_jig_ctrl_on(void *mdata)
 	return _s2mu106_muic_set_jig_on(muic_data);
 }
 
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 static int s2mu106_if_show_register(void *mdata, char *mesg)
 {
 #if IS_ENABLED(CONFIG_MUIC_DEBUG)
@@ -1486,7 +1475,6 @@ detect_done:
 }
 
 #if IS_ENABLED(CONFIG_MUIC_S2MU106_RID)
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static int s2mu106_muic_detect_dev_rid_array(struct s2mu106_muic_data *muic_data)
 {
 	muic_data->new_dev = ATTACHED_DEV_UNKNOWN_MUIC;
@@ -1514,7 +1502,6 @@ static int s2mu106_muic_detect_dev_rid_array(struct s2mu106_muic_data *muic_data
 
 	return muic_data->new_dev;
 }
-#endif
 
 #if IS_ENABLED(CONFIG_MUIC_SUPPORT_TYPEB)
 static int s2mu106_muic_detect_dev_jig_type(struct s2mu106_muic_data *muic_data)
@@ -1679,7 +1666,6 @@ static int s2mu106_muic_detect_dev_mrid_adc(struct s2mu106_muic_data *muic_data)
 #endif /* CONFIG_MUIC_SUPPORT_TYPEB */
 #endif /* CONFIG_MUIC_S2MU106_RID */
 
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_muic_set_water_state(struct s2mu106_muic_data *muic_data, bool en)
 {
 struct muic_platform_data *muic_pdata = muic_data->pdata;
@@ -1707,7 +1693,6 @@ struct muic_platform_data *muic_pdata = muic_data->pdata;
 	s2mu106_muic_set_hiccup_mode(muic_data, MUIC_DISABLE);
 #endif
 }
-#endif
 
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
 static int s2mu106_muic_set_hiccup_mode(struct s2mu106_muic_data *muic_data, bool en)
@@ -2172,12 +2157,10 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 	muic_data->adc = muic_pdata->adc = _s2mu106_muic_get_rid_adc(muic_data);
 	muic_data->vbvolt = _s2mu106_muic_get_vbus_state(muic_data);
 
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	pr_info("%s Vbus(%s), rid_adc(%#x), Type(%s), opmode : %s\n", __func__,
 			(muic_data->vbvolt ? "High" : "Low"),
 			muic_data->adc, dev_to_str(muic_pdata->attached_dev),
 			(muic_if->opmode ? "PDIC" : "MUIC"));
-#endif
 
 #if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	if (muic_if->opmode == OPMODE_MUIC) {
@@ -2438,7 +2421,7 @@ static void s2mu106_muic_init_interface(struct s2mu106_muic_data *muic_data,
 	muic_if->get_adc = s2mu106_if_get_adc;
 #endif
 	muic_if->set_jig_ctrl_on = s2mu106_if_set_jig_ctrl_on;
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 	muic_if->show_register = s2mu106_if_show_register;
 #endif
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
@@ -2451,9 +2434,7 @@ static void s2mu106_muic_init_interface(struct s2mu106_muic_data *muic_data,
 	muic_if->prswap_work = s2mu106_if_prswap_work;
 #endif
 	muic_if->set_bypass = s2mu106_if_set_bypass;
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	muic_if->set_water_state = s2mu106_if_set_water_state;
-#endif
 	muic_data->if_data = muic_if;
 	muic_pdata->muic_if = muic_if;
 }
@@ -2533,7 +2514,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 	pr_info("%s: usb_path(%d), uart_path(%d)\n", __func__,
 		muic_pdata->usb_path, muic_pdata->uart_path);
 
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 	ret = muic_sysfs_init(muic_pdata);
 	if (ret) {
 		pr_err("failed to create sysfs\n");
@@ -2629,7 +2610,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 
 fail_init_irq:
 fail:
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 	muic_sysfs_deinit(muic_pdata);
 fail_init_sysfs:
 #endif
@@ -2653,7 +2634,7 @@ static int s2mu106_muic_remove(struct platform_device *pdev)
 	if (muic_data) {
 		pr_info("%s\n", __func__);
 
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 		if (muic_data->pdata != NULL)
 			muic_sysfs_deinit(muic_data->pdata);
 #endif

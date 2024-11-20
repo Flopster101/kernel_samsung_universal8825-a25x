@@ -41,6 +41,11 @@
 		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);		\
 	} while (0)
 
+enum muic_op_mode {
+	OPMODE_MUIC = 0<<0,
+	OPMODE_PDIC = 1<<0,
+};
+
 /* Slave addr = 0x4A: MUIC */
 enum ioctl_cmd {
 	GET_COM_VAL = 0x01,
@@ -206,8 +211,6 @@ struct muic_interface_t {
 	int gpio_uart_sel;
 	int gpio_usb_sel;
 
-	enum muic_op_mode opmode;
-
 	/* muic Device ID */
 	u8 muic_vendor;			/* Vendor ID */
 	u8 muic_version;		/* Version ID */
@@ -251,6 +254,8 @@ struct muic_interface_t {
 	struct delayed_work	pdic_work;
 	bool 			afc_water_disable;
 #endif
+	/* Operation Mode */
+	enum muic_op_mode	opmode;
 
 #if IS_ENABLED(CONFIG_MUIC_SUPPORT_PRSWAP)
 	muic_prswap_t prswap_status;
@@ -319,7 +324,7 @@ struct muic_interface_t {
 	int (*get_vbus)(void *);
 	int (*get_adc)(void *);
 	int (*check_usb_killer)(void *);
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 	int (*show_register)(void *, char *mesg);
 #if IS_ENABLED(CONFIG_SEC_FACTORY) && IS_ENABLED(CONFIG_USB_HOST_NOTIFY)
 	int (*set_otg_reg)(void *, bool enable);
