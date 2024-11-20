@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: GPL-2.0
 /*
  * include/linux/muic/common/muic.h
  *
  * header file supporting MUIC common information
  *
- * Copyright (C) 2022 Samsung Electronics
+ * Copyright (C) 2010 Samsung Electronics
+ * Seoyoung Jeong <seo0.jeong@samsung.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,25 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
 
 #ifndef __MUIC_H__
 #define __MUIC_H__
 
-#ifdef CONFIG_IFCONN_NOTIFIER
-#include <linux/ifconn/ifconn_notifier.h>
-#endif
-#include <linux/muic/common/muic_param.h>
 #include <linux/power_supply.h>
 
 #define MUIC_CORE "MUIC_CORE"
+
 #define SIOP (1 << 0)
 #define AFC_REQUEST_CHARGER SIOP
 #define FLED (1 << 1)
 #define AFC_REQUEST_MST (1 << 2)
 #define AFC_REQUEST_MFC (1 << 3)
 #define AFC_REQUEST_DETACH_CLEAR_BIT ((SIOP))
+
 /* Status of IF PMIC chip (suspend and resume) */
 enum {
 	MUIC_SUSPEND		= 0,
@@ -77,6 +76,13 @@ enum {
 	MUIC_PATH_AUDIO,
 };
 
+#ifdef CONFIG_MUIC_HV_FORCE_LIMIT
+enum {
+	HV_9V = 0,
+	HV_5V,
+};
+#endif
+
 /* bootparam SWITCH_SEL */
 enum {
 	SWITCH_SEL_USB_MASK	= 0x1,
@@ -88,11 +94,6 @@ enum {
 /* bootparam CHARGING_MODE */
 enum {
 	CH_MODE_AFC_DISABLE_VAL = 0x31, /* char '1' */
-};
-
-enum driver_probe_flag {
-	MUIC_PROBE_DONE = 1 << 0,
-	CHARGER_PROBE_DONE = 1 << 1,
 };
 
 /* MUIC ADC table */
@@ -141,7 +142,7 @@ typedef enum {
 typedef enum {
 	ATTACHED_DEV_NONE_MUIC = 0,
 
-	ATTACHED_DEV_USB_MUIC = 1,
+	ATTACHED_DEV_USB_MUIC,
 	ATTACHED_DEV_CDP_MUIC,
 	ATTACHED_DEV_OTG_MUIC,
 	ATTACHED_DEV_TA_MUIC,
@@ -223,24 +224,17 @@ typedef enum {
 	ATTACHED_DEV_CHECK_OCP,
 	ATTACHED_DEV_RDU_TA_MUIC,
 	ATTACHED_DEV_FACTORY_UART_MUIC,
-	ATTACHED_DEV_PE_CHARGER_PREPARE_MUIC,
-	ATTACHED_DEV_PE_CHARGER_9V_MUIC,
-	ATTACHED_DEV_TURBO_CHARGER,
-	ATTACHED_DEV_SPECOUT_CHARGER_MUIC,
-	ATTACHED_DEV_UNKNOWN_MUIC,
-
-	ATTACHED_DEV_POGO_DOCK_MUIC = 81,
+	ATTACHED_DEV_POGO_DOCK_MUIC,
 	ATTACHED_DEV_POGO_DOCK_5V_MUIC,
 	ATTACHED_DEV_POGO_DOCK_9V_MUIC,
-	ATTACHED_DEV_POGO_DOCK_34K_MUIC,
-	ATTACHED_DEV_POGO_DOCK_49_9K_MUIC,
 	ATTACHED_DEV_ABNORMAL_OTG_MUIC,
 	ATTACHED_DEV_RETRY_TIMEOUT_OPEN_MUIC,
-	ATTACHED_DEV_RETRY_AFC_CHARGER_5V_MUIC,
-	ATTACHED_DEV_RETRY_AFC_CHARGER_9V_MUIC,
-	ATTACHED_DEV_WIRELESS_TA_MUIC,
 
-	ATTACHED_DEV_LO_TA_MUIC = 91,
+	ATTACHED_DEV_RETRY_AFC_CHARGER_5V_MUIC = 81,
+	ATTACHED_DEV_RETRY_AFC_CHARGER_9V_MUIC,
+	ATTACHED_DEV_UNKNOWN_MUIC,
+	ATTACHED_DEV_LO_TA_MUIC,
+
 	ATTACHED_DEV_NUM,
 } muic_attached_dev_t;
 
@@ -254,6 +248,7 @@ typedef enum {
 } muic_silent_change_state_t;
 #endif
 
+#if defined(CONFIG_MUIC_HV)
 /* MUIC HV State type */
 typedef enum {
 	HV_STATE_INVALID = -1,
@@ -273,24 +268,21 @@ typedef enum {
 typedef enum {
 	HV_TRANS_INVALID = -1,
 	HV_TRANS_MUIC_DETACH = 0,
-	HV_TRANS_DCP_DETECTED,
-	HV_TRANS_NO_RESPONSE,
-	HV_TRANS_VDNMON_LOW,
-	HV_TRANS_FAST_CHARGE_PING_RESPONSE,
-	HV_TRANS_AFC_TA_DETECTED,
-	HV_TRANS_QC_TA_DETECTED,
-	HV_TRANS_VBUS_5V_BOOST,
-	HV_TRANS_VBUS_BOOST,
-	HV_TRANS_VBUS_REDUCE,
-	HV_TRANS_VBUS_UPDATE,
-	HV_TRANS_FAST_CHARGE_REOPEN,
-	HV_TRANS_MAX_NUM,
+	HV_TRANS_DCP_DETECTED = 1,
+	HV_TRANS_NO_RESPONSE = 2,
+	HV_TRANS_VDNMON_LOW = 3,
+	HV_TRANS_FAST_CHARGE_PING_RESPONSE = 4,
+	HV_TRANS_VBUS_BOOST = 5,
+	HV_TRANS_VBUS_REDUCE = 6,
+	HV_TRANS_FAST_CHARGE_REOPEN = 7,
+	HV_TRANS_MAX_NUM = 8,
 } muic_hv_transaction_t;
 
 typedef enum {
 	HV_9V = 0,
 	HV_5V,
 } muic_hv_voltage_t;
+#endif
 
 #ifdef CONFIG_MUIC_COMMON_SYSFS
 struct muic_sysfs_cb {
@@ -315,6 +307,7 @@ struct muic_sysfs_cb {
 	int (*set_overheat_hiccup)(void *data, int en);
 };
 #endif
+
 /* muic common callback driver internal data structure
  * that setted at muic-core.c file
  */
@@ -324,7 +317,11 @@ struct muic_platform_data {
 	struct mutex sysfs_mutex;
 	struct muic_sysfs_cb sysfs_cb;
 #endif
-	struct device *muic_device;
+	void *drv_data;
+	void *muic_if;
+	int irq_gpio;
+	bool suspended;
+	bool need_to_noti;
 
 #if IS_ENABLED(CONFIG_IF_CB_MANAGER)
 	struct muic_dev	*muic_d;
@@ -337,19 +334,45 @@ struct muic_platform_data {
 	int usb_path;
 	int uart_path;
 
+	int gpio_uart_sel;
+	int gpio_usb_sel;
+
 	bool rustproof_on;
 	bool afc_disable;
-
+	bool is_new_factory;
+	bool dcd_timeout;
 	int afc_disabled_updated;
+
+#ifdef CONFIG_MUIC_HV_FORCE_LIMIT
+	int hv_sel;
+	int silent_chg_change_state;
+#endif
+
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
+	struct device *switch_device;
+	struct mutex sysfs_mutex;
+#endif
+
+#if defined(CONFIG_MUIC_HV)
+	muic_hv_state_t hv_state;
+#endif
+
+	/* muic current attached device */
+	muic_attached_dev_t	attached_dev;
+
+	bool is_usb_ready;
+	bool is_factory_start;
+	bool is_rustproof;
+	bool is_otg_test;
+
+	bool is_jig_on;
+	bool jig_disable;
+	bool is_factory_uart;
 
 	enum muic_op_mode opmode;
 
 	int vbvolt;
 	int adc;
-
-	bool is_factory_start;
-
-	unsigned long driver_probe_flag;
 
 	/* muic switch dev register function for DockObserver */
 	void (*init_switch_dev_cb) (void);
@@ -358,14 +381,14 @@ struct muic_platform_data {
 	void (*jig_uart_cb)(int jig_state);
 
 	/* muic GPIO control function */
-#if IS_MODULE(CONFIG_MUIC_NOTIFIER)
-	int (*init_gpio_cb)(int switch_sel);
-#else
-	int (*init_gpio_cb)(void);
-#endif
-	int (*set_gpio_usb_sel)(void *data, int usb_path);
+	int (*init_gpio_cb) (void *, int switch_sel);
+	int (*set_gpio_usb_sel) (int usb_path);
 	int (*set_gpio_uart_sel)(void *data, int uart_path);
 	int (*set_safeout) (int safeout_path);
+
+	/* muic path switch function for rustproof */
+	void (*set_path_switch_suspend) (struct device *dev);
+	void (*set_path_switch_resume) (struct device *dev);
 
 	/* muic cable data collecting function */
 	void (*init_cable_data_collect_cb)(void);
@@ -376,22 +399,11 @@ struct muic_platform_data {
 	/* muic AFC get voltage function */
 	int (*muic_afc_get_voltage_cb)(void);
 
-	/* muic hv charger disable function */
-	int (*muic_hv_charger_disable_cb)(bool en);
-
 	/* muic check charger init function */
 	int (*muic_hv_charger_init_cb)(void);
 
 	/* muic set hiccup mode function */
 	int (*muic_set_hiccup_mode_cb)(int on_off);
-
-	/* muic set pogo adc function */
-	int (*muic_set_pogo_adc_cb)(int adc);
-
-	/* muic request afc cause */
-	int afc_request_cause;
-
-	void *drv_data;
 };
 
 #define MUIC_PDATA_VOID_FUNC(func, param) \
@@ -402,17 +414,9 @@ struct muic_platform_data {
 		pr_err("[muic_core] func not defined %s\n", __func__);	\
 }
 
-#define MUIC_PDATA_VOID_FUNC_MULTI_PARAM(func, param1, param2) \
-{\
-	if (func)	\
-		func(param1, param2);	\
-	else	\
-		pr_err("[muic_core] func not defined %s\n", __func__);	\
-}
-
 #define MUIC_PDATA_FUNC(func, param, ret) \
 {\
-	*ret = 0;	\
+	*ret = -1;	\
 	if (func)	\
 		*ret = func(param);	\
 	else	\
@@ -421,11 +425,19 @@ struct muic_platform_data {
 
 #define MUIC_PDATA_FUNC_MULTI_PARAM(func, param1, param2, ret) \
 {					\
-	*ret = 0;	\
+	*ret = -1;	\
 	if (func)	\
 		*ret = func(param1, param2);	\
 	else	\
 		pr_err("[muic_core] func not defined %s\n", __func__);	\
+}
+
+#define MUIC_PDATA_VOID_FUNC_MULTI_PARAM(func, param1, param2) \
+{\
+	if (func)	\
+		func(param1, param2);	\
+		else	\
+			pr_err("[muic_core] func not defined %s\n", __func__);	\
 }
 
 #define MUIC_IS_ATTACHED(dev) \
@@ -439,6 +451,26 @@ enum muic_param_en {
 /* Integration */
 #define ENUM_STR(x, r) { case x: r = #x; break; }
 
+#define REQUEST_IRQ(_irq, _dev_id, _name, _func)			\
+do {									\
+	ret = request_threaded_irq(_irq, NULL, _func,			\
+				0, _name, _dev_id);			\
+	if (ret < 0) {							\
+		pr_err("%s:%s Failed to request IRQ #%d: %d\n",		\
+				MUIC_DEV_NAME, __func__, _irq, ret);	\
+		_irq = 0;						\
+	}								\
+} while (0)
+
+#define FREE_IRQ(_irq, _dev_id, _name)					\
+do {									\
+	if (_irq) {							\
+		free_irq(_irq, _dev_id);				\
+		pr_info("%s:%s IRQ(%d):%s free done\n", MUIC_DEV_NAME,	\
+				__func__, _irq, _name);			\
+	}								\
+} while (0)
+
 #define MASK_1b (1)
 #define MASK_2b (0x3)
 #define MASK_3b (0x7)
@@ -448,11 +480,12 @@ enum muic_param_en {
 #define MASK_7b (0x7f)
 #define MASK_8b (0xff)
 
+#if defined(CONFIG_MUIC_HV)
 #define IS_VCHGIN_9V(x) ((8000 <= x) && (x <= 10300))
 #define IS_VCHGIN_5V(x) ((4000 <= x) && (x <= 6000))
 
 #define AFC_MRXRDY_CNT_LIMIT (3)
-#define AFC_MPING_RETRY_CNT_LIMIT (10)
+#define AFC_MPING_RETRY_CNT_LIMIT (20)
 #define AFC_QC_RETRY_CNT_LIMIT (3)
 #define VCHGIN_CHECK_CNT_LIMIT (3)
 #define AFC_QC_RETRY_WAIT_CNT_LIMIT (3)
@@ -504,10 +537,10 @@ typedef enum tx_data{
     MUIC_HV_5V = 0,
     MUIC_HV_9V,
 } muic_afc_txdata_t;
+#endif
 
 enum power_supply_lsi_property {
-#if !defined(CONFIG_BATTERY_SAMSUNG) || \
-	IS_ENABLED(CONFIG_MFD_S2MU106) || IS_ENABLED(CONFIG_MFD_S2MF301) || IS_MODULE(CONFIG_MFD_S2MU106) || defined(CONFIG_BATTERY_GKI)
+#if IS_MODULE(CONFIG_MFD_S2MU106) || defined(CONFIG_BATTERY_GKI)
 	POWER_SUPPLY_LSI_PROP_MIN = 10000,
 #else
 	POWER_SUPPLY_LSI_PROP_MIN = POWER_SUPPLY_EXT_PROP_MAX + 1,
@@ -537,10 +570,10 @@ enum power_supply_lsi_property {
 	POWER_SUPPLY_LSI_PROP_VBYP,
 	POWER_SUPPLY_LSI_PROP_VSYS,
 	POWER_SUPPLY_LSI_PROP_VBAT,
-	POWER_SUPPLY_LSI_PROP_VGPADC,
 	POWER_SUPPLY_LSI_PROP_VGPADC1,
 	POWER_SUPPLY_LSI_PROP_VGPADC2,
 	POWER_SUPPLY_LSI_PROP_ENABLE_WATER,
+	POWER_SUPPLY_LSI_PROP_VGPADC,
 	POWER_SUPPLY_LSI_PROP_VCC1,
 	POWER_SUPPLY_LSI_PROP_VCC2,
 	POWER_SUPPLY_LSI_PROP_ICHGIN,
@@ -554,7 +587,7 @@ enum power_supply_lsi_property {
 	POWER_SUPPLY_LSI_PROP_RID_OPS,
 	POWER_SUPPLY_LSI_PROP_RID_DISABLE,
 	POWER_SUPPLY_LSI_PROP_GET_REV,
-#if IS_ENABLED(CONFIG_MFD_S2MU106) || IS_ENABLED(CONFIG_MFD_S2MU106) || IS_ENABLED(CONFIG_MFD_S2MF301) || defined(CONFIG_BATTERY_GKI)
+#if IS_ENABLED(CONFIG_MFD_S2MU106) || defined(CONFIG_BATTERY_GKI)
 	POWER_SUPPLY_LSI_PROP_MAX,
 #endif
 };
@@ -577,38 +610,6 @@ enum power_supply_lsi_property {
 	}	\
 }
 
-#define MUIC_SEND_NOTI_ATTACH_ALL(dev) \
-{	\
-	int ret;	\
-	ret = ifconn_notifier_notify( \
-					IFCONN_NOTIFY_MUIC,	\
-					IFCONN_NOTIFY_ALL,	\
-					IFCONN_NOTIFY_ID_ATTACH,	\
-					dev,	\
-					IFCONN_NOTIFY_PARAM_DATA,	\
-					NULL);	\
-	if (ret < 0) {	\
-		pr_err("%s: Fail to send noti\n", \
-				__func__);	\
-	}	\
-}
-
-#define MUIC_SEND_NOTI_DETACH_ALL(dev) \
-{	\
-	int ret;	\
-	ret = ifconn_notifier_notify( \
-					IFCONN_NOTIFY_MUIC,	\
-					IFCONN_NOTIFY_ALL,	\
-					IFCONN_NOTIFY_ID_DETACH,	\
-					dev,	\
-					IFCONN_NOTIFY_PARAM_DATA,	\
-					NULL);	\
-	if (ret < 0) {	\
-		pr_err("%s: Fail to send noti\n", \
-				__func__);	\
-	}	\
-}
-
 #define MUIC_SEND_NOTI_TO_PDIC_ATTACH(dev) \
 {	\
 	int ret;	\
@@ -619,7 +620,6 @@ enum power_supply_lsi_property {
 					IFCONN_NOTIFY_PDIC,	\
 					IFCONN_NOTIFY_ID_ATTACH,	\
 					IFCONN_NOTIFY_EVENT_ATTACH,	\
-					IFCONN_NOTIFY_PARAM_DATA,	\
 					&template);	\
 	if (ret < 0) {	\
 		pr_err("%s: Fail to send noti\n", \
@@ -637,7 +637,6 @@ enum power_supply_lsi_property {
 					IFCONN_NOTIFY_PDIC,	\
 					IFCONN_NOTIFY_ID_DETACH,	\
 					IFCONN_NOTIFY_EVENT_DETACH,	\
-					IFCONN_NOTIFY_PARAM_DATA,	\
 					&template);	\
 	if (ret < 0) {	\
 		pr_err("%s: Fail to send noti\n", \
@@ -655,7 +654,6 @@ enum power_supply_lsi_property {
 					IFCONN_NOTIFY_MANAGER,	\
 					IFCONN_NOTIFY_ID_DETACH,	\
 					IFCONN_NOTIFY_EVENT_DETACH,	\
-					IFCONN_NOTIFY_PARAM_DATA,	\
 					&template);	\
 	if (ret < 0) {	\
 		pr_err("%s: Fail to send noti\n", \
@@ -680,6 +678,22 @@ extern int muic_hv_charger_init(void);
 #if IS_ENABLED(CONFIG_MUIC_POGO)
 extern int muic_set_pogo_adc(int adc);
 #endif
+int get_switch_sel(void);
+int get_afc_mode(void);
+void muic_set_hmt_status(int status);
+int muic_core_handle_attach(struct muic_platform_data *muic_pdata,
+							muic_attached_dev_t new_dev, int adc, u8 vbvolt);
+int muic_core_handle_detach(struct muic_platform_data *muic_pdata);
+extern bool muic_core_get_pdic_cable_state(struct muic_platform_data *muic_pdata);
+extern struct muic_platform_data *muic_core_init(void *drv_data);
+extern void muic_core_exit(struct muic_platform_data *muic_pdata);
+extern void muic_disable_otg_detect(void);
+#if defined(CONFIG_MUIC_HV)
+int muic_core_hv_state_manager(struct muic_platform_data *muic_pdata,
+								muic_hv_transaction_t trans);
+void muic_core_hv_init(struct muic_platform_data *muic_pdata);
+bool muic_core_hv_is_hv_dev(struct muic_platform_data *muic_pdata);
+#endif
 extern int muic_afc_get_voltage(void);
 extern int muic_afc_set_voltage(int voltage);
 extern int muic_afc_request_voltage(int cause, int voltage);
@@ -690,7 +704,7 @@ extern int muic_hv_charger_disable(bool en);
 
 #else
 static inline void muic_send_lcd_on_uevent(struct muic_platform_data *muic_pdata)
-	{return; }
+{return; }
 static inline int muic_set_hiccup_mode(int on_off) {return 0; }
 static inline int muic_hv_charger_init(void) {return 0; }
 static inline int muic_afc_get_voltage(void) {return 0; }
@@ -704,5 +718,5 @@ static inline int muic_afc_get_request_cause(void) {return 0;}
 static inline bool muic_is_enable_afc_request(void) {return false;}
 static inline int muic_hv_charger_disable(bool en) {return 0; }
 #endif
-
 #endif /* __MUIC_H__ */
+

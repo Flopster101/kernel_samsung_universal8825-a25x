@@ -34,7 +34,7 @@
 #include <linux/mfd/slsi/s2mf301/s2mf301_log.h>
 #include <linux/muic/slsi/s2mf301/s2mf301-muic.h>
 
-#if IS_ENABLED(CONFIG_MUIC_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
 #include <linux/muic/common/muic_sysfs.h>
 #endif
 #if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
