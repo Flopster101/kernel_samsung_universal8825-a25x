@@ -64,3 +64,5 @@ obj-y				+= samsung/
 ccflags-$(CONFIG_TZDEV) += -I$(srctree)/drivers/misc/tzdev/include
 obj-$(CONFIG_TZDEV)     += tzdev/
 obj-$(CONFIG_SAMSUNG_TUI)	+= tui/
+
+obj-$(CONFIG_SEC_DETECT)	+= sec_detect.o
