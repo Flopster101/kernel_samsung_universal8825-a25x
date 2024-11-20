@@ -131,14 +131,9 @@ exynos_mfc.ko
 fimc-is.ko
 is-cis-imx258.ko
 is-cis-4ha.ko
-is-cis-gw1.ko
 is-cis-gc02m1.ko
 is-cis-gc5035.ko
-is-cis-imx616.ko
-is-cis-imx682.ko
 is-cis-hi1339.ko
-is-cis-hi1336.ko
-is-cis-gd2.ko
 is-cis-jn1.ko
 is-cis-imx355.ko
 is-cis-4ha.ko
@@ -234,7 +229,6 @@ vbus_notifier.ko
 sec_common_fn.ko
 dropdump.ko
 mcd-panel-s6e3fc3_a25x.ko
-mcd-panel-s6e3fc3_a33x.ko
 mcd-panel-s6e8fc3_a33x.ko
 usdm-panel-oled-common.ko
 muic_platform.ko
@@ -246,6 +240,7 @@ fingerprint_sysfs.ko
 s2m_pdic_notifier_module.ko
 pdic_notifier_module.ko
 mcd-panel.ko
+mcd-panel-decon.ko
 abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
@@ -258,7 +253,6 @@ s2mf301_fuelgauge.ko
 s2mu106_fuelgauge.ko
 shub.ko
 sensor_core.ko
-stm_ts.ko
 mstdrv.ko
 snvm.ko
 dc_vibrator.ko
