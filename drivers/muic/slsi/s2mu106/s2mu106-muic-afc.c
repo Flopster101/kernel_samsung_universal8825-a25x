@@ -37,7 +37,7 @@
 #include <linux/muic/common/muic.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic-hv.h>
-#ifdef CONFIG_MUIC_MANAGER
+#ifdef CONFIG_MUIC_PLATFORM
 #include <linux/muic/common/muic_interface.h>
 #endif
 
@@ -340,7 +340,7 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 {
 	char *str = NULL;
 	int afc_request_cause = 0;
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
+#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
 	struct muic_interface_t *muic_if;
 
 	if (muic_data == NULL) {
@@ -356,7 +356,7 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 		str = "User Disable";
 		s2mu106_hv_muic_set_chgtype_usrcmd(muic_data);
 		muic_afc_request_cause_clear();
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
+#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
 	} else if (muic_if->is_afc_pdic_ready == false) {
 		str = "VBUS-CC Short";
 		pr_info("%s short detected or 56k not detected, revert dev to TA\n", __func__);
@@ -484,7 +484,7 @@ static void s2mu106_if_hv_muic_dcp_charger(void *mdata)
 static bool s2mu106_if_hv_muic_fast_charge_need(struct s2mu106_muic_data *muic_data)
 {
 	struct muic_platform_data *muic_pdata = muic_data->pdata;
-#if IS_ENABLED(CONFIG_MUIC_MANAGER) && !IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_MUIC_PLATFORM) && !IS_ENABLED(CONFIG_SEC_FACTORY)
 	struct muic_interface_t *muic_if = (struct muic_interface_t *)muic_data->if_data;
 
 	if (muic_if->is_afc_pdic_ready == false) {
