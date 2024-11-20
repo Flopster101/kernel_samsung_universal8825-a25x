@@ -1254,7 +1254,7 @@ static struct spi_driver st54spi_spi_driver = {
 
 /*-------------------------------------------------------------------------*/
 
-static int __init st54spi_init(void)
+int __init st54spi_init(void)
 {
 	int status;
 
@@ -1283,15 +1283,13 @@ static int __init st54spi_init(void)
 	pr_info("Loading st54spi driver: %d\n", status);
 	return status;
 }
-module_init(st54spi_init);
 
-static void __exit st54spi_exit(void)
+void __exit st54spi_exit(void)
 {
 	spi_unregister_driver(&st54spi_spi_driver);
 	class_destroy(st54spi_class);
 	unregister_chrdev(spidev_major, st54spi_spi_driver.driver.name);
 }
-module_exit(st54spi_exit);
 
 MODULE_AUTHOR("Andrea Paterniani, <a.paterniani@swapp-eng.it>");
 MODULE_DESCRIPTION("User mode SPI device interface");

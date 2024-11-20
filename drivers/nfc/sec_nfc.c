@@ -1569,13 +1569,30 @@ early_param("nfc_sec.nfc_param_lpcharge", nfc_lpcharge_func);
 #endif
 
 #if IS_MODULE(CONFIG_SAMSUNG_NFC)
+#if IS_ENABLED(CONFIG_ESE_P3_LSI)
 extern int spip3_dev_init(void);
 extern void spip3_dev_exit(void);
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST21NFC)
+extern int st21nfc_dev_init(void);
+extern void st21nfc_dev_exit(void);
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
+extern int st54spi_init(void);
+extern void st54spi_exit(void);
+#endif
+
 
 static int __init sec_nfc_init(void)
 {
 #if IS_ENABLED(CONFIG_ESE_P3_LSI)
 	spip3_dev_init();
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST21NFC)
+	st21nfc_dev_init();
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
+	st54spi_init();
 #endif
 	return SEC_NFC_INIT(&sec_nfc_driver);
 }
@@ -1584,6 +1601,12 @@ static void __exit sec_nfc_exit(void)
 {
 #if IS_ENABLED(CONFIG_ESE_P3_LSI)
 	spip3_dev_exit();
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST21NFC)
+	st21nfc_dev_exit();
+#endif
+#if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
+	st54spi_exit();
 #endif
 	SEC_NFC_EXIT(&sec_nfc_driver);
 }

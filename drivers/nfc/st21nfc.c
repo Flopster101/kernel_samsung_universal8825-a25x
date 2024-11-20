@@ -1708,7 +1708,7 @@ static struct i2c_driver st21nfc_driver = {
 
 
 /* module load/unload record keeping */
-static int __init st21nfc_dev_init(void)
+int __init st21nfc_dev_init(void)
 {
 #ifdef CONFIG_SEC_NFC_LOGGER
 	nfc_logger_init();
@@ -1720,15 +1720,12 @@ static int __init st21nfc_dev_init(void)
 	return i2c_add_driver(&st21nfc_driver);
 }
 
-module_init(st21nfc_dev_init);
-
-static void __exit st21nfc_dev_exit(void)
+void __exit st21nfc_dev_exit(void)
 {
 	NFC_LOG_INFO("Unloading st21nfc driver\n");
 	i2c_del_driver(&st21nfc_driver);
 }
 
-module_exit(st21nfc_dev_exit);
 
 MODULE_AUTHOR("STMicroelectronics");
 MODULE_DESCRIPTION("NFC ST21NFC driver");

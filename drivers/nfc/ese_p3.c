@@ -1135,7 +1135,7 @@ void spip3_dev_exit(void)
 }
 EXPORT_SYMBOL(spip3_dev_exit);
 #else
-static int __init spip3_dev_init(void)
+int __init spip3_dev_init(void)
 {
 	P3_INFO_MSG("Entry : %s\n", __func__);
 
@@ -1147,15 +1147,12 @@ static int __init spip3_dev_init(void)
 	return spi_register_driver(&spip3_driver);
 }
 
-static void __exit spip3_dev_exit(void)
+void __exit spip3_dev_exit(void)
 {
 	P3_INFO_MSG("Entry : %s\n", __func__);
 	if (ese_param_support)
 		spi_unregister_driver(&spip3_driver);
 }
-
-module_init(spip3_dev_init);
-module_exit(spip3_dev_exit);
 
 MODULE_AUTHOR("Sec");
 MODULE_DESCRIPTION("ese SPI driver");
