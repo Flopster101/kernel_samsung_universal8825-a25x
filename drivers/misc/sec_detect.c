@@ -16,25 +16,48 @@
 #include <linux/sec_detect.h>
 #include <linux/init.h>
 #include <linux/module.h>
-#include <linux/of_fdt.h>
+#include <linux/of.h>
 #include <linux/string.h>
 
 int sec_current_device = DEVICE_UNKNOWN;
 EXPORT_SYMBOL(sec_current_device);
+
 int sec_detect_init(void) {
-	const char *machine_name = of_flat_dt_get_machine_name();
-    if (strstr(machine_name, "A25") == 0) {
-      sec_current_device = SEC_A25;
-    } else if (strstr(machine_name, "A33") == 0) {
-      sec_current_device = SEC_A33;
+    struct device_node *root;
+    const char *machine_name;
+
+    root = of_find_node_by_path("/");
+    if (!root) {
+        printk(KERN_ERR "Failed to find device tree root\n");
+        return -ENOENT;
+    }
+
+    machine_name = of_get_property(root, "model", NULL);
+    if (!machine_name)
+        machine_name = of_get_property(root, "compatible", NULL);
+
+    if (!machine_name) {
+        printk(KERN_ERR "Failed to find machine name\n");
+        return -ENOENT;
+    }
+
+    printk(KERN_INFO "Current machine name: %s\n", machine_name);
+
+    if (strstr(machine_name, "A25") != NULL) {
+        sec_current_device = SEC_A25;
+    } else if (strstr(machine_name, "A33") != NULL) {
+        sec_current_device = SEC_A33;
     }
     return 0;
 }
+
 void sec_detect_exit(void) {
-	return;
+    return;
 }
+
 rootfs_initcall(sec_detect_init); // runs before regular drivers init
 module_exit(sec_detect_exit);
+
 MODULE_AUTHOR("Flopster101");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Detects the Samsung device currently running this kernel.");
