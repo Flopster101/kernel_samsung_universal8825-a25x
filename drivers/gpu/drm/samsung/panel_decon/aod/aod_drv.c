@@ -1195,7 +1195,7 @@ int aod_drv_probe(struct panel_device *panel, struct aod_tune *aod_tune)
 
 	for (i = 0; i < aod->nr_maptbl; i++) {
 		aod->maptbl[i].pdata = aod;
-		maptbl_init(&aod->maptbl[i]);
+		decon_maptbl_init(&aod->maptbl[i]);
 	}
 
 	aod->dev.minor = MISC_DYNAMIC_MINOR;

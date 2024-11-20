@@ -17,7 +17,7 @@
  * copy from slided source byte array to
  * continuous destination byte array
  */
-int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
+int decon_copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step)
 {
 	u8 *d = dest;
@@ -39,13 +39,13 @@ int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(d - dest);
 }
-EXPORT_SYMBOL(copy_from_sliced_byte_array);
+EXPORT_SYMBOL(decon_copy_from_sliced_byte_array);
 
 /*
  * copy to slided destination byte array from
  * continuous source byte array
  */
-int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
+int decon_copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step)
 {
 	u8 *d = dest;
@@ -64,34 +64,34 @@ int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(s - src);
 }
-EXPORT_SYMBOL(copy_to_sliced_byte_array);
+EXPORT_SYMBOL(decon_copy_to_sliced_byte_array);
 
 /*
- * hextos32 - hexa-decimal to signed int
+ * decon_hextos32 - hexa-decimal to signed int
  * @hex : input hexa deciaml number
  * @bits : total number of bits
  * MSB(most-significant-bit) is signed bit.
- * for example, hextos32(0x3FF, 10) returns -511.
+ * for example, decon_hextos32(0x3FF, 10) returns -511.
  */
-s32 hextos32(u32 hex, u32 bits)
+s32 decon_hextos32(u32 hex, u32 bits)
 {
 	int sign = (hex & BIT_MASK(bits - 1)) ? -1 : 1;
 
 	return sign * (hex & GENMASK(bits - 2, 0));
 }
-EXPORT_SYMBOL(hextos32);
+EXPORT_SYMBOL(decon_hextos32);
 
 /*
- * s32tohex - signed int to hexa-decimal
+ * decon_s32tohex - signed int to hexa-decimal
  * @dec : input signed deciaml number
  * @bits : total number of bits
  * MSB(most-significant-bit) is signed bit.
- * for example, s32tohex(-511, 10) returns 0x3FF.
+ * for example, decon_s32tohex(-511, 10) returns 0x3FF.
  */
-u32 s32tohex(s32 dec, u32 bits)
+u32 decon_s32tohex(s32 dec, u32 bits)
 {
 	u32 signed_bit = (dec < 0) ? BIT_MASK(bits - 1) : 0;
 
 	return (signed_bit | (abs(dec) & GENMASK(bits - 2, 0)));
 }
-EXPORT_SYMBOL(s32tohex);
+EXPORT_SYMBOL(decon_s32tohex);

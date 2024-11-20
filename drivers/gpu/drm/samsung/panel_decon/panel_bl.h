@@ -52,10 +52,10 @@ struct panel_irc_info;
 #define IS_UI_BRIGHTNESS(br)            (((br) <= UI_MAX_BRIGHTNESS) ? 1 : 0)
 
 #define AOR_TO_RATIO(aor, vtotal) \
-	(((aor) * disp_pow(10, 5) / (vtotal) + 5 * disp_pow(10, 0)) / disp_pow(10, 1))
+	(((aor) * decon_disp_pow(10, 5) / (vtotal) + 5 * decon_disp_pow(10, 0)) / decon_disp_pow(10, 1))
 
 #define VIRTUAL_BASE_LUMINANCE(lum, aor_ratio) \
-	((lum) * disp_pow(10, 6) / (disp_pow(10, 4) - (aor_ratio)))
+	((lum) * decon_disp_pow(10, 6) / (decon_disp_pow(10, 4) - (aor_ratio)))
 
 enum SEARCH_TYPE {
 	SEARCH_TYPE_EXACT,
@@ -233,19 +233,19 @@ int panel_update_brightness(struct panel_device *panel);
 int panel_update_brightness_cmd_skip(struct panel_device *panel);
 int max_brt_tbl(struct brightness_table *brt_tbl);
 int get_max_brightness(struct panel_bl_device *panel_bl);
-int get_brightness_pac_step_by_subdev_id(struct panel_bl_device *panel_bl, int id, int brightness);
-int get_brightness_pac_step(struct panel_bl_device *panel_bl, int brightness);
+int decon_decon_get_brightness_pac_step_by_subdev_id(struct panel_bl_device *panel_bl, int id, int brightness);
+int decon_get_brightness_pac_step(struct panel_bl_device *panel_bl, int brightness);
 int get_brightness_of_brt_to_step(struct panel_bl_device *panel_bl, int id, int brightness);
-int get_actual_brightness(struct panel_bl_device *panel_bl, int brightness);
+int decon_get_actual_brightness(struct panel_bl_device *panel_bl, int brightness);
 int get_subdev_actual_brightness(struct panel_bl_device *panel_bl, int id, int brightness);
-int get_actual_brightness_index(struct panel_bl_device *panel_bl, int brightness);
-int get_subdev_actual_brightness_index(struct panel_bl_device *panel_bl,
+int decon_decon_get_actual_brightness_index(struct panel_bl_device *panel_bl, int brightness);
+int decon_get_subdev_actual_brightness_index(struct panel_bl_device *panel_bl,
 		int id, int brightness);
-int get_actual_brightness_interpolation(struct panel_bl_device *panel_bl, int brightness);
+int decon_get_actual_brightness_interpolation(struct panel_bl_device *panel_bl, int brightness);
 int get_subdev_actual_brightness_interpolation(struct panel_bl_device *panel_bl, int id, int brightness);
-int panel_bl_get_acl_pwrsave(struct panel_bl_device *panel_bl);
-int panel_bl_get_acl_opr(struct panel_bl_device *panel_bl);
-bool is_hbm_brightness(struct panel_bl_device *panel_bl, int brightness);
+int decon_panel_bl_get_acl_pwrsave(struct panel_bl_device *panel_bl);
+int decon_panel_bl_get_acl_opr(struct panel_bl_device *panel_bl);
+bool decon_is_hbm_brightness(struct panel_bl_device *panel_bl, int brightness);
 bool is_ext_hbm_brightness(struct panel_bl_device *panel_bl, int brightness);
 int panel_bl_set_subdev(struct panel_bl_device *panel_bl, int id);
 
@@ -258,9 +258,9 @@ int panel_bl_aor_interpolation(struct panel_bl_device *panel_bl,
 		int id, u8 (*aor_tbl)[2]);
 int panel_bl_aor_interpolation_2(struct panel_bl_device *panel_bl,
 		int id, u8 (*aor_tbl)[2]);
-int panel_bl_irc_interpolation(struct panel_bl_device *panel_bl, int id,
+int decon_panel_bl_irc_interpolation(struct panel_bl_device *panel_bl, int id,
 	struct panel_irc_info *irc_info);
 int search_tbl(int *tbl, int sz, enum SEARCH_TYPE type, int value);
-int panel_bl_get_brightness_set_count(struct panel_bl_device *panel_bl);
+int decon_panel_bl_get_brightness_set_count(struct panel_bl_device *panel_bl);
 
 #endif /* __PANEL_BL_H__ */
