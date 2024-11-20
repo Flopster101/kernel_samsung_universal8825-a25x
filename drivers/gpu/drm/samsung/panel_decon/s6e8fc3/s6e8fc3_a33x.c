@@ -10,13 +10,19 @@
  * published by the Free Software Foundation.
  */
 #include <linux/of_gpio.h>
+#include <linux/sec_detect.h>
 #include <video/mipi_display.h>
 #include "s6e8fc3_a33x.h"
 #include "s6e8fc3_a33x_panel.h"
 
 __visible_for_testing int __init s6e8fc3_a33x_panel_init(void)
 {
-	register_common_panel(&s6e8fc3_a33x_panel_info);
+	if (sec_current_device == SEC_A33) {
+		printk(KERN_INFO "Initialized s6e8fc3_a33x_panel\n");
+		register_common_panel(&s6e8fc3_a33x_panel_info);
+	} else {
+		printk(KERN_INFO "Skipped a33x panel\n");
+	}
 	return 0;
 }
 
