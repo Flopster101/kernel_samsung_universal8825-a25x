@@ -7198,7 +7198,7 @@ CONFIG_SUPPORT_HV_CTRL=y
 #
 # KernelSU
 #
-# CONFIG_KSU is not set
+CONFIG_KSU=y
 
 #
 # KernelSU - SUSFS
