@@ -10,6 +10,7 @@
  * published by the Free Software Foundation.
  */
 #include <linux/of_gpio.h>
+#include <linux/sec_detect.h>
 #include <video/mipi_display.h>
 #include "../maptbl.h"
 #include "../panel.h"
@@ -123,9 +124,14 @@ struct pnobj_func s6e3fc3_a25x_function_table[MAX_S6E3FC3_A25X_FUNCTION] = {
 
 static int __init s6e3fc3_a25x_panel_init(void)
 {
-	s6e3fc3_init(&s6e3fc3_a25x_panel_info);
-	panel_function_insert_array(s6e3fc3_a25x_function_table, ARRAY_SIZE(s6e3fc3_a25x_function_table));
-	register_common_panel(&s6e3fc3_a25x_panel_info);
+	if (sec_current_device == SEC_A25) {
+		printk(KERN_INFO "Initialized s6e3fc3_a25x panel\n");
+		s6e3fc3_init(&s6e3fc3_a25x_panel_info);
+		panel_function_insert_array(s6e3fc3_a25x_function_table, ARRAY_SIZE(s6e3fc3_a25x_function_table));
+		register_common_panel(&s6e3fc3_a25x_panel_info);
+	} else {
+		printk(KERN_INFO "Skipped a25x panel\n");
+	}
 
 	return 0;
 }

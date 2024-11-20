@@ -8,6 +8,7 @@
  */
 
 #include <linux/module.h>
+#include <linux/sec_detect.h>
 #include "../panel_debug.h"
 #include "../panel_function.h"
 #include "oled_common.h"
@@ -109,10 +110,15 @@ static int __init oled_function_init(void)
 {
 	int ret;
 
-	ret = panel_function_insert_array(oled_function_table,
-			ARRAY_SIZE(oled_function_table));
-	if (ret < 0)
-		panel_err("failed to insert oled_function_table\n");
+	if (sec_current_device == SEC_A25) {
+		printk(KERN_INFO "Initialized oled common driver\n");
+		ret = panel_function_insert_array(oled_function_table,
+				ARRAY_SIZE(oled_function_table));
+		if (ret < 0)
+			panel_err("failed to insert oled_function_table\n");
+	} else {
+		printk(KERN_INFO "Skipped oled driver\n");
+	}
 
 	return 0;
 }

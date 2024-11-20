@@ -27,6 +27,7 @@
 #include <linux/of_address.h>
 #include <linux/of_platform.h>
 #include <linux/ctype.h>
+#include <linux/sec_detect.h>
 #include <video/mipi_display.h>
 #include "panel_kunit.h"
 #include "kernel/irq/internals.h"
@@ -5585,28 +5586,34 @@ static int __init panel_drv_init(void)
 {
 	int ret;
 
-	panel_info("++\n");
-	ret = panel_create_lcd_class();
-	if (ret < 0) {
-		panel_err("panel_create_lcd_class returned %d\n", ret);
-		return -EINVAL;
-	}
+	if (sec_current_device == SEC_A33) {
+		printk(KERN_INFO "Initialized decon panel driver\n");
+		panel_info("++\n");
+		ret = panel_create_lcd_class();
+		if (ret < 0) {
+			panel_err("panel_create_lcd_class returned %d\n", ret);
+			return -EINVAL;
+		}
 
-#ifdef CONFIG_SUPPORT_MAFPC
-	ret = platform_driver_register(&mafpc_driver);
-	if (ret) {
-		panel_err("failed to register mafpc driver\n");
-		return ret;
-	}
-#endif
-	ret = platform_driver_register(&panel_driver);
-	if (ret) {
-		panel_err("failed to register panel driver\n");
-		return ret;
-	}
-	panel_info("--\n");
+	#ifdef CONFIG_SUPPORT_MAFPC
+		ret = platform_driver_register(&mafpc_driver);
+		if (ret) {
+			panel_err("failed to register mafpc driver\n");
+			return ret;
+		}
+	#endif
+		ret = platform_driver_register(&panel_driver);
+		if (ret) {
+			panel_err("failed to register panel driver\n");
+			return ret;
+		}
+		panel_info("--\n");
 
-	return ret;
+		return ret;
+	} else {
+		printk(KERN_INFO "Skipped decon panel driver\n");
+		return 0;
+	}
 }
 
 static void __exit panel_drv_exit(void)
