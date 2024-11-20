@@ -133,11 +133,11 @@ static inline int maptbl_get_sizeof_maptbl(struct maptbl *tbl)
 	return maptbl_get_sizeof_n_dimen_element(tbl, maptbl_get_countof_dimen(tbl));
 }
 
-int maptbl_get_indexof_n_dimen_element(struct maptbl *tbl, enum ndarray_dimen dimen, unsigned int indexof_element);
-int maptbl_get_indexof_box(struct maptbl *tbl, unsigned int indexof_box);
-int maptbl_get_indexof_layer(struct maptbl *tbl, unsigned int indexof_layer);
-int maptbl_get_indexof_row(struct maptbl *tbl, unsigned int indexof_row);
-int maptbl_get_indexof_col(struct maptbl *tbl, unsigned int indexof_col);
+int decon_maptbl_get_indexof_n_dimen_element(struct maptbl *tbl, enum ndarray_dimen dimen, unsigned int indexof_element);
+int decon_maptbl_get_indexof_box(struct maptbl *tbl, unsigned int indexof_box);
+int decon_maptbl_get_indexof_layer(struct maptbl *tbl, unsigned int indexof_layer);
+int decon_maptbl_get_indexof_row(struct maptbl *tbl, unsigned int indexof_row);
+int decon_maptbl_get_indexof_col(struct maptbl *tbl, unsigned int indexof_col);
 
 /* maptbl shape macros */
 #define DIMENSION(_n_) (_n_)
@@ -302,27 +302,27 @@ void maptbl_set_ops(struct maptbl *m, struct maptbl_ops *ops);
 void maptbl_set_initialized(struct maptbl *m, bool initialized);
 void maptbl_set_private_data(struct maptbl *m, void *priv);
 void *maptbl_get_private_data(struct maptbl *m);
-struct maptbl *maptbl_create(char *name, struct maptbl_shape *shape,
+struct maptbl *decon_maptbl_create(char *name, struct maptbl_shape *shape,
 		struct maptbl_ops *ops, void *init_data, void *priv);
-struct maptbl *maptbl_clone(struct maptbl *src);
-struct maptbl *maptbl_deepcopy(struct maptbl *dst, struct maptbl *src);
-void maptbl_destroy(struct maptbl *m);
+struct maptbl *decon_maptbl_clone(struct maptbl *src);
+struct maptbl *decon_maptbl_deepcopy(struct maptbl *dst, struct maptbl *src);
+void decon_maptbl_destroy(struct maptbl *m);
 
-int maptbl_index(struct maptbl *tbl, int layer, int row, int col);
-int maptbl_4d_index(struct maptbl *tbl, int box, int layer, int row, int col);
-bool maptbl_is_initialized(struct maptbl *tbl);
-bool maptbl_is_index_in_bound(struct maptbl *tbl, unsigned int index);
-int maptbl_init(struct maptbl *tbl);
-int maptbl_getidx(struct maptbl *tbl);
-int maptbl_copy(struct maptbl *tbl, u8 *dst);
-int maptbl_cmp_shape(struct maptbl *m1, struct maptbl *m2);
-struct maptbl *maptbl_memcpy(struct maptbl *dst, struct maptbl *src);
-int maptbl_pos_to_index(struct maptbl *tbl, struct maptbl_pos *pos);
-int maptbl_index_to_pos(struct maptbl *tbl, unsigned int index, struct maptbl_pos *pos);
-int maptbl_fill(struct maptbl *tbl, struct maptbl_pos *pos, u8 *src, size_t n);
+int decon_maptbl_index(struct maptbl *tbl, int layer, int row, int col);
+int decon_maptbl_4d_index(struct maptbl *tbl, int box, int layer, int row, int col);
+bool decon_maptbl_is_initialized(struct maptbl *tbl);
+bool decon_maptbl_is_index_in_bound(struct maptbl *tbl, unsigned int index);
+int decon_maptbl_init(struct maptbl *tbl);
+int decon_maptbl_getidx(struct maptbl *tbl);
+int decon_maptbl_copy(struct maptbl *tbl, u8 *dst);
+int decon_maptbl_cmp_shape(struct maptbl *m1, struct maptbl *m2);
+struct maptbl *decon_maptbl_memcpy(struct maptbl *dst, struct maptbl *src);
+int decon_maptbl_pos_to_index(struct maptbl *tbl, struct maptbl_pos *pos);
+int decon_decon_maptbl_index_to_pos(struct maptbl *tbl, unsigned int index, struct maptbl_pos *pos);
+int decon_maptbl_fill(struct maptbl *tbl, struct maptbl_pos *pos, u8 *src, size_t n);
 int maptbl_snprintf_head(struct maptbl *tbl, char *buf, size_t size);
 int maptbl_snprintf_body(struct maptbl *tbl, char *buf, size_t size);
 int maptbl_snprintf_tail(struct maptbl *tbl, char *buf, size_t size);
 int maptbl_snprintf(struct maptbl *tbl, char *buf, size_t size);
-void maptbl_print(struct maptbl *tbl);
+void decon_maptbl_print(struct maptbl *tbl);
 #endif /* __MAPTBL_H__ */

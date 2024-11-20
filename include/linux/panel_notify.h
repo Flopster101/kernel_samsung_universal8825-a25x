@@ -76,21 +76,21 @@ struct panel_screen_mode_data {
 };
 
 #ifdef CONFIG_PANEL_NOTIFY
-extern int panel_notifier_register(struct notifier_block *nb);
-extern int panel_notifier_unregister(struct notifier_block *nb);
-extern int panel_notifier_call_chain(unsigned long val, void *v);
+extern int decon_panel_notifier_register(struct notifier_block *nb);
+extern int decon_panel_notifier_unregister(struct notifier_block *nb);
+extern int decon_panel_notifier_call_chain(unsigned long val, void *v);
 #else
-static inline int panel_notifier_register(struct notifier_block *nb)
+static inline int decon_panel_notifier_register(struct notifier_block *nb)
 {
 	return 0;
 };
 
-static inline int panel_notifier_unregister(struct notifier_block *nb)
+static inline int decon_panel_notifier_unregister(struct notifier_block *nb)
 {
 	return 0;
 };
 
-static inline int panel_notifier_call_chain(unsigned long val, void *v)
+static inline int decon_panel_notifier_call_chain(unsigned long val, void *v)
 {
 	return 0;
 };

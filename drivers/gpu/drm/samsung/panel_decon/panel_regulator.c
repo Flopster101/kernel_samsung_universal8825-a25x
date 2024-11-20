@@ -248,7 +248,7 @@ int panel_regulator_helper_set_current_limit(struct panel_regulator *regulator, 
 	return call_panel_regulator_func(regulator, set_current_limit, uA);
 }
 
-int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator)
+int decon_of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator)
 {
 	struct device_node *reg_np;
 
@@ -276,9 +276,9 @@ int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regul
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_regulator);
+EXPORT_SYMBOL(decon_of_get_panel_regulator);
 
-struct panel_regulator *panel_regulator_create(void)
+struct panel_regulator *decon_panel_regulator_create(void)
 {
 	struct panel_regulator *regulator;
 
@@ -290,9 +290,9 @@ struct panel_regulator *panel_regulator_create(void)
 
 	return regulator;
 }
-EXPORT_SYMBOL(panel_regulator_create);
+EXPORT_SYMBOL(decon_panel_regulator_create);
 
-void panel_regulator_destroy(struct panel_regulator *regulator)
+void decon_panel_regulator_destroy(struct panel_regulator *regulator)
 {
 	if (!regulator)
 		return;
@@ -300,4 +300,4 @@ void panel_regulator_destroy(struct panel_regulator *regulator)
 	regulator_put(regulator->reg);
 	kfree(regulator);
 }
-EXPORT_SYMBOL(panel_regulator_destroy);
+EXPORT_SYMBOL(decon_panel_regulator_destroy);

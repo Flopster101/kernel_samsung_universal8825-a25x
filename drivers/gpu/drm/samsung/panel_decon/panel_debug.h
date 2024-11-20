@@ -19,62 +19,62 @@
 #define PANEL_PR_PREFIX	"panel-"
 #define PANEL_DEV_PR_PREFIX	"panel%d-"
 
-extern int panel_log_level;
-extern int panel_cmd_log;
+extern int decon_panel_log_level;
+extern int decon_panel_cmd_log;
 
 #define panel_err(fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 3)					\
+		if (decon_panel_log_level >= 3)					\
 			pr_err(pr_fmt(PANEL_PR_PREFIX PANEL_PR_TAG ":E:%s: " fmt), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_warn(fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 4)					\
+		if (decon_panel_log_level >= 4)					\
 			pr_warn(pr_fmt(PANEL_PR_PREFIX PANEL_PR_TAG ":W:%s: " fmt), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_info(fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 6)					\
+		if (decon_panel_log_level >= 6)					\
 			pr_info(pr_fmt(PANEL_PR_PREFIX PANEL_PR_TAG ":I:%s: " fmt), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_dbg(fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 7)					\
+		if (decon_panel_log_level >= 7)					\
 			pr_info(pr_fmt(PANEL_PR_PREFIX PANEL_PR_TAG ":D:%s: " fmt), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 
 #define panel_ext_err(_tag_, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 3)					\
+		if (decon_panel_log_level >= 3)					\
 			pr_err(pr_fmt(PANEL_PR_PREFIX "%s:E:%s: " fmt), (_tag_), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_ext_warn(_tag_, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 4)					\
+		if (decon_panel_log_level >= 4)					\
 			pr_warn(pr_fmt(PANEL_PR_PREFIX "%s:W:%s: " fmt), (_tag_), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_ext_info(_tag_, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 6)					\
+		if (decon_panel_log_level >= 6)					\
 			pr_info(pr_fmt(PANEL_PR_PREFIX "%s:I:%s: " fmt), (_tag_), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 #define panel_ext_dbg(_tag_, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 7)					\
+		if (decon_panel_log_level >= 7)					\
 			pr_info(pr_fmt(PANEL_PR_PREFIX "%s:D:%s: " fmt), (_tag_), __func__, ##__VA_ARGS__);			\
 	} while (0)
 
 
 #define panel_dev_err(panel_dev, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 3)					\
+		if (decon_panel_log_level >= 3)					\
 			pr_err(pr_fmt(PANEL_DEV_PR_PREFIX PANEL_PR_TAG ":E:%s: " fmt), \
 					(panel_dev) ? (panel_dev)->id : 0, \
 					__func__, ##__VA_ARGS__);			\
@@ -82,7 +82,7 @@ extern int panel_cmd_log;
 
 #define panel_dev_warn(panel_dev, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 4)					\
+		if (decon_panel_log_level >= 4)					\
 			pr_warn(pr_fmt(PANEL_DEV_PR_PREFIX PANEL_PR_TAG ":W:%s: " fmt), \
 					(panel_dev) ? (panel_dev)->id : 0, \
 					__func__, ##__VA_ARGS__);			\
@@ -90,7 +90,7 @@ extern int panel_cmd_log;
 
 #define panel_dev_info(panel_dev, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 6)					\
+		if (decon_panel_log_level >= 6)					\
 			pr_info(pr_fmt(PANEL_DEV_PR_PREFIX PANEL_PR_TAG ":I:%s: " fmt), \
 					(panel_dev) ? (panel_dev)->id : 0, \
 					__func__, ##__VA_ARGS__);			\
@@ -98,12 +98,12 @@ extern int panel_cmd_log;
 
 #define panel_dev_dbg(panel_dev, fmt, ...)							\
 	do {									\
-		if (panel_log_level >= 7)					\
+		if (decon_panel_log_level >= 7)					\
 			pr_info(pr_fmt(PANEL_DEV_PR_PREFIX PANEL_PR_TAG ":D:%s: " fmt), \
 					(panel_dev) ? (panel_dev)->id : 0, \
 					__func__, ##__VA_ARGS__);			\
 	} while (0)
 
-#define panel_cmd_log_enabled(_x_)	((panel_cmd_log) & (1 << (_x_)))
+#define decon_panel_cmd_log_enabled(_x_)	((decon_panel_cmd_log) & (1 << (_x_)))
 
 #endif /* __PANEL_DEBUG_H__ */

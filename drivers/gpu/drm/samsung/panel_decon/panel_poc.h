@@ -347,14 +347,14 @@ struct panel_poc_data {
 
 int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data);
 int panel_poc_remove(struct panel_device *panel);
-extern int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg);
+extern int decon_set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg);
 extern int read_poc_partition(struct panel_poc_device *poc_dev, int index);
 extern int get_poc_partition_addr(struct panel_poc_device *poc_dev, int index);
 extern int get_poc_partition_size(struct panel_poc_device *poc_dev, int index);
 extern int copy_poc_partition(struct panel_poc_device *poc_dev, u8 *dst,
 		 int index, int offset, int size);
-extern int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index);
-extern int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
+extern int decon_check_poc_partition_exists(struct panel_poc_device *poc_dev, int index);
+extern int decon_get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 		u32 *chksum_ok, u32 *chksum_by_calc, u32 *chksum_by_read);
 extern int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index);
 int cmp_poc_partition_data(struct panel_poc_device *poc_dev,

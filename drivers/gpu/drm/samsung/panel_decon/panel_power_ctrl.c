@@ -292,7 +292,7 @@ static int of_get_action_value(struct panel_device *panel,
 	return ret;
 }
 
-int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
+int decon_of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
 	const char *prop_name, struct panel_power_ctrl *pctrl)
 {
 	struct device_node *action_np;
@@ -367,4 +367,4 @@ int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_power_ctrl);
+EXPORT_SYMBOL(decon_of_get_panel_power_ctrl);

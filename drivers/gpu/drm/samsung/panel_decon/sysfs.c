@@ -105,7 +105,7 @@ static ssize_t isc_store(struct device *dev,
 	panel_data->props.isc_threshold = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_ISC_THRESHOLD_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_ISC_THRESHOLD_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write isc threshold seq\n");
 		return ret;
@@ -176,7 +176,7 @@ static ssize_t stm_store(struct device *dev,
 				panel_info("invalid input %s\n", ptr);
 		}
 	}
-	ret = panel_do_seqtbl_by_index(panel, PANEL_STM_TUNE_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_STM_TUNE_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write stm_tune\n");
 		return ret;
@@ -452,7 +452,7 @@ static void prepare_mafpc_check_mode(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to disable pcd irq\n");
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_EXIT_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_EXIT_SEQ);
 	if (ret < 0)
 		panel_err("failed exit-seq\n");
 
@@ -464,7 +464,7 @@ static void prepare_mafpc_check_mode(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to set power on\n");
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_INIT_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_INIT_SEQ);
 	if (ret < 0)
 		panel_err("failed init-seq\n");
 
@@ -536,13 +536,13 @@ static ssize_t mafpc_check_show(struct device *dev,
 	mutex_lock(&panel->op_lock);
 	prepare_mafpc_check_mode(panel);
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_MAFPC_CHECKSUM_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_MAFPC_CHECKSUM_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write panel_mafpc_crc seq\n");
 		goto out;
 	}
 
-	ret = resource_copy_n_clear_by_name(panel_data,	target_crc, "mafpc_crc");
+	ret = decon_resource_copy_n_clear_by_name(panel_data,	target_crc, "mafpc_crc");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read mafpc crc\n");
 		goto out;
@@ -786,7 +786,7 @@ static ssize_t brightness_table_show(struct device *dev,
 
 	mutex_lock(&panel_bl->lock);
 	for (br = 0; br <= max_brightness; br++) {
-		actual_brightness = get_actual_brightness(panel_bl, br);
+		actual_brightness = decon_get_actual_brightness(panel_bl, br);
 		if (recv_len == 0) {
 			recv_len += snprintf(recv_buf, recv_buf_len, "%5d", prev_br);
 			prev_actual_brightness = actual_brightness;
@@ -1011,7 +1011,7 @@ static ssize_t mcd_mode_store(struct device *dev,
 	panel_data->props.mcd_on = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel,
+	ret = decon_panel_do_seqtbl_by_index(panel,
 			value ? PANEL_MCD_ON_SEQ : PANEL_MCD_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd seq\n");
@@ -1063,7 +1063,7 @@ static int read_mcd_resistance(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to disable disp_det irq\n");
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_MCD_RS_ON_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_MCD_RS_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd_3_0_on seq\n");
 		goto out;
@@ -1072,14 +1072,14 @@ static int read_mcd_resistance(struct panel_device *panel)
 	memset(mcd_nok, 0, sizeof(mcd_nok));
 	for (code = 0; code < 0x80; code++) {
 		panel_data->props.mcd_resistance = code;
-		ret = panel_do_seqtbl_by_index_nolock(panel,
+		ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel,
 				PANEL_MCD_RS_READ_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write mcd_rs_read seq\n");
 			goto out;
 		}
 
-		ret = resource_copy_n_clear_by_name(panel_data,
+		ret = decon_resource_copy_n_clear_by_name(panel_data,
 				&mcd_nok[code], "mcd_resistance");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to copy resource(mcd_resistance) (ret %d)\n", ret);
@@ -1101,7 +1101,7 @@ static int read_mcd_resistance(struct panel_device *panel)
 		panel_data->props.mcd_rs_range[i][1] = end;
 	}
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_MCD_RS_OFF_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_MCD_RS_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd_3_0_off seq\n");
 		goto out;
@@ -1187,12 +1187,12 @@ static ssize_t mcd_resistance_store(struct device *dev,
 					panel_data->props.mcd_rs_range[i][1]);
 
 #ifdef CONFIG_SUPPORT_DDI_FLASH
-		ret = set_panel_poc(&panel->poc_dev, POC_OP_MCD_READ, NULL);
+		ret = decon_set_panel_poc(&panel->poc_dev, POC_OP_MCD_READ, NULL);
 		if (unlikely(ret)) {
 			panel_err("failed to read mcd(ret %d)\n", ret);
 			return ret;
 		}
-		ret = panel_resource_update_by_name(panel, "flash_mcd");
+		ret = decon_panel_resource_update_by_name(panel, "flash_mcd");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to update flash_mcd res (ret %d)\n", ret);
 			return ret;
@@ -1305,7 +1305,7 @@ static ssize_t dia_store(struct device *dev,
 	panel_data->props.dia_mode = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_DIA_ONOFF_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_DIA_ONOFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd seq\n");
 		return ret;
@@ -1354,7 +1354,7 @@ static ssize_t partial_disp_store(struct device *dev,
 		panel_data->props.panel_partial_disp = value;
 		mutex_unlock(&panel->op_lock);
 
-		ret = panel_do_seqtbl_by_index(panel,
+		ret = decon_panel_do_seqtbl_by_index(panel,
 				value ? PANEL_PARTIAL_DISP_ON_SEQ : PANEL_PARTIAL_DISP_OFF_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write mcd seq\n");
@@ -1410,7 +1410,7 @@ ssize_t mst_store(struct device *dev, struct device_attribute *attr, const char 
 	panel_data->props.mst_on = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel, value ? PANEL_MST_ON_SEQ : PANEL_MST_OFF_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, value ? PANEL_MST_ON_SEQ : PANEL_MST_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mst seq\n");
 		return ret;
@@ -1443,7 +1443,7 @@ static void clear_gct_mode(struct panel_device *panel)
 	struct panel_info *panel_data = &panel->panel_data;
 	int ret;
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_EXIT_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_EXIT_SEQ);
 	if (ret < 0)
 		panel_err("failed exit-seq\n");
 
@@ -1455,7 +1455,7 @@ static void clear_gct_mode(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to set power on\n");
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_INIT_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_INIT_SEQ);
 	if (ret < 0)
 		panel_err("failed init-seq\n");
 
@@ -1587,7 +1587,7 @@ static ssize_t gct_store(struct device *dev,
 	}
 #endif
 #endif
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_ENTER_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_ENTER_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write gram-checksum-test-enter seq\n");
 		result = ret;
@@ -1596,7 +1596,7 @@ static ssize_t gct_store(struct device *dev,
 
 	for (vddm = VDDM_LV; vddm < MAX_VDDM; vddm++) {
 		panel_data->props.gct_vddm = vddm;
-		ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_VDDM_SEQ);
+		ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_VDDM_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write gram-checksum-on seq\n");
 			result = ret;
@@ -1607,7 +1607,7 @@ static ssize_t gct_store(struct device *dev,
 			panel_data->props.gct_pattern = pattern;
 			seqtbl = find_index_seqtbl(&panel->panel_data,
 					PANEL_GCT_IMG_UPDATE_SEQ);
-			ret = panel_do_seqtbl_by_index_nolock(panel,
+			ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel,
 					(seqtbl && seqtbl->cmdtbl) ? PANEL_GCT_IMG_UPDATE_SEQ :
 					((pattern == GCT_PATTERN_1) ?
 					 PANEL_GCT_IMG_0_UPDATE_SEQ : PANEL_GCT_IMG_1_UPDATE_SEQ));
@@ -1617,7 +1617,7 @@ static ssize_t gct_store(struct device *dev,
 				goto out;
 			}
 
-			ret = resource_copy_n_clear_by_name(panel_data,
+			ret = decon_resource_copy_n_clear_by_name(panel_data,
 					&checksum[index], "gram_checksum");
 			if (unlikely(ret < 0)) {
 				panel_err("failed to copy gram_checksum[%d] (ret %d)\n", index, ret);
@@ -1629,7 +1629,7 @@ static ssize_t gct_store(struct device *dev,
 		}
 	}
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_EXIT_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_GCT_EXIT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write gram-checksum-off seq\n");
 		result = ret;
@@ -1890,13 +1890,13 @@ static ssize_t poc_show(struct device *dev,
 	poc_dev = &panel->poc_dev;
 	poc_info = &poc_dev->poc_info;
 
-	ret = set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
+	ret = decon_set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to chkpoc (ret %d)\n", ret);
 		return ret;
 	}
 
-	ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+	ret = decon_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to chksum (ret %d)\n", ret);
 		return ret;
@@ -1965,7 +1965,7 @@ static ssize_t poc_store(struct device *dev,
 		atomic_set(&poc_dev->cancel, 1);
 	} else {
 		mutex_lock(&panel->io_lock);
-		ret = set_panel_poc(poc_dev, value, (void *)buf);
+		ret = decon_set_panel_poc(poc_dev, value, (void *)buf);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to poc_op %d(ret %d)\n", value, ret);
 			mutex_unlock(&panel->io_lock);
@@ -2003,7 +2003,7 @@ static ssize_t poc_mca_show(struct device *dev,
 	}
 
 	panel_set_key(panel, 2, true);
-	ret = panel_resource_update_by_name(panel, "poc_mca_chksum");
+	ret = decon_panel_resource_update_by_name(panel, "poc_mca_chksum");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to update poc_mca_chksum res (ret %d)\n", ret);
 		return ret;
@@ -2016,7 +2016,7 @@ static ssize_t poc_mca_show(struct device *dev,
 		return ret;
 	}
 
-	len = get_resource_size_by_name(&panel->panel_data, "poc_mca_chksum");
+	len = decon_get_resource_size_by_name(&panel->panel_data, "poc_mca_chksum");
 	for (i = 0; i < len; i++)
 		ofs += snprintf(buf + ofs,
 				PAGE_SIZE - ofs, "%02X ", chksum_data[i]);
@@ -2199,7 +2199,7 @@ static ssize_t grayspot_store(struct device *dev,
 	panel_data->props.grayspot = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel,
+	ret = decon_panel_do_seqtbl_by_index(panel,
 			value ? PANEL_GRAYSPOT_ON_SEQ : PANEL_GRAYSPOT_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write grayspot on/off seq\n");
@@ -2339,7 +2339,7 @@ static ssize_t hmt_on_store(struct device *dev,
 		goto exit;
 	}
 
-	vrr = get_panel_vrr(panel);
+	vrr = decon_get_panel_vrr(panel);
 	if (vrr != NULL && value == PANEL_HMD_ON) {
 		if (vrr->fps != 60 || vrr->mode != 0) {
 			panel_err("failed to set hmd %s: fps %d mode %d\n",
@@ -2350,7 +2350,7 @@ static ssize_t hmt_on_store(struct device *dev,
 		}
 	}
 
-	ret = panel_do_seqtbl_by_index_nolock(panel,
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel,
 			(value == PANEL_HMD_ON) ? PANEL_HMD_ON_SEQ : PANEL_HMD_OFF_SEQ);
 	if (ret < 0)
 		panel_err("failed to set hmd %s seq\n",
@@ -2636,7 +2636,7 @@ static ssize_t lux_store(struct device *dev,
 		mutex_lock(&panel->op_lock);
 		panel_data->props.lux = value;
 		mutex_unlock(&panel->op_lock);
-		attr_store_for_each(mdnie->class, attr->attr.name, buf, size);
+		decon_attr_store_for_each(mdnie->class, attr->attr.name, buf, size);
 	}
 
 	return size;
@@ -2667,13 +2667,13 @@ static ssize_t copr_store(struct device *dev,
 	while ((p = strsep(&arg, " \t")) != NULL) {
 		if (!*p)
 			continue;
-		index = find_copr_reg_by_name(copr->props.version, p);
+		index = decon_find_copr_reg_by_name(copr->props.version, p);
 		if (index < 0) {
 			panel_err("arg(%s) not found\n", p);
 			continue;
 		}
 
-		name = get_copr_reg_name(copr->props.version, index);
+		name = decon_get_copr_reg_name(copr->props.version, index);
 		if (name == NULL) {
 			panel_err("arg(%s) not found\n", p);
 			continue;
@@ -2917,8 +2917,8 @@ static ssize_t dpui_show(struct device *dev,
 {
 	int ret;
 
-	update_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
-	ret = get_dpui_log(buf, DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
+	decon_update_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
+	ret = decon_get_dpui_log(buf, DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
 	if (ret < 0) {
 		panel_err("failed to get log %d\n", ret);
 		return ret;
@@ -2932,7 +2932,7 @@ static ssize_t dpui_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t size)
 {
 	if (buf[0] == 'C' || buf[0] == 'c')
-		clear_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
+		decon_clear_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_PANEL);
 
 	return size;
 }
@@ -2946,8 +2946,8 @@ static ssize_t dpui_dbg_show(struct device *dev,
 {
 	int ret;
 
-	update_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
-	ret = get_dpui_log(buf, DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
+	decon_update_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
+	ret = decon_get_dpui_log(buf, DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
 	if (ret < 0) {
 		panel_err("failed to get log %d\n", ret);
 		return ret;
@@ -2961,7 +2961,7 @@ static ssize_t dpui_dbg_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t size)
 {
 	if (buf[0] == 'C' || buf[0] == 'c')
-		clear_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
+		decon_clear_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_PANEL);
 
 	return size;
 }
@@ -2975,8 +2975,8 @@ static ssize_t dpci_show(struct device *dev,
 {
 	int ret;
 
-	update_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
-	ret = get_dpui_log(buf, DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
+	decon_update_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
+	ret = decon_get_dpui_log(buf, DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
 	if (ret < 0) {
 		panel_err("failed to get log %d\n", ret);
 		return ret;
@@ -2990,7 +2990,7 @@ static ssize_t dpci_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t size)
 {
 	if (buf[0] == 'C' || buf[0] == 'c')
-		clear_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
+		decon_clear_dpui_log(DPUI_LOG_LEVEL_INFO, DPUI_TYPE_CTRL);
 
 	return size;
 }
@@ -3004,8 +3004,8 @@ static ssize_t dpci_dbg_show(struct device *dev,
 {
 	int ret;
 
-	update_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
-	ret = get_dpui_log(buf, DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
+	decon_update_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
+	ret = decon_get_dpui_log(buf, DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
 	if (ret < 0) {
 		panel_err("failed to get log %d\n", ret);
 		return ret;
@@ -3019,7 +3019,7 @@ static ssize_t dpci_dbg_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t size)
 {
 	if (buf[0] == 'C' || buf[0] == 'c')
-		clear_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
+		decon_clear_dpui_log(DPUI_LOG_LEVEL_DEBUG, DPUI_TYPE_CTRL);
 
 	return size;
 }
@@ -3201,7 +3201,7 @@ static ssize_t self_mask_check_show(struct device *dev,
 			return ret;
 		}
 
-		ret = resource_copy_n_clear_by_name(panel_data,	recv_checksum, "self_mask_checksum");
+		ret = decon_resource_copy_n_clear_by_name(panel_data,	recv_checksum, "self_mask_checksum");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to get selfmask checksum\n");
 			kfree(recv_checksum);
@@ -3321,7 +3321,7 @@ static ssize_t isc_defect_store(struct device *dev,
 	mutex_lock(&panel->op_lock);
 
 	if (value) {
-		ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_CHECK_ISC_DEFECT_SEQ);
+		ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_CHECK_ISC_DEFECT_SEQ);
 		if (unlikely(ret < 0))
 			panel_err("failed to write ics defect seq\n");
 	}
@@ -3367,7 +3367,7 @@ static ssize_t brightdot_store(struct device *dev,
 	panel_info("%u -> %u\n", panel_data->props.brightdot_test_enable, value);
 	panel_data->props.brightdot_test_enable = value;
 
-	ret = panel_do_seqtbl_by_index_nolock(panel, PANEL_BRIGHTDOT_TEST_SEQ);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, PANEL_BRIGHTDOT_TEST_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write brightdot seq\n");
 
@@ -3408,7 +3408,7 @@ static ssize_t spi_if_sel_store(struct device *dev,
 
 	panel_info("%d\n", value);
 	mutex_lock(&panel->op_lock);
-	ret = panel_do_seqtbl_by_index_nolock(panel,
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel,
 			value ? PANEL_SPI_IF_ON_SEQ : PANEL_SPI_IF_OFF_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write spi-if-%s seq\n", value ? "on" : "off");
@@ -3447,7 +3447,7 @@ static ssize_t ccd_state_show(struct device *dev,
 	}
 	panel_data = &panel->panel_data;
 
-	info = find_panel_resource(panel_data, "ccd_state");
+	info = decon_find_panel_resource(panel_data, "ccd_state");
 	if (unlikely(info == NULL)) {
 		panel_err("failed to get ccd resource\n");
 		return -EINVAL;
@@ -3459,20 +3459,20 @@ static ssize_t ccd_state_show(struct device *dev,
 		return -EINVAL;
 	}
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_CCD_TEST_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_CCD_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write ccd seq\n");
 		return ret;
 	}
 
-	ret = resource_copy_n_clear_by_name(panel_data, ccd_state, "ccd_state");
+	ret = decon_resource_copy_n_clear_by_name(panel_data, ccd_state, "ccd_state");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read ccd_state \n");
 		return ret;
 	}
 
 	for (ires = 0; ires < ARRAY_SIZE(ccd_resource_name); ires++) {
-		info = find_panel_resource(panel_data, (char *)ccd_resource_name[ires]);
+		info = decon_find_panel_resource(panel_data, (char *)ccd_resource_name[ires]);
 		if (info) {
 			panel_info("find ccd compare resource.(%s)\n", (char *)ccd_resource_name[ires]);
 			break;
@@ -3486,7 +3486,7 @@ static ssize_t ccd_state_show(struct device *dev,
 						ccd_resource_name[ires], info->dlen, ccd_size);
 				return -EINVAL;
 			}
-			if (rescpy(ccd_compare, info, 0, ccd_size) < 0)
+			if (decon_rescpy(ccd_compare, info, 0, ccd_size) < 0)
 				return -EINVAL;
 
 			if (ires == CCD_CHKSUM_PASS) {
@@ -3501,7 +3501,7 @@ static ssize_t ccd_state_show(struct device *dev,
 		} else if (ires == CCD_CHKSUM_PASS_LIST) {
 			retVal = 0;
 
-			if (rescpy(ccd_compare, info, 0, info->dlen) < 0)
+			if (decon_rescpy(ccd_compare, info, 0, info->dlen) < 0)
 				return -EINVAL;
 
 			for (i = 0 ; i < info->dlen; i++) {
@@ -3571,7 +3571,7 @@ static ssize_t dynamic_hlpm_store(struct device *dev,
 	panel_data->props.dynamic_hlpm = value;
 	mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_index(panel,
+	ret = decon_panel_do_seqtbl_by_index(panel,
 			value ? PANEL_DYNAMIC_HLPM_ON_SEQ : PANEL_DYNAMIC_HLPM_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write dynamic_hlpm on/off seq\n");
@@ -3604,7 +3604,7 @@ static ssize_t vrr_show(struct device *dev,
 	if (!panel_vrr_is_supported(panel))
 		return snprintf(buf, PAGE_SIZE, "60 0\n");
 
-	vrr = get_panel_vrr(panel);
+	vrr = decon_get_panel_vrr(panel);
 	if (vrr == NULL)
 		return -EINVAL;
 
@@ -4450,7 +4450,7 @@ static int attr_find_and_store(struct device *dev, void *data)
 	return 0;
 }
 
-ssize_t attr_store_for_each(struct class *class,
+ssize_t decon_attr_store_for_each(struct class *class,
 	const char *name, const char *buf, size_t size)
 {
 	struct attr_store_args args = {
@@ -4464,7 +4464,7 @@ ssize_t attr_store_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_store);
 }
-EXPORT_SYMBOL(attr_store_for_each);
+EXPORT_SYMBOL(decon_attr_store_for_each);
 
 static int attr_find_and_show(struct device *dev, void *data)
 {
@@ -4492,7 +4492,7 @@ static int attr_find_and_show(struct device *dev, void *data)
 	return 0;
 }
 
-ssize_t attr_show_for_each(struct class *class,
+ssize_t decon_attr_show_for_each(struct class *class,
 	const char *name, char *buf)
 {
 	struct attr_show_args args = {
@@ -4505,7 +4505,7 @@ ssize_t attr_show_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_show);
 }
-EXPORT_SYMBOL(attr_show_for_each);
+EXPORT_SYMBOL(decon_attr_show_for_each);
 
 static int attr_exist(struct device *dev, void *data)
 {
@@ -4524,7 +4524,7 @@ static int attr_exist(struct device *dev, void *data)
 	return 1;
 }
 
-ssize_t attr_exist_for_each(struct class *class, const char *name)
+ssize_t decon_attr_exist_for_each(struct class *class, const char *name)
 {
 	struct attr_exist_args args = {
 		.name = name,
@@ -4535,7 +4535,7 @@ ssize_t attr_exist_for_each(struct class *class, const char *name)
 
 	return class_for_each_device(class, NULL, &args, attr_exist);
 }
-EXPORT_SYMBOL(attr_exist_for_each);
+EXPORT_SYMBOL(decon_attr_exist_for_each);
 
 int panel_remove_svc_octa(struct panel_device *panel)
 {

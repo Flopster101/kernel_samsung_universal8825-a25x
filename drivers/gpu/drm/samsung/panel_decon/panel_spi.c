@@ -158,9 +158,9 @@ static int panel_spi_sync(struct panel_spi_dev *spi_dev, const u8 *wbuf, int wsi
 	if (rbuf != NULL)
 		memcpy(rbuf, spi_dev->read_buf_data, rsize);
 #if 0
-	if (panel_cmd_log_enabled(PANEL_CMD_LOG_SPI_TX))
+	if (decon_panel_cmd_log_enabled(PANEL_CMD_LOG_SPI_TX))
 		print_hex_dump(KERN_ERR, "spi_cmd_print write ", DUMP_PREFIX_ADDRESS, 16, 1, wbuf, wsize, false);
-	if (panel_cmd_log_enabled(PANEL_CMD_LOG_SPI_RX))
+	if (decon_panel_cmd_log_enabled(PANEL_CMD_LOG_SPI_RX))
 		print_hex_dump(KERN_ERR, "spi_cmd_print read ", DUMP_PREFIX_ADDRESS, 16, 1, rbuf, rsize, false);
 #endif
 	return rsize;
@@ -941,7 +941,7 @@ static ssize_t panel_spi_fops_read(struct file *file, char __user *buf, size_t l
 		read_done += read_size;
 	}
 
-	if (panel_log_level > 6)
+	if (decon_panel_log_level > 6)
 		print_hex_dump(KERN_ERR, "panel_spi_read ", DUMP_PREFIX_ADDRESS, 16, 1, read_buf, read_size, false);
 
 	res = simple_read_from_buffer(buf, count, &empty_pos, read_buf, count);

@@ -109,9 +109,9 @@ int find_vrr_lfd_client_name(const char *name);
 const char *get_vrr_lfd_scope_name(int index);
 int find_vrr_lfd_scope_name(const char *name);
 int update_vrr_lfd(struct vrr_lfd_info *vrr_lfd_info);
-struct panel_vrr *get_panel_vrr(struct panel_device *panel);
-int get_panel_refresh_rate(struct panel_device *panel);
-int get_panel_refresh_mode(struct panel_device *panel);
+struct panel_vrr *decon_get_panel_vrr(struct panel_device *panel);
+int decon_get_panel_refresh_rate(struct panel_device *panel);
+int decon_get_panel_refresh_mode(struct panel_device *panel);
 #ifdef CONFIG_PANEL_VRR_BRIDGE
 bool panel_vrr_bridge_is_reached_target_nolock(struct panel_device *panel);
 bool panel_vrr_bridge_is_supported(struct panel_device *panel);

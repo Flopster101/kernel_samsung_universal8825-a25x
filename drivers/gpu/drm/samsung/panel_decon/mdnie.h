@@ -521,14 +521,14 @@ extern int mdnie_probe(struct mdnie_info *mdnie, struct mdnie_tune *mdnie_tune);
 extern int mdnie_remove(struct mdnie_info *mdnie);
 extern int mdnie_enable(struct mdnie_info *mdnie);
 extern int mdnie_disable(struct mdnie_info *mdnie);
-extern int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
+extern int decon_mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b);
-extern int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
+extern int decon_mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b);
-extern int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
+extern int decon_mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 		unsigned char *dst, unsigned int stride);
 extern int panel_mdnie_update(struct panel_device *panel);
-extern int mdnie_update_wrgb(struct mdnie_info *mdnie,
+extern int decon_mdnie_update_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b);
 #else
 static inline int mdnie_init(struct mdnie_info *mdnie) { return 0; }
@@ -537,16 +537,16 @@ static inline int mdnie_remove(struct mdnie_info *mdnie) { return 0; }
 static inline int mdnie_enable(struct mdnie_info *mdnie) { return 0; }
 static inline int mdnie_disable(struct mdnie_info *mdnie) { return 0; }
 static inline int panel_mdnie_update(struct panel_device *panel) { return 0; }
-static inline int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
+static inline int decon_mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b) { return 0; }
-static inline int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
+static inline int decon_mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b) { return 0; }
-static inline int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
+static inline int decon_mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 		unsigned char *dst, unsigned int stride) { return 0; }
-static inline int mdnie_update_wrgb(struct mdnie_info *mdnie,
+static inline int decon_mdnie_update_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b) { return 0; }
 #endif
-extern struct maptbl *mdnie_find_maptbl(struct mdnie_info *);
+extern struct maptbl *decon_mdnie_find_maptbl(struct mdnie_info *);
 extern struct maptbl *mdnie_find_etc_maptbl(struct mdnie_info *mdnie, int index);
-extern int mdnie_get_maptbl_index(struct mdnie_info *mdnie);
+extern int mdnie_get_decon_maptbl_index(struct mdnie_info *mdnie);
 #endif /* __MDNIE_H__ */

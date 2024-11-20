@@ -122,24 +122,24 @@ struct dpui_info {
 };
 
 #ifdef CONFIG_DISPLAY_USE_INFO
-int dpui_logging_register(struct notifier_block *n, enum dpui_type type);
-int dpui_logging_unregister(struct notifier_block *n);
-void update_dpui_log(enum dpui_log_level level, enum dpui_type type);
-void clear_dpui_log(enum dpui_log_level level, enum dpui_type type);
-int get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type);
-int set_dpui_field(enum dpui_key key, char *buf, int size);
-int set_dpui_u32_field(enum dpui_key key, u32 value);
-int get_dpui_u32_field(enum dpui_key key, u32 *value);
-int inc_dpui_u32_field(enum dpui_key key, u32 value);
+int decon_dpui_logging_register(struct notifier_block *n, enum dpui_type type);
+int decon_dpui_logging_unregister(struct notifier_block *n);
+void decon_update_dpui_log(enum dpui_log_level level, enum dpui_type type);
+void decon_clear_dpui_log(enum dpui_log_level level, enum dpui_type type);
+int decon_get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type);
+int decon_set_dpui_field(enum dpui_key key, char *buf, int size);
+int decon_set_dpui_u32_field(enum dpui_key key, u32 value);
+int decon_get_dpui_u32_field(enum dpui_key key, u32 *value);
+int decon_inc_dpui_u32_field(enum dpui_key key, u32 value);
 #else
-static inline int dpui_logging_register(struct notifier_block *n, enum dpui_type type) { return 0; }
-static inline int dpui_logging_unregister(struct notifier_block *n) { return 0; }
-static inline void update_dpui_log(enum dpui_log_level level, enum dpui_type type) { return; }
-static inline void clear_dpui_log(enum dpui_log_level level, enum dpui_type type) { return; }
-static inline int get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type) { return 0; }
-static inline int set_dpui_field(enum dpui_key key, char *buf, int size) { return 0; }
-static inline int set_dpui_u32_field(enum dpui_key key, u32 value) { return 0; }
-static inline int get_dpui_u32_field(enum dpui_key key, u32 *value) { return 0; }
-static inline int inc_dpui_u32_field(enum dpui_key key, u32 value) { return 0; }
+static inline int decon_dpui_logging_register(struct notifier_block *n, enum dpui_type type) { return 0; }
+static inline int decon_dpui_logging_unregister(struct notifier_block *n) { return 0; }
+static inline void decon_update_dpui_log(enum dpui_log_level level, enum dpui_type type) { return; }
+static inline void decon_clear_dpui_log(enum dpui_log_level level, enum dpui_type type) { return; }
+static inline int decon_get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type) { return 0; }
+static inline int decon_set_dpui_field(enum dpui_key key, char *buf, int size) { return 0; }
+static inline int decon_set_dpui_u32_field(enum dpui_key key, u32 value) { return 0; }
+static inline int decon_get_dpui_u32_field(enum dpui_key key, u32 *value) { return 0; }
+static inline int decon_inc_dpui_u32_field(enum dpui_key key, u32 value) { return 0; }
 #endif /* CONFIG_DISPLAY_USE_INFO */
 #endif /* __DPUI_H__ */

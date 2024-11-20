@@ -129,7 +129,7 @@ static int mafpc_instant_on(struct mafpc_device *mafpc)
 	 * 2. Send instant_on command to DDI, after frame done
 	 */
 	panel_err("++ PANEL_MAFPC_IMG_SEQ ++\n");
-	ret = panel_do_seqtbl_by_index(panel, PANEL_MAFPC_IMG_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_MAFPC_IMG_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write init seqtbl\n");
 		goto exit_write;
@@ -162,7 +162,7 @@ static int mafpc_instant_off(struct mafpc_device *mafpc)
 		goto err;
 	}
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_MAFPC_OFF_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_MAFPC_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write init seqtbl\n");
 	}
@@ -235,14 +235,14 @@ static int transmit_mafpc_data(struct mafpc_device *mafpc)
 #if 0
 	decon_systrace(get_decon_drvdata(0), 'C', "mafpc", 1);
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_MAFPC_IMG_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_MAFPC_IMG_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write init seqtbl\n");
 	}
 #endif
 
 #if 0
-	ret = panel_do_seqtbl_by_index(panel, PANEL_MAFPC_ON_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_MAFPC_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write init seqtbl\n");
 	}
@@ -349,7 +349,7 @@ static int mafpc_v4l2_frame_done(struct mafpc_device *mafpc)
 	int ret = 0;
 	struct panel_device *panel = mafpc->panel;
 
-	ret = panel_do_seqtbl_by_index(panel, PANEL_MAFPC_ON_SEQ);
+	ret = decon_panel_do_seqtbl_by_index(panel, PANEL_MAFPC_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write init seqtbl\n");
 	}
@@ -416,7 +416,7 @@ static void mafpc_init_v4l2_subdev(struct mafpc_device *mafpc)
 	v4l2_set_subdevdata(sd, mafpc);
 }
 
-struct mafpc_device *mafpc_device_create(void)
+struct mafpc_device *decon_mafpc_device_create(void)
 {
 	struct mafpc_device *mafpc;
 
@@ -426,9 +426,9 @@ struct mafpc_device *mafpc_device_create(void)
 
 	return mafpc;
 }
-EXPORT_SYMBOL(mafpc_device_create);
+EXPORT_SYMBOL(decon_mafpc_device_create);
 
-int mafpc_device_init(struct mafpc_device *mafpc)
+int decon_mafpc_device_init(struct mafpc_device *mafpc)
 {
 	if (!mafpc)
 		return -EINVAL;
@@ -438,9 +438,9 @@ int mafpc_device_init(struct mafpc_device *mafpc)
 
 	return 0;
 }
-EXPORT_SYMBOL(mafpc_device_init);
+EXPORT_SYMBOL(decon_mafpc_device_init);
 
-struct mafpc_device *get_mafpc_device(struct panel_device *panel)
+struct mafpc_device *decon_get_mafpc_device(struct panel_device *panel)
 {
 	struct mafpc_device *mafpc;
 	int ret;
@@ -474,7 +474,7 @@ struct mafpc_device *get_mafpc_device(struct panel_device *panel)
 
 	return mafpc;
 }
-EXPORT_SYMBOL(get_mafpc_device);
+EXPORT_SYMBOL(decon_get_mafpc_device);
 
 static int mafpc_probe(struct platform_device *pdev)
 {
@@ -482,7 +482,7 @@ static int mafpc_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct mafpc_device *mafpc;
 
-	mafpc = mafpc_device_create();
+	mafpc = decon_mafpc_device_create();
 	if (!mafpc) {
 		panel_err("failed to allocate mafpc device.\n");
 		return -ENOMEM;
@@ -497,7 +497,7 @@ static int mafpc_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mafpc);
 
-	ret = mafpc_device_init(mafpc);
+	ret = decon_mafpc_device_init(mafpc);
 	if (ret < 0) {
 		panel_err("failed to initialize panel device\n");
 		return ret;

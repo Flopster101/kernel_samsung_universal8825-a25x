@@ -725,10 +725,10 @@ static inline int panel_self_move_pattern_update(struct panel_device *panel)
 int panel_find_max_brightness_from_cpi(struct common_panel_info *info);
 
 inline char *get_panel_state_names(enum panel_active_state);
-struct panel_device *panel_device_create(void);
-void panel_device_destroy(struct panel_device *panel);
-int panel_device_init(struct panel_device *panel);
-int panel_device_exit(struct panel_device *panel);
+struct panel_device *decon_panel_device_create(void);
+void decon_panel_device_destroy(struct panel_device *panel);
+int decon_panel_device_init(struct panel_device *panel);
+int decon_panel_device_exit(struct panel_device *panel);
 
 void panel_init_v4l2_subdev(struct panel_device *panel);
 

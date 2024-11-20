@@ -87,7 +87,7 @@ void print_data(char *data, int size)
 		return;
 	}
 
-	if (panel_log_level < 7)
+	if (decon_panel_log_level < 7)
 		return;
 
 	if (size > MAX_PRINT_DATA_LEN) {
@@ -119,7 +119,7 @@ EXPORT_SYMBOL(print_data);
 
 __visible_for_testing int nr_panel;
 __visible_for_testing struct common_panel_info *panel_list[MAX_PANEL];
-int register_common_panel(struct common_panel_info *info)
+int decon_register_common_panel(struct common_panel_info *info)
 {
 	int i;
 
@@ -149,15 +149,15 @@ int register_common_panel(struct common_panel_info *info)
 
 	return 0;
 }
-EXPORT_SYMBOL(register_common_panel);
+EXPORT_SYMBOL(decon_register_common_panel);
 
-int deregister_common_panel(struct common_panel_info *info)
+int decon_deregister_common_panel(struct common_panel_info *info)
 {
 	/* TODO: implement deregister function using list */
 
 	return 0;
 }
-EXPORT_SYMBOL(deregister_common_panel);
+EXPORT_SYMBOL(decon_deregister_common_panel);
 
 static struct common_panel_info *find_common_panel_with_name(const char *name)
 {
@@ -489,7 +489,7 @@ find_panel_dimming(struct panel_info *panel_data, char *name)
 	return NULL;
 }
 
-struct maptbl *find_panel_maptbl_by_index(struct panel_info *panel, int index)
+struct maptbl *decon_find_panel_maptbl_by_index(struct panel_info *panel, int index)
 {
 	if (unlikely(!panel || !panel->maptbl)) {
 		panel_err("maptbl not exist\n");
@@ -503,9 +503,9 @@ struct maptbl *find_panel_maptbl_by_index(struct panel_info *panel, int index)
 
 	return &panel->maptbl[index];
 }
-EXPORT_SYMBOL(find_panel_maptbl_by_index);
+EXPORT_SYMBOL(decon_find_panel_maptbl_by_index);
 
-struct maptbl *find_panel_maptbl_by_name(struct panel_info *panel_data, char *name)
+struct maptbl *decon_find_panel_maptbl_by_name(struct panel_info *panel_data, char *name)
 {
 	int i = 0;
 
@@ -519,7 +519,7 @@ struct maptbl *find_panel_maptbl_by_name(struct panel_info *panel_data, char *na
 			return &panel_data->maptbl[i];
 	return NULL;
 }
-EXPORT_SYMBOL(find_panel_maptbl_by_name);
+EXPORT_SYMBOL(decon_find_panel_maptbl_by_name);
 
 struct maptbl *maptbl_find(struct panel_info *panel, char *name)
 {
@@ -541,7 +541,7 @@ struct maptbl *maptbl_find(struct panel_info *panel, char *name)
 	return NULL;
 }
 
-int pktui_maptbl_getidx(struct pkt_update_info *pktui)
+int pktui_decon_maptbl_getidx(struct pkt_update_info *pktui)
 {
 	if (pktui && pktui->getidx)
 		return pktui->getidx(pktui);
@@ -568,9 +568,9 @@ void panel_update_packet_data(struct panel_device *panel, struct pktinfo *info)
 		pktui[i].pdata = panel;
 		offset = pktui[i].offset;
 		if (pktui[i].nr_maptbl > 1 && pktui[i].getidx) {
-			idx = pktui_maptbl_getidx(&pktui[i]);
+			idx = pktui_decon_maptbl_getidx(&pktui[i]);
 			if (unlikely(idx < 0)) {
-				panel_err("failed to pktui_maptbl_getidx %d\n", idx);
+				panel_err("failed to pktui_decon_maptbl_getidx %d\n", idx);
 				return;
 			}
 			maptbl = &pktui[i].maptbl[idx];
@@ -583,9 +583,9 @@ void panel_update_packet_data(struct panel_device *panel, struct pktinfo *info)
 			return;
 		}
 
-		if (!maptbl_is_initialized(maptbl)) {
+		if (!decon_maptbl_is_initialized(maptbl)) {
 			panel_info("init maptbl(%s) +\n", maptbl->name);
-			maptbl_init(maptbl);
+			decon_maptbl_init(maptbl);
 			panel_info("init maptbl(%s) -\n", maptbl->name);
 		}
 
@@ -595,7 +595,7 @@ void panel_update_packet_data(struct panel_device *panel, struct pktinfo *info)
 			return;
 		}
 
-		ret = maptbl_copy(maptbl, &info->data[offset]);
+		ret = decon_maptbl_copy(maptbl, &info->data[offset]);
 		if (ret < 0) {
 			panel_err("failed to copy maptbl (offset %d, sz_copy %d, dlen %d)\n",
 					offset, maptbl_get_sizeof_copy(maptbl), info->dlen);
@@ -1800,7 +1800,7 @@ int panel_do_init_maptbl(struct panel_device *panel, struct maptbl *maptbl)
 		return -EINVAL;
 	}
 
-	ret = maptbl_init(maptbl);
+	ret = decon_maptbl_init(maptbl);
 	if (ret < 0) {
 		panel_err("failed to init maptbl(%s) ret %d\n", maptbl->name, ret);
 		return ret;
@@ -2115,7 +2115,7 @@ do_exit:
 	return 0;
 }
 
-int panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index)
+int decon_decon_panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index)
 {
 	if (panel == NULL) {
 		panel_err("invalid panel\n");
@@ -2134,21 +2134,21 @@ int panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index)
 
 	return excute_seqtbl_nolock(panel, panel->panel_data.seqtbl, index);
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_index_nolock);
+EXPORT_SYMBOL(decon_decon_panel_do_seqtbl_by_index_nolock);
 
-int panel_do_seqtbl_by_index(struct panel_device *panel, int index)
+int decon_panel_do_seqtbl_by_index(struct panel_device *panel, int index)
 {
 	int ret;
 
 	mutex_lock(&panel->op_lock);
-	ret = panel_do_seqtbl_by_index_nolock(panel, index);
+	ret = decon_decon_panel_do_seqtbl_by_index_nolock(panel, index);
 	mutex_unlock(&panel->op_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_index);
+EXPORT_SYMBOL(decon_panel_do_seqtbl_by_index);
 
-struct resinfo *find_panel_resource(struct panel_info *panel_data, char *name)
+struct resinfo *decon_find_panel_resource(struct panel_info *panel_data, char *name)
 {
 	int i = 0;
 
@@ -2163,11 +2163,11 @@ struct resinfo *find_panel_resource(struct panel_info *panel_data, char *name)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(find_panel_resource);
+EXPORT_SYMBOL(decon_find_panel_resource);
 
-bool panel_resource_initialized(struct panel_info *panel_data, char *name)
+bool decon_panel_resource_initialized(struct panel_info *panel_data, char *name)
 {
-	struct resinfo *res = find_panel_resource(panel_data, name);
+	struct resinfo *res = decon_find_panel_resource(panel_data, name);
 
 	if (unlikely(!res)) {
 		panel_err("%s not found in resource\n", name);
@@ -2176,9 +2176,9 @@ bool panel_resource_initialized(struct panel_info *panel_data, char *name)
 
 	return res->state == RES_INITIALIZED;
 }
-EXPORT_SYMBOL(panel_resource_initialized);
+EXPORT_SYMBOL(decon_panel_resource_initialized);
 
-int rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len)
+int decon_rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len)
 {
 	if (unlikely(!dst || !res)) {
 		panel_warn("invalid parameter\n");
@@ -2194,9 +2194,9 @@ int rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len)
 	memcpy(dst, &res->data[offset], len);
 	return 0;
 }
-EXPORT_SYMBOL(rescpy);
+EXPORT_SYMBOL(decon_rescpy);
 
-int rescpy_by_name(struct panel_info *panel_data, u8 *dst, char *name, u32 offset, u32 len)
+int decon_rescpy_by_name(struct panel_info *panel_data, u8 *dst, char *name, u32 offset, u32 len)
 {
 	struct resinfo *res;
 
@@ -2205,7 +2205,7 @@ int rescpy_by_name(struct panel_info *panel_data, u8 *dst, char *name, u32 offse
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_err("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2248,7 +2248,7 @@ int resource_clear_by_name(struct panel_info *panel_data, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2268,7 +2268,7 @@ int resource_copy(u8 *dst, struct resinfo *res)
 		panel_warn("%s not initialized\n", res->name);
 		return -EINVAL;
 	}
-	return rescpy(dst, res, 0, res->dlen);
+	return decon_rescpy(dst, res, 0, res->dlen);
 }
 EXPORT_SYMBOL(resource_copy);
 
@@ -2281,7 +2281,7 @@ int resource_copy_by_name(struct panel_info *panel_data, u8 *dst, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2291,11 +2291,11 @@ int resource_copy_by_name(struct panel_info *panel_data, u8 *dst, char *name)
 		panel_warn("%s not initialized\n", res->name);
 		return -EINVAL;
 	}
-	return rescpy(dst, res, 0, res->dlen);
+	return decon_rescpy(dst, res, 0, res->dlen);
 }
 EXPORT_SYMBOL(resource_copy_by_name);
 
-int resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *name)
+int decon_resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *name)
 {
 	struct resinfo *res;
 	int ret;
@@ -2305,7 +2305,7 @@ int resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2315,14 +2315,14 @@ int resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *
 		panel_warn("%s not initialized\n", res->name);
 		return -EINVAL;
 	}
-	ret = rescpy(dst, res, 0, res->dlen);
+	ret = decon_rescpy(dst, res, 0, res->dlen);
 	resource_clear(res);
 
 	return ret;
 }
-EXPORT_SYMBOL(resource_copy_n_clear_by_name);
+EXPORT_SYMBOL(decon_resource_copy_n_clear_by_name);
 
-int get_resource_size_by_name(struct panel_info *panel_data, char *name)
+int decon_get_resource_size_by_name(struct panel_info *panel_data, char *name)
 {
 	struct resinfo *res;
 
@@ -2331,7 +2331,7 @@ int get_resource_size_by_name(struct panel_info *panel_data, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2339,7 +2339,7 @@ int get_resource_size_by_name(struct panel_info *panel_data, char *name)
 
 	return get_panel_resource_size(res);
 }
-EXPORT_SYMBOL(get_resource_size_by_name);
+EXPORT_SYMBOL(decon_get_resource_size_by_name);
 
 #define MAX_READ_BYTES  (128)
 int panel_rx_nbytes(struct panel_device *panel,
@@ -2657,7 +2657,7 @@ int panel_resource_update(struct panel_device *panel, struct resinfo *res)
 	return 0;
 }
 
-int __mockable panel_resource_update_by_name(struct panel_device *panel, char *name)
+int __mockable decon_panel_resource_update_by_name(struct panel_device *panel, char *name)
 {
 	int ret;
 	struct resinfo *res;
@@ -2669,7 +2669,7 @@ int __mockable panel_resource_update_by_name(struct panel_device *panel, char *n
 	}
 	panel_data = &panel->panel_data;
 
-	res = find_panel_resource(panel_data, name);
+	res = decon_find_panel_resource(panel_data, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2683,7 +2683,7 @@ int __mockable panel_resource_update_by_name(struct panel_device *panel, char *n
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_resource_update_by_name);
+EXPORT_SYMBOL(decon_panel_resource_update_by_name);
 
 int panel_dumpinfo_update(struct panel_device *panel, struct dumpinfo *info)
 {

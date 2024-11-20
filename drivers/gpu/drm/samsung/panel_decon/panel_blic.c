@@ -592,7 +592,7 @@ static int of_get_panel_blic(struct panel_blic_dev *blic_dev, struct device_node
 	if (gpios_np) {
 		for_each_child_of_node(gpios_np, gpio_np) {
 			memset(&gpio, 0, sizeof(gpio));
-			if (of_get_panel_gpio(gpio_np, &gpio)) {
+			if (decon_of_get_panel_gpio(gpio_np, &gpio)) {
 				panel_err("failed to get gpio %s\n", gpio_np->name);
 				break;
 			}
@@ -631,7 +631,7 @@ static int of_get_panel_blic(struct panel_blic_dev *blic_dev, struct device_node
 		}
 		p_seq->dev_name = np->name;
 		p_seq->name = pp->name;
-		ret = of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
+		ret = decon_of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
 		if (ret < 0) {
 			panel_err("failed to get power_ctrl %s\n", pp->name);
 			break;

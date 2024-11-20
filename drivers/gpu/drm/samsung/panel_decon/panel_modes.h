@@ -128,10 +128,10 @@ struct panel_display_modes {
 	.panel_vporch[PANEL_PORCH_VBP] = (vbp), .panel_vporch[PANEL_PORCH_VFP] = (vfp), .panel_vporch[PANEL_PORCH_VSA] = (vsa), \
 	.cmd_lp_ref = (lp_ref)
 
-void panel_mode_set_name(struct panel_display_mode *mode);
-struct panel_display_mode *panel_mode_create(void);
-struct panel_display_modes *of_get_panel_display_modes(const struct device_node *np);
-const char *refresh_mode_to_str(int refresh_mode);
-int str_to_refresh_mode(const char *str);
-int panel_mode_vscan(const struct panel_display_mode *mode);
+void decon_panel_mode_set_name(struct panel_display_mode *mode);
+struct panel_display_mode *decon_panel_mode_create(void);
+struct panel_display_modes *decon_of_get_panel_display_modes(const struct device_node *np);
+const char *decon_refresh_mode_to_str(int refresh_mode);
+int decon_str_to_refresh_mode(const char *str);
+int decon_panel_mode_vscan(const struct panel_display_mode *mode);
 #endif /* __PANEL_DISPLAY_MODES_H__ */
