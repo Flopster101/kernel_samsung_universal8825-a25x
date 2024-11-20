@@ -254,7 +254,9 @@ struct domain_fn mif_fn = {
  *			Gathering MIFFreq Information			*
  ************************************************************************/
 //ktime_t * exynos_stats_get_mif_time_in_state(void);
+#ifdef CONFIG_EXYNOS_BCM_DBG
 extern u64 exynos_bcm_get_ccnt(unsigned int idx);
+#endif
 u32 mifpro_update_profile(int user)
 {
 	struct freq_cstate *fc = &profiler.fc;
@@ -278,8 +280,10 @@ u32 mifpro_update_profile(int user)
 			exynos_pm_qos_request(profiler.freq_infos.pm_qos_class), RELATION_HIGH);
 
 #if defined(CONFIG_SOC_S5E9925_EVT0) || defined(CONFIG_SOC_S5E8825)
+#if defined(CONFIG_EXYNOS_BCM_DBG)
 	// Update time in state and get tables from DVFS driver
 	exynos_devfreq_get_profile(profiler.devfreq_type, fc->time, profiler.freq_stats);
+#endif
 
 	// calculate delta from previous status
 	make_snapshot_and_time_delta(fc, fc_snap, fc_result, profiler.table_cnt);
@@ -290,14 +294,18 @@ u32 mifpro_update_profile(int user)
 	compute_freq_cstate_result(profiler.table, fc_result, profiler.table_cnt,
 					profiler.cur_freq_idx, result->avg_temp);
 
+#ifdef CONFIG_EXYNOS_BCM_DBG
 	ccnt = exynos_bcm_get_ccnt(0);
+#endif
 
 	diff_ccnt = ccnt - prev_ccnt;
 	prev_ccnt = ccnt;
 #else
 	profile_in_state = kzalloc(sizeof(struct exynos_wow_profile) * profiler.table_cnt, GFP_KERNEL);
 
+#ifdef CONFIG_EXYNOS_BCM_DBG
 	exynos_devfreq_get_profile(profiler.devfreq_type, fc->time, profile_in_state);
+#endif
 
 	// calculate delta from previous status
 	make_snapshot_and_time_delta(fc, fc_snap, fc_result, profiler.table_cnt);
