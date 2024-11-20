@@ -5587,7 +5587,7 @@ static int __init panel_drv_init(void)
 	int ret;
 
 	if (sec_current_device == SEC_A33) {
-		printk(KERN_INFO "Initialized decon panel driver\n");
+		SEC_DETECT_LOG("Initialized DRM DECON panel driver\n");
 		panel_info("++\n");
 		ret = panel_create_lcd_class();
 		if (ret < 0) {
@@ -5611,7 +5611,7 @@ static int __init panel_drv_init(void)
 
 		return ret;
 	} else {
-		printk(KERN_INFO "Skipped decon panel driver\n");
+		SEC_DETECT_LOG("Skipped DRM DECON panel driver\n");
 		return 0;
 	}
 }
