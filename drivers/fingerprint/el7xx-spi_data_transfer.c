@@ -432,3 +432,5 @@ int el7xx_free_buffer(struct el7xx_data *etspi)
 	return 0;
 }
 #endif
+
+MODULE_LICENSE("GPL");
