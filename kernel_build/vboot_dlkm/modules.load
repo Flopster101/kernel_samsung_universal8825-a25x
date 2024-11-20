@@ -278,6 +278,7 @@ goodix_ts_berlin.ko
 s2mf301_fuelgauge.ko
 shub.ko
 sensor_core.ko
+mstdrv.ko
 snvm.ko
 dc_vibrator.ko
 focaltech_ts_ft3519.ko
