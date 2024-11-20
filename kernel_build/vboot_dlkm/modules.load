@@ -272,6 +272,8 @@ abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
 hl7132_charger.ko
+hall_ic.ko
+hall_ic_notifier.ko
 goodix_ts_berlin.ko
 s2mf301_fuelgauge.ko
 shub.ko
