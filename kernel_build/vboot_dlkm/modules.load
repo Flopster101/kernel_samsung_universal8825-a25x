@@ -64,7 +64,6 @@ cpif.ko
 gnss_mbox.ko
 gnssif.ko
 exynos_pm_qos.ko
-exynos-bcm.ko
 exynos-ssp.ko
 exynos-cm.ko
 exynos-el2.ko
