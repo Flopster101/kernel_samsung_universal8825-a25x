@@ -28,7 +28,7 @@ int sec_detect_init(void) {
 
     root = of_find_node_by_path("/");
     if (!root) {
-        SEC_DETECT_LOG("Failed to find device tree root\n");
+        printk(KERN_INFO "%s Failed to find device tree root\n", sec_detect_label);
         return -ENOENT;
     }
 
@@ -37,11 +37,11 @@ int sec_detect_init(void) {
         machine_name = of_get_property(root, "compatible", NULL);
 
     if (!machine_name) {
-        SEC_DETECT_LOG("Failed to find machine name\n");
+        printk(KERN_INFO "%s Failed to find machine name\n", sec_detect_label);
         return -ENOENT;
     }
 
-    SEC_DETECT_LOG("Current machine name: %s\n", machine_name);
+    printk(KERN_INFO "%s Current machine name: %s\n", sec_detect_label, machine_name);
 
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;

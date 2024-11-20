@@ -18,10 +18,10 @@
 static int __init s6e3fc3_a33x_panel_init(void)
 {
 	if (sec_current_device == SEC_A33) {
-		SEC_DETECT_LOG("Initialized s6e8fc3_a33x panel driver\n");
+		printk(KERN_INFO "%s Initialized s6e8fc3_a33x panel driver\n", sec_detect_label);
 		decon_register_common_panel(&s6e3fc3_a33x_panel_info);
 	} else {
-		SEC_DETECT_LOG("Skipped s6e3fc3_a33x panel driver\n");
+		printk(KERN_INFO "%s Skipped s6e3fc3_a33x panel driver\n", sec_detect_label);
 	}
 	return 0;
 }
