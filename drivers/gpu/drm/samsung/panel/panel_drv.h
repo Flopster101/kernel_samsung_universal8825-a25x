@@ -283,7 +283,7 @@ struct panel_drv_funcs {
 	/* display controller event operation */
 	int (*vsync)(struct panel_device *, void *);
 	int (*frame_done)(struct panel_device *, void *);
-#ifdef CONFIG_USDM_PANEL_MASK_LAYER
+#if defined(CONFIG_USDM_PANEL_MASK_LAYER) || defined(CONFIG_SUPPORT_MASK_LAYER)
 	int (*set_mask_layer)(struct panel_device *, void *);
 #endif
 	int (*req_set_clock)(struct panel_device *, void *);

@@ -441,7 +441,7 @@ struct panel_mres {
 	struct panel_resol *resol;
 };
 
-#ifdef CONFIG_USDM_PANEL_MASK_LAYER
+#if defined(CONFIG_USDM_PANEL_MASK_LAYER) || defined(CONFIG_SUPPORT_MASK_LAYER)
 enum {
 	MASK_LAYER_ON_BEFORE,
 	MASK_LAYER_ON_AFTER,
@@ -458,6 +458,8 @@ enum {
 
 struct mask_layer_data {
 	u32 req;
+	u32 trigger_time;
+	u32 req_mask_layer;
 };
 #endif
 
