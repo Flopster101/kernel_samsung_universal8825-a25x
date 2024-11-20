@@ -705,3 +705,5 @@ int ec6xx_free_buffer(struct ec6xx_data *etspi)
 	return 0;
 }
 #endif
+
+MODULE_LICENSE("GPL");
