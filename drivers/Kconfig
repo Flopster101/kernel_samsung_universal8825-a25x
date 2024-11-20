@@ -296,5 +296,6 @@ source "drivers/kernelsu/kernel/Kconfig"
 
 # a33x
 source "drivers/input/misc/hall/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/mstdrv/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 
 endmenu
