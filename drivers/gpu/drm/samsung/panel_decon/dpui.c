@@ -130,7 +130,6 @@ void dpui_logging_notify(unsigned long val, enum dpui_type type, void *v)
 	else
 		blocking_notifier_call_chain(&dpui_notifier_list, val, v);
 }
-EXPORT_SYMBOL_GPL(dpui_logging_notify);
 
 /**
  *	dpui_logging_register - register a client notifier
@@ -157,7 +156,6 @@ int dpui_logging_register(struct notifier_block *n, enum dpui_type type)
 	panel_info("register type %s\n", dpui_type_name[type]);
 	return 0;
 }
-EXPORT_SYMBOL_GPL(dpui_logging_register);
 
 /**
  *	dpui_logging_unregister - unregister a client notifier
@@ -167,7 +165,6 @@ int dpui_logging_unregister(struct notifier_block *n)
 {
 	return blocking_notifier_chain_unregister(&dpui_notifier_list, n);
 }
-EXPORT_SYMBOL_GPL(dpui_logging_unregister);
 
 static bool is_dpui_var_u32(enum dpui_key key)
 {
@@ -184,7 +181,6 @@ void update_dpui_log(enum dpui_log_level level, enum dpui_type type)
 	dpui_logging_notify(level, type, &dpui);
 	panel_info("update dpui log(%d) done\n", level);
 }
-EXPORT_SYMBOL_GPL(update_dpui_log);
 
 void clear_dpui_log(enum dpui_log_level level, enum dpui_type type)
 {
@@ -206,7 +202,6 @@ void clear_dpui_log(enum dpui_log_level level, enum dpui_type type)
 
 	panel_info("clear dpui log(%d) done\n", level);
 }
-EXPORT_SYMBOL_GPL(clear_dpui_log);
 
 static int __get_dpui_field(enum dpui_key key, char *buf)
 {
@@ -242,7 +237,6 @@ void print_dpui_field(enum dpui_key key)
 	__get_dpui_field(key, tbuf);
 	panel_info("%s\n", tbuf);
 }
-EXPORT_SYMBOL_GPL(print_dpui_field);
 
 static int __set_dpui_field(enum dpui_key key, char *buf, int size)
 {
@@ -366,7 +360,6 @@ int set_dpui_field(enum dpui_key key, char *buf, int size)
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(set_dpui_field);
 
 int get_dpui_u32_field(enum dpui_key key, u32 *value)
 {
@@ -378,7 +371,6 @@ int get_dpui_u32_field(enum dpui_key key, u32 *value)
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(get_dpui_u32_field);
 
 int set_dpui_u32_field(enum dpui_key key, u32 value)
 {
@@ -390,7 +382,6 @@ int set_dpui_u32_field(enum dpui_key key, u32 value)
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(set_dpui_u32_field);
 
 int inc_dpui_u32_field(enum dpui_key key, u32 value)
 {
@@ -402,7 +393,6 @@ int inc_dpui_u32_field(enum dpui_key key, u32 value)
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(inc_dpui_u32_field);
 
 int __get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
 {
@@ -449,4 +439,3 @@ int get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
 {
 	return __get_dpui_log(buf, level, type);
 }
-EXPORT_SYMBOL_GPL(get_dpui_log);

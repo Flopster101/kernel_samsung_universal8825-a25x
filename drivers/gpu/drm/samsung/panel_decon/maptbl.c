@@ -123,7 +123,6 @@ err:
 	kfree(m);
 	return NULL;
 }
-EXPORT_SYMBOL(maptbl_create);
 
 /**
  * maptbl_clone - create a struct maptbl structure by source maptbl
@@ -144,7 +143,6 @@ struct maptbl *maptbl_clone(struct maptbl *src)
 	return maptbl_create(src->name, &src->shape, &src->ops,
 			src->arr, maptbl_get_private_data(src));
 }
-EXPORT_SYMBOL(maptbl_clone);
 
 /**
  * maptbl_deepcopy - copy members of struct maptbl structure from maptbl
@@ -187,7 +185,6 @@ struct maptbl *maptbl_deepcopy(struct maptbl *dst, struct maptbl *src)
 
 	return dst;
 }
-EXPORT_SYMBOL(maptbl_deepcopy);
 
 /**
  * maptbl_destroy - destroys a struct maptbl structure
@@ -201,7 +198,6 @@ void maptbl_destroy(struct maptbl *m)
 	maptbl_free_buffer(m);
 	kfree(m);
 }
-EXPORT_SYMBOL(maptbl_destroy);
 
 int maptbl_get_indexof_n_dimen_element(struct maptbl *tbl, enum ndarray_dimen dimen, unsigned int indexof_element)
 {
@@ -217,31 +213,26 @@ int maptbl_get_indexof_n_dimen_element(struct maptbl *tbl, enum ndarray_dimen di
 
 	return maptbl_get_sizeof_n_dimen_element(tbl, dimen) * indexof_element;
 }
-EXPORT_SYMBOL(maptbl_get_indexof_n_dimen_element);
 
 int maptbl_get_indexof_box(struct maptbl *tbl, unsigned int indexof_element)
 {
 	return maptbl_get_indexof_n_dimen_element(tbl, NDARR_4D, indexof_element);
 }
-EXPORT_SYMBOL(maptbl_get_indexof_box);
 
 int maptbl_get_indexof_layer(struct maptbl *tbl, unsigned int indexof_element)
 {
 	return maptbl_get_indexof_n_dimen_element(tbl, NDARR_3D, indexof_element);
 }
-EXPORT_SYMBOL(maptbl_get_indexof_layer);
 
 int maptbl_get_indexof_row(struct maptbl *tbl, unsigned int indexof_element)
 {
 	return maptbl_get_indexof_n_dimen_element(tbl, NDARR_2D, indexof_element);
 }
-EXPORT_SYMBOL(maptbl_get_indexof_row);
 
 int maptbl_get_indexof_col(struct maptbl *tbl, unsigned int indexof_element)
 {
 	return maptbl_get_indexof_n_dimen_element(tbl, NDARR_1D, indexof_element);
 }
-EXPORT_SYMBOL(maptbl_get_indexof_col);
 
 int maptbl_4d_index(struct maptbl *tbl, int box, int layer, int row, int col)
 {
@@ -270,7 +261,6 @@ int maptbl_4d_index(struct maptbl *tbl, int box, int layer, int row, int col)
 
 	return res;
 }
-EXPORT_SYMBOL(maptbl_4d_index);
 
 int maptbl_index(struct maptbl *tbl, int layer, int row, int col)
 {
@@ -279,7 +269,6 @@ int maptbl_index(struct maptbl *tbl, int layer, int row, int col)
 
 	return maptbl_4d_index(tbl, 0, layer, row, col);
 }
-EXPORT_SYMBOL(maptbl_index);
 
 int maptbl_pos_to_index(struct maptbl *tbl, struct maptbl_pos *pos)
 {
@@ -300,7 +289,6 @@ int maptbl_pos_to_index(struct maptbl *tbl, struct maptbl_pos *pos)
 
 	return res;
 }
-EXPORT_SYMBOL(maptbl_pos_to_index);
 
 int maptbl_index_to_pos(struct maptbl *tbl, unsigned int index, struct maptbl_pos *pos)
 {
@@ -324,19 +312,16 @@ int maptbl_index_to_pos(struct maptbl *tbl, unsigned int index, struct maptbl_po
 
 	return 0;
 }
-EXPORT_SYMBOL(maptbl_index_to_pos);
 
 bool maptbl_is_initialized(struct maptbl *tbl)
 {
 	return (tbl && tbl->initialized);
 }
-EXPORT_SYMBOL(maptbl_is_initialized);
 
 bool maptbl_is_index_in_bound(struct maptbl *tbl, unsigned int index)
 {
 	return (tbl && (index + maptbl_get_sizeof_copy(tbl) <= maptbl_get_sizeof_maptbl(tbl)));
 }
-EXPORT_SYMBOL(maptbl_is_index_in_bound);
 
 int maptbl_init(struct maptbl *tbl)
 {
@@ -363,7 +348,6 @@ int maptbl_init(struct maptbl *tbl)
 
 	return 0;
 }
-EXPORT_SYMBOL(maptbl_init);
 
 int maptbl_getidx(struct maptbl *tbl)
 {
@@ -396,7 +380,6 @@ int maptbl_getidx(struct maptbl *tbl)
 
 	return index;
 }
-EXPORT_SYMBOL(maptbl_getidx);
 
 int maptbl_copy(struct maptbl *tbl, u8 *dst)
 {
@@ -417,7 +400,6 @@ int maptbl_copy(struct maptbl *tbl, u8 *dst)
 
 	return 0;
 }
-EXPORT_SYMBOL(maptbl_copy);
 
 int maptbl_fill(struct maptbl *tbl, struct maptbl_pos *pos, u8 *src, size_t n)
 {
@@ -444,7 +426,6 @@ int maptbl_fill(struct maptbl *tbl, struct maptbl_pos *pos, u8 *src, size_t n)
 
 	return 0;
 }
-EXPORT_SYMBOL(maptbl_fill);
 
 int maptbl_cmp_shape(struct maptbl *m1, struct maptbl *m2)
 {
@@ -467,7 +448,6 @@ int maptbl_cmp_shape(struct maptbl *m1, struct maptbl *m2)
 
 	return res;
 }
-EXPORT_SYMBOL(maptbl_cmp_shape);
 
 struct maptbl *maptbl_memcpy(struct maptbl *dst, struct maptbl *src)
 {
@@ -488,7 +468,6 @@ struct maptbl *maptbl_memcpy(struct maptbl *dst, struct maptbl *src)
 
 	return dst;
 }
-EXPORT_SYMBOL(maptbl_memcpy);
 
 int maptbl_snprintf_head(struct maptbl *tbl, char *buf, size_t size)
 {
@@ -580,4 +559,3 @@ void maptbl_print(struct maptbl *tbl)
 	maptbl_snprintf(tbl, buf, sizeof(buf));
 	pr_info("%s\n", buf);
 }
-EXPORT_SYMBOL(maptbl_print);

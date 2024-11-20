@@ -149,7 +149,6 @@ int register_common_panel(struct common_panel_info *info)
 
 	return 0;
 }
-EXPORT_SYMBOL(register_common_panel);
 
 int deregister_common_panel(struct common_panel_info *info)
 {
@@ -157,7 +156,6 @@ int deregister_common_panel(struct common_panel_info *info)
 
 	return 0;
 }
-EXPORT_SYMBOL(deregister_common_panel);
 
 static struct common_panel_info *find_common_panel_with_name(const char *name)
 {
@@ -503,7 +501,6 @@ struct maptbl *find_panel_maptbl_by_index(struct panel_info *panel, int index)
 
 	return &panel->maptbl[index];
 }
-EXPORT_SYMBOL(find_panel_maptbl_by_index);
 
 struct maptbl *find_panel_maptbl_by_name(struct panel_info *panel_data, char *name)
 {
@@ -519,7 +516,6 @@ struct maptbl *find_panel_maptbl_by_name(struct panel_info *panel_data, char *na
 			return &panel_data->maptbl[i];
 	return NULL;
 }
-EXPORT_SYMBOL(find_panel_maptbl_by_name);
 
 struct maptbl *maptbl_find(struct panel_info *panel, char *name)
 {
@@ -2134,7 +2130,6 @@ int panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index)
 
 	return excute_seqtbl_nolock(panel, panel->panel_data.seqtbl, index);
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_index_nolock);
 
 int panel_do_seqtbl_by_index(struct panel_device *panel, int index)
 {
@@ -2146,7 +2141,6 @@ int panel_do_seqtbl_by_index(struct panel_device *panel, int index)
 
 	return ret;
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_index);
 
 struct resinfo *find_panel_resource(struct panel_info *panel_data, char *name)
 {
@@ -2163,7 +2157,6 @@ struct resinfo *find_panel_resource(struct panel_info *panel_data, char *name)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(find_panel_resource);
 
 bool panel_resource_initialized(struct panel_info *panel_data, char *name)
 {
@@ -2176,7 +2169,6 @@ bool panel_resource_initialized(struct panel_info *panel_data, char *name)
 
 	return res->state == RES_INITIALIZED;
 }
-EXPORT_SYMBOL(panel_resource_initialized);
 
 int rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len)
 {
@@ -2194,7 +2186,6 @@ int rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len)
 	memcpy(dst, &res->data[offset], len);
 	return 0;
 }
-EXPORT_SYMBOL(rescpy);
 
 int rescpy_by_name(struct panel_info *panel_data, u8 *dst, char *name, u32 offset, u32 len)
 {
@@ -2320,7 +2311,6 @@ int resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *
 
 	return ret;
 }
-EXPORT_SYMBOL(resource_copy_n_clear_by_name);
 
 int get_resource_size_by_name(struct panel_info *panel_data, char *name)
 {
@@ -2339,7 +2329,6 @@ int get_resource_size_by_name(struct panel_info *panel_data, char *name)
 
 	return get_panel_resource_size(res);
 }
-EXPORT_SYMBOL(get_resource_size_by_name);
 
 #define MAX_READ_BYTES  (128)
 int panel_rx_nbytes(struct panel_device *panel,
@@ -2683,7 +2672,6 @@ int __mockable panel_resource_update_by_name(struct panel_device *panel, char *n
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_resource_update_by_name);
 
 int panel_dumpinfo_update(struct panel_device *panel, struct dumpinfo *info)
 {

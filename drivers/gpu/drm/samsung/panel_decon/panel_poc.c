@@ -957,7 +957,6 @@ int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
 
 	return poc_dev->partition[index].write_check;
 }
-EXPORT_SYMBOL(check_poc_partition_exists);
 
 int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 		u32 *chksum_ok, u32 *chksum_by_calc, u32 *chksum_by_read)
@@ -984,7 +983,6 @@ int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 
 	return 0;
 }
-EXPORT_SYMBOL(get_poc_partition_chksum);
 
 int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index)
 {
@@ -1311,7 +1309,6 @@ int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 
 	return 0;
 };
-EXPORT_SYMBOL(set_panel_poc);
 
 #ifdef CONFIG_SUPPORT_POC_FLASH
 static long panel_poc_ioctl(struct file *file, unsigned int cmd,

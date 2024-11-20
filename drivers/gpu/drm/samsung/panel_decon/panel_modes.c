@@ -37,7 +37,6 @@ void panel_mode_debug_printmodeline(const struct panel_display_mode *mode)
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_debug("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_debug_printmodeline);
 
 void panel_mode_info_printmodeline(const struct panel_display_mode *mode)
 {
@@ -46,7 +45,6 @@ void panel_mode_info_printmodeline(const struct panel_display_mode *mode)
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_info("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_info_printmodeline);
 
 const char *refresh_mode_to_str(int refresh_mode)
 {
@@ -55,7 +53,6 @@ const char *refresh_mode_to_str(int refresh_mode)
 
 	return refresh_mode_names[refresh_mode];
 }
-EXPORT_SYMBOL(refresh_mode_to_str);
 
 int str_to_refresh_mode(const char *str)
 {
@@ -71,7 +68,6 @@ int str_to_refresh_mode(const char *str)
 
 	return -1;
 }
-EXPORT_SYMBOL(str_to_refresh_mode);
 
 int panel_mode_vscan(const struct panel_display_mode *mode)
 {
@@ -81,7 +77,6 @@ int panel_mode_vscan(const struct panel_display_mode *mode)
 	return max_t(typeof(mode->panel_te_sw_skip_count), mode->panel_te_sw_skip_count + 1, 1) *
 		max_t(typeof(mode->panel_te_hw_skip_count), mode->panel_te_hw_skip_count + 1, 1);
 }
-EXPORT_SYMBOL(panel_mode_vscan);
 
 /**
  * of_parse_panel_display_mode - parse panel_display_mode entry from device_node
@@ -140,7 +135,6 @@ void panel_display_modes_release(struct panel_display_modes *disp)
 	}
 	kfree(disp);
 }
-EXPORT_SYMBOL_GPL(panel_display_modes_release);
 
 /**
  * of_get_panel_display_modes - parse all panel_display_mode entries from a device_node
@@ -245,7 +239,6 @@ entryfail:
 	kfree(disp);
 	return NULL;
 }
-EXPORT_SYMBOL_GPL(of_get_panel_display_modes);
 
 void panel_mode_set_name(struct panel_display_mode *mode)
 {
@@ -253,7 +246,6 @@ void panel_mode_set_name(struct panel_display_mode *mode)
 			mode->width, mode->height, mode->refresh_rate,
 			(mode->refresh_mode == REFRESH_MODE_NS) ? "NS" : "HS");
 }
-EXPORT_SYMBOL(panel_mode_set_name);
 
 struct panel_display_mode *panel_mode_create(void)
 {
@@ -265,4 +257,3 @@ struct panel_display_mode *panel_mode_create(void)
 
 	return nmode;
 }
-EXPORT_SYMBOL(panel_mode_create);

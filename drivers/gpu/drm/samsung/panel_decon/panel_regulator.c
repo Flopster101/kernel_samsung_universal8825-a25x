@@ -276,7 +276,6 @@ int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regul
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_regulator);
 
 struct panel_regulator *panel_regulator_create(void)
 {
@@ -290,7 +289,6 @@ struct panel_regulator *panel_regulator_create(void)
 
 	return regulator;
 }
-EXPORT_SYMBOL(panel_regulator_create);
 
 void panel_regulator_destroy(struct panel_regulator *regulator)
 {
@@ -300,4 +298,3 @@ void panel_regulator_destroy(struct panel_regulator *regulator)
 	regulator_put(regulator->reg);
 	kfree(regulator);
 }
-EXPORT_SYMBOL(panel_regulator_destroy);

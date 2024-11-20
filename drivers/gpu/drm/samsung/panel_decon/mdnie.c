@@ -255,7 +255,6 @@ struct maptbl *mdnie_find_maptbl(struct mdnie_info *mdnie)
 	}
 	return &mdnie->maptbl[index];
 }
-EXPORT_SYMBOL(mdnie_find_maptbl);
 
 struct maptbl *mdnie_find_etc_maptbl(struct mdnie_info *mdnie, int index)
 {
@@ -540,7 +539,6 @@ int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_def_wrgb);
 
 int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
@@ -559,7 +557,6 @@ int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_cur_wrgb);
 
 int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 		unsigned char *dst, unsigned int stride)
@@ -572,7 +569,6 @@ int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_cur_wrgb_to_byte_array);
 
 int mdnie_update_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
@@ -617,7 +613,6 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_update_wrgb);
 
 int panel_mdnie_update(struct panel_device *panel)
 {

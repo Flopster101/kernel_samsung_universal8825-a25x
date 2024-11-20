@@ -31,7 +31,6 @@ int panel_lib_rdinfo_alloc_buffer(struct rdinfo *m)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_alloc_buffer);
 
 void panel_lib_rdinfo_free_buffer(struct rdinfo *m)
 {
@@ -41,7 +40,6 @@ void panel_lib_rdinfo_free_buffer(struct rdinfo *m)
 	kfree(m->data);
 	m->data = NULL;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_free_buffer);
 
 struct rdinfo *panel_lib_rdinfo_create(u32 type, char *name, u32 addr, u32 offset, u32 len, u8 *init_data)
 {
@@ -84,14 +82,12 @@ err:
 	kfree(m);
 	return NULL;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_create);
 
 void panel_lib_rdinfo_destroy(struct rdinfo *m)
 {
 	panel_lib_rdinfo_free_buffer(m);
 	kfree(m);
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_destroy);
 
 int panel_lib_rdinfo_copy(struct rdinfo *dst, struct rdinfo *src)
 {
@@ -140,7 +136,6 @@ err:
 	kfree(temp_dst);
 	return ret;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_copy);
 
 struct res_update_info *panel_lib_res_update_info_create(u32 offset, struct rdinfo *rditbl)
 {
@@ -160,13 +155,11 @@ struct res_update_info *panel_lib_res_update_info_create(u32 offset, struct rdin
 
 	return resui;
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_create);
 
 void panel_lib_res_update_info_destroy(struct res_update_info *resui)
 {
 	kfree(resui);
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_destroy);
 
 int panel_lib_res_update_info_copy(struct res_update_info *dst, struct res_update_info *src)
 {
@@ -180,7 +173,6 @@ int panel_lib_res_update_info_copy(struct res_update_info *dst, struct res_updat
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_copy);
 
 int panel_lib_resinfo_alloc_buffer(struct resinfo *m)
 {
@@ -198,7 +190,6 @@ int panel_lib_resinfo_alloc_buffer(struct resinfo *m)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_alloc_buffer);
 
 void panel_lib_resinfo_free_buffer(struct resinfo *m)
 {
@@ -208,7 +199,6 @@ void panel_lib_resinfo_free_buffer(struct resinfo *m)
 	kfree(m->data);
 	m->data = NULL;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_free_buffer);
 
 struct resinfo *panel_lib_resinfo_create(char *name, u8 *init_data, u32 dlen, struct res_update_info *resui, u32 nr_resui)
 {
@@ -246,14 +236,12 @@ err:
 	kfree(m);
 	return NULL;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_create);
 
 void panel_lib_resinfo_destroy(struct resinfo *m)
 {
 	panel_lib_resinfo_free_buffer(m);
 	kfree(m);
 }
-EXPORT_SYMBOL(panel_lib_resinfo_destroy);
 
 int panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
 {
@@ -301,7 +289,6 @@ err:
 	kfree(temp_dst);
 	return ret;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_copy);
 
 struct dumpinfo *panel_lib_dumpinfo_create(char *name, struct resinfo *res, dump_cb_t callback)
 {
@@ -323,13 +310,11 @@ struct dumpinfo *panel_lib_dumpinfo_create(char *name, struct resinfo *res, dump
 
 	return m;
 }
-EXPORT_SYMBOL(panel_lib_dumpinfo_create);
 
 void panel_lib_dumpinfo_destroy(struct dumpinfo *m)
 {
 	kfree(m);
 }
-EXPORT_SYMBOL(panel_lib_dumpinfo_destroy);
 
 int panel_lib_dumpinfo_copy(struct dumpinfo *dst, struct dumpinfo *src)
 {
@@ -343,4 +328,3 @@ int panel_lib_dumpinfo_copy(struct dumpinfo *dst, struct dumpinfo *src)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_dumpinfo_copy);

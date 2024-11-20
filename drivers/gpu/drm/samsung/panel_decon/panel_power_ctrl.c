@@ -367,4 +367,3 @@ int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_power_ctrl);

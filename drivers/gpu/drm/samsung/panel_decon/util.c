@@ -39,7 +39,6 @@ int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(d - dest);
 }
-EXPORT_SYMBOL(copy_from_sliced_byte_array);
 
 /*
  * copy to slided destination byte array from
@@ -64,7 +63,6 @@ int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(s - src);
 }
-EXPORT_SYMBOL(copy_to_sliced_byte_array);
 
 /*
  * hextos32 - hexa-decimal to signed int
@@ -79,7 +77,6 @@ s32 hextos32(u32 hex, u32 bits)
 
 	return sign * (hex & GENMASK(bits - 2, 0));
 }
-EXPORT_SYMBOL(hextos32);
 
 /*
  * s32tohex - signed int to hexa-decimal
@@ -94,4 +91,3 @@ u32 s32tohex(s32 dec, u32 bits)
 
 	return (signed_bit | (abs(dec) & GENMASK(bits - 2, 0)));
 }
-EXPORT_SYMBOL(s32tohex);

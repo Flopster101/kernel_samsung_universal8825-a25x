@@ -20,7 +20,6 @@ int panel_notifier_register(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_register(&panel_notifier_list, nb);
 }
-EXPORT_SYMBOL(panel_notifier_register);
 
 /**
  *	panel_notifier_unregister - unregister a client notifier
@@ -30,7 +29,6 @@ int panel_notifier_unregister(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_unregister(&panel_notifier_list, nb);
 }
-EXPORT_SYMBOL(panel_notifier_unregister);
 
 /**
  * panel_notifier_call_chain - notify clients
@@ -40,4 +38,3 @@ int panel_notifier_call_chain(unsigned long val, void *v)
 {
 	return blocking_notifier_call_chain(&panel_notifier_list, val, v);
 }
-EXPORT_SYMBOL_GPL(panel_notifier_call_chain);

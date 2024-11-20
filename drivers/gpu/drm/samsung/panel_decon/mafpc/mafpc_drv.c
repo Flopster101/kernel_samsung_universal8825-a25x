@@ -426,7 +426,6 @@ struct mafpc_device *mafpc_device_create(void)
 
 	return mafpc;
 }
-EXPORT_SYMBOL(mafpc_device_create);
 
 int mafpc_device_init(struct mafpc_device *mafpc)
 {
@@ -438,7 +437,6 @@ int mafpc_device_init(struct mafpc_device *mafpc)
 
 	return 0;
 }
-EXPORT_SYMBOL(mafpc_device_init);
 
 struct mafpc_device *get_mafpc_device(struct panel_device *panel)
 {
@@ -474,7 +472,6 @@ struct mafpc_device *get_mafpc_device(struct panel_device *panel)
 
 	return mafpc;
 }
-EXPORT_SYMBOL(get_mafpc_device);
 
 static int mafpc_probe(struct platform_device *pdev)
 {

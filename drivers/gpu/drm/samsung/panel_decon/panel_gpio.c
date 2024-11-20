@@ -407,7 +407,6 @@ int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_gpio);
 
 struct panel_gpio *panel_gpio_create(void)
 {
@@ -421,10 +420,8 @@ struct panel_gpio *panel_gpio_create(void)
 
 	return gpio;
 }
-EXPORT_SYMBOL(panel_gpio_create);
 
 void panel_gpio_destroy(struct panel_gpio *gpio)
 {
 	kfree(gpio);
 }
-EXPORT_SYMBOL(panel_gpio_destroy);

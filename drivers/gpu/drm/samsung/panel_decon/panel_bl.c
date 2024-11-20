@@ -131,7 +131,6 @@ bool __mockable is_hbm_brightness(struct panel_bl_device *panel_bl, int brightne
 
 	return (luminance > subdev->brt_tbl.lum[sz_ui_lum - 1]);
 }
-EXPORT_SYMBOL(is_hbm_brightness);
 
 bool is_ext_hbm_brightness(struct panel_bl_device *panel_bl, int brightness)
 {
@@ -298,7 +297,6 @@ __mockable int get_subdev_actual_brightness_index(struct panel_bl_device *panel_
 
 	return index;
 }
-EXPORT_SYMBOL(get_subdev_actual_brightness_index);
 
 __mockable int get_actual_brightness_index(struct panel_bl_device *panel_bl, int brightness)
 {
@@ -315,7 +313,6 @@ __mockable int get_actual_brightness_index(struct panel_bl_device *panel_bl, int
 	return get_subdev_actual_brightness_index(panel_bl,
 			panel_bl->props.id, brightness);
 }
-EXPORT_SYMBOL(get_actual_brightness_index);
 
 int get_brightness_pac_step_by_subdev_id(struct panel_bl_device *panel_bl, int id, int brightness)
 {
@@ -358,7 +355,6 @@ int get_brightness_pac_step_by_subdev_id(struct panel_bl_device *panel_bl, int i
 
 	return index;
 }
-EXPORT_SYMBOL(get_brightness_pac_step_by_subdev_id);
 
 int get_brightness_pac_step(struct panel_bl_device *panel_bl, int brightness)
 {
@@ -372,7 +368,6 @@ int get_brightness_pac_step(struct panel_bl_device *panel_bl, int brightness)
 
 	return get_brightness_pac_step_by_subdev_id(panel_bl, id, brightness);
 }
-EXPORT_SYMBOL(get_brightness_pac_step);
 
 int get_brightness_of_brt_to_step(struct panel_bl_device *panel_bl, int id, int brightness)
 {
@@ -467,7 +462,6 @@ int get_actual_brightness(struct panel_bl_device *panel_bl, int brightness)
 	return get_subdev_actual_brightness(panel_bl,
 			panel_bl->props.id, brightness);
 }
-EXPORT_SYMBOL(get_actual_brightness);
 
 int get_actual_brightness_interpolation(struct panel_bl_device *panel_bl, int brightness)
 {
@@ -524,13 +518,11 @@ int panel_bl_get_acl_pwrsave(struct panel_bl_device *panel_bl)
 {
 	return panel_bl->props.acl_pwrsave;
 }
-EXPORT_SYMBOL(panel_bl_get_acl_pwrsave);
 
 int panel_bl_get_acl_opr(struct panel_bl_device *panel_bl)
 {
 	return panel_bl->props.acl_opr;
 }
-EXPORT_SYMBOL(panel_bl_get_acl_opr);
 
 void panel_bl_clear_brightness_set_count(struct panel_bl_device *panel_bl)
 {
@@ -541,7 +533,6 @@ int panel_bl_get_brightness_set_count(struct panel_bl_device *panel_bl)
 {
 	return atomic_read(&panel_bl->props.brightness_set_count);
 }
-EXPORT_SYMBOL(panel_bl_get_brightness_set_count);
 
 inline void panel_bl_inc_brightness_set_count(struct panel_bl_device *panel_bl)
 {
@@ -731,7 +722,6 @@ int panel_bl_aor_interpolation_2(struct panel_bl_device *panel_bl,
 	return aor_interpolation_2(brt_tbl->brt, aor_tbl, brt_tbl->sz_lum,
 			brt_tbl->sz_ui_lum, brt_tbl->vtotal, brightness);
 }
-EXPORT_SYMBOL(panel_bl_aor_interpolation_2);
 
 int panel_bl_irc_interpolation(struct panel_bl_device *panel_bl, int id, struct panel_irc_info *irc_info)
 {
@@ -749,7 +739,6 @@ int panel_bl_irc_interpolation(struct panel_bl_device *panel_bl, int id, struct 
 
 	return generate_irc(brt_tbl, irc_info, brightness);
 }
-EXPORT_SYMBOL(panel_bl_irc_interpolation);
 
 //void g_tracing_mark_write(char id, char *str1, int value);
 int panel_bl_set_brightness(struct panel_bl_device *panel_bl, int id, u32 send_cmd)

@@ -418,7 +418,6 @@ int get_copr_reg_size(int version)
 	else
 		return 0;
 }
-EXPORT_SYMBOL(get_copr_reg_size);
 
 int get_copr_reg_packed_size(int version)
 {
@@ -429,7 +428,6 @@ int get_copr_reg_packed_size(int version)
 	else
 		return 0;
 }
-EXPORT_SYMBOL(get_copr_reg_packed_size);
 
 const char *get_copr_reg_name(int version, int index)
 {
@@ -448,7 +446,6 @@ const char *get_copr_reg_name(int version, int index)
 	else
 		return NULL;
 }
-EXPORT_SYMBOL(get_copr_reg_name);
 
 int get_copr_reg_offset(int version, int index)
 {
@@ -467,7 +464,6 @@ int get_copr_reg_offset(int version, int index)
 	else
 		return -EINVAL;
 }
-EXPORT_SYMBOL(get_copr_reg_offset);
 
 u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index)
 {
@@ -491,7 +487,6 @@ u32 *get_copr_reg_ptr(struct copr_reg *reg, int version, int index)
 	else
 		return NULL;
 }
-EXPORT_SYMBOL(get_copr_reg_ptr);
 
 int find_copr_reg_by_name(int version, char *s)
 {
@@ -512,7 +507,6 @@ int find_copr_reg_by_name(int version, char *s)
 
 	return -EINVAL;
 }
-EXPORT_SYMBOL(find_copr_reg_by_name);
 
 int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byte_array)
 {
@@ -582,7 +576,6 @@ int copr_reg_to_byte_array(struct copr_reg *reg, int version, unsigned char *byt
 
 	return 0;
 }
-EXPORT_SYMBOL(copr_reg_to_byte_array);
 
 ssize_t copr_reg_show(struct copr_info *copr, char *buf)
 {

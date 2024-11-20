@@ -170,10 +170,8 @@ int panel_log_level = 3;
 #else
 int panel_log_level = 6;
 #endif
-EXPORT_SYMBOL(panel_log_level);
 module_param(panel_log_level, int, 0600);
 int panel_cmd_log;
-EXPORT_SYMBOL(panel_cmd_log);
 #ifdef CONFIG_SUPPORT_PANEL_SWAP
 int panel_reprobe(struct panel_device *panel);
 #endif
@@ -376,7 +374,6 @@ int get_lcd_info(char *arg)
 	else
 		return -EINVAL;
 }
-EXPORT_SYMBOL(get_lcd_info);
 
 int panel_initialize_regulator(struct panel_device *panel)
 {
@@ -5257,13 +5254,11 @@ struct panel_device *panel_device_create(void)
 
 	return panel;
 }
-EXPORT_SYMBOL(panel_device_create);
 
 void panel_device_destroy(struct panel_device *panel)
 {
 	kfree(panel);
 }
-EXPORT_SYMBOL(panel_device_destroy);
 
 int panel_device_register_notifiers(struct panel_device *panel)
 {
@@ -5458,7 +5453,6 @@ int panel_device_init(struct panel_device *panel)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_device_init);
 
 int panel_device_exit(struct panel_device *panel)
 {
@@ -5518,7 +5512,6 @@ int panel_device_exit(struct panel_device *panel)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_device_exit);
 
 static int panel_drv_probe(struct platform_device *pdev)
 {

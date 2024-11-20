@@ -4464,7 +4464,6 @@ ssize_t attr_store_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_store);
 }
-EXPORT_SYMBOL(attr_store_for_each);
 
 static int attr_find_and_show(struct device *dev, void *data)
 {
@@ -4505,7 +4504,6 @@ ssize_t attr_show_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_show);
 }
-EXPORT_SYMBOL(attr_show_for_each);
 
 static int attr_exist(struct device *dev, void *data)
 {
@@ -4535,7 +4533,6 @@ ssize_t attr_exist_for_each(struct class *class, const char *name)
 
 	return class_for_each_device(class, NULL, &args, attr_exist);
 }
-EXPORT_SYMBOL(attr_exist_for_each);
 
 int panel_remove_svc_octa(struct panel_device *panel)
 {

@@ -138,7 +138,6 @@ s64 disp_pow(s64 num, u32 digits)
 		res *= num;
 	return res;
 }
-EXPORT_SYMBOL(disp_pow);
 
 s64 disp_round(s64 num, u32 digits)
 {
@@ -232,7 +231,6 @@ s64 disp_div64(s64 num, s64 den)
 
 	return sign * tnum;
 }
-EXPORT_SYMBOL(disp_div64);
 
 #ifdef DIMMING_CALC_PRECISE
 s64 disp_div64_round(s64 num, s64 den, u32 digits)
@@ -813,7 +811,6 @@ s64 disp_interpolation64(s64 from, s64 to, int cur_step, int total_step)
 
 	return num;
 }
-EXPORT_SYMBOL(disp_interpolation64);
 
 int gamma_table_add_offset(s32 (*src)[MAX_COLOR], s32 (*ofs)[MAX_COLOR],
 		s32 (*out)[MAX_COLOR], struct tp *tp, int nr_tp)
@@ -905,7 +902,6 @@ int gamma_table_interpolation_round(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR]
 
 	return 0;
 }
-EXPORT_SYMBOL(gamma_table_interpolation_round);
 
 static int generate_gray_scale(struct dimming_info *dim_info)
 {
@@ -1120,7 +1116,6 @@ void get_dimming_gamma(struct dimming_info *dim_info, u32 luminance, u8 *output,
 
 	return;
 }
-EXPORT_SYMBOL(get_dimming_gamma);
 
 void print_dimming_tp_output(struct dimming_lut *dim_lut, struct tp *tp, int size)
 {
@@ -1567,7 +1562,6 @@ int init_dimming_info(struct dimming_info *dim_info, struct dimming_init_info *s
 
 	return 0;
 }
-EXPORT_SYMBOL(init_dimming_info);
 
 int init_dimming_mtp(struct dimming_info *dim_info, s32 (*mtp)[MAX_COLOR])
 {
@@ -1583,7 +1577,6 @@ int init_dimming_mtp(struct dimming_info *dim_info, s32 (*mtp)[MAX_COLOR])
 
 	return 0;
 }
-EXPORT_SYMBOL(init_dimming_mtp);
 
 int init_dimming_hbm_info(struct dimming_info *dim_info, s32 (*hbm_gamma_tbl)[MAX_COLOR], u32 hbm_luminance)
 {
@@ -1694,4 +1687,3 @@ int process_dimming(struct dimming_info *dim_info)
 
 	return 0;
 }
-EXPORT_SYMBOL(process_dimming);
