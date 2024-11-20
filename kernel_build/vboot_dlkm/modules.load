@@ -275,6 +275,7 @@ hl7132_charger.ko
 hall_ic.ko
 hall_ic_notifier.ko
 goodix_ts_berlin.ko
+isg5320a.ko
 s2mf301_fuelgauge.ko
 shub.ko
 sensor_core.ko
