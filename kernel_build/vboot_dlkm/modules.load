@@ -301,11 +301,13 @@ exynos-bts.ko
 exynos-btsops8825.ko
 spu_verify.ko
 exynos-usb-audio-offloading.ko
+abox_adaptation.ko
 snd-soc-rl6231.ko
 snd-soc-rt5665.ko
 snd-soc-rt5691.ko
 snd-soc-tfa98xx.ko
 snd-soc-tfa_sysfs.ko
+snd-soc-tas2562.ko
 snd-soc-s3c-dma.ko
 snd-soc-samsung-abox-gic.ko
 snd-soc-samsung-abox.ko
@@ -313,6 +315,7 @@ snd-soc-samsung-abox-sync.ko
 snd-soc-samsung-vts-mailbox.ko
 snd-soc-samsung-vts.ko
 snd-soc-samsung-slif.ko
+exynos8825_audio.ko
 exynos8825_rt5665.ko
 exynos8825_rt5691.ko
 sec_audio_sysfs.ko
