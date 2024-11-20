@@ -73,8 +73,8 @@ int panel_gpio_helper_clear_irq_pending_bit(struct panel_gpio *gpio);
 bool panel_gpio_helper_is_irq_enabled(struct panel_gpio *gpio);
 int panel_gpio_helper_devm_request_irq(struct panel_gpio *gpio,
 		struct device *dev, irq_handler_t handler, const char *devname, void *dev_id);
-int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio);
-struct panel_gpio *panel_gpio_create(void);
-void panel_gpio_destroy(struct panel_gpio *gpio);
+int decon_of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio);
+struct panel_gpio *decon_panel_gpio_create(void);
+void decon_panel_gpio_destroy(struct panel_gpio *gpio);
 
 #endif /* __PANEL_GPIO_H__ */

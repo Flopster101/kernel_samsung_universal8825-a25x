@@ -186,7 +186,7 @@ int mdnie_current_state(struct mdnie_info *mdnie)
 	return mdnie_mode;
 }
 
-__mockable int mdnie_get_maptbl_index(struct mdnie_info *mdnie)
+__mockable int mdnie_get_decon_maptbl_index(struct mdnie_info *mdnie)
 {
 	int index;
 	int mdnie_mode = mdnie_current_state(mdnie);
@@ -243,11 +243,11 @@ __mockable int mdnie_get_maptbl_index(struct mdnie_info *mdnie)
 
 	return index;
 }
-EXPORT_SYMBOL(mdnie_get_maptbl_index);
+EXPORT_SYMBOL(mdnie_get_decon_maptbl_index);
 
-struct maptbl *mdnie_find_maptbl(struct mdnie_info *mdnie)
+struct maptbl *decon_mdnie_find_maptbl(struct mdnie_info *mdnie)
 {
-	int index = mdnie_get_maptbl_index(mdnie);
+	int index = mdnie_get_decon_maptbl_index(mdnie);
 
 	if (unlikely(index < 0 || index >= MAX_MDNIE_MAPTBL)) {
 		panel_err("failed to find maptbl %d\n", index);
@@ -255,7 +255,7 @@ struct maptbl *mdnie_find_maptbl(struct mdnie_info *mdnie)
 	}
 	return &mdnie->maptbl[index];
 }
-EXPORT_SYMBOL(mdnie_find_maptbl);
+EXPORT_SYMBOL(decon_mdnie_find_maptbl);
 
 struct maptbl *mdnie_find_etc_maptbl(struct mdnie_info *mdnie, int index)
 {
@@ -462,7 +462,7 @@ static int panel_set_mdnie(struct panel_device *panel)
 	return ret;
 }
 
-static void mdnie_maptbl_init(struct mdnie_info *mdnie, int index)
+static void mdnie_decon_maptbl_init(struct mdnie_info *mdnie, int index)
 {
 	int i;
 
@@ -472,16 +472,16 @@ static void mdnie_maptbl_init(struct mdnie_info *mdnie, int index)
 	}
 
 	for (i = 0; i < mdnie->nr_reg; i++)
-		maptbl_init(&mdnie->maptbl[index * mdnie->nr_reg + i]);
+		decon_maptbl_init(&mdnie->maptbl[index * mdnie->nr_reg + i]);
 }
 
-static void scr_white_maptbl_init(struct mdnie_info *mdnie, int index)
+static void scr_white_decon_maptbl_init(struct mdnie_info *mdnie, int index)
 {
 	if ((index + 1) > mdnie->nr_scr_white_maptbl) {
 		panel_err("out of range index %d\n", index);
 		return;
 	}
-	maptbl_init(&mdnie->scr_white_maptbl[index]);
+	decon_maptbl_init(&mdnie->scr_white_maptbl[index]);
 }
 
 static void scr_white_maptbls_init(struct mdnie_info *mdnie)
@@ -489,7 +489,7 @@ static void scr_white_maptbls_init(struct mdnie_info *mdnie)
 	int i;
 
 	for (i = 0; i < mdnie->nr_scr_white_maptbl; i++)
-		maptbl_init(&mdnie->scr_white_maptbl[i]);
+		decon_maptbl_init(&mdnie->scr_white_maptbl[i]);
 }
 
 static void mdnie_update_scr_white_mode(struct mdnie_info *mdnie)
@@ -523,7 +523,7 @@ static void mdnie_update_scr_white_mode(struct mdnie_info *mdnie)
 			scr_white_mode_name[mdnie->props.scr_white_mode]);
 }
 
-int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
+int decon_mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	if (!mdnie)
@@ -540,9 +540,9 @@ int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_def_wrgb);
+EXPORT_SYMBOL(decon_mdnie_set_def_wrgb);
 
-int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
+int decon_mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	if (!mdnie)
@@ -559,22 +559,22 @@ int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_cur_wrgb);
+EXPORT_SYMBOL(decon_mdnie_set_cur_wrgb);
 
-int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
+int decon_mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 		unsigned char *dst, unsigned int stride)
 {
 	if (!mdnie || !dst || !stride)
 		return -EINVAL;
 
-	copy_to_sliced_byte_array(dst,
+	decon_copy_to_sliced_byte_array(dst,
 			mdnie->props.cur_wrgb, 0, MAX_COLOR * stride, stride);
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_cur_wrgb_to_byte_array);
+EXPORT_SYMBOL(decon_mdnie_cur_wrgb_to_byte_array);
 
-int mdnie_update_wrgb(struct mdnie_info *mdnie,
+int decon_mdnie_update_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	unsigned char src[MAX_COLOR] = { r, g, b };
@@ -592,14 +592,14 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 	}
 
 	if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_COLOR_COORDINATE) {
-		mdnie_set_def_wrgb(mdnie, r, g, b);
+		decon_mdnie_set_def_wrgb(mdnie, r, g, b);
 		for_each_color(i) {
 			value = (int)mdnie->props.def_wrgb[i] +
 				(int)((mdnie->props.mode == AUTO) ?
 						mdnie->props.def_wrgb_ofs[i] : 0);
 			dst[i] = min(max(value, 0), 255);
 		}
-		mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
+		decon_mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
 	} else if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_ADJUST_LDU) {
 		for_each_color(i) {
 			value = (int)src[i] + (int)(((mdnie->props.mode == AUTO) &&
@@ -607,9 +607,9 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 						mdnie->props.def_wrgb_ofs[i] : 0);
 			dst[i] = min(max(value, 0), 255);
 		}
-		mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
+		decon_mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
 	} else if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_SENSOR_RGB) {
-		mdnie_set_cur_wrgb(mdnie, r, g, b);
+		decon_mdnie_set_cur_wrgb(mdnie, r, g, b);
 	} else {
 		panel_warn("wrgb is not updated in scr_white_mode(%d)\n",
 				mdnie->props.scr_white_mode);
@@ -617,7 +617,7 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_update_wrgb);
+EXPORT_SYMBOL(decon_mdnie_update_wrgb);
 
 int panel_mdnie_update(struct panel_device *panel)
 {
@@ -814,7 +814,7 @@ static ssize_t accessibility_store(struct device *dev,
 			mdnie->props.scr[i * 2 + 1] = GET_MSB_8BIT(s[i]);
 		}
 		mdnie->props.sz_scr = (ret - 1) * 2;
-		mdnie_maptbl_init(mdnie,
+		mdnie_decon_maptbl_init(mdnie,
 			MAPTBL_IDX_ACCESSIBILITY(mdnie->props.accessibility));
 	}
 	mutex_unlock(&mdnie->lock);
@@ -896,7 +896,7 @@ static ssize_t mdnie_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	struct mdnie_info *mdnie = dev_get_drvdata(dev);
-	int maptbl_index = mdnie_get_maptbl_index(mdnie);
+	int decon_maptbl_index = mdnie_get_decon_maptbl_index(mdnie);
 	int mdnie_mode = mdnie_current_state(mdnie);
 	unsigned int i, len = 0;
 
@@ -907,8 +907,8 @@ static ssize_t mdnie_show(struct device *dev,
 
 	len += snprintf(buf + len, PAGE_SIZE - len,
 			"mdnie %s-mode, maptbl %s(%d)\n",
-			mdnie_mode_name[mdnie_mode], (maptbl_index < 0) ?
-			"invalid" : mdnie_maptbl_name[maptbl_index], maptbl_index);
+			mdnie_mode_name[mdnie_mode], (decon_maptbl_index < 0) ?
+			"invalid" : mdnie_maptbl_name[decon_maptbl_index], decon_maptbl_index);
 	len += snprintf(buf + len, PAGE_SIZE - len,
 			"accessibility %s(%d), hdr %d, hmd %d, hbm %d\n",
 			accessibility_name[mdnie->props.accessibility],
@@ -1013,7 +1013,7 @@ static ssize_t sensorRGB_store(struct device *dev,
 		mdnie->props.ssr_wrgb[1] = white_green;
 		mdnie->props.ssr_wrgb[2] = white_blue;
 		mdnie->props.update_sensorRGB = true;
-		scr_white_maptbl_init(mdnie, MDNIE_SENSOR_RGB_MAPTBL);
+		scr_white_decon_maptbl_init(mdnie, MDNIE_SENSOR_RGB_MAPTBL);
 		mutex_unlock(&mdnie->lock);
 		mdnie_update(mdnie);
 	}
@@ -1093,7 +1093,7 @@ static ssize_t night_mode_store(struct device *dev,
 	mdnie->props.night_level = level;
 	if (enable) {
 		/* MDNIE_NIGHT_MAPTBL update using MDNIE_ETC_NIGHT_MAPTBL */
-		mdnie_maptbl_init(mdnie, MDNIE_NIGHT_MAPTBL);
+		mdnie_decon_maptbl_init(mdnie, MDNIE_NIGHT_MAPTBL);
 	}
 	mutex_unlock(&mdnie->lock);
 	mdnie_update(mdnie);
@@ -1137,7 +1137,7 @@ static ssize_t color_lens_store(struct device *dev,
 	mdnie->props.color_lens_level = level;
 	if (enable) {
 		/* MDNIE_COLOR_LENS_MAPTBL update using MDNIE_ETC_COLOR_LENS_MAPTBL */
-		mdnie_maptbl_init(mdnie, MDNIE_COLOR_LENS_MAPTBL);
+		mdnie_decon_maptbl_init(mdnie, MDNIE_COLOR_LENS_MAPTBL);
 	}
 	mutex_unlock(&mdnie->lock);
 	mdnie_update(mdnie);
@@ -1477,30 +1477,30 @@ static int dpui_notifier_callback(struct notifier_block *self,
 	resource_copy_by_name(panel_data, coordinate, "coordinate");
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			(coordinate[0] << 8) | coordinate[1]);
-	set_dpui_field(DPUI_KEY_WCRD_X, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WCRD_X, tbuf, size);
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			(coordinate[2] << 8) | coordinate[3]);
-	set_dpui_field(DPUI_KEY_WCRD_Y, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WCRD_Y, tbuf, size);
 
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			mdnie->props.def_wrgb_ofs[0]);
-	set_dpui_field(DPUI_KEY_WOFS_R, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_R, tbuf, size);
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			mdnie->props.def_wrgb_ofs[1]);
-	set_dpui_field(DPUI_KEY_WOFS_G, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_G, tbuf, size);
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			mdnie->props.def_wrgb_ofs[2]);
-	set_dpui_field(DPUI_KEY_WOFS_B, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_B, tbuf, size);
 
 #if 0 /* disable for GKI build */
 	mdnie_get_efs(MDNIE_WOFS_ORG_PATH, def_wrgb_ofs_org);
 
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", def_wrgb_ofs_org[0]);
-	set_dpui_field(DPUI_KEY_WOFS_R_ORG, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_R_ORG, tbuf, size);
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", def_wrgb_ofs_org[1]);
-	set_dpui_field(DPUI_KEY_WOFS_G_ORG, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_G_ORG, tbuf, size);
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", def_wrgb_ofs_org[2]);
-	set_dpui_field(DPUI_KEY_WOFS_B_ORG, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_WOFS_B_ORG, tbuf, size);
 #endif
 
 	mutex_unlock(&mdnie->lock);
@@ -1512,12 +1512,12 @@ static int mdnie_register_dpui(struct mdnie_info *mdnie)
 {
 	memset(&mdnie->dpui_notif, 0, sizeof(mdnie->dpui_notif));
 	mdnie->dpui_notif.notifier_call = dpui_notifier_callback;
-	return dpui_logging_register(&mdnie->dpui_notif, DPUI_TYPE_PANEL);
+	return decon_dpui_logging_register(&mdnie->dpui_notif, DPUI_TYPE_PANEL);
 }
 
 static int mdnie_unregister_dpui(struct mdnie_info *mdnie)
 {
-	dpui_logging_unregister(&mdnie->dpui_notif);
+	decon_dpui_logging_unregister(&mdnie->dpui_notif);
 	mdnie->dpui_notif.notifier_call = NULL;
 
 	return 0;
@@ -1603,23 +1603,23 @@ __visible_for_testing int mdnie_init_maptbls(struct mdnie_info *mdnie)
 
 	for (i = 0; i < mdnie->nr_etc_maptbl; i++) {
 		mdnie->etc_maptbl[i].pdata = mdnie;
-		maptbl_init(&mdnie->etc_maptbl[i]);
+		decon_maptbl_init(&mdnie->etc_maptbl[i]);
 	}
 
 	for (i = 0; i < mdnie->nr_maptbl; i++) {
 		mdnie->maptbl[i].pdata = mdnie;
-		maptbl_init(&mdnie->maptbl[i]);
+		decon_maptbl_init(&mdnie->maptbl[i]);
 	}
 
 	for (i = 0; i < mdnie->nr_scr_white_maptbl; i++) {
 		mdnie->scr_white_maptbl[i].pdata = mdnie;
-		maptbl_init(&mdnie->scr_white_maptbl[i]);
+		decon_maptbl_init(&mdnie->scr_white_maptbl[i]);
 	}
 
 #ifdef CONFIG_SUPPORT_AFC
 	for (i = 0; i < mdnie->nr_afc_maptbl; i++) {
 		mdnie->afc_maptbl[i].pdata = mdnie;
-		maptbl_init(&mdnie->afc_maptbl[i]);
+		decon_maptbl_init(&mdnie->afc_maptbl[i]);
 	}
 #endif
 

@@ -62,13 +62,13 @@ int generate_brt_step_table(struct brightness_table *brt_tbl)
 	while (i < brt_tbl->sz_brt_to_step) {
 		for (k = 1; k < brt_tbl->sz_brt; k++) {
 			for (j = 1; j <= brt_tbl->step_cnt[k]; j++, i++) {
-				brt_tbl->brt_to_step[i] = disp_interpolation64(brt_tbl->brt[k - 1] * disp_pow(10, 2),
-					brt_tbl->brt[k] * disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
-				brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
-				brt_tbl->brt_to_step[i] = disp_div64(brt_tbl->brt_to_step[i], disp_pow(10, 2));
+				brt_tbl->brt_to_step[i] = decon_disp_interpolation64(brt_tbl->brt[k - 1] * decon_disp_pow(10, 2),
+					brt_tbl->brt[k] * decon_disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
+				brt_tbl->brt_to_step[i] = decon_disp_pow_round(brt_tbl->brt_to_step[i], 2);
+				brt_tbl->brt_to_step[i] = decon_disp_div64(brt_tbl->brt_to_step[i], decon_disp_pow(10, 2));
 				if (brt_tbl->brt[brt_tbl->sz_brt - 1] < brt_tbl->brt_to_step[i]) {
 
-					brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
+					brt_tbl->brt_to_step[i] = decon_disp_pow_round(brt_tbl->brt_to_step[i], 2);
 				}
 				if (i >= brt_tbl->sz_brt_to_step) {
 					panel_err("step cnt over %d %d\n", i, brt_tbl->sz_brt_to_step);
@@ -138,10 +138,10 @@ int getidx_hbm_transition_table(struct maptbl *tbl)
 	panel_data = &panel->panel_data;
 	panel_bl = &panel->panel_bl;
 
-	layer = is_hbm_brightness(panel_bl, panel_bl->props.brightness);
+	layer = decon_is_hbm_brightness(panel_bl, panel_bl->props.brightness);
 	row = panel_bl->props.smooth_transition;
 
-	return maptbl_index(tbl, layer, row, 0);
+	return decon_maptbl_index(tbl, layer, row, 0);
 }
 
 int getidx_smooth_transition_table(struct maptbl *tbl)
@@ -161,7 +161,7 @@ int getidx_smooth_transition_table(struct maptbl *tbl)
 
 	row = panel_bl->props.smooth_transition;
 
-	return maptbl_index(tbl, 0, row, 0);
+	return decon_maptbl_index(tbl, 0, row, 0);
 }
 
 int getidx_acl_onoff_table(struct maptbl *tbl)
@@ -173,7 +173,7 @@ int getidx_acl_onoff_table(struct maptbl *tbl)
 		return -EINVAL;
 	}
 
-	return maptbl_index(tbl, 0, panel_bl_get_acl_pwrsave(&panel->panel_bl), 0);
+	return decon_maptbl_index(tbl, 0, decon_panel_bl_get_acl_pwrsave(&panel->panel_bl), 0);
 }
 
 int getidx_hbm_onoff_table(struct maptbl *tbl)
@@ -188,8 +188,8 @@ int getidx_hbm_onoff_table(struct maptbl *tbl)
 
 	panel_bl = &panel->panel_bl;
 
-	return maptbl_index(tbl, 0,
-			is_hbm_brightness(panel_bl, panel_bl->props.brightness), 0);
+	return decon_maptbl_index(tbl, 0,
+			decon_is_hbm_brightness(panel_bl, panel_bl->props.brightness), 0);
 }
 
 int getidx_acl_dim_onoff_table(struct maptbl *tbl)
@@ -205,10 +205,10 @@ int getidx_acl_dim_onoff_table(struct maptbl *tbl)
 	panel_bl = &panel->panel_bl;
 
 #ifdef CONFIG_SUPPORT_MASK_LAYER
-	return maptbl_index(tbl, 0,
+	return decon_maptbl_index(tbl, 0,
 			 panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON ? false : true , 0);
 #else
-	return maptbl_index(tbl, 0, 0, 0);
+	return decon_maptbl_index(tbl, 0, 0, 0);
 #endif
 }
 
@@ -225,22 +225,22 @@ int getidx_acl_opr_table(struct maptbl *tbl)
 
 	panel_bl = &panel->panel_bl;
 
-	if (panel_bl_get_acl_pwrsave(&panel->panel_bl) == ACL_PWRSAVE_OFF) {
+	if (decon_panel_bl_get_acl_pwrsave(&panel->panel_bl) == ACL_PWRSAVE_OFF) {
 		row = S6E8FC3_ACL_OPR_0;
 	} else {
 		/* adaptive_control : 0~1 */
 		/* HBM : 8% */
 		/* NORMAL : 8% */
-		row = panel_bl_get_acl_opr(&panel->panel_bl);
+		row = decon_panel_bl_get_acl_opr(&panel->panel_bl);
 		if (row) {
-			if (is_hbm_brightness(panel_bl, panel_bl->props.brightness))
+			if (decon_is_hbm_brightness(panel_bl, panel_bl->props.brightness))
 				row = S6E8FC3_ACL_OPR_1; /* HBM : 8% */
 			else
 				row = S6E8FC3_ACL_OPR_1; /* NORMAL : 8% */
 		}
 	}
 
-	return maptbl_index(tbl, 0, row, 0);
+	return decon_maptbl_index(tbl, 0, row, 0);
 }
 
 int getidx_s6e8fc3_vrr_fps(int vrr_fps)
@@ -269,7 +269,7 @@ int getidx_s6e8fc3_current_vrr_fps(struct panel_device *panel)
 {
 	int vrr_fps;
 
-	vrr_fps = get_panel_refresh_rate(panel);
+	vrr_fps = decon_get_panel_refresh_rate(panel);
 	if (vrr_fps < 0)
 		return -EINVAL;
 
@@ -287,7 +287,7 @@ int getidx_vrr_fps_table(struct maptbl *tbl)
 	else
 		row = index;
 
-	return maptbl_index(tbl, layer, row, 0);
+	return decon_maptbl_index(tbl, layer, row, 0);
 }
 
 #if defined(__PANEL_NOT_USED_VARIABLE__)
@@ -320,7 +320,7 @@ int getidx_vrr_gamma_table(struct maptbl *tbl)
 		break;
 	}
 
-	return maptbl_index(tbl, layer, row, 0);
+	return decon_maptbl_index(tbl, layer, row, 0);
 }
 #endif
 
@@ -341,7 +341,7 @@ void copy_common_maptbl(struct maptbl *tbl, u8 *dst)
 		return;
 	}
 
-	idx = maptbl_getidx(tbl);
+	idx = decon_maptbl_getidx(tbl);
 	if (idx < 0) {
 		panel_err("failed to getidx %d\n", idx);
 		return;
@@ -370,7 +370,7 @@ int getidx_fast_discharge_table(struct maptbl *tbl)
 	row = ((panel_data->props.enable_fd) ? 1 : 0);
 	panel_info("fast_discharge %d\n", row);
 
-	return maptbl_index(tbl, 0, row, 0);
+	return decon_maptbl_index(tbl, 0, row, 0);
 }
 #endif
 
@@ -416,7 +416,7 @@ int getidx_mdnie_scenario_maptbl(struct maptbl *tbl)
 
 	mdnie = tbl->pdata;
 
-	return maptbl_get_indexof_row(tbl, mdnie->props.mode);
+	return decon_maptbl_get_indexof_row(tbl, mdnie->props.mode);
 }
 
 int getidx_mdnie_hdr_maptbl(struct maptbl *tbl)
@@ -428,7 +428,7 @@ int getidx_mdnie_hdr_maptbl(struct maptbl *tbl)
 
 	mdnie = tbl->pdata;
 
-	return maptbl_get_indexof_row(tbl, mdnie->props.hdr);
+	return decon_maptbl_get_indexof_row(tbl, mdnie->props.hdr);
 }
 
 int getidx_mdnie_night_mode_maptbl(struct maptbl *tbl)
@@ -444,7 +444,7 @@ int getidx_mdnie_night_mode_maptbl(struct maptbl *tbl)
 	if (mdnie->props.mode != AUTO)
 		mode = NIGHT_MODE_ON;
 
-	return maptbl_index(tbl, mode, mdnie->props.night_level, 0);
+	return decon_maptbl_index(tbl, mode, mdnie->props.night_level, 0);
 }
 
 int init_mdnie_night_mode_table(struct maptbl *tbl)
@@ -470,7 +470,7 @@ int init_mdnie_night_mode_table(struct maptbl *tbl)
 		return -EINVAL;
 	}
 
-	maptbl_copy(night_maptbl, &tbl->arr[S6E8FC3_NIGHT_MODE_OFS]);
+	decon_maptbl_copy(night_maptbl, &tbl->arr[S6E8FC3_NIGHT_MODE_OFS]);
 
 	return 0;
 }
@@ -499,7 +499,7 @@ int init_mdnie_color_lens_table(struct maptbl *tbl)
 	}
 
 	if (IS_COLOR_LENS_MODE(mdnie))
-		maptbl_copy(color_lens_maptbl, &tbl->arr[S6E8FC3_COLOR_LENS_OFS]);
+		decon_maptbl_copy(color_lens_maptbl, &tbl->arr[S6E8FC3_COLOR_LENS_OFS]);
 
 	return 0;
 }
@@ -546,7 +546,7 @@ int init_color_coordinate_table(struct maptbl *tbl)
 	}
 
 	maptbl_for_each(tbl, index) {
-		if (maptbl_index_to_pos(tbl, index, &pos) < 0)
+		if (decon_decon_maptbl_index_to_pos(tbl, index, &pos) < 0)
 			return -EINVAL;
 
 		type = pos.index[NDARR_2D];
@@ -580,7 +580,7 @@ int init_sensor_rgb_table(struct maptbl *tbl)
 	}
 
 	maptbl_for_each(tbl, index) {
-		if (maptbl_index_to_pos(tbl, index, &pos) < 0)
+		if (decon_decon_maptbl_index_to_pos(tbl, index, &pos) < 0)
 			return -EINVAL;
 
 		indexof_column = pos.index[NDARR_1D];
@@ -608,7 +608,7 @@ int getidx_color_coordinate_maptbl(struct maptbl *tbl)
 		panel_err("out of mode range %d\n", mdnie->props.mode);
 		return -EINVAL;
 	}
-	return maptbl_index(tbl, 0, wcrd_type[mdnie->props.mode], 0);
+	return decon_maptbl_index(tbl, 0, wcrd_type[mdnie->props.mode], 0);
 }
 
 int getidx_adjust_ldu_maptbl(struct maptbl *tbl)
@@ -634,7 +634,7 @@ int getidx_adjust_ldu_maptbl(struct maptbl *tbl)
 		return -EINVAL;
 	}
 
-	return maptbl_index(tbl, wcrd_type[mdnie->props.mode], mdnie->props.ldu, 0);
+	return decon_maptbl_index(tbl, wcrd_type[mdnie->props.mode], mdnie->props.ldu, 0);
 }
 
 int getidx_color_lens_maptbl(struct maptbl *tbl)
@@ -659,7 +659,7 @@ int getidx_color_lens_maptbl(struct maptbl *tbl)
 		return -EINVAL;
 	}
 
-	return maptbl_index(tbl, mdnie->props.color_lens_color, mdnie->props.color_lens_level, 0);
+	return decon_maptbl_index(tbl, mdnie->props.color_lens_color, mdnie->props.color_lens_level, 0);
 }
 
 void copy_scr_white_maptbl(struct maptbl *tbl, u8 *dst)
@@ -676,15 +676,15 @@ void copy_scr_white_maptbl(struct maptbl *tbl, u8 *dst)
 		return;
 	}
 
-	idx = maptbl_getidx(tbl);
+	idx = decon_maptbl_getidx(tbl);
 	if (idx < 0 || (idx + MAX_COLOR > maptbl_get_sizeof_maptbl(tbl))) {
 		panel_err("invalid index %d\n", idx);
 		return;
 	}
 
-	mdnie_update_wrgb(mdnie, tbl->arr[idx + RED],
+	decon_mdnie_update_wrgb(mdnie, tbl->arr[idx + RED],
 			tbl->arr[idx + GREEN], tbl->arr[idx + BLUE]);
-	mdnie_cur_wrgb_to_byte_array(mdnie, dst, 1);
+	decon_mdnie_cur_wrgb_to_byte_array(mdnie, dst, 1);
 }
 
 int getidx_mdnie_maptbl(struct pkt_update_info *pktui, int offset)
@@ -704,7 +704,7 @@ int getidx_mdnie_maptbl(struct pkt_update_info *pktui, int offset)
 		return -EINVAL;
 	}
 
-	row = mdnie_get_maptbl_index(mdnie);
+	row = mdnie_get_decon_maptbl_index(mdnie);
 	if (row < 0) {
 		panel_err("invalid row %d\n", row);
 		return -EINVAL;
@@ -977,7 +977,7 @@ int show_err_fg(struct dumpinfo *info)
 		panel_info("* VLOUT3 Error\n");
 //Todo
 #ifdef CONFIG_DISPLAY_USE_INFO
-		inc_dpui_u32_field(DPUI_KEY_PNVLO3E, 1);
+		decon_inc_dpui_u32_field(DPUI_KEY_PNVLO3E, 1);
 #endif
 	}
 
@@ -985,7 +985,7 @@ int show_err_fg(struct dumpinfo *info)
 		panel_info("* ELVDD Error\n");
 //Todo
 #ifdef CONFIG_DISPLAY_USE_INFO
-		inc_dpui_u32_field(DPUI_KEY_PNELVDE, 1);
+		decon_inc_dpui_u32_field(DPUI_KEY_PNELVDE, 1);
 #endif
 	}
 
@@ -993,7 +993,7 @@ int show_err_fg(struct dumpinfo *info)
 		panel_info("* VLIN1 Error\n");
 //Todo
 #ifdef CONFIG_DISPLAY_USE_INFO
-		inc_dpui_u32_field(DPUI_KEY_PNVLI1E, 1);
+		decon_inc_dpui_u32_field(DPUI_KEY_PNVLI1E, 1);
 #endif
 	}
 
@@ -1027,7 +1027,7 @@ int show_dsi_err(struct dumpinfo *info)
 	panel_info("====================================================\n");
 //Todo
 #ifdef CONFIG_DISPLAY_USE_INFO
-	inc_dpui_u32_field(DPUI_KEY_PNDSIE, dsi_err[0]);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNDSIE, dsi_err[0]);
 #endif
 #if IS_ENABLED(CONFIG_SEC_ABC)
 	if (dsi_err[0] > 0)
@@ -1064,7 +1064,7 @@ int show_self_diag(struct dumpinfo *info)
 	panel_info("=====================================================\n");
 //Todo
 #ifdef CONFIG_DISPLAY_USE_INFO
-	inc_dpui_u32_field(DPUI_KEY_PNSDRE, (self_diag[0] & 0x40) ? 0 : 1);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNSDRE, (self_diag[0] & 0x40) ? 0 : 1);
 #endif
 
 	return 0;
@@ -1171,9 +1171,9 @@ int getidx_gamma_mode2_brt_table(struct maptbl *tbl)
 	panel_bl = &panel->panel_bl;
 	panel_data = &panel->panel_data;
 
-	row = get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
+	row = decon_get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
 
-	return maptbl_index(tbl, 0, row, 0);
+	return decon_maptbl_index(tbl, 0, row, 0);
 }
 
 bool s6e8fc3_is_90hz(struct panel_device *panel)

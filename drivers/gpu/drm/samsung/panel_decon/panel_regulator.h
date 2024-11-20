@@ -49,8 +49,8 @@ int panel_regulator_helper_enable(struct panel_regulator *regulator);
 int panel_regulator_helper_disable(struct panel_regulator *regulator);
 int panel_regulator_helper_set_voltage(struct panel_regulator *regulator, int uV);
 int panel_regulator_helper_set_current_limit(struct panel_regulator *regulator, int uA);
-int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator);
-struct panel_regulator *panel_regulator_create(void);
-void panel_regulator_destroy(struct panel_regulator *regulator);
+int decon_of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator);
+struct panel_regulator *decon_panel_regulator_create(void);
+void decon_panel_regulator_destroy(struct panel_regulator *regulator);
 
 #endif /* __PANEL_REGULATOR_H__ */

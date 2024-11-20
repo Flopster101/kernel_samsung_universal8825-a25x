@@ -676,7 +676,7 @@ static int poc_get_poc_ctrl(struct panel_device *panel)
 
 	mutex_lock(&panel->op_lock);
 	panel_set_key(panel, 3, true);
-	ret = panel_resource_update_by_name(panel, "poc_ctrl");
+	ret = decon_panel_resource_update_by_name(panel, "poc_ctrl");
 	panel_set_key(panel, 3, false);
 	mutex_unlock(&panel->op_lock);
 	if (unlikely(ret < 0)) {
@@ -944,7 +944,7 @@ int get_poc_partition_size(struct panel_poc_device *poc_dev, int index)
 	return poc_dev->partition[index].size;
 }
 
-int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
+int decon_check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
 {
 	int ret;
 
@@ -957,9 +957,9 @@ int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
 
 	return poc_dev->partition[index].write_check;
 }
-EXPORT_SYMBOL(check_poc_partition_exists);
+EXPORT_SYMBOL(decon_check_poc_partition_exists);
 
-int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
+int decon_get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 		u32 *chksum_ok, u32 *chksum_by_calc, u32 *chksum_by_read)
 {
 	int ret;
@@ -984,7 +984,7 @@ int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 
 	return 0;
 }
-EXPORT_SYMBOL(get_poc_partition_chksum);
+EXPORT_SYMBOL(decon_get_poc_partition_chksum);
 
 int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index)
 {
@@ -993,7 +993,7 @@ int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index)
 	int chksum_by_read;
 	int chksum_by_calc;
 
-	ret = get_poc_partition_chksum(poc_dev, index,
+	ret = decon_get_poc_partition_chksum(poc_dev, index,
 			&chksum_ok, &chksum_by_calc, &chksum_by_read);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to get chksum (partition:%d, ret:%d)\n", index, ret);
@@ -1059,7 +1059,7 @@ int copy_poc_partition(struct panel_poc_device *poc_dev, u8 *dst,
 	return size;
 }
 
-int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
+int decon_set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 {
 	struct panel_poc_info *poc_info = &poc_dev->poc_info;
 	struct panel_device *panel = to_panel_device(poc_dev);
@@ -1311,7 +1311,7 @@ int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 
 	return 0;
 };
-EXPORT_SYMBOL(set_panel_poc);
+EXPORT_SYMBOL(decon_set_panel_poc);
 
 #ifdef CONFIG_SUPPORT_POC_FLASH
 static long panel_poc_ioctl(struct file *file, unsigned int cmd,
@@ -1344,9 +1344,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_CHKSUM:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+		ret = decon_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error decon_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1357,9 +1357,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_CSDATA:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+		ret = decon_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error decon_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1377,9 +1377,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_FLASHED:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
+		ret = decon_set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error decon_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1390,9 +1390,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_SET_POC_ERASE:
-		ret = set_panel_poc(poc_dev, POC_OP_ERASE, NULL);
+		ret = decon_set_panel_poc(poc_dev, POC_OP_ERASE, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error decon_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1429,7 +1429,7 @@ static int panel_poc_open(struct inode *inode, struct file *file)
 
 	mutex_lock(&panel->io_lock);
 
-	ret = set_panel_poc(poc_dev, POC_OP_INITIALIZE, NULL);
+	ret = decon_set_panel_poc(poc_dev, POC_OP_INITIALIZE, NULL);
 	if (ret < 0)
 		goto err_open;
 
@@ -1491,7 +1491,7 @@ static int panel_poc_release(struct inode *inode, struct file *file)
 	poc_dev->opened = 0;
 	atomic_set(&poc_dev->cancel, 0);
 
-	ret = set_panel_poc(poc_dev, POC_OP_UNINITIALIZE, NULL);
+	ret = decon_set_panel_poc(poc_dev, POC_OP_UNINITIALIZE, NULL);
 	if (ret < 0)
 		panel_err("failed to uninitialize %d\n", ret);
 
@@ -1560,7 +1560,7 @@ static ssize_t panel_poc_read(struct file *file, char __user *buf, size_t count,
 	}
 	poc_info->rsize = (u32)count;
 
-	res = set_panel_poc(poc_dev, POC_OP_READ, NULL);
+	res = decon_set_panel_poc(poc_dev, POC_OP_READ, NULL);
 	if (res < 0)
 		goto err_read;
 
@@ -1649,7 +1649,7 @@ static ssize_t panel_poc_write(struct file *file, const char __user *buf,
 
 	panel_info("write %ld bytes (count %ld)\n", res, count);
 
-	res = set_panel_poc(poc_dev, POC_OP_WRITE, NULL);
+	res = decon_set_panel_poc(poc_dev, POC_OP_WRITE, NULL);
 	if (res < 0)
 		goto err_write;
 	mutex_unlock(&panel->io_lock);
@@ -1898,39 +1898,39 @@ static int poc_dpui_callback(struct panel_poc_device *poc_dev)
 	if (ret < 0)
 		poc_info->total_trycount = (ret > -MAX_EPOCEFS) ? ret : -1;
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", poc_info->total_trycount);
-	set_dpui_field(DPUI_KEY_PNPOCT, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_PNPOCT, tbuf, size);
 
 	ret = poc_get_efs_count(POC_TOTAL_FAIL_COUNT_FILE_PATH, &poc_info->total_failcount);
 	if (ret < 0)
 		poc_info->total_failcount = (ret > -MAX_EPOCEFS) ? ret : -1;
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", poc_info->total_failcount);
-	set_dpui_field(DPUI_KEY_PNPOCF, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_PNPOCF, tbuf, size);
 
 	ret = poc_get_efs_image_index_org(POC_INFO_FILE_PATH, &poci_org);
 	if (ret < 0)
 		poci_org = -EPOCEFS_IMGIDX + ret;
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", poci_org);
-	set_dpui_field(DPUI_KEY_PNPOCI_ORG, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_PNPOCI_ORG, tbuf, size);
 
 	ret = poc_get_efs_image_index(POC_USER_FILE_PATH, &poci);
 	if (ret < 0)
 		poci = -EPOCEFS_IMGIDX + ret;
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", poci);
-	set_dpui_field(DPUI_KEY_PNPOCI, tbuf, size);
+	decon_set_dpui_field(DPUI_KEY_PNPOCI, tbuf, size);
 
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_ER_TRY, poc_info->erase_trycount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_ER_TRY, poc_info->erase_trycount);
 	poc_info->erase_trycount = 0;
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_ER_FAIL, poc_info->erase_failcount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_ER_FAIL, poc_info->erase_failcount);
 	poc_info->erase_failcount = 0;
 
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_WR_TRY, poc_info->write_trycount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_WR_TRY, poc_info->write_trycount);
 	poc_info->write_trycount = 0;
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_WR_FAIL, poc_info->write_failcount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_WR_FAIL, poc_info->write_failcount);
 	poc_info->write_failcount = 0;
 
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_RD_TRY, poc_info->read_trycount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_RD_TRY, poc_info->read_trycount);
 	poc_info->read_trycount = 0;
-	inc_dpui_u32_field(DPUI_KEY_PNPOC_RD_FAIL, poc_info->read_failcount);
+	decon_inc_dpui_u32_field(DPUI_KEY_PNPOC_RD_FAIL, poc_info->read_failcount);
 	poc_info->read_failcount = 0;
 
 	return 0;
@@ -2003,7 +2003,7 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 	poc_dev->opened = 0;
 
 	for (i = 0; i < poc_dev->nr_maptbl; i++)
-		maptbl_init(&poc_dev->maptbl[i]);
+		decon_maptbl_init(&poc_dev->maptbl[i]);
 
 	for (i = 0; i < poc_dev->nr_partition; i++) {
 		poc_dev->partition[i].preload_done = false;
@@ -2032,7 +2032,7 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 
 	if (!initialized) {
 		poc_dev->poc_notif.notifier_call = poc_notifier_callback;
-		ret = dpui_logging_register(&poc_dev->poc_notif, DPUI_TYPE_PANEL);
+		ret = decon_dpui_logging_register(&poc_dev->poc_notif, DPUI_TYPE_PANEL);
 		if (ret) {
 			panel_err("failed to register dpui notifier callback\n");
 			goto exit_probe;
@@ -2042,7 +2042,7 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 
 	for (i = 0; i < poc_dev->nr_partition; i++) {
 		if (poc_dev->partition[i].need_preload) {
-			exists = check_poc_partition_exists(poc_dev, i);
+			exists = decon_check_poc_partition_exists(poc_dev, i);
 			if (exists < 0) {
 				panel_err("failed to check partition(%d)\n", i);
 				ret = exists;

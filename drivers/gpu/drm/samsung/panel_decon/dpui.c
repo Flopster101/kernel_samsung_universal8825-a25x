@@ -118,25 +118,25 @@ static struct dpui_info dpui = {
 };
 
 /**
- * dpui_logging_notify - notify clients of fb_events
+ * decon_dpui_logging_notify - notify clients of fb_events
  * @val: dpui log type
  * @v : data
  *
  */
-void dpui_logging_notify(unsigned long val, enum dpui_type type, void *v)
+void decon_dpui_logging_notify(unsigned long val, enum dpui_type type, void *v)
 {
 	if (type == DPUI_TYPE_CTRL)
 		blocking_notifier_call_chain(&dpci_notifier_list, val, v);
 	else
 		blocking_notifier_call_chain(&dpui_notifier_list, val, v);
 }
-EXPORT_SYMBOL_GPL(dpui_logging_notify);
+EXPORT_SYMBOL_GPL(decon_dpui_logging_notify);
 
 /**
- *	dpui_logging_register - register a client notifier
+ *	decon_dpui_logging_register - register a client notifier
  *	@n: notifier block to callback on events
  */
-int dpui_logging_register(struct notifier_block *n, enum dpui_type type)
+int decon_dpui_logging_register(struct notifier_block *n, enum dpui_type type)
 {
 	int ret;
 
@@ -157,36 +157,36 @@ int dpui_logging_register(struct notifier_block *n, enum dpui_type type)
 	panel_info("register type %s\n", dpui_type_name[type]);
 	return 0;
 }
-EXPORT_SYMBOL_GPL(dpui_logging_register);
+EXPORT_SYMBOL_GPL(decon_dpui_logging_register);
 
 /**
- *	dpui_logging_unregister - unregister a client notifier
+ *	decon_dpui_logging_unregister - unregister a client notifier
  *	@n: notifier block to callback on events
  */
-int dpui_logging_unregister(struct notifier_block *n)
+int decon_dpui_logging_unregister(struct notifier_block *n)
 {
 	return blocking_notifier_chain_unregister(&dpui_notifier_list, n);
 }
-EXPORT_SYMBOL_GPL(dpui_logging_unregister);
+EXPORT_SYMBOL_GPL(decon_dpui_logging_unregister);
 
 static bool is_dpui_var_u32(enum dpui_key key)
 {
 	return (dpui.field[key].var_type == DPUI_VAR_U32);
 }
 
-void update_dpui_log(enum dpui_log_level level, enum dpui_type type)
+void decon_update_dpui_log(enum dpui_log_level level, enum dpui_type type)
 {
 	if (level < 0 || level >= MAX_DPUI_LOG_LEVEL) {
 		panel_err("invalid log level %d\n", level);
 		return;
 	}
 
-	dpui_logging_notify(level, type, &dpui);
+	decon_dpui_logging_notify(level, type, &dpui);
 	panel_info("update dpui log(%d) done\n", level);
 }
-EXPORT_SYMBOL_GPL(update_dpui_log);
+EXPORT_SYMBOL_GPL(decon_update_dpui_log);
 
-void clear_dpui_log(enum dpui_log_level level, enum dpui_type type)
+void decon_clear_dpui_log(enum dpui_log_level level, enum dpui_type type)
 {
 	size_t i;
 
@@ -206,7 +206,7 @@ void clear_dpui_log(enum dpui_log_level level, enum dpui_type type)
 
 	panel_info("clear dpui log(%d) done\n", level);
 }
-EXPORT_SYMBOL_GPL(clear_dpui_log);
+EXPORT_SYMBOL_GPL(decon_clear_dpui_log);
 
 static int __get_dpui_field(enum dpui_key key, char *buf)
 {
@@ -230,7 +230,7 @@ static int __get_dpui_field(enum dpui_key key, char *buf)
 			"\"%s\":\"%s\"", dpui_key_name[key], dpui.field[key].buf);
 }
 
-void print_dpui_field(enum dpui_key key)
+void decon_print_dpui_field(enum dpui_key key)
 {
 	char tbuf[MAX_DPUI_KEY_LEN + MAX_DPUI_VAL_LEN];
 
@@ -242,9 +242,9 @@ void print_dpui_field(enum dpui_key key)
 	__get_dpui_field(key, tbuf);
 	panel_info("%s\n", tbuf);
 }
-EXPORT_SYMBOL_GPL(print_dpui_field);
+EXPORT_SYMBOL_GPL(decon_print_dpui_field);
 
-static int __set_dpui_field(enum dpui_key key, char *buf, int size)
+static int __decon_set_dpui_field(enum dpui_key key, char *buf, int size)
 {
 	if (!buf) {
 		panel_err("buf is null\n");
@@ -267,7 +267,7 @@ static int __set_dpui_field(enum dpui_key key, char *buf, int size)
 	return 0;
 }
 
-static int __get_dpui_u32_field(enum dpui_key key, u32 *value)
+static int __decon_get_dpui_u32_field(enum dpui_key key, u32 *value)
 {
 	int rc, cur_val;
 
@@ -292,7 +292,7 @@ static int __get_dpui_u32_field(enum dpui_key key, u32 *value)
 	return 0;
 }
 
-static int __set_dpui_u32_field(enum dpui_key key, u32 value)
+static int __decon_set_dpui_u32_field(enum dpui_key key, u32 value)
 {
 	char tbuf[MAX_DPUI_VAL_LEN];
 	int size;
@@ -312,12 +312,12 @@ static int __set_dpui_u32_field(enum dpui_key key, u32 value)
 		panel_err("exceed dpui value size (%d)\n", size);
 		return -EINVAL;
 	}
-	__set_dpui_field(key, tbuf, size);
+	__decon_set_dpui_field(key, tbuf, size);
 
 	return 0;
 }
 
-static int __inc_dpui_u32_field(enum dpui_key key, u32 value)
+static int __decon_inc_dpui_u32_field(enum dpui_key key, u32 value)
 {
 	int ret;
 	u32 cur_val = 0;
@@ -333,14 +333,14 @@ static int __inc_dpui_u32_field(enum dpui_key key, u32 value)
 	}
 
 	if (dpui.field[key].initialized) {
-		ret = __get_dpui_u32_field(key, &cur_val);
+		ret = __decon_get_dpui_u32_field(key, &cur_val);
 		if (ret < 0) {
 			panel_err("failed to get u32 field (%d)\n", ret);
 			return -EINVAL;
 		}
 	}
 
-	__set_dpui_u32_field(key, cur_val + value);
+	__decon_set_dpui_u32_field(key, cur_val + value);
 
 	return 0;
 }
@@ -356,55 +356,55 @@ int get_dpui_field(enum dpui_key key, char *buf)
 	return ret;
 }
 
-int set_dpui_field(enum dpui_key key, char *buf, int size)
+int decon_set_dpui_field(enum dpui_key key, char *buf, int size)
 {
 	int ret;
 
 	mutex_lock(&dpui_lock);
-	ret = __set_dpui_field(key, buf, size);
+	ret = __decon_set_dpui_field(key, buf, size);
 	mutex_unlock(&dpui_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(set_dpui_field);
+EXPORT_SYMBOL_GPL(decon_set_dpui_field);
 
-int get_dpui_u32_field(enum dpui_key key, u32 *value)
+int decon_get_dpui_u32_field(enum dpui_key key, u32 *value)
 {
 	int ret;
 
 	mutex_lock(&dpui_lock);
-	ret = __get_dpui_u32_field(key, value);
+	ret = __decon_get_dpui_u32_field(key, value);
 	mutex_unlock(&dpui_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(get_dpui_u32_field);
+EXPORT_SYMBOL_GPL(decon_get_dpui_u32_field);
 
-int set_dpui_u32_field(enum dpui_key key, u32 value)
+int decon_set_dpui_u32_field(enum dpui_key key, u32 value)
 {
 	int ret;
 
 	mutex_lock(&dpui_lock);
-	ret = __set_dpui_u32_field(key, value);
+	ret = __decon_set_dpui_u32_field(key, value);
 	mutex_unlock(&dpui_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(set_dpui_u32_field);
+EXPORT_SYMBOL_GPL(decon_set_dpui_u32_field);
 
-int inc_dpui_u32_field(enum dpui_key key, u32 value)
+int decon_inc_dpui_u32_field(enum dpui_key key, u32 value)
 {
 	int ret;
 
 	mutex_lock(&dpui_lock);
-	ret = __inc_dpui_u32_field(key, value);
+	ret = __decon_inc_dpui_u32_field(key, value);
 	mutex_unlock(&dpui_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(inc_dpui_u32_field);
+EXPORT_SYMBOL_GPL(decon_inc_dpui_u32_field);
 
-int __get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
+int __decon_get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
 {
 	int i, ret, len = 0;
 	char tbuf[MAX_DPUI_KEY_LEN + MAX_DPUI_VAL_LEN];
@@ -445,8 +445,8 @@ int __get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
 	return len;
 }
 
-int get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
+int decon_get_dpui_log(char *buf, enum dpui_log_level level, enum dpui_type type)
 {
-	return __get_dpui_log(buf, level, type);
+	return __decon_get_dpui_log(buf, level, type);
 }
-EXPORT_SYMBOL_GPL(get_dpui_log);
+EXPORT_SYMBOL_GPL(decon_get_dpui_log);

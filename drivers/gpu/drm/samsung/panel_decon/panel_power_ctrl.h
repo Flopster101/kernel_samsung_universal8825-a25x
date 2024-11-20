@@ -51,7 +51,7 @@ struct panel_power_ctrl_funcs {
 	int (*execute)(struct panel_power_ctrl *pctrl);
 };
 
-int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
+int decon_of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
 	const char *prop_name, struct panel_power_ctrl *pctrl);
 int panel_power_ctrl_helper_execute(struct panel_power_ctrl *pctrl);
 #endif

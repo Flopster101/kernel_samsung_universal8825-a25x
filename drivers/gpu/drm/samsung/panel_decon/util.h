@@ -46,10 +46,10 @@
 #define M_GET_BACK_2(...) __M_GET_ELEM(M_NARGS(__VA_ARGS__), _, 0, ##__VA_ARGS__ ,0,0,0,0,0,0,0)
 #define M_GET_BACK_1(...) __M_GET_ELEM(M_NARGS(__VA_ARGS__), _, ##__VA_ARGS__  ,0,0,0,0,0,0,0,0)
 
-int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
+int decon_copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step);
-int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
+int decon_copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step);
-s32 hextos32(u32 hex, u32 bits);
-u32 s32tohex(s32 dec, u32 bits);
+s32 decon_hextos32(u32 hex, u32 bits);
+u32 decon_s32tohex(s32 dec, u32 bits);
 #endif /* __UTIL_H__ */

@@ -1462,10 +1462,10 @@ static inline int search_table(void *tbl, int itemsize, u32 sz_tbl, void *value)
 
 const char *pnobj_type_to_string(u32 type);
 void print_data(char *data, int size);
-int register_common_panel(struct common_panel_info *info);
-int deregister_common_panel(struct common_panel_info *info);
-struct maptbl *find_panel_maptbl_by_index(struct panel_info *panel, int index);
-struct maptbl *find_panel_maptbl_by_name(struct panel_info *panel_data, char *name);
+int decon_register_common_panel(struct common_panel_info *info);
+int decon_deregister_common_panel(struct common_panel_info *info);
+struct maptbl *decon_find_panel_maptbl_by_index(struct panel_info *panel, int index);
+struct maptbl *decon_find_panel_maptbl_by_name(struct panel_info *panel_data, char *name);
 struct common_panel_info *find_panel(struct panel_device *panel, u32 id);
 struct device_node *find_panel_ddi_node(struct panel_device *panel, u32 id);
 struct device_node *find_panel_modes_node(struct panel_device *panel, u32 id);
@@ -1483,21 +1483,21 @@ struct pktinfo *find_packet_suffix(struct seqinfo *seqtbl, char *name);
 struct panel_dimming_info *find_panel_dimming(struct panel_info *panel_data, char *name);
 int excute_seqtbl_nolock(struct panel_device *panel, struct seqinfo *seqtbl, int index);
 int panel_do_seqtbl(struct panel_device *panel, struct seqinfo *seqtbl);
-int panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index);
-int panel_do_seqtbl_by_index(struct panel_device *panel, int index);
-struct resinfo *find_panel_resource(struct panel_info *panel, char *name);
-bool panel_resource_initialized(struct panel_info *panel_data, char *name);
-int rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len);
-int rescpy_by_name(struct panel_info *panel, u8 *dst, char *name, u32 offset, u32 len);
+int decon_decon_panel_do_seqtbl_by_index_nolock(struct panel_device *panel, int index);
+int decon_panel_do_seqtbl_by_index(struct panel_device *panel, int index);
+struct resinfo *decon_find_panel_resource(struct panel_info *panel, char *name);
+bool decon_panel_resource_initialized(struct panel_info *panel_data, char *name);
+int decon_rescpy(u8 *dst, struct resinfo *res, u32 offset, u32 len);
+int decon_rescpy_by_name(struct panel_info *panel, u8 *dst, char *name, u32 offset, u32 len);
 int resource_clear(struct resinfo *res);
 int resource_clear_by_name(struct panel_info *panel_data, char *name);
 int resource_copy(u8 *dst, struct resinfo *res);
 int resource_copy_by_name(struct panel_info *panel_data, u8 *dst, char *name);
-int resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *name);
-int get_resource_size_by_name(struct panel_info *panel_data, char *name);
+int decon_resource_copy_n_clear_by_name(struct panel_info *panel_data, u8 *dst, char *name);
+int decon_get_resource_size_by_name(struct panel_info *panel_data, char *name);
 int get_panel_resource_size(struct resinfo *res);
 int panel_resource_update(struct panel_device *panel, struct resinfo *res);
-int panel_resource_update_by_name(struct panel_device *panel, char *name);
+int decon_panel_resource_update_by_name(struct panel_device *panel, char *name);
 int panel_dumpinfo_update(struct panel_device *panel, struct dumpinfo *info);
 int panel_rx_nbytes(struct panel_device *panel, u32 type, u8 *buf, u8 addr, u32 pos, u32 len);
 int panel_tx_nbytes(struct panel_device *panel,	u32 type, u8 *buf, u8 addr, u32 pos, u32 len);
@@ -1534,15 +1534,15 @@ struct panel_dt_lut *find_panel_lut(struct panel_device *panel, u32 id);
 #ifdef CONFIG_EXYNOS_DECON_LCD_SYSFS
 int panel_sysfs_probe(struct panel_device *panel);
 int panel_sysfs_remove(struct panel_device *panel);
-ssize_t attr_store_for_each(struct class *cls, const char *name, const char *buf, size_t size);
-ssize_t attr_show_for_each(struct class *cls, const char *name, char *buf);
-ssize_t attr_exist_for_each(struct class *cls, const char *name);
+ssize_t decon_attr_store_for_each(struct class *cls, const char *name, const char *buf, size_t size);
+ssize_t decon_attr_show_for_each(struct class *cls, const char *name, char *buf);
+ssize_t decon_attr_exist_for_each(struct class *cls, const char *name);
 #else
 static inline int panel_sysfs_probe(struct panel_device *panel) { return 0; }
 static inline int panel_sysfs_remove(struct panel_device *panel) { return 0; }
-static inline ssize_t attr_store_for_each(struct class *cls, const char *name, const char *buf, size_t size) { return 0; }
-static inline ssize_t attr_show_for_each(struct class *cls, const char *name, char *buf) { return 0; }
-static inline ssize_t attr_exist_for_each(struct class *cls, const char *name) { return 0; }
+static inline ssize_t decon_attr_store_for_each(struct class *cls, const char *name, const char *buf, size_t size) { return 0; }
+static inline ssize_t decon_attr_show_for_each(struct class *cls, const char *name, char *buf) { return 0; }
+static inline ssize_t decon_attr_exist_for_each(struct class *cls, const char *name) { return 0; }
 #endif
 #define IS_PANEL_ACTIVE(_panel) check_panel_active(_panel, __func__)
 #endif /* __PANEL_H__ */
