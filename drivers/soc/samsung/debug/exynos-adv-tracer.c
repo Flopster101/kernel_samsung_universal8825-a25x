@@ -23,10 +23,6 @@
 #include <soc/samsung/exynos-adv-tracer-ipc.h>
 #include <soc/samsung/exynos-pmu-if.h>
 
-#ifndef CONFIG_DEBUG_SNAPSHOT
-#include <linux/sched/clock.h>
-#endif
-
 static struct adv_tracer_info *exynos_ati;
 static struct adv_tracer_ipc_main *adv_tracer_ipc;
 

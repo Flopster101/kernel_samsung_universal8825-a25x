@@ -552,9 +552,7 @@ static void exynos_recovery_handler(struct work_struct *work)
 #endif
 #endif
 			dpu_dump(exynos_crtc);
-#if defined(CONFIG_DEBUG_SNAPSHOT)
 			dbg_snapshot_expire_watchdog();
-#endif
 			BUG();
 			return;
 		}
@@ -675,9 +673,7 @@ out:
 #endif
 #endif
 				dpu_dump(exynos_crtc);
-#if defined(CONFIG_DEBUG_SNAPSHOT)
 				dbg_snapshot_expire_watchdog();
-#endif
 				BUG();
 			}
 			recov_info(" *** recovery retry!! (%d) *** \n", retry);
