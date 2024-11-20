@@ -170,6 +170,7 @@ is-cis-3l6.ko
 is-actuator-ak737x.ko
 is-flash-s2mf301.ko
 is-flash-sm5714.ko
+is-flash-s2mu106.ko
 pablo-smc.ko
 is-device-eeprom.ko
 is-device-otprom.ko
@@ -194,6 +195,7 @@ dw_mmc-pltfm.ko
 dw_mmc-exynos-sec.ko
 leds-s2mf301.ko
 leds-sm5714-fled.ko
+leds-s2mu106.ko
 hid-a4tech.ko
 hid-axff.ko
 hid-belkin.ko
@@ -244,8 +246,10 @@ sec_key_notifier.ko
 sec_class.ko
 sec_bootstat.ko
 sec_argos.ko
+s2m_pdic_notifier_module.ko
 sec_panel_notifier_v2.ko
 pmic_class.ko
+s2mu106-usbpd.ko
 usb_typec_manager.ko
 if_cb_manager.ko
 vibrator_vib_info.ko
@@ -291,6 +295,8 @@ abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
 mfd_sm5714.ko
+mfd_s2mu106.ko
+sm5451-charger.ko
 hl7132_charger.ko
 sm5714-charger.ko
 sm5451-charger.ko
@@ -301,6 +307,7 @@ goodix_ts_berlin.ko
 isg5320a.ko
 s2mf301_fuelgauge.ko
 sm5714_fuelgauge.ko
+s2mu106_fuelgauge.ko
 shub.ko
 sensor_core.ko
 mstdrv.ko
@@ -309,10 +316,13 @@ dc_vibrator.ko
 focaltech_ts_ft3519.ko
 muic_s2mf301.ko
 muic_sm5714.ko
+muic_s2mu106.ko
 top_s2mf301.ko
 a96t396.ko
 s2mf301_pmeter.ko
+s2mu106_pmeter.ko
 s2mf301_charger.ko
+s2mu106_charger.ko
 sec-direct-charger.ko
 sec_pd.ko
 sb_wireless.ko
