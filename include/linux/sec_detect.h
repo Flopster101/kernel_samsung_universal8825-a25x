@@ -15,6 +15,8 @@
 
 #ifndef _LINUX_SEC_H
 #define _LINUX_SEC_H
+#define SEC_DETECT_LOG(fmt, ...) printk(KERN_INFO "sec_detect: " fmt, ##__VA_ARGS__)
+
 enum SEC_devices {
     DEVICE_UNKNOWN = -1,
     SEC_A25,

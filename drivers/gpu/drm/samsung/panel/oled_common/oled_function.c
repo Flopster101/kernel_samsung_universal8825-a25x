@@ -111,13 +111,13 @@ static int __init oled_function_init(void)
 	int ret;
 
 	if (sec_current_device == SEC_A25) {
-		printk(KERN_INFO "Initialized oled common driver\n");
+		SEC_DETECT_LOG("Initialized USDM OLED driver\n");
 		ret = panel_function_insert_array(oled_function_table,
 				ARRAY_SIZE(oled_function_table));
 		if (ret < 0)
 			panel_err("failed to insert oled_function_table\n");
 	} else {
-		printk(KERN_INFO "Skipped oled driver\n");
+		SEC_DETECT_LOG("Skipped USDM OLED driver\n");
 	}
 
 	return 0;
