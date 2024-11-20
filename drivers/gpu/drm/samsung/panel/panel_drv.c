@@ -7671,7 +7671,7 @@ static int __init panel_drv_init(void)
 	int ret;
 
 	if (sec_current_device == SEC_A25) {
-		printk(KERN_INFO "Initialized usdm panel driver\n");
+		SEC_DETECT_LOG("Initialized USDM panel driver\n");
 		panel_info("++\n");
 		ret = panel_create_lcd_class();
 		if (ret < 0) {
@@ -7697,7 +7697,7 @@ static int __init panel_drv_init(void)
 
 		return ret;
 	} else {
-		printk(KERN_INFO "Skipped usdm panel driver\n");
+		SEC_DETECT_LOG("Skipped USDM panel driver\n");
 		return 0;
 	}
 }
