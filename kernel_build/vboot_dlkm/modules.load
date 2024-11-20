@@ -152,8 +152,13 @@ fimc-is.ko
 is-cis-imx258.ko
 is-cis-4ha.ko
 is-cis-gc02m1.ko
+is-cis-gc5035.ko
 is-cis-hi1339.ko
 is-cis-jn1.ko
+is-cis-imx355.ko
+is-cis-4ha.ko
+is-cis-imx582.ko
+is-cis-3l6.ko
 is-actuator-ak737x.ko
 is-flash-s2mf301.ko
 pablo-smc.ko
