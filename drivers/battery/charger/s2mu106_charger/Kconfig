@@ -1,0 +1,22 @@
+config CHARGER_S2MU106
+	tristate "S2MU106 charger support"
+	depends on MFD_S2MU106
+	help
+	 Say Y here to enable support for the S2MU106 charger.
+	 S2MU106 charger is an AFC compatible charging IC.
+	 S2MU106 charger is dependent on MFD_S2MU106
+	 so it needs to be defined.
+
+config PM_S2MU106
+	tristate "S2MU106 power meter support"
+	depends on MFD_S2MU106
+	help
+	 Say Y here to enable support for
+	 the S2MU106 power meter.
+	 S2MU106 power meter is dependent on MFD_S2MU106
+	 so it needs to be defined.
+
+config LSI_IFPMIC
+	 bool "support for lsi ifpmic"
+	 help
+	  Say Y to include support for lsi ifpmic
