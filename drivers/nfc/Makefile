@@ -8,15 +8,43 @@ endif
 
 ifeq ($(CONFIG_SAMSUNG_NFC),m)
 obj-$(CONFIG_SAMSUNG_NFC)		+= nfc_stm_sec.o
+nfc_stm_sec-$(CONFIG_SEC_NFC)		+= sec_nfc.o
+nfc_stm_sec-$(CONFIG_ESE_P3_LSI)		+= ese_p3.o
 nfc_stm_sec-$(CONFIG_NFC_ST21NFC)		+= st21nfc.o
 nfc_stm_sec-$(CONFIG_NFC_ST54SPI_ESE_SUPPORT)	+= st54spi.o
 nfc_stm_sec-$(CONFIG_SEC_NFC_LOGGER)		+= nfc_logger/nfc_logger.o
 else
+obj-$(CONFIG_NFC_PN547)			+= pn547.o
+obj-$(CONFIG_NFC_PN547_ESE_SUPPORT)	+= p61.o
+obj-$(CONFIG_NFC_FEATURE_SN100U)	+= cold_reset.o
+obj-$(CONFIG_SEC_NFC)			+= sec_nfc.o
+obj-$(CONFIG_ESE_P3_LSI)		+= ese_p3.o
 obj-$(CONFIG_NFC_ST21NFC)		+= st21nfc.o
 obj-$(CONFIG_NFC_ST54SPI_ESE_SUPPORT)	+= st54spi.o
 obj-$(CONFIG_SEC_NFC_LOGGER)		+= nfc_logger/nfc_logger.o
 endif
+ccflags-$(CONFIG_NFC_DEBUG) := -DDEBUG
 
 ccflags-y 			+= -DRECOVERY_ENABLE -UDEBUG
 
+ifeq ($(CONFIG_SEC_STAR), m)
+obj-$(CONFIG_SEC_STAR) = sec-star/sec_star.o
 
+sec_star-y += \
+                        sec-star/sec_star.o \
+                        sec-star/protocol/ese_data.o \
+                        sec-star/protocol/ese_iso7816_t1.o \
+                        sec-star/hal/ese_i2c.o \
+                        sec-star/hal/ese_spi.o \
+                        sec-star/hal/ese_hal.o
+sec_star-$(CONFIG_STAR_K250A) += sec-star/sec_k250a.o
+else
+obj-$(CONFIG_SEC_STAR) += sec-star/sec_star.o \
+                        sec-star/protocol/ese_data.o \
+                        sec-star/protocol/ese_memory.o \
+                        sec-star/protocol/ese_iso7816_t1.o \
+                        sec-star/hal/ese_i2c.o \
+                        sec-star/hal/ese_spi.o \
+                        sec-star/hal/ese_hal.o
+obj-$(CONFIG_STAR_K250A) += sec-star/sec_k250a.o
+endif
