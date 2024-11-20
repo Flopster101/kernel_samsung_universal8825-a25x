@@ -1,0 +1,18 @@
+&smd {
+	s2mu106_charger: s2mu106-charger {
+		status = "disable";
+		compatible = "samsung,s2mu106-charger";
+	};
+
+	battery {
+		battery,otg_name = "s2mu106-otg";
+	};
+};
+
+
+/* /home/dpi/qb5_8814/workspace/P4_1716/android/kernel/kmodule/battery/suwon/charger/s2mu106/s2mu106_charger.a33x.dtsi */
+
+&s2mu106_charger {
+	charger,mrstbtmr_factory = <1>;
+	charger,block_otg_psk_mode_en;
+};
