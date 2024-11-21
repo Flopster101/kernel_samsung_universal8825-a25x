@@ -157,6 +157,7 @@ is-cis-imx582.ko
 is-cis-3l6.ko
 is-actuator-ak737x.ko
 is-flash-s2mf301.ko
+is-flash-s2mu106.ko
 pablo-smc.ko
 is-device-eeprom.ko
 is-device-otprom.ko
