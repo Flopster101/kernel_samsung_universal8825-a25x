@@ -2393,6 +2393,8 @@ static void s2mu106_muic_init_interface(struct s2mu106_muic_data *muic_data,
 	pr_info("%s, muic_if : 0x%p, muic_data : 0x%p\n",
         __func__, muic_if, muic_data);
 
+	muic_data = (void *)muic_data;
+
 	ic_data->m_ops.set_com_to_open = s2mu106_if_com_to_open;
 	ic_data->m_ops.set_switch_to_usb = s2mu106_if_com_to_usb;
 	ic_data->m_ops.set_com_to_otg = s2mu106_if_com_to_usb;
@@ -2425,6 +2427,7 @@ static void s2mu106_muic_init_interface(struct s2mu106_muic_data *muic_data,
 #endif
 	ic_data->m_ops.set_bypass = s2mu106_if_set_bypass;
 	ic_data->m_ops.set_water_state = s2mu106_if_set_water_state;
+	muic_data->if_data = muic_if;
 	sdata->muic_if = muic_if;
 }
 
