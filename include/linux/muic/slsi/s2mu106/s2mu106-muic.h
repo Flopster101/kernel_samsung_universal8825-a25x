@@ -21,7 +21,8 @@
 #define __S2MU106_MUIC_H__
 
 #include <linux/muic/common/muic.h>
-#include <linux/muic/common/muic_interface.h>
+#include <linux/muic/slsi/platform/muic_platform_layer.h>
+#include <linux/muic/slsi/platform/muic_platform_manager.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic-hv.h>
 #include <linux/pm_wakeup.h>
 
@@ -800,7 +801,7 @@ struct s2mu106_muic_data {
 	struct s2mu106_platform_data *mfd_pdata;
 
 	/* model dependant muic platform data */
-	struct muic_platform_data *pdata;
+	struct muic_share_data *sdata;
 
 	void *if_data;
 
