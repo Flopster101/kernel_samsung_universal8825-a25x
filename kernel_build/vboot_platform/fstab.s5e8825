@@ -7,9 +7,13 @@ system	/system	erofs	ro	wait,logical,first_stage_mount,avb=vbmeta_system,avb_key
 system	/system	f2fs	ro	wait,logical,first_stage_mount,avb=vbmeta_system,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
 system	/system	ext4	ro	wait,logical,first_stage_mount,avb=vbmeta_system,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
 vendor	/vendor	erofs	ro	wait,logical,first_stage_mount,avb=vbmeta_system
+vendor	/vendor	f2fs	ro	wait,logical,first_stage_mount,avb=vbmeta_system
 vendor_dlkm	/vendor_dlkm	erofs	ro	wait,logical,first_stage_mount,avb=vbmeta_system
+vendor_dlkm	/vendor_dlkm	ext4	ro	wait,logical,first_stage_mount,avb=vbmeta_system
 product	/product	erofs	ro	wait,avb,logical,first_stage_mount
+product	/product	ext4	ro	wait,avb,logical,first_stage_mount
 odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
+odm	/odm	ext4	ro	wait,avb,logical,first_stage_mount
 
 /dev/block/by-name/boot	/boot	emmc	defaults	first_stage_mount,formattable,avb=boot
 /dev/block/by-name/vendor_boot	/vendor_boot	emmc	defaults	first_stage_mount,formattable,avb=vendor_boot
