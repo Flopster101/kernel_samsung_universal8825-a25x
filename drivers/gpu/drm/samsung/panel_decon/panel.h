@@ -37,8 +37,8 @@
 #include "panel_vrr.h"
 
 #include "panel_modes.h"
-#ifdef CONFIG_PANEL_NOTIFY
-#include <linux/panel_notify.h>
+#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#include <linux/sec_panel_notifier_v2.h>
 #endif
 
 #ifdef CONFIG_EXTEND_LIVE_CLOCK
