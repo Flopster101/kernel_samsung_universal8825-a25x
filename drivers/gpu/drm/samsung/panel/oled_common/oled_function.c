@@ -9,8 +9,8 @@
 
 #include <linux/module.h>
 #include <linux/sec_detect.h>
-#include "../panel_debug.h"
-#include "../panel_function.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_panel_function.h"
 #include "oled_common.h"
 #include "oled_common_cond.h"
 #include "oled_common_dump.h"
@@ -22,11 +22,11 @@
 #endif
 #include "oled_function.h"
 
-struct pnobj_func oled_function_table[MAX_OLED_FUNCTION] = {
-	[OLED_MAPTBL_INIT_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_INIT_DEFAULT, oled_maptbl_init_default),
-	[OLED_MAPTBL_GETIDX_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_GETIDX_DEFAULT, oled_maptbl_getidx_default),
+struct pnobj_func usdm_oled_function_table[MAX_OLED_FUNCTION] = {
+	[OLED_MAPTBL_INIT_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_INIT_DEFAULT, usdm_oled_maptbl_init_default),
+	[OLED_MAPTBL_GETIDX_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_GETIDX_DEFAULT, usdm_oled_maptbl_getidx_default),
 	[OLED_MAPTBL_GETIDX_GM2_BRT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_GETIDX_GM2_BRT, oled_maptbl_getidx_gm2_brt),
-	[OLED_MAPTBL_COPY_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_COPY_DEFAULT, oled_maptbl_copy_default),
+	[OLED_MAPTBL_COPY_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_COPY_DEFAULT, usdm_oled_maptbl_copy_default),
 	[OLED_MAPTBL_COPY_TSET] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_COPY_TSET, oled_maptbl_copy_tset),
 	[OLED_MAPTBL_COPY_DUMMY] = __PNOBJ_FUNC_INITIALIZER(OLED_MAPTBL_COPY_DUMMY, oled_maptbl_copy_dummy),
 #ifdef CONFIG_USDM_PANEL_COPR
@@ -81,7 +81,7 @@ struct pnobj_func oled_function_table[MAX_OLED_FUNCTION] = {
 	[OLED_COND_IS_PANEL_MRES_UPDATED] = __PNOBJ_FUNC_INITIALIZER(OLED_COND_IS_PANEL_MRES_UPDATED, oled_cond_is_panel_mres_updated),
 	[OLED_COND_IS_PANEL_MRES_UPDATED_BIGGER] = __PNOBJ_FUNC_INITIALIZER(OLED_COND_IS_PANEL_MRES_UPDATED_BIGGER, oled_cond_is_panel_mres_updated_bigger),
 	[OLED_COND_IS_ACL_PWRSAVE_ON] = __PNOBJ_FUNC_INITIALIZER(OLED_COND_IS_ACL_PWRSAVE_ON, oled_cond_is_acl_pwrsave_on),
-	[OLED_DUMP_SHOW_EXPECTS] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_EXPECTS, oled_dump_show_expects),
+	[OLED_DUMP_SHOW_EXPECTS] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_EXPECTS, usdm_oled_dump_show_expects),
 	[OLED_DUMP_SHOW_RESOURCE] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_RESOURCE, oled_dump_show_resource),
 	[OLED_DUMP_SHOW_RESOURCE_AND_PANIC] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_RESOURCE_AND_PANIC, oled_dump_show_resource_and_panic),
 	[OLED_DUMP_SHOW_RDDPM] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_RDDPM, oled_dump_show_rddpm),
@@ -104,7 +104,7 @@ struct pnobj_func oled_function_table[MAX_OLED_FUNCTION] = {
 #endif
 	[OLED_DUMP_SHOW_SELF_MASK_CRC] = __PNOBJ_FUNC_INITIALIZER(OLED_DUMP_SHOW_SELF_MASK_CRC, oled_dump_show_self_mask_crc),
 };
-EXPORT_SYMBOL(oled_function_table);
+EXPORT_SYMBOL(usdm_oled_function_table);
 
 static int __init oled_function_init(void)
 {
@@ -112,10 +112,10 @@ static int __init oled_function_init(void)
 
 	if (sec_current_device == SEC_A25) {
 		SEC_DETECT_LOG("Initialized USDM OLED driver\n");
-		ret = panel_function_insert_array(oled_function_table,
-				ARRAY_SIZE(oled_function_table));
+		ret = usdm_panel_function_insert_array(usdm_oled_function_table,
+				ARRAY_SIZE(usdm_oled_function_table));
 		if (ret < 0)
-			panel_err("failed to insert oled_function_table\n");
+			panel_err("failed to insert usdm_oled_function_table\n");
 	} else {
 		SEC_DETECT_LOG("Skipped USDM OLED driver\n");
 	}

@@ -12,8 +12,8 @@
 
 #ifndef __S6E3FC3_A33X_PANEL_DIMMING_H___
 #define __S6E3FC3_A33X_PANEL_DIMMING_H___
-#include "../dimming.h"
-#include "../panel_dimming.h"
+#include "../decon_dimming.h"
+#include "../decon_panel_dimming.h"
 
 /*
  * PANEL INFORMATION

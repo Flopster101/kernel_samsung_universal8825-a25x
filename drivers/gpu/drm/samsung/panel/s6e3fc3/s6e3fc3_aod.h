@@ -13,7 +13,7 @@
 #ifndef __S6E3FAC_AOD_H__
 #define __S6E3FAC_AOD_H__
 
-#include "../panel.h"
+#include "../usdm_panel.h"
 #include "../aod/aod_drv.h"
 
 #endif

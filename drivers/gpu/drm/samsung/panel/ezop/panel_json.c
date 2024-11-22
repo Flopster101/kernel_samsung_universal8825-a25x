@@ -8,18 +8,18 @@
  */
 #include <linux/module.h>
 #include <linux/list_sort.h>
-#include "panel.h"
-#include "panel_debug.h"
-#include "maptbl.h"
-#include "panel_drv.h"
+#include "usdm_panel.h"
+#include "usdm_panel_debug.h"
+#include "usdm_maptbl.h"
+#include "usdm_panel_drv.h"
 #include "panel_json.h"
-#include "panel_delay.h"
-#include "panel_packet.h"
-#include "panel_property.h"
-#include "panel_config.h"
-#include "panel_condition.h"
-#include "panel_expression.h"
-#include "panel_function.h"
+#include "usdm_panel_delay.h"
+#include "usdm_panel_packet.h"
+#include "usdm_panel_property.h"
+#include "usdm_panel_config.h"
+#include "usdm_panel_condition.h"
+#include "usdm_panel_expression.h"
+#include "usdm_panel_function.h"
 #include "json.h"
 #include "json_writer.h"
 #include "json_reader.h"
@@ -1591,7 +1591,7 @@ int jsonr_function(json_reader_t *r, struct pnobj_func *func)
 		goto out_free;
 	}
 
-	found = panel_function_lookup(get_pnobj_name(&t_pnobj));
+	found = usdm_panel_function_lookup(get_pnobj_name(&t_pnobj));
 	if (!found) {
 		panel_err("pnobj(%s:%s) not found in panel_function_list\n",
 				get_pnobj_name(&t_pnobj),
@@ -2160,9 +2160,9 @@ static int jsonw_resource_update_info_array(json_writer_t *w, struct res_update_
 int jsonw_resource(json_writer_t *w, struct resinfo *res)
 {
 	/* fill 0 if mutable resource */
-	u8 *arr = is_resource_mutable(res) ? NULL : res->data;
+	u8 *arr = usdm_is_resource_mutable(res) ? NULL : res->data;
 
-	jsonw_name(w, get_resource_name(res));
+	jsonw_name(w, usdm_get_resource_name(res));
 	jsonw_start_object(w);
 	{
 		jsonw_pnobj(w, (struct pnobj *)res);

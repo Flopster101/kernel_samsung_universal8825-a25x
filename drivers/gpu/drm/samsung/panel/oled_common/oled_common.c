@@ -9,16 +9,16 @@
  */
 
 #include <linux/module.h>
-#include "../panel_kunit.h"
-#include "../panel.h"
-#include "../panel_drv.h"
-#include "../panel_debug.h"
-#include "../panel_bl.h"
-#include "../maptbl.h"
-#include "../util.h"
+#include "../usdm_panel_kunit.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_panel_bl.h"
+#include "../usdm_maptbl.h"
+#include "../usdm_util.h"
 #include "oled_function.h"
 
-int oled_maptbl_init_default(struct maptbl *tbl)
+int usdm_oled_maptbl_init_default(struct maptbl *tbl)
 {
 	if (!tbl) {
 		panel_err("maptbl is null\n");
@@ -33,14 +33,14 @@ int oled_maptbl_init_default(struct maptbl *tbl)
 	return 0;
 }
 
-EXPORT_SYMBOL(oled_maptbl_init_default);
+EXPORT_SYMBOL(usdm_oled_maptbl_init_default);
 
-int oled_maptbl_getidx_default(struct maptbl *m)
+int usdm_oled_maptbl_getidx_default(struct maptbl *m)
 {
-	return maptbl_getidx_from_props(m);
+	return usdm_maptbl_getidx_from_props(m);
 }
 
-EXPORT_SYMBOL(oled_maptbl_getidx_default);
+EXPORT_SYMBOL(usdm_oled_maptbl_getidx_default);
 
 int oled_maptbl_getidx_gm2_brt(struct maptbl *tbl)
 {
@@ -64,17 +64,17 @@ int oled_maptbl_getidx_gm2_brt(struct maptbl *tbl)
 	}
 	panel_bl = &panel->panel_bl;
 
-	row = get_brightness_pac_step_by_subdev_id(panel_bl,
+	row = usdm_get_brightness_pac_step_by_subdev_id(panel_bl,
 			PANEL_BL_SUBDEV_TYPE_DISP, panel_bl->props.brightness);
 
-	return maptbl_index(tbl, 0, row, 0);
+	return usdm_maptbl_index(tbl, 0, row, 0);
 }
 
 void oled_maptbl_copy_dummy(struct maptbl *tbl, u8 *dst)
 {
 }
 
-void oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
+void usdm_oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
 {
 	int idx;
 
@@ -100,7 +100,7 @@ void oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
 		return;
 	}
 
-	idx = maptbl_getidx(tbl);
+	idx = usdm_maptbl_getidx(tbl);
 	if (idx < 0) {
 		panel_err("maptbl(%s) failed to get index(%d)\n",
 				maptbl_get_name(tbl), idx);
@@ -113,7 +113,7 @@ void oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
 			maptbl_get_name(tbl), idx, maptbl_get_sizeof_copy(tbl));
 	usdm_dbg_bytes(dst, maptbl_get_sizeof_copy(tbl));
 }
-EXPORT_SYMBOL(oled_maptbl_copy_default);
+EXPORT_SYMBOL(usdm_oled_maptbl_copy_default);
 
 void oled_maptbl_copy_tset(struct maptbl *tbl, u8 *dst)
 {
@@ -155,7 +155,7 @@ void oled_maptbl_copy_copr(struct maptbl *tbl, u8 *dst)
 		return;
 
 	copr = &panel->copr;
-	copr_reg_to_byte_array(&copr->props.reg,
+	usdm_copr_reg_to_byte_array(&copr->props.reg,
 			copr->props.version, dst);
 }
 #endif

@@ -66,13 +66,9 @@ exynos-drm-y				+= $(cal-dir)/decon_reg.o		\
 exynos-drm-$(CONFIG_EXYNOS_BTS)		+= $(dpu-dir)/exynos_drm_bts.o
 
 obj-$(CONFIG_DRM_SAMSUNG_DPU)		+= exynos-drm.o
-ifneq ($(filter y m,$(CONFIG_DRM_PANEL_MCD_COMMON)),)
-subdir-ccflags-y += -I$(srctree)/drivers/gpu/drm/samsung/panel
-subdir-ccflags-y += -I$(srctree)/drivers/gpu/drm/samsung/panel_decon
-obj-$(CONFIG_DRM_PANEL_MCD_COMMON)	+= panel/
-else
-obj-$(CONFIG_DRM_PANEL_SAMSUNG_COMMON)	+= panel/
-endif
+subdir-ccflags-y += -I$(srctree)/drivers/gpu/drm/samsung/panel -I$(srctree)/drivers/gpu/drm/samsung/panel_decon
+obj-$(CONFIG_DRM_PANEL_MCD_COMMON) += panel/
+
 ifneq ($(filter y m,$(CONFIG_SEC_KUNIT)),)
 subdir-ccflags-y += \
     -Wframe-larger-than=8192 \

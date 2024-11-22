@@ -13,8 +13,8 @@
 #include <linux/kernel.h>
 #include <linux/slab.h>
 #include <linux/errno.h>
-#include "panel_kunit.h"
-#include "panel_modes.h"
+#include "decon_panel_kunit.h"
+#include "decon_panel_modes.h"
 
 static const char *refresh_mode_names[MAX_REFRESH_MODE] = {
 	[REFRESH_MODE_NS] = "ns",

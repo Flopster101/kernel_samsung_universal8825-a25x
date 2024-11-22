@@ -14,22 +14,22 @@
 #include <video/mipi_display.h>
 #include <linux/lcd.h>
 #include <linux/spi/spi.h>
-#include "panel_kunit.h"
-#include "panel_drv.h"
-#include "panel.h"
-#include "panel_debug.h"
-#include "panel_bl.h"
-#include "panel_dimming.h"
-#include "maptbl.h"
+#include "decon_panel_kunit.h"
+#include "decon_panel_drv.h"
+#include "decon_panel.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_bl.h"
+#include "decon_panel_dimming.h"
+#include "decon_maptbl.h"
 #if defined(CONFIG_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "decon_panel_freq_hop.h"
 #endif
 #ifdef CONFIG_EXYNOS_DECON_LCD_SPI
 #include "spi.h"
 #endif
 
 #ifdef CONFIG_PANEL_AID_DIMMING
-#include "dimming.h"
+#include "decon_dimming.h"
 #endif
 
 const char *cmd_type_name[MAX_CMD_TYPE] = {

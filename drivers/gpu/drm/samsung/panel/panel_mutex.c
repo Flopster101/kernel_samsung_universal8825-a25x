@@ -12,9 +12,9 @@
 #include <linux/of.h>
 #include <linux/of_platform.h>
 
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_mutex.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_mutex.h"
 
 void panel_mutex_init(void *ctx, struct panel_mutex *panel_lock)
 {

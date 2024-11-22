@@ -199,6 +199,6 @@ int aod_drv_unprepare(struct panel_device *panel);
 int aod_drv_probe(struct panel_device *panel, struct aod_tune *aod_tune);
 int aod_drv_remove(struct panel_device *panel);
 int panel_do_aod_seqtbl_by_name(struct aod_dev_info *aod, char *seqname);
-bool check_aod_seqtbl_exist(struct aod_dev_info *aod, char *seqname);
-int panel_do_aod_seqtbl_by_name_nolock(struct aod_dev_info *aod, char *seqname);
+bool usdm_check_aod_seqtbl_exist(struct aod_dev_info *aod, char *seqname);
+int usdm_panel_do_aod_seqtbl_by_name_nolock(struct aod_dev_info *aod, char *seqname);
 #endif //__AOD_DRV_H__

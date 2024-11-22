@@ -224,7 +224,7 @@ static int mafpc_instant_on(struct mafpc_device *mafpc)
 		goto exit_write;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		panel_warn("ABC not supported on LPM\n");
 		goto exit_write;
 	}
@@ -235,7 +235,7 @@ static int mafpc_instant_on(struct mafpc_device *mafpc)
 	 * 2. Send instant_on command to DDI, after frame done
 	 */
 	panel_info("++ PANEL_MAFPC_IMG_SEQ\n");
-	ret = panel_do_seqtbl_by_name(panel, PANEL_MAFPC_IMG_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_MAFPC_IMG_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_MAFPC_IMG_SEQ);
 		goto exit_write;
@@ -244,7 +244,7 @@ static int mafpc_instant_on(struct mafpc_device *mafpc)
 	mafpc_set_written_to_dev(mafpc);
 
 	panel_info("++ PANEL_MAFPC_ON_SEQ\n");
-	ret = panel_do_seqtbl_by_name(panel, PANEL_MAFPC_ON_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_MAFPC_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_MAFPC_ON_SEQ);
 		goto exit_write;
@@ -267,12 +267,12 @@ static int mafpc_instant_off(struct mafpc_device *mafpc)
 		goto err;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		panel_warn("ABC not supported on LPM\n");
 		goto err;
 	}
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_MAFPC_OFF_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_MAFPC_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_MAFPC_OFF_SEQ);
 		goto err;
@@ -497,7 +497,7 @@ int mafpc_device_probe(struct mafpc_device *mafpc, struct mafpc_info *info)
 	return 0;
 }
 
-struct mafpc_device *mafpc_device_create(void)
+struct mafpc_device *usdm_mafpc_device_create(void)
 {
 	struct mafpc_device *mafpc;
 
@@ -507,25 +507,25 @@ struct mafpc_device *mafpc_device_create(void)
 
 	return mafpc;
 }
-EXPORT_SYMBOL(mafpc_device_create);
+EXPORT_SYMBOL(usdm_mafpc_device_create);
 
-int mafpc_device_init(struct mafpc_device *mafpc)
+int usdm_mafpc_device_init(struct mafpc_device *mafpc)
 {
 	if (!mafpc)
 		return -EINVAL;
 
 	return 0;
 }
-EXPORT_SYMBOL(mafpc_device_init);
+EXPORT_SYMBOL(usdm_mafpc_device_init);
 
-struct mafpc_device *get_mafpc_device(struct panel_device *panel)
+struct mafpc_device *usdm_get_mafpc_device(struct panel_device *panel)
 {
 	if (!panel)
 		return NULL;
 
 	return panel->mafpc;
 }
-EXPORT_SYMBOL(get_mafpc_device);
+EXPORT_SYMBOL(usdm_get_mafpc_device);
 
 #if IS_ENABLED(CONFIG_LPD_OLED_COMPENSATION)
 int parse_lpd_rmem(struct mafpc_device *mafpc, struct device *dev)
@@ -587,7 +587,7 @@ static int mafpc_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct mafpc_device *mafpc;
 
-	mafpc = mafpc_device_create();
+	mafpc = usdm_mafpc_device_create();
 	if (!mafpc) {
 		panel_err("failed to allocate mafpc device.\n");
 		return -ENOMEM;
@@ -601,7 +601,7 @@ static int mafpc_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mafpc);
 
-	ret = mafpc_device_init(mafpc);
+	ret = usdm_mafpc_device_init(mafpc);
 	if (ret < 0) {
 		panel_err("failed to initialize mafpc device\n");
 		return ret;

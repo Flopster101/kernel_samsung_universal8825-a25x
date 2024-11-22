@@ -11,8 +11,8 @@
 #include <asm-generic/errno-base.h>
 #include <linux/string.h>
 
-#include "maptbl.h"
-#include "panel_debug.h"
+#include "decon_maptbl.h"
+#include "decon_panel_debug.h"
 
 int maptbl_alloc_buffer(struct maptbl *m, size_t size)
 {

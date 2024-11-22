@@ -10,8 +10,8 @@
  * published by the Free Software Foundation.
  */
 
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../decon_panel_drv.h"
+#include "../decon_panel_debug.h"
 #include "s6e8fc3_aod.h"
 
 void s6e8fc3_copy_self_mask_ctrl(struct maptbl *tbl, u8 *dst)

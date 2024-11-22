@@ -8,12 +8,12 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel.h"
-#include "panel_obj.h"
-#include "panel_debug.h"
+#include "usdm_panel.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_debug.h"
 
 /**
- * create_dumpinfo - create a struct dumpinfo structure
+ * usdm_create_dumpinfo - create a struct dumpinfo structure
  * @name: pointer to a string for the name of this dump.
  * @res: pointer to a resource.
  * @ops: function to be called when execute dump.
@@ -25,9 +25,9 @@
  * Returns &struct dumpinfo pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_dumpinfo().
+ * making a call to usdm_destroy_dumpinfo().
  */
-struct dumpinfo *create_dumpinfo(char *name,
+struct dumpinfo *usdm_create_dumpinfo(char *name,
 		struct resinfo *res, struct dump_ops *ops,
 		struct dump_expect *expects, unsigned int nr_expects)
 {
@@ -57,16 +57,16 @@ struct dumpinfo *create_dumpinfo(char *name,
 
 	return dump;
 }
-EXPORT_SYMBOL(create_dumpinfo);
+EXPORT_SYMBOL(usdm_create_dumpinfo);
 
 /**
- * destroy_dumpinfo - destroys a struct dumpinfo structure
+ * usdm_destroy_dumpinfo - destroys a struct dumpinfo structure
  * @rx_packet: pointer to the struct dumpinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_dumpinfo().
+ * to usdm_create_dumpinfo().
  */
-void destroy_dumpinfo(struct dumpinfo *dump)
+void usdm_destroy_dumpinfo(struct dumpinfo *dump)
 {
 	int i;
 
@@ -80,4 +80,4 @@ void destroy_dumpinfo(struct dumpinfo *dump)
 	kfree(dump->expects);
 	kfree(dump);
 }
-EXPORT_SYMBOL(destroy_dumpinfo);
+EXPORT_SYMBOL(usdm_destroy_dumpinfo);

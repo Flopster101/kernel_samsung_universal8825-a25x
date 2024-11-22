@@ -32,7 +32,10 @@
 #include "../exynos_drm_connector.h"
 #if IS_ENABLED(CONFIG_DRM_PANEL_MCD_COMMON)
 #include "../exynos_drm_drv.h"
-#include "panel_drv.h"
+#include "usdm_panel_drv.h"
+#include "decon_panel_drv.h"
+#include "usdm_panel_modes.h"
+#include "decon_panel_modes.h"
 #endif
 #include "../exynos_drm_debug.h"
 

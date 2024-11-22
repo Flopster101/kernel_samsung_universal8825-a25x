@@ -9,12 +9,12 @@
  */
 
 #include <linux/module.h>
-#include "../panel_kunit.h"
-#include "../panel.h"
-#include "../panel_bl.h"
-#include "../panel_drv.h"
-#include "../panel_debug.h"
-#include "../panel_vrr.h"
+#include "../usdm_panel_kunit.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_bl.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_panel_vrr.h"
 
 bool oled_cond_is_panel_display_mode_changed(struct panel_device *panel)
 {
@@ -48,7 +48,7 @@ bool oled_cond_is_panel_refresh_mode_ns(struct panel_device *panel)
 	if (!panel)
 		return false;
 
-	return (get_panel_refresh_mode(panel) == VRR_NORMAL_MODE);
+	return (usdm_get_panel_refresh_mode(panel) == VRR_NORMAL_MODE);
 }
 
 bool oled_cond_is_panel_refresh_mode_hs(struct panel_device *panel)
@@ -56,7 +56,7 @@ bool oled_cond_is_panel_refresh_mode_hs(struct panel_device *panel)
 	if (!panel)
 		return false;
 
-	return (get_panel_refresh_mode(panel) == VRR_HS_MODE);
+	return (usdm_get_panel_refresh_mode(panel) == VRR_HS_MODE);
 }
 
 bool oled_cond_is_panel_state_lpm(struct panel_device *panel)
@@ -64,7 +64,7 @@ bool oled_cond_is_panel_state_lpm(struct panel_device *panel)
 	if (!panel)
 		return false;
 
-	return (panel_get_cur_state(panel) == PANEL_STATE_ALPM);
+	return (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM);
 }
 
 bool oled_cond_is_panel_state_not_lpm(struct panel_device *panel)
@@ -80,7 +80,7 @@ bool oled_cond_is_first_set_bl(struct panel_device *panel)
 	if (!panel)
 		return false;
 
-	return (panel_bl_get_brightness_set_count(&panel->panel_bl) == 0);
+	return (usdm_panel_bl_get_brightness_set_count(&panel->panel_bl) == 0);
 }
 
 bool oled_cond_is_panel_mres_updated(struct panel_device *panel)
@@ -128,7 +128,7 @@ bool oled_cond_is_panel_mres_updated_bigger(struct panel_device *panel)
 
 bool oled_cond_is_acl_pwrsave_on(struct panel_device *panel)
 {
-	return (panel_bl_get_acl_pwrsave(&panel->panel_bl) == ACL_PWRSAVE_ON);
+	return (usdm_panel_bl_get_acl_pwrsave(&panel->panel_bl) == ACL_PWRSAVE_ON);
 }
 
 MODULE_DESCRIPTION("oled_common driver");
