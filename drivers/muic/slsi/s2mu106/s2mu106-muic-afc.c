@@ -69,16 +69,16 @@ muic_attached_dev_t s2mu106_hv_muic_check_id_err(struct s2mu106_muic_data *muic_
 	muic_attached_dev_t new_dev)
 {
 	muic_attached_dev_t after_new_dev = new_dev;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
-	if (!muic_platform_hv_is_hv_dev(sdata))
+	if (!muic_core_hv_is_hv_dev(muic_pdata))
 		goto out;
 
 	switch (new_dev) {
 	case ATTACHED_DEV_TA_MUIC:
 		pr_info("%s cannot change HV(%d)->TA(%d)!\n",
-			__func__, sdata->attached_dev, new_dev);
-		after_new_dev = sdata->attached_dev;
+			__func__, muic_pdata->attached_dev, new_dev);
+		after_new_dev = muic_pdata->attached_dev;
 		break;
 	case ATTACHED_DEV_UNDEFINED_CHARGING_MUIC:
 		pr_info("%s UnIS_ENABLED\n", __func__);
@@ -209,13 +209,13 @@ static inline int s2mu106_hv_muic_get_vdnmon_status(struct s2mu106_muic_data* mu
 }
 
 #if IS_ENABLED(CONFIG_MUIC_SUPPORT_POWERMETER)
-static int s2mu106_hv_muic_get_vbus_value(struct s2mu106_muic_data *muic_data)
+static int s2mu106_hv_muic_get_vbus_voltage(struct s2mu106_muic_data *muic_data)
 {
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	int val = 0, vchgin = 0;
 
 	vchgin = (s2mu106_hv_muic_get_vchgin(muic_data));
-	pr_info("%s vchgin:(%d)mV, cable:(%d)\n", __func__, vchgin, sdata->attached_dev);
+	pr_info("%s vchgin:(%d)mV, cable:(%d)\n", __func__, vchgin, muic_pdata->attached_dev);
 
 	if (IS_VCHGIN_9V(vchgin)) {
 		val = 9;
@@ -313,7 +313,7 @@ static void s2mu106_hv_muic_send_mping(struct s2mu106_muic_data* muic_data)
 
 static void _s2mu106_hv_muic_reset(struct s2mu106_muic_data *muic_data)
 {
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	/* set reg default value */
 	s2mu106_hv_muic_write_reg(muic_data, S2MU106_REG_AFC_CTRL1, 0);
 	s2mu106_hv_muic_write_reg(muic_data, S2MU106_REG_AFC_CTRL2, 0);
@@ -322,7 +322,7 @@ static void _s2mu106_hv_muic_reset(struct s2mu106_muic_data *muic_data)
 	s2mu106_hv_muic_write_reg(muic_data, S2MU106_REG_LDOADC_VSETL, 0x7c);
 	s2mu106_hv_muic_write_reg(muic_data, S2MU106_REG_AFC_INT_MASK, 0);
 
-	sdata->hv_state = HV_STATE_IDLE;
+	muic_pdata->hv_state = HV_STATE_IDLE;
 	muic_data->is_dp_drive = false;
 	muic_data->is_hvcharger_detected = false;
 	muic_data->mrxrdy_cnt = 0;
@@ -340,7 +340,6 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 {
 	char *str = NULL;
 	int afc_request_cause = 0;
-	struct muic_share_data *sdata = muic_data->sdata;
 #if IS_ENABLED(CONFIG_MUIC_PLATFORM)
 	struct muic_interface_t *muic_if;
 
@@ -353,12 +352,12 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 
 	if (muic_data->afc_check == false) {
 		str = "Unsupported DCP";
-	} else if (muic_data->sdata->pdata->afc_disable == true) {
+	} else if (muic_data->pdata->afc_disable == true) {
 		str = "User Disable";
 		s2mu106_hv_muic_set_chgtype_usrcmd(muic_data);
 		muic_afc_request_cause_clear();
 #if IS_ENABLED(CONFIG_MUIC_PLATFORM)
-	} else if (sdata->is_afc_pdic_ready == false) {
+	} else if (muic_if->is_afc_pdic_ready == false) {
 		str = "VBUS-CC Short";
 		pr_info("%s short detected or 56k not detected, revert dev to TA\n", __func__);
 		s2mu106_hv_muic_handle_attach(muic_data, ATTACHED_DEV_TA_MUIC);
@@ -384,16 +383,15 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 
 static void _s2mu106_hv_muic_dcp_charger_attach(struct s2mu106_muic_data *muic_data)
 {
-	struct muic_share_data *sdata = muic_data->sdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata;
 
 	if (muic_data == NULL) {
 		pr_err("%s data NULL\n", __func__);
 		return;
 	}
-	muic_pdata = muic_data->sdata->pdata;
+	muic_pdata = muic_data->pdata;
 
-	muic_platform_hv_state_manager(sdata, HV_TRANS_DCP_DETECTED);
+	muic_core_hv_state_manager(muic_pdata, HV_TRANS_DCP_DETECTED);
 }
 
 #if IS_ENABLED(CONFIG_CHARGER_S2MU106)
@@ -436,8 +434,7 @@ static int s2mu106_hv_muic_set_chg_lv_mode(struct s2mu106_muic_data *muic_data,
 
 static void s2mu106_hv_muic_set_chgtype_usrcmd(struct s2mu106_muic_data *muic_data)
 {
-	struct muic_share_data *sdata = muic_data->sdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	int vbus = 0;
 	u8 device_typ1 = 0;
 
@@ -455,7 +452,7 @@ static void s2mu106_hv_muic_set_chgtype_usrcmd(struct s2mu106_muic_data *muic_da
 		s2mu106_hv_muic_handle_attach(muic_data, ATTACHED_DEV_AFC_CHARGER_DISABLED_MUIC);
 	} else {
 		/* Since user activate high-voltage charging again, do it again from HVDCP detection */
-		muic_platform_hv_state_manager(sdata, HV_TRANS_DCP_DETECTED);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_DCP_DETECTED);
 	}
 }
 
@@ -486,10 +483,11 @@ static void s2mu106_if_hv_muic_dcp_charger(void *mdata)
 
 static bool s2mu106_if_hv_muic_fast_charge_need(struct s2mu106_muic_data *muic_data)
 {
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 #if IS_ENABLED(CONFIG_MUIC_PLATFORM) && !IS_ENABLED(CONFIG_SEC_FACTORY)
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_interface_t *muic_if = (struct muic_interface_t *)muic_data->if_data;
 
-	if (sdata->is_afc_pdic_ready == false) {
+	if (muic_if->is_afc_pdic_ready == false) {
 		pr_info("%s AFC is diabled by PDIC\n", __func__);
 		return false;
 	}
@@ -500,7 +498,7 @@ static bool s2mu106_if_hv_muic_fast_charge_need(struct s2mu106_muic_data *muic_d
 		return false;
 	}
 
-	if (sdata->attached_dev == ATTACHED_DEV_HICCUP_MUIC) {
+	if (muic_pdata->attached_dev == ATTACHED_DEV_HICCUP_MUIC) {
 		pr_info("%s attached device is hiccup, just return\n", __func__);
 		return false;
 	}
@@ -511,7 +509,7 @@ static bool s2mu106_if_hv_muic_fast_charge_need(struct s2mu106_muic_data *muic_d
 static void s2mu106_if_hv_muic_fast_charge_adaptor(void *mdata)
 {
 	struct s2mu106_muic_data *muic_data = (struct s2mu106_muic_data *)mdata;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	bool afc_enabled = true;
 
 	if (!s2mu106_if_hv_muic_fast_charge_need(muic_data)) {
@@ -519,7 +517,7 @@ static void s2mu106_if_hv_muic_fast_charge_adaptor(void *mdata)
 	}
 
 	pr_info("%s attached_dev:%d, hv_state:%d\n", __func__,
-			sdata->attached_dev, sdata->hv_state);
+			muic_pdata->attached_dev, muic_pdata->hv_state);
 
 	if (muic_data->is_hvcharger_detected == false) {
 		s2mu106_hv_muic_irq_mask(muic_data, AFC_IRQ_VDNMON, AFC_MASK);
@@ -551,11 +549,11 @@ static void s2mu106_if_hv_muic_fast_charge_communication(void *mdata)
 {
     struct s2mu106_muic_data *muic_data =
         (struct s2mu106_muic_data *)mdata;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	cancel_delayed_work(&muic_data->mping_retry_work);
 	pr_info("%s mrxrdy_cnt(%d)\n", __func__, muic_data->mrxrdy_cnt);
 
-	if (sdata->hv_state == HV_STATE_IDLE) {
+	if (muic_pdata->hv_state == HV_STATE_IDLE) {
 		pr_info("%s emergency exit\n", __func__);
 	} else if (muic_data->mping_cnt < AFC_MPING_RETRY_CNT_LIMIT) {
 		s2mu106_hv_muic_send_mping(muic_data);
@@ -563,7 +561,7 @@ static void s2mu106_if_hv_muic_fast_charge_communication(void *mdata)
 		muic_data->mrxrdy_cnt = 0;
 		muic_data->mping_cnt = 0;
 
-		muic_platform_hv_state_manager(sdata, HV_TRANS_NO_RESPONSE);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_NO_RESPONSE);
 	}
 }
 
@@ -642,7 +640,7 @@ static void s2mu106_hv_muic_handle_attach(struct s2mu106_muic_data* muic_data,
 {
 	pr_info("%s new_dev(%d)\n", __func__, new_dev);
 
-	muic_data->sdata->attached_dev = new_dev;
+	muic_data->pdata->attached_dev = new_dev;
 
 	switch (new_dev) {
 	case ATTACHED_DEV_TA_MUIC:
@@ -666,29 +664,29 @@ static void s2mu106_hv_muic_handle_attach(struct s2mu106_muic_data* muic_data,
 
 static void s2mu106_hv_muic_set_ready(struct s2mu106_muic_data* muic_data)
 {
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
 	mutex_lock(&muic_data->afc_mutex);
 	pr_info("%s attached_dev:%d, hv_state:%d\n", __func__,
-			sdata->attached_dev, sdata->hv_state);
+			muic_pdata->attached_dev, muic_pdata->hv_state);
 	if (!muic_data->is_charger_ready) {
 		pr_info("%s, charger is not ready, return\n", __func__);
 		goto out;
 	}
-	switch (sdata->attached_dev) {
+	switch (muic_pdata->attached_dev) {
 	case ATTACHED_DEV_TA_MUIC:
 	case ATTACHED_DEV_UNDEFINED_CHARGING_MUIC:
 	case ATTACHED_DEV_UNSUPPORTED_ID_VB_MUIC:
-		if (sdata->hv_state == HV_STATE_IDLE) {
+		if (muic_pdata->hv_state == HV_STATE_IDLE) {
 			_s2mu106_hv_muic_dcp_charger_attach(muic_data);
 		}
-		else if (sdata->hv_state == HV_STATE_FAST_CHARGE_ADAPTOR) {
-			muic_platform_hv_state_manager(sdata, HV_TRANS_FAST_CHARGE_REOPEN);
+		else if (muic_pdata->hv_state == HV_STATE_FAST_CHARGE_ADAPTOR) {
+			muic_core_hv_state_manager(muic_pdata, HV_TRANS_FAST_CHARGE_REOPEN);
 		}
 		break;
 	case ATTACHED_DEV_AFC_CHARGER_PREPARE_MUIC:
-		if (sdata->hv_state == HV_STATE_FAST_CHARGE_ADAPTOR) {
-			muic_platform_hv_state_manager(sdata, HV_TRANS_FAST_CHARGE_REOPEN);
+		if (muic_pdata->hv_state == HV_STATE_FAST_CHARGE_ADAPTOR) {
+			muic_core_hv_state_manager(muic_pdata, HV_TRANS_FAST_CHARGE_REOPEN);
 		}
 	default:
 		break;
@@ -712,10 +710,10 @@ static int s2mu106_if_check_afc_ready(void *mdata)
 static int s2mu106_if_reset_hvcontrol_reg(void *mdata)
 {
     struct s2mu106_muic_data *muic_data = (struct s2mu106_muic_data *)mdata;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
 	mutex_lock(&muic_data->afc_mutex);
-	muic_platform_hv_init(sdata);
+	muic_core_hv_init(muic_pdata);
 	mutex_unlock(&muic_data->afc_mutex);
 
 	return 0;
@@ -729,28 +727,27 @@ static muic_attached_dev_t s2mu106_if_check_id_err(void *mdata,
     return s2mu106_hv_muic_check_id_err(muic_data, new_dev);
 }
 
-static int s2mu106_if_set_afc_ready(void *mdata)
+static void s2mu106_if_set_afc_ready(void *mdata, bool en)
 {
     struct s2mu106_muic_data *muic_data = (struct s2mu106_muic_data *)mdata;
-
-	s2mu106_hv_muic_set_ready(muic_data);
-	return 0;
+	if (en)
+		s2mu106_hv_muic_set_ready(muic_data);
 }
 
 #if IS_ENABLED(CONFIG_MUIC_SUPPORT_POWERMETER)
-static int s2mu106_if_get_vbus_value(void *mdata)
+static int s2mu106_if_get_vbus_voltage(void *mdata)
 {
     struct s2mu106_muic_data *muic_data =
         (struct s2mu106_muic_data *)mdata;
 
-    return s2mu106_hv_muic_get_vbus_value(muic_data);
+    return s2mu106_hv_muic_get_vbus_voltage(muic_data);
 }
 
 static int s2mu106_if_vchgin_isr(void *mdata, int voltage)
 {
 	struct s2mu106_muic_data *muic_data =
 		(struct s2mu106_muic_data *)mdata;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	int vchgin = 0;
 
 	if (muic_data->is_hvcharger_detected == false)
@@ -761,9 +758,9 @@ static int s2mu106_if_vchgin_isr(void *mdata, int voltage)
 	usleep_range(10000, 12000);
 	vchgin = s2mu106_hv_muic_get_vchgin(muic_data);
 	if (IS_VCHGIN_9V(vchgin)) {
-		muic_platform_hv_state_manager(sdata, HV_TRANS_VBUS_BOOST);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_VBUS_BOOST);
 	} else if (IS_VCHGIN_5V(vchgin)) {
-		muic_platform_hv_state_manager(sdata, HV_TRANS_VBUS_REDUCE);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_VBUS_REDUCE);
 	}
 
 	mutex_unlock(&muic_data->afc_mutex);
@@ -773,6 +770,11 @@ static int s2mu106_if_vchgin_isr(void *mdata, int voltage)
 #endif
 
 #ifdef CONFIG_HV_MUIC_VOLTAGE_CTRL
+static inline int s2mu106_if_set_afc_voltage(void *mdata, int vol)
+{
+    return muic_afc_set_voltage(vol);
+}
+
 void s2mu106_if_hv_muic_afc_ping(struct s2mu106_muic_data *muic_data)
 {
 	u8 reg_val;
@@ -791,17 +793,16 @@ void s2mu106_if_hv_muic_afc_ping(struct s2mu106_muic_data *muic_data)
 
 static void s2mu106_if_change_afc_voltage(void *mdata, int tx_data)
 {
-	struct muic_share_data *sdata = (struct muic_share_data *)mdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata = (struct muic_platform_data *)mdata;
 	struct s2mu106_muic_data *muic_data = muic_pdata->drv_data;
 
 	pr_info("%s attached_dev:%d, tx_data:%#x, hv_state:%d\n", __func__,
-			sdata->attached_dev, tx_data, sdata->hv_state);
+			muic_pdata->attached_dev, tx_data, muic_pdata->hv_state);
 
-	switch (sdata->attached_dev) {
+	switch (muic_pdata->attached_dev) {
 	case ATTACHED_DEV_AFC_CHARGER_PREPARE_MUIC:
 		if (tx_data == MUIC_HV_9V)
-			muic_platform_hv_state_manager(sdata, HV_TRANS_FAST_CHARGE_REOPEN);
+			muic_core_hv_state_manager(muic_pdata, HV_TRANS_FAST_CHARGE_REOPEN);
 		break;
 	case ATTACHED_DEV_QC_CHARGER_5V_MUIC:
 		if (tx_data == MUIC_HV_9V)
@@ -830,13 +831,12 @@ static void s2mu106_if_change_afc_voltage(void *mdata, int tx_data)
 
 int s2mu106_if_afc_get_voltage(void *mdata)
 {
-	struct muic_share_data *sdata = (struct muic_share_data *)mdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata = (struct muic_platform_data *)mdata;
 	struct s2mu106_muic_data *muic_data = muic_pdata->drv_data;
 	int ret = -1;
 
 	mutex_lock(&muic_data->afc_mutex);
-	switch (sdata->attached_dev) {
+	switch (muic_pdata->attached_dev) {
 	case ATTACHED_DEV_AFC_CHARGER_9V_MUIC:
 	case ATTACHED_DEV_QC_CHARGER_9V_MUIC:
 		ret = 9;
@@ -852,7 +852,7 @@ int s2mu106_if_afc_get_voltage(void *mdata)
 	default:
 		break;
 	}
-	pr_info("%s attached_dev(%d)\n", __func__, sdata->attached_dev);
+	pr_info("%s attached_dev(%d)\n", __func__, muic_pdata->attached_dev);
 	mutex_unlock(&muic_data->afc_mutex);
 
 	return ret;
@@ -860,8 +860,7 @@ int s2mu106_if_afc_get_voltage(void *mdata)
 
 int s2mu106_if_afc_set_voltage(void *mdata, int vol)
 {
-	struct muic_share_data *sdata = (struct muic_share_data *)mdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata = (struct muic_platform_data *)mdata;
 	struct s2mu106_muic_data *muic_data = muic_pdata->drv_data;
 	int ret;
 
@@ -905,12 +904,12 @@ static void s2mu106_hv_muic_reset_work(struct work_struct *work)
 {
 	struct s2mu106_muic_data *muic_data =
 	    container_of(work, struct s2mu106_muic_data, reset_work.work);
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
 	mutex_lock(&muic_data->afc_mutex);
 	pr_info("%s\n", __func__);
 
-	muic_platform_hv_state_manager(sdata, HV_TRANS_NO_RESPONSE);
+	muic_core_hv_state_manager(muic_pdata, HV_TRANS_NO_RESPONSE);
 
 	mutex_unlock(&muic_data->afc_mutex);
 }
@@ -919,7 +918,7 @@ static void s2mu106_hv_muic_mping_retry_work(struct work_struct *work)
 {
 	struct s2mu106_muic_data *muic_data =
 	    container_of(work, struct s2mu106_muic_data, mping_retry_work.work);
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
 	mutex_lock(&muic_data->afc_mutex);
 	cancel_delayed_work(&muic_data->mping_retry_work);
@@ -932,7 +931,7 @@ static void s2mu106_hv_muic_mping_retry_work(struct work_struct *work)
 		muic_data->mrxrdy_cnt = 0;
 		muic_data->mping_cnt = 0;
 
-		muic_platform_hv_state_manager(sdata, HV_TRANS_NO_RESPONSE);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_NO_RESPONSE);
 	}
 
 	mutex_unlock(&muic_data->afc_mutex);
@@ -942,7 +941,7 @@ static void s2mu106_hv_muic_qc_retry_work(struct work_struct *work)
 {
 	struct s2mu106_muic_data *muic_data =
 	    container_of(work, struct s2mu106_muic_data, qc_retry_work.work);
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	int vchgin = 0;
 
 	mutex_lock(&muic_data->afc_mutex);
@@ -961,7 +960,7 @@ static void s2mu106_hv_muic_qc_retry_work(struct work_struct *work)
 		goto exit;
 	} else if (IS_VCHGIN_9V(vchgin)) {
 		muic_data->qc_retry_wait_cnt = 0;
-		muic_platform_hv_state_manager(sdata, HV_TRANS_VBUS_BOOST);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_VBUS_BOOST);
 		goto exit;
 	}
 
@@ -974,7 +973,7 @@ static void s2mu106_hv_muic_qc_retry_work(struct work_struct *work)
 
 		schedule_delayed_work(&muic_data->qc_retry_work, msecs_to_jiffies(150));
 	} else {
-		muic_platform_hv_state_manager(sdata, HV_TRANS_NO_RESPONSE);
+		muic_core_hv_state_manager(muic_pdata, HV_TRANS_NO_RESPONSE);
 	}
 exit:
 	mutex_unlock(&muic_data->afc_mutex);
@@ -987,8 +986,7 @@ static irqreturn_t s2mu106_hv_muic_vdnmon_isr(int irq, void *data)
 {
 	struct s2mu106_muic_data *muic_data = data;
 	u8 vdnmon = 0;
-	struct muic_share_data *sdata = muic_data->sdata;
-	struct muic_platform_data *muic_pdata = sdata->pdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	int vbus = 0;
 
 	mutex_lock(&muic_data->afc_mutex);
@@ -999,14 +997,14 @@ static irqreturn_t s2mu106_hv_muic_vdnmon_isr(int irq, void *data)
 	pr_info("%s vdnmon(%s) vbus(%d)\n", __func__, (vdnmon ? "High" : "Low"), vbus);
 
 	if (muic_data->is_dp_drive && !vdnmon && vbus) {
-		if (muic_pdata->afc_disable == false) {
-			muic_platform_hv_state_manager(sdata, HV_TRANS_VDNMON_LOW);
+		if (muic_data->pdata->afc_disable == false) {
+			muic_core_hv_state_manager(muic_pdata, HV_TRANS_VDNMON_LOW);
 		} else {
 			s2mu106_hv_muic_set_chgtype_usrcmd(muic_data);
 		}
 	} else {
 		pr_err("%s afc blocked is_dp_drive:%d, afc_disable:%d\n",
-			__func__, muic_data->is_dp_drive, muic_pdata->afc_disable);
+			__func__, muic_data->is_dp_drive, muic_data->pdata->afc_disable);
 	}
 
 	mutex_unlock(&muic_data->afc_mutex);
@@ -1041,7 +1039,7 @@ static irqreturn_t s2mu106_hv_muic_mrxtrf_isr(int irq, void *data)
 static irqreturn_t s2mu106_hv_muic_mrxrdy_isr(int irq, void *data)
 {
 	struct s2mu106_muic_data *muic_data = data;
-	struct muic_share_data *sdata = muic_data->sdata;
+	struct muic_platform_data *muic_pdata = muic_data->pdata;
 
 	mutex_lock(&muic_data->afc_mutex);
 	if (muic_data->is_hvcharger_detected == false) {
@@ -1053,7 +1051,7 @@ static irqreturn_t s2mu106_hv_muic_mrxrdy_isr(int irq, void *data)
 	pr_info("%s\n", __func__);
 
 	muic_data->mrxrdy_cnt++;
-	muic_platform_hv_state_manager(sdata, HV_TRANS_FAST_CHARGE_PING_RESPONSE);
+	muic_core_hv_state_manager(muic_pdata, HV_TRANS_FAST_CHARGE_PING_RESPONSE);
 
 	mutex_unlock(&muic_data->afc_mutex);
 	return IRQ_HANDLED;
@@ -1136,8 +1134,6 @@ int s2mu106_hv_muic_init(struct s2mu106_muic_data *muic_data)
 {
 	int ret = 0;
 	struct muic_interface_t *muic_if;
-	struct muic_share_data *sdata = muic_data->sdata;
-	struct muic_ic_data *ic_data = sdata->ic_data;
 	struct muic_platform_data *muic_pdata;
 
 	if (muic_data == NULL) {
@@ -1147,7 +1143,7 @@ int s2mu106_hv_muic_init(struct s2mu106_muic_data *muic_data)
 
 	pr_info("%s start\n", __func__);
 
-	muic_pdata = muic_data->sdata->pdata;
+	muic_pdata = muic_data->pdata;
 	static_data = muic_data;
 
 	mutex_init(&muic_data->afc_mutex);
@@ -1163,29 +1159,30 @@ int s2mu106_hv_muic_init(struct s2mu106_muic_data *muic_data)
 
 	muic_pdata->muic_hv_charger_init_cb = s2mu106_hv_muic_hv_charger_init;
 
-	ic_data->m_ops.check_afc_ready = s2mu106_if_check_afc_ready;
-	ic_data->m_ops.reset_hvcontrol_reg = s2mu106_if_reset_hvcontrol_reg;
-	ic_data->m_ops.check_id_err = s2mu106_if_check_id_err;
-	ic_data->m_ops.set_afc_ready = s2mu106_if_set_afc_ready;
+	muic_if->check_afc_ready = s2mu106_if_check_afc_ready;
+	muic_if->reset_hvcontrol_reg = s2mu106_if_reset_hvcontrol_reg;
+	muic_if->check_id_err = s2mu106_if_check_id_err;
+	muic_if->set_afc_ready = s2mu106_if_set_afc_ready;
 #ifdef CONFIG_HV_MUIC_VOLTAGE_CTRL
-	ic_data->m_ops.change_afc_voltage = s2mu106_if_change_afc_voltage;
-	ic_data->m_ops.afc_get_voltage = s2mu106_if_afc_get_voltage;
-	ic_data->m_ops.afc_set_voltage = s2mu106_if_afc_set_voltage;
+	muic_if->set_afc_voltage = s2mu106_if_set_afc_voltage;
+	muic_if->change_afc_voltage = s2mu106_if_change_afc_voltage;
+	muic_if->afc_get_voltage = s2mu106_if_afc_get_voltage;
+	muic_if->afc_set_voltage = s2mu106_if_afc_set_voltage;
 #endif
-	ic_data->m_ops.set_chgtype_usrcmd = s2mu106_if_set_chgtype_usrcmd;
-	ic_data->m_ops.hv_reset = s2mu106_if_hv_muic_reset;
-	ic_data->m_ops.hv_dcp_charger = s2mu106_if_hv_muic_dcp_charger;
-	ic_data->m_ops.hv_fast_charge_adaptor = s2mu106_if_hv_muic_fast_charge_adaptor;
-	ic_data->m_ops.hv_fast_charge_communication = s2mu106_if_hv_muic_fast_charge_communication;
-	ic_data->m_ops.hv_afc_5v_charger = s2mu106_if_hv_muic_afc_5v_charger;
-	ic_data->m_ops.hv_afc_9v_charger = s2mu106_if_hv_muic_afc_9v_charger;
-	ic_data->m_ops.hv_qc_charger = s2mu106_if_hv_muic_qc_charger;
-	ic_data->m_ops.hv_qc_5v_charger = s2mu106_if_hv_muic_qc_5v_charger;
-	ic_data->m_ops.hv_qc_9v_charger = s2mu106_if_hv_muic_qc_9v_charger;
+	muic_if->set_chgtype_usrcmd = s2mu106_if_set_chgtype_usrcmd;
+	muic_if->hv_reset = s2mu106_if_hv_muic_reset;
+	muic_if->hv_dcp_charger = s2mu106_if_hv_muic_dcp_charger;
+	muic_if->hv_fast_charge_adaptor = s2mu106_if_hv_muic_fast_charge_adaptor;
+	muic_if->hv_fast_charge_communication = s2mu106_if_hv_muic_fast_charge_communication;
+	muic_if->hv_afc_5v_charger = s2mu106_if_hv_muic_afc_5v_charger;
+	muic_if->hv_afc_9v_charger = s2mu106_if_hv_muic_afc_9v_charger;
+	muic_if->hv_qc_charger = s2mu106_if_hv_muic_qc_charger;
+	muic_if->hv_qc_5v_charger = s2mu106_if_hv_muic_qc_5v_charger;
+	muic_if->hv_qc_9v_charger = s2mu106_if_hv_muic_qc_9v_charger;
 
 #if IS_ENABLED(CONFIG_MUIC_SUPPORT_POWERMETER)
-	ic_data->m_ops.get_vbus_value = s2mu106_if_get_vbus_value;
-	ic_data->m_ops.pm_chgin_irq = s2mu106_if_vchgin_isr;
+	muic_if->get_vbus_voltage = s2mu106_if_get_vbus_voltage;
+	muic_if->pm_chgin_irq = s2mu106_if_vchgin_isr;
 #if IS_ENABLED(CONFIG_CHARGER_S2MU106)	
 	muic_data->psy_pm = get_power_supply_by_name("s2mu106_pmeter");
 #endif
@@ -1210,7 +1207,7 @@ int s2mu106_hv_muic_init(struct s2mu106_muic_data *muic_data)
 	INIT_DELAYED_WORK(&muic_data->qc_retry_work, s2mu106_hv_muic_qc_retry_work);
 	INIT_DELAYED_WORK(&muic_data->muic_hv_charger_init_work, s2mu106_hv_muic_hv_charger_init_work);
 
-	muic_platform_hv_init(sdata);
+	muic_core_hv_init(muic_pdata);
 
 	return ret;
 }
