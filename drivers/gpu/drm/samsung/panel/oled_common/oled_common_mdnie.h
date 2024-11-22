@@ -11,7 +11,7 @@
 #ifndef __OLED_COMMON_MDNIE_H__
 #define __OLED_COMMON_MDNIE_H__
 
-#include "../maptbl.h"
+#include "../usdm_maptbl.h"
 
 int oled_maptbl_getidx_mdnie_scenario_mode(struct maptbl *tbl);
 #ifdef CONFIG_USDM_PANEL_HMD

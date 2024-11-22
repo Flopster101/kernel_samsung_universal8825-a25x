@@ -36,9 +36,11 @@
 #include "../exynos_drm_dqe.h"
 #include "panel-samsung-drv.h"
 #include "mcd-panel-samsung-helper.h"
-#include "panel_drv.h"
+#include "usdm_panel_drv.h"
+#include "decon_panel_drv.h"
 #if IS_ENABLED(CONFIG_PANEL_FREQ_HOP) || IS_ENABLED(CONFIG_USDM_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "usdm_panel_freq_hop.h"
+#include "decon_panel_freq_hop.h"
 #endif
 
 #define MCD_PANEL_PROBE_DELAY_MSEC (5000)

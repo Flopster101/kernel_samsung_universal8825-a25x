@@ -16,8 +16,8 @@
 #include <linux/io.h>
 
 #include "aod_drv_ioctl.h"
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../decon_panel_drv.h"
+#include "../decon_panel_debug.h"
 #include "aod_drv.h"
 
 int panel_do_aod_seqtbl_by_index_nolock(struct aod_dev_info *aod, int index)

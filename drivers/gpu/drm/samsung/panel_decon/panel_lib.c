@@ -11,8 +11,8 @@
 #include <asm-generic/errno-base.h>
 #include <linux/string.h>
 
-#include "panel_lib.h"
-#include "panel_debug.h"
+#include "decon_panel_lib.h"
+#include "decon_panel_debug.h"
 
 /* rdinfo */
 int decon_panel_lib_rdinfo_alloc_buffer(struct rdinfo *m)

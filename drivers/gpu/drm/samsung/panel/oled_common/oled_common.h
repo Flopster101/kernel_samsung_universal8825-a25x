@@ -13,14 +13,14 @@
 
 #include <linux/types.h>
 #include <linux/kernel.h>
-#include "../maptbl.h"
-#include "../panel_function.h"
+#include "../usdm_maptbl.h"
+#include "../usdm_panel_function.h"
 
-int oled_maptbl_init_default(struct maptbl *tbl);
-int oled_maptbl_getidx_default(struct maptbl *tbl);
+int usdm_oled_maptbl_init_default(struct maptbl *tbl);
+int usdm_oled_maptbl_getidx_default(struct maptbl *tbl);
 int oled_maptbl_getidx_gm2_brt(struct maptbl *tbl);
 void oled_maptbl_copy_dummy(struct maptbl *tbl, u8 *dst);
-void oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst);
+void usdm_oled_maptbl_copy_default(struct maptbl *tbl, u8 *dst);
 void oled_maptbl_copy_tset(struct maptbl *tbl, u8 *dst);
 #ifdef CONFIG_USDM_PANEL_COPR
 void oled_maptbl_copy_copr(struct maptbl *tbl, u8 *dst);

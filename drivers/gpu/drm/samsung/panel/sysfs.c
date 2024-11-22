@@ -12,34 +12,34 @@
 #include <linux/lcd.h>
 #include <linux/device.h>
 #include <linux/sec_panel_notifier_v2.h>
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_vrr.h"
-#include "panel_debug.h"
-#include "panel_bl.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_vrr.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_bl.h"
 #ifdef CONFIG_USDM_PANEL_COPR
-#include "copr.h"
+#include "usdm_copr.h"
 #endif
 #if defined(CONFIG_USDM_MDNIE)
-#include "mdnie.h"
+#include "usdm_mdnie.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_DIMMING
-#include "dimming.h"
+#include "usdm_dimming.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_DDI_FLASH
-#include "panel_poc.h"
+#include "usdm_panel_poc.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_SELF_DISPLAY
 #include "./aod/aod_drv.h"
 #endif
 #ifdef CONFIG_USDM_POC_SPI
-#include "panel_spi.h"
+#include "usdm_panel_spi.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_DPUI
-#include "dpui.h"
+#include "usdm_dpui.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_TESTMODE
-#include "panel_testmode.h"
+#include "usdm_panel_testmode.h"
 #endif
 
 #define INVALID_CELL_ID_STR ("0000000000")
@@ -328,7 +328,7 @@ static ssize_t mafpc_time_show(struct device *dev,
 
 static int mafpc_get_target_crc(struct panel_device *panel, u8 *crc)
 {
-	struct mafpc_device *mafpc = get_mafpc_device(panel);
+	struct mafpc_device *mafpc = usdm_get_mafpc_device(panel);
 
 	if (!mafpc) {
 		panel_err("failed to get mafpc info\n");
@@ -356,7 +356,7 @@ static void prepare_mafpc_check_mode(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to panel_disable_irq\n");
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
 	if (ret < 0)
 		panel_err("failed exit-seq\n");
 
@@ -372,7 +372,7 @@ static void prepare_mafpc_check_mode(struct panel_device *panel)
 	if (ret < 0 && ret != -ENODATA)
 		panel_warn("skip panel_reset_lp11\n");
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
 	if (ret < 0)
 		panel_err("failed init-seq\n");
 
@@ -425,7 +425,7 @@ static ssize_t mafpc_check_show(struct device *dev,
 		goto exit;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		panel_err("gct not supported on LPM\n");
 		goto exit;
 	}
@@ -441,13 +441,13 @@ static ssize_t mafpc_check_show(struct device *dev,
 	panel_mutex_lock(&panel->op_lock);
 	prepare_mafpc_check_mode(panel);
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_MAFPC_CHECKSUM_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MAFPC_CHECKSUM_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write panel_mafpc_crc seq\n");
 		goto out;
 	}
 
-	ret = panel_resource_copy_and_clear(panel, target_crc, "mafpc_crc");
+	ret = usdm_panel_resource_copy_and_clear(panel, target_crc, "mafpc_crc");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read mafpc crc\n");
 		goto out;
@@ -580,7 +580,7 @@ static ssize_t color_coordinate_show(struct device *dev,
 	}
 	panel_data = &panel->panel_data;
 
-	panel_resource_copy(panel, coordinate, "coordinate");
+	usdm_panel_resource_copy(panel, coordinate, "coordinate");
 
 	snprintf(buf, PAGE_SIZE, "%u, %u\n", /* X, Y */
 			coordinate[0] << 8 | coordinate[1],
@@ -623,7 +623,7 @@ static ssize_t brightness_table_show(struct device *dev,
 
 	panel_mutex_lock(&panel_bl->lock);
 	for (br = 0; br <= max_brightness; br++) {
-		actual_brightness = get_actual_brightness(panel_bl, br);
+		actual_brightness = usdm_get_actual_brightness(panel_bl, br);
 		if (recv_len == 0) {
 			recv_len += snprintf(recv_buf, recv_buf_len, "%5d", prev_br);
 			prev_actual_brightness = actual_brightness;
@@ -840,7 +840,7 @@ static ssize_t mcd_mode_store(struct device *dev,
 	panel_data->props.mcd_on = value;
 	panel_mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name(panel,
+	ret = usdm_panel_do_seqtbl_by_name(panel,
 			value ? PANEL_MCD_ON_SEQ : PANEL_MCD_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd seq\n");
@@ -892,7 +892,7 @@ static int read_mcd_resistance(struct panel_device *panel)
 	if (ret < 0)
 		panel_err("failed to panel_disable_irq\n");
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_MCD_RS_ON_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MCD_RS_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd_3_0_on seq\n");
 		goto out;
@@ -901,14 +901,14 @@ static int read_mcd_resistance(struct panel_device *panel)
 	memset(mcd_nok, 0, sizeof(mcd_nok));
 	for (code = 0; code < 0x80; code++) {
 		panel_data->props.mcd_resistance = code;
-		ret = panel_do_seqtbl_by_name_nolock(panel,
+		ret = usdm_panel_do_seqtbl_by_name_nolock(panel,
 				PANEL_MCD_RS_READ_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write mcd_rs_read seq\n");
 			goto out;
 		}
 
-		ret = panel_resource_copy_and_clear(panel,
+		ret = usdm_panel_resource_copy_and_clear(panel,
 				&mcd_nok[code], "mcd_resistance");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to copy resource(mcd_resistance) (ret %d)\n", ret);
@@ -930,7 +930,7 @@ static int read_mcd_resistance(struct panel_device *panel)
 		panel_data->props.mcd_rs_range[i][1] = end;
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_MCD_RS_OFF_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MCD_RS_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mcd_3_0_off seq\n");
 		goto out;
@@ -1016,18 +1016,18 @@ static ssize_t mcd_resistance_store(struct device *dev,
 					panel_data->props.mcd_rs_range[i][1]);
 
 #ifdef CONFIG_USDM_PANEL_DDI_FLASH
-		ret = set_panel_poc(&panel->poc_dev, POC_OP_MCD_READ, NULL);
+		ret = usdm_set_panel_poc(&panel->poc_dev, POC_OP_MCD_READ, NULL);
 		if (unlikely(ret)) {
 			panel_err("failed to read mcd(ret %d)\n", ret);
 			return ret;
 		}
-		ret = panel_resource_update_by_name(panel, "flash_mcd");
+		ret = usdm_panel_resource_update_by_name(panel, "flash_mcd");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to update flash_mcd res (ret %d)\n", ret);
 			return ret;
 		}
 
-		ret = panel_resource_copy(panel, flash_mcd, "flash_mcd");
+		ret = usdm_panel_resource_copy(panel, flash_mcd, "flash_mcd");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to copy flash_mcd res (ret %d)\n", ret);
 			return ret;
@@ -1134,7 +1134,7 @@ static ssize_t dia_store(struct device *dev,
 	panel_set_property(panel, &panel_data->props.dia_mode, value);
 	panel_mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_DIA_ONOFF_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_DIA_ONOFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write %s\n", PANEL_DIA_ONOFF_SEQ);
 		return ret;
@@ -1183,7 +1183,7 @@ static ssize_t partial_disp_store(struct device *dev,
 		panel_data->props.panel_partial_disp = value;
 		panel_mutex_unlock(&panel->op_lock);
 
-		ret = panel_do_seqtbl_by_name(panel,
+		ret = usdm_panel_do_seqtbl_by_name(panel,
 				value ? PANEL_PARTIAL_DISP_ON_SEQ : PANEL_PARTIAL_DISP_OFF_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write mcd seq\n");
@@ -1239,7 +1239,7 @@ ssize_t mst_store(struct device *dev, struct device_attribute *attr, const char 
 	panel_data->props.mst_on = value;
 	panel_mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name(panel, value ? PANEL_MST_ON_SEQ : PANEL_MST_OFF_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, value ? PANEL_MST_ON_SEQ : PANEL_MST_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write mst seq\n");
 		return ret;
@@ -1268,7 +1268,7 @@ static void clear_gct_mode(struct panel_device *panel)
 	struct panel_info *panel_data = &panel->panel_data;
 	int ret;
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
 	if (ret < 0)
 		panel_err("failed exit-seq\n");
 
@@ -1284,7 +1284,7 @@ static void clear_gct_mode(struct panel_device *panel)
 	if (ret < 0 && ret != -ENODATA)
 		panel_warn("skip panel_reset_lp11\n");
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
 	if (ret < 0)
 		panel_err("failed init-seq\n");
 
@@ -1383,7 +1383,7 @@ static ssize_t gct_store(struct device *dev,
 		return -EAGAIN;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		panel_warn("gct not supported on LPM\n");
 		panel_mutex_unlock(&panel->io_lock);
 		return -EINVAL;
@@ -1413,7 +1413,7 @@ static ssize_t gct_store(struct device *dev,
 	}
 #endif
 #endif
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_ENTER_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_ENTER_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write gram-checksum-test-enter seq\n");
 		result = ret;
@@ -1422,7 +1422,7 @@ static ssize_t gct_store(struct device *dev,
 
 	for (vddm = VDDM_LV; vddm < MAX_VDDM; vddm++) {
 		panel_set_property(panel, &panel_data->props.gct_vddm, vddm);
-		ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_VDDM_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_VDDM_SEQ);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write gram-checksum-on seq\n");
 			result = ret;
@@ -1432,7 +1432,7 @@ static ssize_t gct_store(struct device *dev,
 		for (pattern = GCT_PATTERN_1; pattern < MAX_GCT_PATTERN; pattern++) {
 			panel_set_property(panel, &panel_data->props.gct_pattern, pattern);
 			seqtbl = find_panel_seq_by_name(panel, PANEL_GCT_IMG_UPDATE_SEQ);
-			ret = panel_do_seqtbl_by_name_nolock(panel,
+			ret = usdm_panel_do_seqtbl_by_name_nolock(panel,
 					(seqtbl && seqtbl->cmdtbl) ? PANEL_GCT_IMG_UPDATE_SEQ :
 					((pattern == GCT_PATTERN_1) ?
 					 PANEL_GCT_IMG_0_UPDATE_SEQ : PANEL_GCT_IMG_1_UPDATE_SEQ));
@@ -1442,7 +1442,7 @@ static ssize_t gct_store(struct device *dev,
 				goto out;
 			}
 
-			ret = panel_resource_copy_and_clear(panel,
+			ret = usdm_panel_resource_copy_and_clear(panel,
 					&checksum[index], "gram_checksum");
 			if (unlikely(ret < 0)) {
 				panel_err("failed to copy gram_checksum[%d] (ret %d)\n", index, ret);
@@ -1454,7 +1454,7 @@ static ssize_t gct_store(struct device *dev,
 		}
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_EXIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_GCT_EXIT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write gram-checksum-off seq\n");
 		result = ret;
@@ -1592,7 +1592,7 @@ static ssize_t dsc_crc_store(struct device *dev,
 		goto exit;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		panel_warn("dsc_crc not supported on LPM\n");
 		panel_mutex_unlock(&panel->io_lock);
 		ret = -EINVAL;
@@ -1724,13 +1724,13 @@ static ssize_t poc_show(struct device *dev,
 	poc_dev = &panel->poc_dev;
 	poc_info = &poc_dev->poc_info;
 
-	ret = set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
+	ret = usdm_set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to chkpoc (ret %d)\n", ret);
 		return ret;
 	}
 
-	ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+	ret = usdm_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to chksum (ret %d)\n", ret);
 		return ret;
@@ -1799,7 +1799,7 @@ static ssize_t poc_store(struct device *dev,
 		atomic_set(&poc_dev->cancel, 1);
 	} else {
 		panel_mutex_lock(&panel->io_lock);
-		ret = set_panel_poc(poc_dev, value, (void *)buf);
+		ret = usdm_set_panel_poc(poc_dev, value, (void *)buf);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to poc_op %d(ret %d)\n", value, ret);
 			panel_mutex_unlock(&panel->io_lock);
@@ -1837,20 +1837,20 @@ static ssize_t poc_mca_show(struct device *dev,
 	}
 
 	panel_set_key(panel, 2, true);
-	ret = panel_resource_update_by_name(panel, "poc_mca_chksum");
+	ret = usdm_panel_resource_update_by_name(panel, "poc_mca_chksum");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to update poc_mca_chksum res (ret %d)\n", ret);
 		return ret;
 	}
 	panel_set_key(panel, 2, false);
 
-	ret = panel_resource_copy(panel, chksum_data, "poc_mca_chksum");
+	ret = usdm_panel_resource_copy(panel, chksum_data, "poc_mca_chksum");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to copy poc_mca_chksum res (ret %d)\n", ret);
 		return ret;
 	}
 
-	len = get_panel_resource_size(panel, "poc_mca_chksum");
+	len = usdm_get_panel_resource_size(panel, "poc_mca_chksum");
 	for (i = 0; i < len; i++)
 		ofs += snprintf(buf + ofs,
 				PAGE_SIZE - ofs, "%02X ", chksum_data[i]);
@@ -2014,7 +2014,7 @@ static ssize_t grayspot_store(struct device *dev,
 	panel_data->props.grayspot = value;
 	panel_mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name(panel,
+	ret = usdm_panel_do_seqtbl_by_name(panel,
 			value ? PANEL_GRAYSPOT_ON_SEQ : PANEL_GRAYSPOT_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write grayspot on/off seq\n");
@@ -2154,7 +2154,7 @@ static ssize_t hmt_on_store(struct device *dev,
 		goto exit;
 	}
 
-	vrr = get_panel_vrr(panel);
+	vrr = usdm_get_panel_vrr(panel);
 	if (vrr != NULL && value == PANEL_HMD_ON) {
 		if (vrr->fps != 60 || vrr->mode != 0) {
 			panel_err("failed to set hmd %s: fps %d mode %d\n",
@@ -2165,7 +2165,7 @@ static ssize_t hmt_on_store(struct device *dev,
 		}
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel,
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel,
 			(value == PANEL_HMD_ON) ? PANEL_HMD_ON_SEQ : PANEL_HMD_OFF_SEQ);
 	if (ret < 0)
 		panel_err("failed to set hmd %s seq\n",
@@ -2210,9 +2210,9 @@ static int set_alpm_mode(struct panel_device *panel, int mode)
 	case ALPM_HIGH_BR:
 	case HLPM_HIGH_BR:
 		panel_data->props.alpm_mode = lpm_mode;
-		if (panel_get_cur_state(panel) != PANEL_STATE_ALPM) {
+		if (usdm_panel_get_cur_state(panel) != PANEL_STATE_ALPM) {
 			panel_info("panel state(%d) is not lpm mode\n",
-					panel_get_cur_state(panel));
+					usdm_panel_get_cur_state(panel));
 			return ret;
 		}
 #if defined(CONFIG_USDM_PANEL_AOD_BL)
@@ -2472,7 +2472,7 @@ static ssize_t lux_store(struct device *dev,
 		panel_mutex_lock(&panel->op_lock);
 		panel_data->props.lux = value;
 		panel_mutex_unlock(&panel->op_lock);
-		attr_store_for_each(mdnie->class, attr->attr.name, buf, size);
+		usdm_attr_store_for_each(mdnie->class, attr->attr.name, buf, size);
 	}
 
 	return size;
@@ -2503,13 +2503,13 @@ static ssize_t copr_store(struct device *dev,
 	while ((p = strsep(&arg, " \t")) != NULL) {
 		if (!*p)
 			continue;
-		index = find_copr_reg_by_name(copr->props.version, p);
+		index = usdm_find_copr_reg_by_name(copr->props.version, p);
 		if (index < 0) {
 			panel_err("arg(%s) not found\n", p);
 			continue;
 		}
 
-		name = get_copr_reg_name(copr->props.version, index);
+		name = usdm_get_copr_reg_name(copr->props.version, index);
 		if (name == NULL) {
 			panel_err("arg(%s) not found\n", p);
 			continue;
@@ -3029,7 +3029,7 @@ static ssize_t self_mask_check_show(struct device *dev,
 	aod = &panel->aod;
 	panel_data = &panel->panel_data;
 
-	if (!find_panel_dumpinfo(panel, "self_mask_crc")) {
+	if (!usdm_find_panel_dumpinfo(panel, "self_mask_crc")) {
 		if (!aod->props.self_mask_crc_len)
 			return snprintf(buf, PAGE_SIZE, "-1\n");
 
@@ -3045,7 +3045,7 @@ static ssize_t self_mask_check_show(struct device *dev,
 			return ret;
 		}
 
-		ret = panel_resource_copy_and_clear(panel, recv_crc, "self_mask_crc");
+		ret = usdm_panel_resource_copy_and_clear(panel, recv_crc, "self_mask_crc");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to get selfmask crc\n");
 			kfree(recv_crc);
@@ -3074,9 +3074,9 @@ static ssize_t self_mask_check_show(struct device *dev,
 		clear_self_mask_check(panel);
 
 		len = snprintf(buf, PAGE_SIZE, "%d ",
-				panel_is_dump_status_success(panel, "self_mask_crc"));
-		len += snprintf_resource_data((char *)buf + len, PAGE_SIZE - len,
-				panel_get_dump_resource(panel, "self_mask_crc"));
+				usdm_panel_is_dump_status_success(panel, "self_mask_crc"));
+		len += usdm_snprintf_resource_data((char *)buf + len, PAGE_SIZE - len,
+				usdm_panel_get_dump_resource(panel, "self_mask_crc"));
 		len += snprintf(buf + len, PAGE_SIZE - len, "\n");
 	}
 
@@ -3177,7 +3177,7 @@ static ssize_t isc_defect_store(struct device *dev,
 	panel_mutex_lock(&panel->op_lock);
 
 	if (value) {
-		ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_CHECK_ISC_DEFECT_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_CHECK_ISC_DEFECT_SEQ);
 		if (unlikely(ret < 0))
 			panel_err("failed to write ics defect seq\n");
 	}
@@ -3223,7 +3223,7 @@ static ssize_t brightdot_store(struct device *dev,
 	panel_info("%u -> %u\n", panel_data->props.brightdot_test_enable, value);
 	panel_set_property(panel, &panel_data->props.brightdot_test_enable, value);
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_BRIGHTDOT_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_BRIGHTDOT_TEST_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write brightdot seq\n");
 
@@ -3269,7 +3269,7 @@ static ssize_t vglhighdot_store(struct device *dev,
 	panel_info("%u -> %u\n", panel_data->props.vglhighdot, value);
 	panel_set_property(panel, &panel_data->props.vglhighdot, value);
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_VGLHIGHDOT_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_VGLHIGHDOT_TEST_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to run %s\n", PANEL_VGLHIGHDOT_TEST_SEQ);
 
@@ -3310,7 +3310,7 @@ static ssize_t spi_if_sel_store(struct device *dev,
 
 	panel_info("%d\n", value);
 	panel_mutex_lock(&panel->op_lock);
-	ret = panel_do_seqtbl_by_name_nolock(panel,
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel,
 			value ? PANEL_SPI_IF_ON_SEQ : PANEL_SPI_IF_OFF_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write spi-if-%s seq\n", value ? "on" : "off");
@@ -3337,7 +3337,7 @@ static ssize_t error_flag_store(struct device *dev,
 	if (rc < 0)
 		return rc;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_FMEM_TEST_WRITE_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_FMEM_TEST_WRITE_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write trim\n");
 		return ret;
@@ -3362,13 +3362,13 @@ static ssize_t error_flag_show(struct device *dev,
 	}
 	panel_data = &panel->panel_data;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_FMEM_TEST_READ_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_FMEM_TEST_READ_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read err_flag\n");
 		return ret;
 	}
 
-	ret = panel_resource_copy(panel, err_flag, "err_flag");
+	ret = usdm_panel_resource_copy(panel, err_flag, "err_flag");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read err_flag \n");
 		return ret;
@@ -3412,7 +3412,7 @@ static ssize_t ccd_state_show(struct device *dev,
 	}
 	panel_data = &panel->panel_data;
 
-	info = find_panel_resource(panel, "ccd_state");
+	info = usdm_find_panel_resource(panel, "ccd_state");
 	if (unlikely(info == NULL)) {
 		panel_err("failed to get ccd resource\n");
 		return -EINVAL;
@@ -3424,20 +3424,20 @@ static ssize_t ccd_state_show(struct device *dev,
 		return -EINVAL;
 	}
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_CCD_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_CCD_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write ccd seq\n");
 		return ret;
 	}
 
-	ret = panel_resource_copy_and_clear(panel, ccd_state, "ccd_state");
+	ret = usdm_panel_resource_copy_and_clear(panel, ccd_state, "ccd_state");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read ccd_state \n");
 		return ret;
 	}
 
 	for (ires = 0; ires < ARRAY_SIZE(ccd_resource_name); ires++) {
-		info = find_panel_resource(panel, (char *)ccd_resource_name[ires]);
+		info = usdm_find_panel_resource(panel, (char *)ccd_resource_name[ires]);
 		if (info) {
 			panel_info("find ccd compare resource.(%s)\n", (char *)ccd_resource_name[ires]);
 			break;
@@ -3451,7 +3451,7 @@ static ssize_t ccd_state_show(struct device *dev,
 						ccd_resource_name[ires], info->dlen, ccd_size);
 				return -EINVAL;
 			}
-			if (copy_resource_slice(ccd_compare, info, 0, ccd_size) < 0)
+			if (usdm_copy_resource_slice(ccd_compare, info, 0, ccd_size) < 0)
 				return -EINVAL;
 
 			if (ires == CCD_CHKSUM_PASS) {
@@ -3466,7 +3466,7 @@ static ssize_t ccd_state_show(struct device *dev,
 		} else if (ires == CCD_CHKSUM_PASS_LIST) {
 			retVal = 0;
 
-			if (copy_resource_slice(ccd_compare, info, 0, info->dlen) < 0)
+			if (usdm_copy_resource_slice(ccd_compare, info, 0, info->dlen) < 0)
 				return -EINVAL;
 
 			for (i = 0 ; i < info->dlen; i++) {
@@ -3509,7 +3509,7 @@ static ssize_t vrr_show(struct device *dev,
 	if (!panel_vrr_is_supported(panel))
 		return snprintf(buf, PAGE_SIZE, "60 0\n");
 
-	vrr = get_panel_vrr(panel);
+	vrr = usdm_get_panel_vrr(panel);
 	if (vrr == NULL)
 		return -EINVAL;
 
@@ -4381,7 +4381,7 @@ static ssize_t panel_aging_store(struct device *dev,
 	panel_data->props.panel_aging = value;
 	panel_mutex_unlock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name(panel,
+	ret = usdm_panel_do_seqtbl_by_name(panel,
 			value ? PANEL_AGING_ON_SEQ : PANEL_AGING_OFF_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to run %s\n",
@@ -4579,7 +4579,7 @@ static int attr_find_and_store(struct device *dev, void *data)
 	return 0;
 }
 
-ssize_t attr_store_for_each(struct class *class,
+ssize_t usdm_attr_store_for_each(struct class *class,
 	const char *name, const char *buf, size_t size)
 {
 	struct attr_store_args args = {
@@ -4593,7 +4593,7 @@ ssize_t attr_store_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_store);
 }
-EXPORT_SYMBOL(attr_store_for_each);
+EXPORT_SYMBOL(usdm_attr_store_for_each);
 
 static int attr_find_and_show(struct device *dev, void *data)
 {
@@ -4621,7 +4621,7 @@ static int attr_find_and_show(struct device *dev, void *data)
 	return 0;
 }
 
-ssize_t attr_show_for_each(struct class *class,
+ssize_t usdm_attr_show_for_each(struct class *class,
 	const char *name, char *buf)
 {
 	struct attr_show_args args = {
@@ -4634,7 +4634,7 @@ ssize_t attr_show_for_each(struct class *class,
 
 	return class_for_each_device(class, NULL, &args, attr_find_and_show);
 }
-EXPORT_SYMBOL(attr_show_for_each);
+EXPORT_SYMBOL(usdm_attr_show_for_each);
 
 static int attr_exist(struct device *dev, void *data)
 {
@@ -4653,7 +4653,7 @@ static int attr_exist(struct device *dev, void *data)
 	return 1;
 }
 
-ssize_t attr_exist_for_each(struct class *class, const char *name)
+ssize_t usdm_attr_exist_for_each(struct class *class, const char *name)
 {
 	struct attr_exist_args args = {
 		.name = name,
@@ -4664,7 +4664,7 @@ ssize_t attr_exist_for_each(struct class *class, const char *name)
 
 	return class_for_each_device(class, NULL, &args, attr_exist);
 }
-EXPORT_SYMBOL(attr_exist_for_each);
+EXPORT_SYMBOL(usdm_attr_exist_for_each);
 
 int panel_remove_svc_octa(struct panel_device *panel)
 {

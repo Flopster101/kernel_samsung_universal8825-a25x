@@ -10,9 +10,9 @@
 #include <linux/fb.h>
 #include <linux/notifier.h>
 #include <linux/export.h>
-#include "dpui.h"
-#include "panel_debug.h"
-#include "panel_drv.h"
+#include "usdm_dpui.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_drv.h"
 
 /*
  * DPUI : display use info (panel common info)

@@ -11,10 +11,10 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "dimming.h"
-#include "dimming_gamma.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
+#include "decon_dimming.h"
+#include "decon_dimming_gamma.h"
 
 static int NR_LUMINANCE;
 static int NR_TP;

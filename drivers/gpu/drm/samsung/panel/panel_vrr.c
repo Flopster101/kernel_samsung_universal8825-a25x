@@ -8,11 +8,11 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel_kunit.h"
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_vrr.h"
-#include "panel_debug.h"
+#include "usdm_panel_kunit.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_vrr.h"
+#include "usdm_panel_debug.h"
 
 const char *vrr_lfd_client_name[MAX_VRR_LFD_CLIENT] = {
 	[VRR_LFD_CLIENT_FAC] = "fac",
@@ -243,7 +243,7 @@ bool panel_vrr_is_valid(struct panel_device *panel)
 	return true;
 }
 
-__mockable struct panel_vrr *get_panel_vrr(struct panel_device *panel)
+__mockable struct panel_vrr *usdm_get_panel_vrr(struct panel_device *panel)
 {
 	struct panel_properties *props = &panel->panel_data.props;
 
@@ -252,28 +252,28 @@ __mockable struct panel_vrr *get_panel_vrr(struct panel_device *panel)
 
 	return panel->panel_data.vrrtbl[props->vrr_idx];
 }
-EXPORT_SYMBOL(get_panel_vrr);
+EXPORT_SYMBOL(usdm_get_panel_vrr);
 
-__mockable int get_panel_refresh_rate(struct panel_device *panel)
+__mockable int usdm_get_panel_refresh_rate(struct panel_device *panel)
 {
 	struct panel_vrr *vrr;
 
-	vrr = get_panel_vrr(panel);
+	vrr = usdm_get_panel_vrr(panel);
 	if (vrr == NULL)
 		return -EINVAL;
 
 	return vrr->fps;
 }
-EXPORT_SYMBOL(get_panel_refresh_rate);
+EXPORT_SYMBOL(usdm_get_panel_refresh_rate);
 
-__mockable int get_panel_refresh_mode(struct panel_device *panel)
+__mockable int usdm_get_panel_refresh_mode(struct panel_device *panel)
 {
 	struct panel_vrr *vrr;
 
-	vrr = get_panel_vrr(panel);
+	vrr = usdm_get_panel_vrr(panel);
 	if (vrr == NULL)
 		return -EINVAL;
 
 	return vrr->mode;
 }
-EXPORT_SYMBOL(get_panel_refresh_mode);
+EXPORT_SYMBOL(usdm_get_panel_refresh_mode);

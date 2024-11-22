@@ -13,8 +13,8 @@
 #include <linux/kernel.h>
 #include <linux/slab.h>
 #include <linux/errno.h>
-#include "panel_kunit.h"
-#include "panel_modes.h"
+#include "usdm_panel_kunit.h"
+#include "usdm_panel_modes.h"
 
 static const char *refresh_mode_names[MAX_REFRESH_MODE] = {
 	[REFRESH_MODE_NS] = "ns",
@@ -30,34 +30,34 @@ __visible_for_testing int panel_mode_snprintf(const struct panel_display_mode *m
 	return snprintf(buf, size, "Panel Modeline " PANEL_MODE_FMT "\n", PANEL_MODE_ARG(mode));
 }
 
-void panel_mode_debug_printmodeline(const struct panel_display_mode *mode)
+void usdm_panel_mode_debug_printmodeline(const struct panel_display_mode *mode)
 {
 	char buf[128];
 
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_debug("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_debug_printmodeline);
+EXPORT_SYMBOL(usdm_panel_mode_debug_printmodeline);
 
-void panel_mode_info_printmodeline(const struct panel_display_mode *mode)
+void usdm_panel_mode_info_printmodeline(const struct panel_display_mode *mode)
 {
 	char buf[128];
 
 	panel_mode_snprintf(mode, buf, sizeof(buf));
 	pr_info("%s", buf);
 }
-EXPORT_SYMBOL(panel_mode_info_printmodeline);
+EXPORT_SYMBOL(usdm_panel_mode_info_printmodeline);
 
-const char *refresh_mode_to_str(int refresh_mode)
+const char *usdm_refresh_mode_to_str(int refresh_mode)
 {
 	if (refresh_mode >= MAX_REFRESH_MODE)
 		return NULL;
 
 	return refresh_mode_names[refresh_mode];
 }
-EXPORT_SYMBOL(refresh_mode_to_str);
+EXPORT_SYMBOL(usdm_refresh_mode_to_str);
 
-int str_to_refresh_mode(const char *str)
+int usdm_str_to_refresh_mode(const char *str)
 {
 	int i;
 
@@ -71,9 +71,9 @@ int str_to_refresh_mode(const char *str)
 
 	return -1;
 }
-EXPORT_SYMBOL(str_to_refresh_mode);
+EXPORT_SYMBOL(usdm_str_to_refresh_mode);
 
-int panel_mode_vscan(const struct panel_display_mode *mode)
+int usdm_panel_mode_vscan(const struct panel_display_mode *mode)
 {
 	if (!mode)
 		return -EINVAL;
@@ -81,7 +81,7 @@ int panel_mode_vscan(const struct panel_display_mode *mode)
 	return max_t(typeof(mode->panel_te_sw_skip_count), mode->panel_te_sw_skip_count + 1, 1) *
 		max_t(typeof(mode->panel_te_hw_skip_count), mode->panel_te_hw_skip_count + 1, 1);
 }
-EXPORT_SYMBOL(panel_mode_vscan);
+EXPORT_SYMBOL(usdm_panel_mode_vscan);
 
 /**
  * of_parse_panel_display_mode - parse panel_display_mode entry from device_node
@@ -238,7 +238,7 @@ struct panel_display_modes *of_get_panel_display_modes(const struct device_node 
 
 		disp->modes[disp->num_modes] = pdm;
 		disp->num_modes++;
-		panel_mode_info_printmodeline(pdm);
+		usdm_panel_mode_info_printmodeline(pdm);
 	}
 	/*
 	 * native_mode points to the device_node returned by of_parse_phandle
@@ -262,15 +262,15 @@ entryfail:
 }
 EXPORT_SYMBOL_GPL(of_get_panel_display_modes);
 
-void panel_mode_set_name(struct panel_display_mode *mode)
+void usdm_panel_mode_set_name(struct panel_display_mode *mode)
 {
 	snprintf(mode->name, PANEL_DISPLAY_MODE_NAME_LEN, "%dx%d@%d%s",
 			mode->width, mode->height, mode->refresh_rate,
 			(mode->refresh_mode == REFRESH_MODE_NS) ? "NS" : "HS");
 }
-EXPORT_SYMBOL(panel_mode_set_name);
+EXPORT_SYMBOL(usdm_panel_mode_set_name);
 
-struct panel_display_mode *panel_mode_create(void)
+struct panel_display_mode *usdm_panel_mode_create(void)
 {
 	struct panel_display_mode *nmode;
 
@@ -280,4 +280,4 @@ struct panel_display_mode *panel_mode_create(void)
 
 	return nmode;
 }
-EXPORT_SYMBOL(panel_mode_create);
+EXPORT_SYMBOL(usdm_panel_mode_create);

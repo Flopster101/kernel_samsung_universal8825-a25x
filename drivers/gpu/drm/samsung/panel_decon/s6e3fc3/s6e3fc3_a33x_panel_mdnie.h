@@ -13,8 +13,8 @@
 #ifndef __S6E3FC3_A33X_PANEL_MDNIE_H__
 #define __S6E3FC3_A33X_PANEL_MDNIE_H__
 
-#include "../panel.h"
-#include "../mdnie.h"
+#include "../decon_panel.h"
+#include "../decon_mdnie.h"
 #include "s6e3fc3_a33x_panel.h"
 
 #define S6E3FC3_A33X_LINE_0_NUM	(-56)

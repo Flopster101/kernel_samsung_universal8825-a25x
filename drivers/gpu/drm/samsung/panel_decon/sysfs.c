@@ -12,31 +12,31 @@
 #include <linux/lcd.h>
 #include <linux/device.h>
 
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_vrr.h"
-#include "panel_debug.h"
-#include "panel_bl.h"
+#include "decon_panel.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_vrr.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_bl.h"
 #ifdef CONFIG_EXYNOS_DECON_LCD_COPR
-#include "copr.h"
+#include "decon_copr.h"
 #endif
 #if defined(CONFIG_EXYNOS_DECON_MDNIE_LITE)
-#include "mdnie.h"
+#include "decon_mdnie.h"
 #endif
 #ifdef CONFIG_PANEL_AID_DIMMING
-#include "dimming.h"
+#include "decon_dimming.h"
 #endif
 #ifdef CONFIG_SUPPORT_DDI_FLASH
-#include "panel_poc.h"
+#include "decon_panel_poc.h"
 #endif
 #ifdef CONFIG_EXTEND_LIVE_CLOCK
 #include "./aod/aod_drv.h"
 #endif
 #ifdef CONFIG_SUPPORT_POC_SPI
-#include "panel_spi.h"
+#include "decon_panel_spi.h"
 #endif
 #ifdef CONFIG_DISPLAY_USE_INFO
-#include "dpui.h"
+#include "decon_dpui.h"
 #endif
 
 #define INVALID_CELL_ID_STR ("0000000000")

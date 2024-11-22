@@ -9,11 +9,11 @@
  */
 
 #include <linux/module.h>
-#include "../panel_drv.h"
-#include "../panel_debug.h"
-#include "../maptbl.h"
-#include "../mdnie.h"
-#include "../util.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_maptbl.h"
+#include "../usdm_mdnie.h"
+#include "../usdm_util.h"
 #include "oled_common.h"
 
 int oled_maptbl_getidx_mdnie_scenario_mode(struct maptbl *tbl)
@@ -27,7 +27,7 @@ int oled_maptbl_getidx_mdnie_scenario_mode(struct maptbl *tbl)
 	panel = tbl->pdata;
 	mdnie = &panel->mdnie;
 
-	return maptbl_index(tbl, mdnie->props.scenario, mdnie->props.scenario_mode, 0);
+	return usdm_maptbl_index(tbl, mdnie->props.scenario, mdnie->props.scenario_mode, 0);
 }
 
 #ifdef CONFIG_USDM_PANEL_HMD
@@ -40,7 +40,7 @@ int oled_maptbl_getidx_mdnie_hmd(struct maptbl *tbl)
 
 	mdnie = tbl->pdata;
 
-	return maptbl_get_indexof_row(tbl, mdnie->props.hmd);
+	return usdm_maptbl_get_indexof_row(tbl, mdnie->props.hmd);
 }
 #endif
 
@@ -55,7 +55,7 @@ int oled_maptbl_getidx_mdnie_hdr(struct maptbl *tbl)
 	panel = tbl->pdata;
 	mdnie = &panel->mdnie;
 
-	return maptbl_get_indexof_row(tbl, mdnie->props.hdr);
+	return usdm_maptbl_get_indexof_row(tbl, mdnie->props.hdr);
 }
 
 int oled_maptbl_getidx_mdnie_trans_mode(struct maptbl *tbl)
@@ -72,7 +72,7 @@ int oled_maptbl_getidx_mdnie_trans_mode(struct maptbl *tbl)
 	if (mdnie->props.trans_mode == TRANS_OFF)
 		panel_dbg("mdnie trans_mode off\n");
 
-	return maptbl_get_indexof_row(tbl, mdnie->props.trans_mode);
+	return usdm_maptbl_get_indexof_row(tbl, mdnie->props.trans_mode);
 }
 
 int oled_maptbl_getidx_mdnie_night_mode(struct maptbl *tbl)
@@ -90,7 +90,7 @@ int oled_maptbl_getidx_mdnie_night_mode(struct maptbl *tbl)
 	if (mdnie->props.scenario_mode != AUTO)
 		mode = NIGHT_MODE_ON;
 
-	return maptbl_index(tbl, mode, mdnie->props.night_level, 0);
+	return usdm_maptbl_index(tbl, mode, mdnie->props.night_level, 0);
 }
 
 int oled_maptbl_getidx_color_lens(struct maptbl *tbl)
@@ -117,7 +117,7 @@ int oled_maptbl_getidx_color_lens(struct maptbl *tbl)
 		return -EINVAL;
 	}
 
-	return maptbl_index(tbl, mdnie->props.color_lens_color, mdnie->props.color_lens_level, 0);
+	return usdm_maptbl_index(tbl, mdnie->props.color_lens_color, mdnie->props.color_lens_level, 0);
 }
 
 void oled_maptbl_copy_scr_white(struct maptbl *tbl, u8 *dst)
@@ -162,12 +162,12 @@ void oled_maptbl_copy_scr_white(struct maptbl *tbl, u8 *dst)
 		r = dst[RED * mdnie->props.scr_white_len];
 		g = dst[GREEN * mdnie->props.scr_white_len];
 		b = dst[BLUE * mdnie->props.scr_white_len];
-		mdnie_set_cur_wrgb(mdnie, r, g, b);
+		usdm_mdnie_set_cur_wrgb(mdnie, r, g, b);
 		return;
 	}
 
-	mdnie_update_wrgb(mdnie, r, g, b);
-	mdnie_cur_wrgb_to_byte_array(mdnie, dst,
+	usdm_mdnie_update_wrgb(mdnie, r, g, b);
+	usdm_mdnie_cur_wrgb_to_byte_array(mdnie, dst,
 			mdnie->props.scr_white_len);
 }
 
@@ -198,18 +198,18 @@ void oled_maptbl_copy_scr_white_anti_glare(struct maptbl *tbl, u8 *dst)
 	panel = tbl->pdata;
 	mdnie = &panel->mdnie;
 
-	ratio = mdnie_get_anti_glare_ratio(mdnie);
+	ratio = usdm_mdnie_get_anti_glare_ratio(mdnie);
 
 	r = (u8)((int)dst[RED * mdnie->props.scr_white_len] * ratio / 100);
 	g = (u8)((int)dst[GREEN * mdnie->props.scr_white_len] * ratio / 100);
 	b = (u8)((int)dst[BLUE * mdnie->props.scr_white_len] * ratio / 100);
-	mdnie_set_cur_wrgb(mdnie, r, g, b);
+	usdm_mdnie_set_cur_wrgb(mdnie, r, g, b);
 
 	panel_dbg("r:%d g:%d b:%d (ratio:%d/100)\n",
 			r, g, b, ratio);
 
-	mdnie_update_wrgb(mdnie, r, g, b);
-	mdnie_cur_wrgb_to_byte_array(mdnie, dst,
+	usdm_mdnie_update_wrgb(mdnie, r, g, b);
+	usdm_mdnie_cur_wrgb_to_byte_array(mdnie, dst,
 			mdnie->props.scr_white_len);
 }
 

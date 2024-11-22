@@ -14,7 +14,7 @@
 #define __S6E8FC3_A33X_RESOL_H__
 
 #include <dt-bindings/display/panel-display.h>
-#include "../panel.h"
+#include "../decon_panel.h"
 #include "s6e8fc3.h"
 #include "s6e8fc3_dimming.h"
 

@@ -17,8 +17,8 @@
 #include <linux/of_address.h>
 #include "kernel/irq/internals.h"
 
-#include "panel_gpio.h"
-#include "panel_debug.h"
+#include "decon_panel_gpio.h"
+#include "decon_panel_debug.h"
 
 static bool panel_gpio_is_valid(struct panel_gpio *gpio)
 {

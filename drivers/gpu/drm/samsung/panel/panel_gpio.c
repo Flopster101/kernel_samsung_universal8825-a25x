@@ -17,8 +17,8 @@
 #include <linux/of_address.h>
 #include "kernel/irq/internals.h"
 
-#include "panel_gpio.h"
-#include "panel_debug.h"
+#include "usdm_panel_gpio.h"
+#include "usdm_panel_debug.h"
 
 static bool panel_gpio_is_valid(struct panel_gpio *gpio)
 {
@@ -343,7 +343,7 @@ int panel_gpio_helper_devm_request_irq(struct panel_gpio *gpio,
 	return call_panel_gpio_func(gpio, devm_request_irq, dev, handler, devname, dev_id);
 }
 
-int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
+int usdm_of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
 {
 	struct device_node *pend_np;
 	enum of_gpio_flags flags;
@@ -409,9 +409,9 @@ int of_get_panel_gpio(struct device_node *np, struct panel_gpio *gpio)
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_gpio);
+EXPORT_SYMBOL(usdm_of_get_panel_gpio);
 
-struct panel_gpio *panel_gpio_create(void)
+struct panel_gpio *usdm_panel_gpio_create(void)
 {
 	struct panel_gpio *gpio;
 
@@ -423,10 +423,10 @@ struct panel_gpio *panel_gpio_create(void)
 
 	return gpio;
 }
-EXPORT_SYMBOL(panel_gpio_create);
+EXPORT_SYMBOL(usdm_panel_gpio_create);
 
-void panel_gpio_destroy(struct panel_gpio *gpio)
+void usdm_panel_gpio_destroy(struct panel_gpio *gpio)
 {
 	kfree(gpio);
 }
-EXPORT_SYMBOL(panel_gpio_destroy);
+EXPORT_SYMBOL(usdm_panel_gpio_destroy);

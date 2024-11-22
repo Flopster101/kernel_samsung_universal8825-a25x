@@ -13,9 +13,9 @@
 #include <linux/bits.h>
 #include <linux/printk.h>
 #include <linux/kernel.h>
-#include "panel_kunit.h"
-#include "panel_debug.h"
-#include "util.h"
+#include "usdm_panel_kunit.h"
+#include "usdm_panel_debug.h"
+#include "usdm_util.h"
 
 #ifdef CONFIG_UML
 #define rtc_time_to_tm(a, b)	(memset(b, 0, sizeof(struct rtc_time)))
@@ -27,7 +27,7 @@
  * copy from slided source byte array to
  * continuous destination byte array
  */
-int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
+int usdm_copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step)
 {
 	u8 *d = dest;
@@ -49,13 +49,13 @@ int copy_from_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(d - dest);
 }
-EXPORT_SYMBOL(copy_from_sliced_byte_array);
+EXPORT_SYMBOL(usdm_copy_from_sliced_byte_array);
 
 /*
  * copy to slided destination byte array from
  * continuous source byte array
  */
-int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
+int usdm_copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 		int start, int stop, int step)
 {
 	u8 *d = dest;
@@ -74,37 +74,37 @@ int copy_to_sliced_byte_array(u8 *dest, const u8 *src,
 
 	return (int)(s - src);
 }
-EXPORT_SYMBOL(copy_to_sliced_byte_array);
+EXPORT_SYMBOL(usdm_copy_to_sliced_byte_array);
 
 /*
- * hextos32 - hexa-decimal to signed int
+ * usdm_hextos32 - hexa-decimal to signed int
  * @hex : input hexa deciaml number
  * @bits : total number of bits
  * MSB(most-significant-bit) is signed bit.
- * for example, hextos32(0x3FF, 10) returns -511.
+ * for example, usdm_hextos32(0x3FF, 10) returns -511.
  */
-s32 hextos32(u32 hex, u32 bits)
+s32 usdm_hextos32(u32 hex, u32 bits)
 {
 	int sign = (hex & BIT_MASK(bits - 1)) ? -1 : 1;
 
 	return sign * (hex & GENMASK(bits - 2, 0));
 }
-EXPORT_SYMBOL(hextos32);
+EXPORT_SYMBOL(usdm_hextos32);
 
 /*
- * s32tohex - signed int to hexa-decimal
+ * usdm_s32tohex - signed int to hexa-decimal
  * @dec : input signed deciaml number
  * @bits : total number of bits
  * MSB(most-significant-bit) is signed bit.
- * for example, s32tohex(-511, 10) returns 0x3FF.
+ * for example, usdm_s32tohex(-511, 10) returns 0x3FF.
  */
-u32 s32tohex(s32 dec, u32 bits)
+u32 usdm_s32tohex(s32 dec, u32 bits)
 {
 	u32 signed_bit = (dec < 0) ? BIT_MASK(bits - 1) : 0;
 
 	return (signed_bit | (abs(dec) & GENMASK(bits - 2, 0)));
 }
-EXPORT_SYMBOL(s32tohex);
+EXPORT_SYMBOL(usdm_s32tohex);
 
 u16 calc_checksum_16bit(u8 *arr, int size)
 {
@@ -187,7 +187,7 @@ void usdm_print_bytes(int log_level, const void *buf, size_t len)
 	if (!buf)
 		return;
 
-	if (log_level > panel_log_level)
+	if (log_level > usdm_panel_log_level)
 		return;
 
 	if (len > MAX_PRINT_HEX_LEN) {

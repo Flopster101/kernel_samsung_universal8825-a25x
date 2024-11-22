@@ -8,11 +8,11 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel_kunit.h"
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_vrr.h"
-#include "panel_debug.h"
+#include "decon_panel_kunit.h"
+#include "decon_panel.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_vrr.h"
+#include "decon_panel_debug.h"
 
 const char *vrr_lfd_client_name[MAX_VRR_LFD_CLIENT] = {
 	[VRR_LFD_CLIENT_FAC] = "fac",

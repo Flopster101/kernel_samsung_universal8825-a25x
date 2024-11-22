@@ -17,10 +17,10 @@
 #include <linux/regulator/machine.h>
 #include <linux/regulator/of_regulator.h>
 
-#include "panel_drv.h"
-#include "panel_blic.h"
-#include "panel_i2c.h"
-#include "panel_debug.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_blic.h"
+#include "usdm_panel_i2c.h"
+#include "usdm_panel_debug.h"
 
 #define BLIC_DT_NODE_NAME "blic"
 
@@ -599,7 +599,7 @@ static int of_get_panel_blic(struct panel_blic_dev *blic_dev, struct device_node
 	if (gpios_np) {
 		for_each_child_of_node(gpios_np, gpio_np) {
 			memset(&gpio, 0, sizeof(gpio));
-			if (of_get_panel_gpio(gpio_np, &gpio)) {
+			if (usdm_of_get_panel_gpio(gpio_np, &gpio)) {
 				panel_err("failed to get gpio %s\n", gpio_np->name);
 				break;
 			}
@@ -638,7 +638,7 @@ static int of_get_panel_blic(struct panel_blic_dev *blic_dev, struct device_node
 		}
 		p_seq->dev_name = np->name;
 		p_seq->name = pp->name;
-		ret = of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
+		ret = usdm_of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
 		if (ret < 0) {
 			panel_err("failed to get power_ctrl %s\n", pp->name);
 			break;

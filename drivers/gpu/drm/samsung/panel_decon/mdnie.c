@@ -19,15 +19,15 @@
 #include <linux/lcd.h>
 #include <linux/fb.h>
 #include <linux/pm_runtime.h>
-#include "panel_kunit.h"
-#include "panel_drv.h"
-#include "mdnie.h"
-#include "panel_debug.h"
+#include "decon_panel_kunit.h"
+#include "decon_panel_drv.h"
+#include "decon_mdnie.h"
+#include "decon_panel_debug.h"
 #ifdef CONFIG_EXYNOS_DECON_LCD_COPR
-#include "copr.h"
+#include "decon_copr.h"
 #endif
 #ifdef CONFIG_DISPLAY_USE_INFO
-#include "dpui.h"
+#include "decon_dpui.h"
 #endif
 
 #ifdef MDNIE_SELF_TEST

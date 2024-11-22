@@ -8,10 +8,10 @@
  */
 
 #include <linux/of_gpio.h>
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "copr.h"
+#include "decon_panel.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
+#include "decon_copr.h"
 
 static struct copr_reg_info copr_reg_v0_list[] = {
 	{ .name = "copr_gamma=", .offset = offsetof(struct copr_reg_v0, copr_gamma) },

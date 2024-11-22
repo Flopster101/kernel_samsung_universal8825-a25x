@@ -11,7 +11,7 @@
 #include <asm-generic/errno-base.h>
 #include <linux/string.h>
 #include <linux/bits.h>
-#include "util.h"
+#include "decon_util.h"
 
 /*
  * copy from slided source byte array to

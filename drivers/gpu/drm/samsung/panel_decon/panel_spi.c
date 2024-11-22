@@ -12,9 +12,9 @@
 #include <linux/miscdevice.h>
 #include <linux/of_platform.h>
 
-#include "panel_drv.h"
-#include "panel_spi.h"
-#include "panel_debug.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_spi.h"
+#include "decon_panel_debug.h"
 
 #define PANEL_SPI_MAX_CMD_SIZE 16
 #define PANEL_SPI_RX_BUF_SIZE 2048

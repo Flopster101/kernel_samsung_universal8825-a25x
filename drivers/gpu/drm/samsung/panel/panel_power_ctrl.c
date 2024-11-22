@@ -1,10 +1,10 @@
 #include <linux/of.h>
 #include <linux/device.h>
 
-#include "panel_debug.h"
-#include "panel_drv.h"
-#include "panel_gpio.h"
-#include "panel_regulator.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_gpio.h"
+#include "usdm_panel_regulator.h"
 
 static u32 action_table[MAX_PANEL_POWER_CTRL_ACTION] = {
 	[PANEL_POWER_CTRL_ACTION_DELAY_MSLEEP] = (PARSE_VALUE),
@@ -310,7 +310,7 @@ static int of_get_action_value(struct panel_device *panel,
 	return ret;
 }
 
-int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
+int usdm_of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_np,
 	const char *prop_name, struct panel_power_ctrl *pctrl)
 {
 	struct device_node *action_np;
@@ -385,7 +385,7 @@ int of_get_panel_power_ctrl(struct panel_device *panel, struct device_node *seq_
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_power_ctrl);
+EXPORT_SYMBOL(usdm_of_get_panel_power_ctrl);
 
 __visible_for_testing struct panel_power_ctrl *panel_power_ctrl_find(struct panel_device *panel,
 	const char *dev_name, const char *name)

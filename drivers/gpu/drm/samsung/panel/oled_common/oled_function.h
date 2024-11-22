@@ -13,7 +13,7 @@
 
 #include <linux/types.h>
 #include <linux/kernel.h>
-#include "../panel_function.h"
+#include "../usdm_panel_function.h"
 
 enum oled_function {
 	OLED_MAPTBL_INIT_DEFAULT,
@@ -99,9 +99,9 @@ enum oled_function {
 	MAX_OLED_FUNCTION,
 };
 
-extern struct pnobj_func oled_function_table[MAX_OLED_FUNCTION];
+extern struct pnobj_func usdm_oled_function_table[MAX_OLED_FUNCTION];
 
-#define OLED_FUNC(_index) (oled_function_table[_index])
+#define OLED_FUNC(_index) (usdm_oled_function_table[_index])
 
 #define __OLED_MAPTBL_OVERRIDE_INIT_INITIALIZER(_name, _init_func, ...) \
 	__SIMPLE_MAPTBL_INITIALIZER(_name, \

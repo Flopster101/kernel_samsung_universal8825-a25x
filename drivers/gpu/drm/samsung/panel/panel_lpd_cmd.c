@@ -8,18 +8,18 @@
  */
 
 #if defined(CONFIG_UML)
-#include "lpd_config_for_uml.h"
+#include "usdm_lpd_config_for_uml.h"
 #else
 #include <soc/samsung/exynos/exynos-lpd.h>
 #endif
 
-#include "util.h"
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_packet.h"
-#include "panel_sequence.h"
-#include "panel_lpd_cmd.h"
+#include "usdm_util.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_packet.h"
+#include "usdm_panel_sequence.h"
+#include "usdm_panel_lpd_cmd.h"
 
 
 #ifdef DEBUG_LPD_CMD

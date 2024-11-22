@@ -6,11 +6,11 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_freq_hop.h"
-#include "dev_ril_header.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_freq_hop.h"
+#include "usdm_dev_ril_header.h"
 
 static int of_get_freq_hop_elem(struct device_node *np, struct freq_hop_elem *elem)
 {

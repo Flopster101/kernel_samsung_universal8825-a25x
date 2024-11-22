@@ -1,10 +1,10 @@
 #include <linux/kernel.h>
 #include <linux/types.h>
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_sequence.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_sequence.h"
 
 bool is_valid_sequence(struct seqinfo *seq)
 {
@@ -47,7 +47,7 @@ int snprintf_sequence(char *buf, size_t size, struct seqinfo *seq)
 }
 
 /**
- * create_sequence - create a struct seqinfo structure
+ * usdm_create_sequence - create a struct seqinfo structure
  * @name: pointer to a string for the name of this sequence.
  * @size : number of commands.
  *
@@ -56,9 +56,9 @@ int snprintf_sequence(char *buf, size_t size, struct seqinfo *seq)
  * Returns &struct seqinfo pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_sequence().
+ * making a call to usdm_destroy_sequence().
  */
-struct seqinfo *create_sequence(char *name, size_t size)
+struct seqinfo *usdm_create_sequence(char *name, size_t size)
 {
 	struct seqinfo *seq;
 
@@ -85,16 +85,16 @@ err:
 	kfree(seq);
 	return NULL;
 }
-EXPORT_SYMBOL(create_sequence);
+EXPORT_SYMBOL(usdm_create_sequence);
 
 /**
- * destroy_sequence - destroys a struct seqinfo structure
+ * usdm_destroy_sequence - destroys a struct seqinfo structure
  * @seq: pointer to the struct seqinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_sequence().
+ * to usdm_create_sequence().
  */
-void destroy_sequence(struct seqinfo *seq)
+void usdm_destroy_sequence(struct seqinfo *seq)
 {
 	if (!seq)
 		return;
@@ -103,7 +103,7 @@ void destroy_sequence(struct seqinfo *seq)
 	kfree(seq->cmdtbl);
 	kfree(seq);
 }
-EXPORT_SYMBOL(destroy_sequence);
+EXPORT_SYMBOL(usdm_destroy_sequence);
 
 __visible_for_testing int add_edge(struct list_head *head, int vertex)
 {

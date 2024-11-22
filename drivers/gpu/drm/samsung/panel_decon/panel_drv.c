@@ -29,23 +29,23 @@
 #include <linux/ctype.h>
 #include <linux/sec_detect.h>
 #include <video/mipi_display.h>
-#include "panel_kunit.h"
+#include "decon_panel_kunit.h"
 #include "kernel/irq/internals.h"
-#include "panel_modes.h"
-#include "panel.h"
-#include "panel_bl.h"
-#include "panel_vrr.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_drv_ioctl.h"
-#include "panel_gpio.h"
-#include "panel_regulator.h"
-#include "panel_obj.h"
+#include "decon_panel_modes.h"
+#include "decon_panel.h"
+#include "decon_panel_bl.h"
+#include "decon_panel_vrr.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_drv_ioctl.h"
+#include "decon_panel_gpio.h"
+#include "decon_panel_regulator.h"
+#include "decon_panel_obj.h"
 
-#include "dpui.h"
+#include "decon_dpui.h"
 
 #ifdef CONFIG_EXYNOS_DECON_MDNIE_LITE
-#include "mdnie.h"
+#include "decon_mdnie.h"
 #endif
 
 #ifdef CONFIG_EXYNOS_DECON_LCD_SPI
@@ -53,7 +53,7 @@
 #endif
 
 #ifdef CONFIG_SUPPORT_DDI_FLASH
-#include "panel_poc.h"
+#include "decon_panel_poc.h"
 #endif
 
 #ifdef CONFIG_EXTEND_LIVE_CLOCK
@@ -65,7 +65,7 @@
 #endif
 
 #ifdef CONFIG_SUPPORT_POC_SPI
-#include "panel_spi.h"
+#include "decon_panel_spi.h"
 #endif
 
 #if defined(CONFIG_TDMB_NOTIFIER)
@@ -81,7 +81,7 @@
 #endif
 
 #if defined(CONFIG_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "decon_panel_freq_hop.h"
 #endif
 
 __visible_for_testing struct class *lcd_class;

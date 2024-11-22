@@ -8,11 +8,11 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_bl.h"
-#include "panel_debug.h"
-#include "panel_testmode.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_bl.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_testmode.h"
 
 struct panel_drv_funcs testmode_dummy_funcs = {
 	.register_cb = panel_testmode_dummy_int_void,

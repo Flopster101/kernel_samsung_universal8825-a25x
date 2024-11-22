@@ -10,9 +10,9 @@
 #include <linux/module.h>
 #include <linux/delay.h>
 
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_obj.h"
 
 struct panel_obj_property *panel_obj_find_property(struct panel_obj_properties *properties, char *name)
 {

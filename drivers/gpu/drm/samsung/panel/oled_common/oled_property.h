@@ -11,7 +11,7 @@
 #ifndef __OLED_PROPERTY_H__
 #define __OLED_PROPERTY_H__
 
-#include "../panel_property.h"
+#include "../usdm_panel_property.h"
 
 enum {
 	OLED_BR_HBM_OFF,
@@ -38,7 +38,7 @@ enum {
 #define OLED_MDNIE_NIGHT_LEVEL_PROPERTY ("oled_mdnie_night_level")
 #define OLED_MDNIE_HBM_CE_LEVEL_PROPERTY ("oled_mdnie_hbm_ce_level")
 
-extern struct panel_prop_list oled_property_array[];
-extern unsigned int oled_property_array_size;
+extern struct panel_prop_list usdm_oled_property_array[];
+extern unsigned int usdm_oled_property_array_size;
 
 #endif /* __OLED_PROPERTY_H__ */

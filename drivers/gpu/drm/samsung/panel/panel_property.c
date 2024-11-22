@@ -8,9 +8,9 @@
  */
 
 #include <linux/module.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
 
 const char *panel_prop_type_name[MAX_PANEL_PROP_TYPE] = {
 	[PANEL_PROP_TYPE_RANGE] = "RANGE",
@@ -43,7 +43,7 @@ int string_to_prop_type(const char *str)
 	return -EINVAL;
 }
 
-int snprintf_property(char *buf, size_t size,
+int usdm_snprintf_property(char *buf, size_t size,
 		struct panel_property *property)
 {
 	int len;
@@ -82,7 +82,7 @@ int snprintf_property(char *buf, size_t size,
 
 	return len;
 }
-EXPORT_SYMBOL(snprintf_property);
+EXPORT_SYMBOL(usdm_snprintf_property);
 
 struct panel_property *panel_property_create(u32 type, const char *name)
 {
@@ -268,7 +268,7 @@ int panel_property_set_enum_value(struct panel_property *property, unsigned int 
 	return 0;
 }
 
-int panel_property_set_value(struct panel_property *property, unsigned int value)
+int usdm_panel_property_set_value(struct panel_property *property, unsigned int value)
 {
 	int ret;
 
@@ -291,16 +291,16 @@ int panel_property_set_value(struct panel_property *property, unsigned int value
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_property_set_value);
+EXPORT_SYMBOL(usdm_panel_property_set_value);
 
-int panel_property_get_value(struct panel_property *property)
+int usdm_panel_property_get_value(struct panel_property *property)
 {
 	if (!property)
 		return -EINVAL;
 
 	return property->value;
 }
-EXPORT_SYMBOL(panel_property_get_value);
+EXPORT_SYMBOL(usdm_panel_property_get_value);
 
 int panel_property_add_enum_value(struct panel_property *property,
 		unsigned int value, const char *name)
@@ -462,7 +462,7 @@ struct panel_property *panel_find_property_by_property(struct panel_device *pane
 	return NULL;
 }
 
-int panel_set_property_value(struct panel_device *panel, char *name, unsigned int value)
+int usdm_panel_set_property_value(struct panel_device *panel, char *name, unsigned int value)
 {
 	struct panel_property *property;
 
@@ -482,11 +482,11 @@ int panel_set_property_value(struct panel_device *panel, char *name, unsigned in
 		return -EINVAL;
 	}
 
-	return panel_property_set_value(property, value);
+	return usdm_panel_property_set_value(property, value);
 }
-EXPORT_SYMBOL(panel_set_property_value);
+EXPORT_SYMBOL(usdm_panel_set_property_value);
 
-int panel_get_property_value(struct panel_device *panel, char *name)
+int usdm_panel_get_property_value(struct panel_device *panel, char *name)
 {
 	struct panel_property *property;
 	int ret;
@@ -505,9 +505,9 @@ int panel_get_property_value(struct panel_device *panel, char *name)
 		}
 	}
 
-	return panel_property_get_value(property);
+	return usdm_panel_property_get_value(property);
 }
-EXPORT_SYMBOL(panel_get_property_value);
+EXPORT_SYMBOL(usdm_panel_get_property_value);
 
 int panel_add_range_property(struct panel_device *panel,
 		char *name, unsigned int init_value, unsigned int min, unsigned int max,

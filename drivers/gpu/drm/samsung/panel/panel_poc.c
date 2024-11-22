@@ -17,14 +17,14 @@
 #include <linux/bug.h>
 #include <linux/list.h>
 
-#include "panel.h"
-#include "panel_bl.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_poc.h"
+#include "usdm_panel.h"
+#include "usdm_panel_bl.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_poc.h"
 #ifdef CONFIG_USDM_POC_SPI
-#include "panel_spi.h"
+#include "usdm_panel_spi.h"
 #endif
 
 static u8 *poc_wr_img;
@@ -148,7 +148,7 @@ static int poc_get_poc_chksum(struct panel_device *panel)
 		return -EINVAL;
 	}
 
-	ret = panel_resource_copy(panel, poc_info->poc_chksum, "poc_chksum");
+	ret = usdm_panel_resource_copy(panel, poc_info->poc_chksum, "poc_chksum");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to copy resource(poc_chksum)\n");
 		return ret;
@@ -405,7 +405,7 @@ static int _dsi_poc_read_data(struct panel_device *panel,
 			goto out_poc_read;
 		}
 
-		ret = panel_resource_copy(panel, &buf[i], "poc_data");
+		ret = usdm_panel_resource_copy(panel, &buf[i], "poc_data");
 		if (unlikely(ret < 0)) {
 			panel_err("failed to copy resource(poc_data)\n");
 			goto out_poc_read;
@@ -656,7 +656,7 @@ static int poc_get_octa_poc(struct panel_device *panel)
 	u8 octa_id[PANEL_OCTA_ID_LEN] = { 0, };
 	int ret;
 
-	ret = panel_resource_copy(panel, octa_id, "octa_id");
+	ret = usdm_panel_resource_copy(panel, octa_id, "octa_id");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to copy resource(octa_id) (ret %d)\n", ret);
 		return ret;
@@ -681,7 +681,7 @@ static int poc_get_poc_ctrl(struct panel_device *panel)
 
 	panel_mutex_lock(&panel->op_lock);
 	panel_set_key(panel, 3, true);
-	ret = panel_resource_update_by_name(panel, "poc_ctrl");
+	ret = usdm_panel_resource_update_by_name(panel, "poc_ctrl");
 	panel_set_key(panel, 3, false);
 	panel_mutex_unlock(&panel->op_lock);
 	if (unlikely(ret < 0)) {
@@ -689,7 +689,7 @@ static int poc_get_poc_ctrl(struct panel_device *panel)
 		return ret;
 	}
 
-	ret = panel_resource_copy(panel, poc_info->poc_ctrl, "poc_ctrl");
+	ret = usdm_panel_resource_copy(panel, poc_info->poc_ctrl, "poc_ctrl");
 	if (unlikely(ret < 0)) {
 		panel_err("failed to copy resource(poc_ctrl)\n");
 		return ret;
@@ -949,7 +949,7 @@ int get_poc_partition_size(struct panel_poc_device *poc_dev, int index)
 	return poc_dev->partition[index].size;
 }
 
-int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
+int usdm_check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
 {
 	int ret;
 
@@ -962,9 +962,9 @@ int check_poc_partition_exists(struct panel_poc_device *poc_dev, int index)
 
 	return poc_dev->partition[index].write_check;
 }
-EXPORT_SYMBOL(check_poc_partition_exists);
+EXPORT_SYMBOL(usdm_check_poc_partition_exists);
 
-int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
+int usdm_get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 		u32 *chksum_ok, u32 *chksum_by_calc, u32 *chksum_by_read)
 {
 	int ret;
@@ -989,7 +989,7 @@ int get_poc_partition_chksum(struct panel_poc_device *poc_dev, int index,
 
 	return 0;
 }
-EXPORT_SYMBOL(get_poc_partition_chksum);
+EXPORT_SYMBOL(usdm_get_poc_partition_chksum);
 
 int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index)
 {
@@ -998,7 +998,7 @@ int check_poc_partition_chksum(struct panel_poc_device *poc_dev, int index)
 	int chksum_by_read;
 	int chksum_by_calc;
 
-	ret = get_poc_partition_chksum(poc_dev, index,
+	ret = usdm_get_poc_partition_chksum(poc_dev, index,
 			&chksum_ok, &chksum_by_calc, &chksum_by_read);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to get chksum (partition:%d, ret:%d)\n", index, ret);
@@ -1064,7 +1064,7 @@ int copy_poc_partition(struct panel_poc_device *poc_dev, u8 *dst,
 	return size;
 }
 
-int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
+int usdm_set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 {
 	struct panel_poc_info *poc_info = &poc_dev->poc_info;
 	struct panel_device *panel = to_panel_device(poc_dev);
@@ -1316,7 +1316,7 @@ int set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 
 	return 0;
 };
-EXPORT_SYMBOL(set_panel_poc);
+EXPORT_SYMBOL(usdm_set_panel_poc);
 
 #ifdef CONFIG_USDM_PANEL_POC_FLASH
 static long panel_poc_ioctl(struct file *file, unsigned int cmd,
@@ -1349,9 +1349,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_CHKSUM:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+		ret = usdm_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error usdm_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1362,9 +1362,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_CSDATA:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
+		ret = usdm_set_panel_poc(poc_dev, POC_OP_CHECKSUM, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error usdm_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1382,9 +1382,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_GET_POC_FLASHED:
-		ret = set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
+		ret = usdm_set_panel_poc(poc_dev, POC_OP_CHECKPOC, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error usdm_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1395,9 +1395,9 @@ static long panel_poc_ioctl(struct file *file, unsigned int cmd,
 		}
 		break;
 	case IOC_SET_POC_ERASE:
-		ret = set_panel_poc(poc_dev, POC_OP_ERASE, NULL);
+		ret = usdm_set_panel_poc(poc_dev, POC_OP_ERASE, NULL);
 		if (ret) {
-			panel_err("error set_panel_poc\n");
+			panel_err("error usdm_set_panel_poc\n");
 			ret = -EFAULT;
 			break;
 		}
@@ -1434,7 +1434,7 @@ static int panel_poc_open(struct inode *inode, struct file *file)
 
 	panel_mutex_lock(&panel->io_lock);
 
-	ret = set_panel_poc(poc_dev, POC_OP_INITIALIZE, NULL);
+	ret = usdm_set_panel_poc(poc_dev, POC_OP_INITIALIZE, NULL);
 	if (ret < 0)
 		goto err_open;
 
@@ -1496,7 +1496,7 @@ static int panel_poc_release(struct inode *inode, struct file *file)
 	poc_dev->opened = 0;
 	atomic_set(&poc_dev->cancel, 0);
 
-	ret = set_panel_poc(poc_dev, POC_OP_UNINITIALIZE, NULL);
+	ret = usdm_set_panel_poc(poc_dev, POC_OP_UNINITIALIZE, NULL);
 	if (ret < 0)
 		panel_err("failed to uninitialize %d\n", ret);
 
@@ -1565,7 +1565,7 @@ static ssize_t panel_poc_read(struct file *file, char __user *buf, size_t count,
 	}
 	poc_info->rsize = (u32)count;
 
-	res = set_panel_poc(poc_dev, POC_OP_READ, NULL);
+	res = usdm_set_panel_poc(poc_dev, POC_OP_READ, NULL);
 	if (res < 0)
 		goto err_read;
 
@@ -1654,7 +1654,7 @@ static ssize_t panel_poc_write(struct file *file, const char __user *buf,
 
 	panel_info("write %ld bytes (count %ld)\n", res, count);
 
-	res = set_panel_poc(poc_dev, POC_OP_WRITE, NULL);
+	res = usdm_set_panel_poc(poc_dev, POC_OP_WRITE, NULL);
 	if (res < 0)
 		goto err_write;
 	panel_mutex_unlock(&panel->io_lock);
@@ -2019,7 +2019,7 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 			pnobj_container_of(pnobj, struct maptbl);
 
 		m->pdata = poc_dev;
-		maptbl_init(m);
+		usdm_maptbl_init(m);
 	}
 
 	poc_info->erased = false;
@@ -2063,7 +2063,7 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 
 	for (i = 0; i < poc_dev->nr_partition; i++) {
 		if (poc_dev->partition[i].need_preload) {
-			exists = check_poc_partition_exists(poc_dev, i);
+			exists = usdm_check_poc_partition_exists(poc_dev, i);
 			if (exists < 0) {
 				panel_err("failed to check partition(%d)\n", i);
 				ret = exists;

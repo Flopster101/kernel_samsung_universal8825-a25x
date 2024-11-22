@@ -6,11 +6,11 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "sdp_adaptive_mipi.h"
-#include "dev_ril_header.h"
+#include "usdm_panel.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_sdp_adaptive_mipi.h"
+#include "usdm_dev_ril_header.h"
 
 static int parse_sdp_mipi_freq(struct device_node *np,
 		struct adaptive_mipi_v2_info *sdp_adap_mipi)

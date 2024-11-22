@@ -31,27 +31,27 @@
 #include <video/mipi_display.h>
 #include <linux/sec_panel_notifier_v2.h>
 #include <linux/list_sort.h>
-#include "panel_kunit.h"
+#include "usdm_panel_kunit.h"
 #include "kernel/irq/internals.h"
-#include "panel_modes.h"
-#include "panel_property.h"
-#include "panel.h"
-#include "panel_bl.h"
-#include "panel_vrr.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_drv_ioctl.h"
-#include "panel_gpio.h"
-#include "panel_regulator.h"
-#include "panel_obj.h"
-#include "panel_function.h"
-#include "panel_firmware.h"
-#include "maptbl.h"
+#include "usdm_panel_modes.h"
+#include "usdm_panel_property.h"
+#include "usdm_panel.h"
+#include "usdm_panel_bl.h"
+#include "usdm_panel_vrr.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_drv_ioctl.h"
+#include "usdm_panel_gpio.h"
+#include "usdm_panel_regulator.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_function.h"
+#include "usdm_panel_firmware.h"
+#include "usdm_maptbl.h"
 
-#include "dpui.h"
+#include "usdm_dpui.h"
 
 #ifdef CONFIG_USDM_MDNIE
-#include "mdnie.h"
+#include "usdm_mdnie.h"
 #endif
 
 #ifdef CONFIG_USDM_COPR_SPI
@@ -59,7 +59,7 @@
 #endif
 
 #ifdef CONFIG_USDM_PANEL_DDI_FLASH
-#include "panel_poc.h"
+#include "usdm_panel_poc.h"
 #endif
 
 #ifdef CONFIG_USDM_PANEL_SELF_DISPLAY
@@ -71,7 +71,7 @@
 #endif
 
 #ifdef CONFIG_USDM_POC_SPI
-#include "panel_spi.h"
+#include "usdm_panel_spi.h"
 #endif
 
 #if IS_ENABLED(CONFIG_SEC_ABC)
@@ -83,20 +83,20 @@
 #endif
 
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "usdm_panel_freq_hop.h"
 #endif
 
 #if defined(CONFIG_USDM_SDP_ADAPTIVE_MIPI)
-#include "sdp_adaptive_mipi.h"
+#include "usdm_sdp_adaptive_mipi.h"
 #elif defined(CONFIG_USDM_ADAPTIVE_MIPI)
-#include "adaptive_mipi.h"
+#include "usdm_adaptive_mipi.h"
 #endif
 
 #if defined(CONFIG_USDM_LPD_AUTO_BR)
-#include "panel_lpd_cmd.h"
+#include "usdm_panel_lpd_cmd.h"
 #endif
 
-#include "abd.h"
+#include "usdm_abd.h"
 
 __visible_for_testing struct class *lcd_class;
 
@@ -378,7 +378,7 @@ int panel_set_property(struct panel_device *panel,
 		return -EINVAL;
 	}
 
-	if (panel_set_property_value(panel,
+	if (usdm_panel_set_property_value(panel,
 				propname, value) < 0) {
 		panel_warn("failed to set property(%s) %d\n",
 				propname, value);
@@ -395,14 +395,14 @@ module_param(board_rev, int, 0600);
 
 #if defined(CONFIG_UML)
 /* suppress normal log because of exception with too much log in UML */
-int panel_log_level = 3;
+int usdm_panel_log_level = 3;
 #else
-int panel_log_level = 6;
+int usdm_panel_log_level = 6;
 #endif
-EXPORT_SYMBOL(panel_log_level);
-module_param(panel_log_level, int, 0600);
-int panel_cmd_log;
-EXPORT_SYMBOL(panel_cmd_log);
+EXPORT_SYMBOL(usdm_panel_log_level);
+module_param(usdm_panel_log_level, int, 0600);
+int usdm_panel_cmd_log;
+EXPORT_SYMBOL(usdm_panel_cmd_log);
 #ifdef CONFIG_SUPPORT_PANEL_SWAP
 int panel_reprobe(struct panel_device *panel);
 #endif
@@ -482,7 +482,7 @@ static bool panel_is_detected_in_lk(struct panel_device *panel)
 
 bool panel_is_factory_mode(struct panel_device *panel)
 {
-	return panel_get_property_value(panel, PANEL_PROPERTY_IS_FACTORY_MODE) ? true : false;
+	return usdm_panel_get_property_value(panel, PANEL_PROPERTY_IS_FACTORY_MODE) ? true : false;
 }
 
 char *get_panel_state_names(enum panel_active_state idx)
@@ -650,11 +650,11 @@ __visible_for_testing void panel_print_bypass_reason(struct panel_device *panel)
 
 module_param(boot_panel_id, int, S_IRUGO);
 
-int get_lk_boot_panel_id(void)
+int usdm_get_lk_boot_panel_id(void)
 {
 	return boot_panel_id;
 }
-EXPORT_SYMBOL(get_lk_boot_panel_id);
+EXPORT_SYMBOL(usdm_get_lk_boot_panel_id);
 
 /**
  * get_lcd info - get lcd global information.
@@ -663,10 +663,10 @@ EXPORT_SYMBOL(get_lk_boot_panel_id);
  * if get lcd info successfully, return 0 or positive value.
  * if not, return -EINVAL.
  */
-int get_lcd_info(char *arg)
+int usdm_get_lcd_info(char *arg)
 {
 	struct panel_device *panel;
-	int panel_id = get_lk_boot_panel_id();
+	int panel_id = usdm_get_lk_boot_panel_id();
 
 	if (!arg) {
 		panel_err("invalid arg\n");
@@ -695,7 +695,7 @@ int get_lcd_info(char *arg)
 	else
 		return -EINVAL;
 }
-EXPORT_SYMBOL(get_lcd_info);
+EXPORT_SYMBOL(usdm_get_lcd_info);
 
 int panel_initialize_regulator(struct panel_device *panel)
 {
@@ -882,7 +882,7 @@ static void evasion_disp_det_handler(struct work_struct *work)
 		container_of(w, struct panel_device, work[PANEL_WORK_EVASION_DISP_DET]);
 	int ret;
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF) {
 		panel_warn("panel is off state\n");
 		return;
 	}
@@ -1123,11 +1123,11 @@ void panel_set_cur_state(struct panel_device *panel,
 	panel_notify_panel_state(state);
 }
 
-enum panel_active_state panel_get_cur_state(struct panel_device *panel)
+enum panel_active_state usdm_panel_get_cur_state(struct panel_device *panel)
 {
 	return panel->state.cur_state;
 }
-EXPORT_SYMBOL(panel_get_cur_state);
+EXPORT_SYMBOL(usdm_panel_get_cur_state);
 
 int panel_set_uevent_recovery_state(struct panel_device *panel,
 		void *arg)
@@ -1344,7 +1344,7 @@ static int __panel_seq_display_on(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_DISPLAY_ON_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_DISPLAY_ON_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_DISPLAY_ON_SEQ);
@@ -1360,7 +1360,7 @@ static int __panel_seq_display_off(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_DISPLAY_OFF_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_DISPLAY_OFF_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_DISPLAY_OFF_SEQ);
@@ -1376,7 +1376,7 @@ static int __panel_seq_res_init(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_RES_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_RES_INIT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_RES_INIT_SEQ);
@@ -1386,7 +1386,7 @@ static int __panel_seq_res_init(struct panel_device *panel)
 	panel_info("%s done\n", PANEL_RES_INIT_SEQ);
 
 #ifdef CONFIG_USDM_PANEL_GM2_FLASH
-	ret = panel_do_seqtbl_by_name(panel, PANEL_GM2_FLASH_RES_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_GM2_FLASH_RES_INIT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_GM2_FLASH_RES_INIT_SEQ);
@@ -1406,7 +1406,7 @@ static int __panel_seq_boot(struct panel_device *panel)
 	if (!check_seqtbl_exist(panel, PANEL_BOOT_SEQ))
 		return 0;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_BOOT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_BOOT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_BOOT_SEQ);
@@ -1423,7 +1423,7 @@ static int __panel_seq_dim_flash_res_init(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_DIM_FLASH_RES_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_DIM_FLASH_RES_INIT_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_DIM_FLASH_RES_INIT_SEQ);
@@ -1480,7 +1480,7 @@ static int __panel_seq_init(struct panel_device *panel)
 		panel_err("failed to panel_ddi_init\n");
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_INIT_SEQ);
 
 	if (panel->panel_data.ddi_props.init_seq_by_lpdt)
 		panel_dsi_set_lpdt(panel, false);
@@ -1506,7 +1506,7 @@ static int __panel_seq_init(struct panel_device *panel)
 
 	if (panel_poll_irq(panel, PANEL_GPIO_PCD)) {
 		if (check_seqtbl_exist(panel, PANEL_PCD_DUMP_SEQ))
-			panel_do_seqtbl_by_name(panel, PANEL_PCD_DUMP_SEQ);
+			usdm_panel_do_seqtbl_by_name(panel, PANEL_PCD_DUMP_SEQ);
 		panel_dsi_set_bypass(panel, true); /* ignore TE checking & frame update request*/
 		panel_mutex_unlock(&panel_bl->lock);
 		return -EAGAIN;
@@ -1550,7 +1550,7 @@ static int __panel_seq_exit(struct panel_device *panel)
 
 	panel_bl_set_subdev(panel_bl, PANEL_BL_SUBDEV_TYPE_DISP);
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_EXIT_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write exit seqtbl\n");
 
@@ -1577,7 +1577,7 @@ static int __panel_seq_hmd_on(struct panel_device *panel)
 	state = &panel->state;
 
 	panel_info("hmd was on, setting hmd on seq\n");
-	ret = panel_do_seqtbl_by_name(panel, PANEL_HMD_ON_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_HMD_ON_SEQ);
 	if (ret)
 		panel_err("failed to set hmd on seq\n");
 
@@ -1643,7 +1643,7 @@ static int __panel_seq_exit_alpm(struct panel_device *panel)
 	if (ret < 0 && ret != -ENODATA)
 		panel_err("failed to panel_power_exit_alpm\n");
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_EXIT_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_EXIT_SEQ);
 	if (ret)
 		panel_err("failed to alpm-exit\n");
 
@@ -1656,7 +1656,7 @@ static int __panel_seq_exit_alpm(struct panel_device *panel)
 	/* PANEL_ALPM_EXIT_AFTER_SEQ temporary added */
 	if (check_seqtbl_exist(panel, PANEL_ALPM_EXIT_AFTER_SEQ)) {
 		panel_bl_set_brightness(&panel->panel_bl, PANEL_BL_SUBDEV_TYPE_DISP, SKIP_CMD);
-		ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_EXIT_AFTER_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_EXIT_AFTER_SEQ);
 		if (ret)
 			panel_err("failed to alpm-exit-after seq\n");
 	}
@@ -1693,7 +1693,7 @@ static int __panel_seq_set_alpm(struct panel_device *panel)
 		panel_err("failed to panel_disable_irq\n");
 
 	if (check_seqtbl_exist(panel, PANEL_ALPM_INIT_SEQ)) {
-		ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_INIT_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_INIT_SEQ);
 		if (ret)
 			panel_err("failed to alpm-init\n");
 	}
@@ -1705,7 +1705,7 @@ static int __panel_seq_set_alpm(struct panel_device *panel)
 #ifdef CONFIG_USDM_PANEL_AOD_BL
 	panel_bl_set_subdev(panel_bl, PANEL_BL_SUBDEV_TYPE_AOD);
 #endif
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_SET_BL_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_ALPM_SET_BL_SEQ);
 	if (ret)
 		panel_err("failed to alpm-set-bl\n");
 
@@ -1735,7 +1735,7 @@ static int __panel_seq_dump(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_DUMP_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_DUMP_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write dump seqtbl\n");
 
@@ -1752,7 +1752,7 @@ static int panel_debug_dump(struct panel_device *panel)
 	}
 
 	if (!IS_PANEL_ACTIVE(panel)) {
-		panel_info("Current state:%d\n", panel_get_cur_state(panel));
+		panel_info("Current state:%d\n", usdm_panel_get_cur_state(panel));
 		goto dump_exit;
 	}
 
@@ -1773,7 +1773,7 @@ int panel_seq_cmdlog_dump(struct panel_device *panel)
 {
 	int ret;
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_CMDLOG_DUMP_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_CMDLOG_DUMP_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write cmdlog dump seqtbl\n");
 
@@ -1798,8 +1798,8 @@ int panel_display_on(struct panel_device *panel)
 		goto do_exit;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF ||
-		panel_get_cur_state(panel) == PANEL_STATE_ON) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF ||
+		usdm_panel_get_cur_state(panel) == PANEL_STATE_ON) {
 		panel_warn("invalid state\n");
 		goto do_exit;
 	}
@@ -1810,7 +1810,7 @@ int panel_display_on(struct panel_device *panel)
 
 #ifdef CONFIG_USDM_PANEL_SELF_DISPLAY
 	// Transmit Black Frame
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		ret = panel_aod_black_grid_on(panel);
 		if (ret)
 			panel_info("PANEL_ERR:failed to black grid on\n");
@@ -1826,7 +1826,7 @@ int panel_display_on(struct panel_device *panel)
 	panel->ktime_panel_disp_on = ktime_get();
 
 #ifdef CONFIG_USDM_PANEL_SELF_DISPLAY
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		usleep_range(33400, 33500);
 		ret = panel_aod_black_grid_off(panel);
 		if (ret)
@@ -1867,8 +1867,8 @@ __visible_for_testing int panel_display_off(struct panel_device *panel)
 		goto do_exit;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF ||
-		panel_get_cur_state(panel) == PANEL_STATE_ON) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF ||
+		usdm_panel_get_cur_state(panel) == PANEL_STATE_ON) {
 		panel_warn("invalid state\n");
 		goto do_exit;
 	}
@@ -1896,7 +1896,7 @@ static int update_panel_id(struct panel_device *panel)
 	}
 
 	memset(id, 0, sizeof(id));
-	ret = read_panel_id(panel, id);
+	ret = usdm_read_panel_id(panel, id);
 	if (ret < 0) {
 		panel_err("failed to read id(ret:%d)\n", ret);
 		set_panel_id(panel, 0);
@@ -1979,7 +1979,7 @@ static int panel_duplicate_maptbl(struct panel_device *panel,
 				&src->base))
 		return 0;
 
-	dst = maptbl_clone(src);
+	dst = usdm_maptbl_clone(src);
 	if (!dst) {
 		panel_err("failed to clone maptbl(%s)\n",
 				maptbl_get_name(src));
@@ -2000,7 +2000,7 @@ static int panel_duplicate_delay(struct panel_device *panel,
 				&src->base))
 		return 0;
 
-	dst = create_delay(get_delay_name(src), get_delay_type(src),
+	dst = usdm_create_delay(get_delay_name(src), get_delay_type(src),
 			src->usec, src->nframe, src->nvsync, src->no_sleep);
 	if (!dst) {
 		panel_err("failed to create delay(%s)\n",
@@ -2037,7 +2037,7 @@ static int panel_duplicate_timer_delay_begin(struct panel_device *panel,
 		return -EINVAL;
 	}
 
-	dst = create_timer_delay_begin(get_pnobj_name(&src->base),
+	dst = usdm_create_timer_delay_begin(get_pnobj_name(&src->base),
 			pnobj_container_of(pnobj, struct delayinfo));
 	if (!dst) {
 		panel_err("failed to create timer_delay_begin(%s)\n",
@@ -2084,7 +2084,7 @@ static int panel_duplicate_readinfo(struct panel_device *panel,
 				&src->base))
 		return 0;
 
-	dst = create_rx_packet(get_rdinfo_name(src),
+	dst = usdm_create_rx_packet(get_rdinfo_name(src),
 			get_rdinfo_type(src), &rx_msg);
 	if (!dst) {
 		panel_err("failed to create rx packet(%s)\n",
@@ -2133,7 +2133,7 @@ __visible_for_testing int panel_duplicate_packet(struct panel_device *panel,
 		}
 	}
 
-	dst = create_tx_packet(get_pktinfo_name(src), get_pktinfo_type(src),
+	dst = usdm_create_tx_packet(get_pktinfo_name(src), get_pktinfo_type(src),
 			&tx_msg, pktui, src->nr_pktui, src->option);
 	if (!dst) {
 		panel_err("failed to create tx packet(%s)\n",
@@ -2213,9 +2213,9 @@ static int panel_duplicate_resource(struct panel_device *panel,
 		}
 	}
 
-	dst = create_resource(get_resource_name(src),
-			is_resource_initialized(src) ? src->data : NULL,
-			get_resource_size(src), resui, src->nr_resui);
+	dst = usdm_create_resource(usdm_get_resource_name(src),
+			usdm_is_resource_initialized(src) ? src->data : NULL,
+			usdm_get_resource_size(src), resui, src->nr_resui);
 	if (!dst) {
 		panel_err("failed to create resource(%s)\n",
 				get_pnobj_name(&src->base));
@@ -2254,7 +2254,7 @@ static int panel_duplicate_dump(struct panel_device *panel,
 		return -EINVAL;
 	}
 
-	dst = create_dumpinfo(get_pnobj_name(&src->base),
+	dst = usdm_create_dumpinfo(get_pnobj_name(&src->base),
 			pnobj_container_of(pnobj, struct resinfo),
 			&src->ops, src->expects, src->nr_expects);
 	if (!dst) {
@@ -2333,7 +2333,7 @@ __visible_for_testing int panel_duplicate_sequence(struct panel_device *panel,
 		return 0;
 	}
 
-	dst = create_sequence(get_pnobj_name(&src->base), src->size);
+	dst = usdm_create_sequence(get_pnobj_name(&src->base), src->size);
 	if (!dst) {
 		panel_err("failed to create sequence(%s)\n",
 				get_pnobj_name(&src->base));
@@ -2374,7 +2374,7 @@ __visible_for_testing int panel_duplicate_sequence(struct panel_device *panel,
 	return 0;
 
 err:
-	destroy_sequence(dst);
+	usdm_destroy_sequence(dst);
 	return ret;
 }
 
@@ -2716,7 +2716,7 @@ static int panel_prepare_func_list(struct panel_device *panel)
 					continue;
 
 				name = get_pnobj_function_name(f[i]);
-				found = panel_function_lookup(name);
+				found = usdm_panel_function_lookup(name);
 				if (!found) {
 					panel_err("%s not exist in panel_function_list\n", name);
 					return -EINVAL;
@@ -2740,7 +2740,7 @@ static int panel_prepare_func_list(struct panel_device *panel)
 					continue;
 
 				name = get_pnobj_function_name(f);
-				found = panel_function_lookup(name);
+				found = usdm_panel_function_lookup(name);
 				if (!found) {
 					panel_err("%s not exist in panel_function_list\n", name);
 					return -EINVAL;
@@ -2757,7 +2757,7 @@ static int panel_prepare_func_list(struct panel_device *panel)
 				continue;
 
 			name = get_pnobj_function_name(f);
-			found = panel_function_lookup(name);
+			found = usdm_panel_function_lookup(name);
 			if (!found) {
 				panel_err("%s not exist in panel_function_list\n", name);
 				return -EINVAL;
@@ -3117,22 +3117,22 @@ void destroy_panel_object(struct pnobj *pnobj)
 	unsigned int type = get_pnobj_cmd_type(pnobj);
 
 	if (IS_CMD_TYPE_MAP(type))
-		maptbl_destroy(pnobj_container_of(pnobj, struct maptbl));
+		usdm_maptbl_destroy(pnobj_container_of(pnobj, struct maptbl));
 	else if (IS_CMD_TYPE_RX_PKT(type))
-		destroy_rx_packet(pnobj_container_of(pnobj, struct rdinfo));
+		usdm_destroy_rx_packet(pnobj_container_of(pnobj, struct rdinfo));
 	else if (IS_CMD_TYPE_RES(type))
-		destroy_resource(pnobj_container_of(pnobj, struct resinfo));
+		usdm_destroy_resource(pnobj_container_of(pnobj, struct resinfo));
 	else if (IS_CMD_TYPE_DUMP(type))
-		destroy_dumpinfo(pnobj_container_of(pnobj, struct dumpinfo));
+		usdm_destroy_dumpinfo(pnobj_container_of(pnobj, struct dumpinfo));
 	else if (IS_CMD_TYPE_KEY(type))
 		destroy_key_packet(pnobj_container_of(pnobj, struct keyinfo));
 	else if (IS_CMD_TYPE_TX_PKT(type))
-		destroy_tx_packet(pnobj_container_of(pnobj, struct pktinfo));
+		usdm_destroy_tx_packet(pnobj_container_of(pnobj, struct pktinfo));
 	else if (type == CMD_TYPE_TIMER_DELAY_BEGIN)
-		destroy_timer_delay_begin(
+		usdm_destroy_timer_delay_begin(
 				pnobj_container_of(pnobj, struct timer_delay_begin_info));
 	else if (IS_CMD_TYPE_DELAY(type) || IS_CMD_TYPE_TIMER_DELAY(type))
-		destroy_delay(pnobj_container_of(pnobj, struct delayinfo));
+		usdm_destroy_delay(pnobj_container_of(pnobj, struct delayinfo));
 	else if (IS_CMD_TYPE_COND(type))
 		destroy_condition(pnobj_container_of(pnobj, struct condinfo));
 	else if (IS_CMD_TYPE_PWRCTRL(type))
@@ -3144,7 +3144,7 @@ void destroy_panel_object(struct pnobj *pnobj)
 	else if (IS_CMD_TYPE_FUNC(type))
 		destroy_pnobj_function(pnobj_container_of(pnobj, struct pnobj_func));
 	else if (IS_CMD_TYPE_SEQ(type))
-		destroy_sequence(pnobj_container_of(pnobj, struct seqinfo));
+		usdm_destroy_sequence(pnobj_container_of(pnobj, struct seqinfo));
 	else
 		panel_err("unknown cmd_type(%d)\n", type);
 }
@@ -3240,7 +3240,7 @@ static int panel_maptbl_init(struct panel_device *panel)
 	panel_mutex_lock(&panel->op_lock);
 	list_for_each_entry(pnobj, &panel->maptbl_list, list) {
 		m = pnobj_container_of(pnobj, struct maptbl);
-		ret = maptbl_init(m);
+		ret = usdm_maptbl_init(m);
 		if (ret == -ENODATA)
 			panel_warn("empty maptbl(%s)\n", maptbl_get_name(m));
 		else if (ret < 0)
@@ -3284,7 +3284,7 @@ int panel_flash_checksum_calc(struct panel_device *panel)
 		return 0;
 	}
 
-	ret = panel_do_seqtbl_by_name(panel, PANEL_FLASH_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_FLASH_TEST_SEQ);
 	if (ret < 0) {
 		panel_err("failed to run sequence(%s)\n",
 				PANEL_FLASH_TEST_SEQ);
@@ -3308,19 +3308,19 @@ int panel_default_ssr_test(struct panel_device *panel)
 		return -ENOENT;
 	}
 
-	ret = panel_init_dumpinfo(panel, "ssr");
+	ret = usdm_panel_init_dumpinfo(panel, "ssr");
 	if (ret < 0) {
 		panel_err("failed to init dump\n");
 		return ret;
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_SSR_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_SSR_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_SSR_TEST_SEQ);
 		return ret;
 	}
 
-	return panel_is_dump_status_success(panel, "ssr") ?
+	return usdm_panel_is_dump_status_success(panel, "ssr") ?
 		PANEL_SSR_TEST_PASS : PANEL_SSR_TEST_FAIL;
 }
 
@@ -3348,19 +3348,19 @@ int panel_default_ecc_test(struct panel_device *panel)
 		return -ENOENT;
 	}
 
-	ret = panel_init_dumpinfo(panel, "ecc");
+	ret = usdm_panel_init_dumpinfo(panel, "ecc");
 	if (ret < 0) {
 		panel_err("failed to init dump\n");
 		return ret;
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_ECC_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_ECC_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_ECC_TEST_SEQ);
 		return ret;
 	}
 
-	return panel_is_dump_status_success(panel, "ecc") ?
+	return usdm_panel_is_dump_status_success(panel, "ecc") ?
 		PANEL_ECC_TEST_PASS : PANEL_ECC_TEST_FAIL;
 }
 
@@ -3385,22 +3385,22 @@ int panel_default_decoder_test(struct panel_device *panel, u8 *buf, int len)
 	if (!buf)
 		return -EINVAL;
 
-	ret = panel_init_dumpinfo(panel, "dsc_crc");
+	ret = usdm_panel_init_dumpinfo(panel, "dsc_crc");
 	if (ret < 0) {
 		panel_err("failed to init dump\n");
 		return ret;
 	}
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_DECODER_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_DECODER_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n", PANEL_DECODER_TEST_SEQ);
 		return ret;
 	}
 
-	snprintf_resource_data(buf, len,
-			panel_get_dump_resource(panel, "dsc_crc"));
+	usdm_snprintf_resource_data(buf, len,
+			usdm_panel_get_dump_resource(panel, "dsc_crc"));
 
-	return panel_is_dump_status_success(panel, "dsc_crc") ?
+	return usdm_panel_is_dump_status_success(panel, "dsc_crc") ?
 		PANEL_DECODER_TEST_PASS : PANEL_DECODER_TEST_FAIL;
 }
 
@@ -3535,7 +3535,7 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 			state = 0;
 			do {
 				/* DIM */
-				ret = set_panel_poc(&panel->poc_dev, POC_OP_DIM_READ, &index);
+				ret = usdm_set_panel_poc(&panel->poc_dev, POC_OP_DIM_READ, &index);
 				if (unlikely(ret < 0)) {
 					panel_err("failed to read gamma flash(ret %d)\n", ret);
 					state = GAMMA_FLASH_ERROR_READ_FAIL;
@@ -3543,7 +3543,7 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 				}
 
 #if !defined(CONFIG_SEC_PANEL_DIM_FLASH_NO_VALIDATION)
-				ret = check_poc_partition_exists(&panel->poc_dev,
+				ret = usdm_check_poc_partition_exists(&panel->poc_dev,
 						POC_DIM_PARTITION + index);
 				if (unlikely(ret < 0)) {
 					panel_err("failed to check dim_flash exist\n");
@@ -3557,7 +3557,7 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 					break;
 				}
 #endif
-				ret = get_poc_partition_chksum(&panel->poc_dev,
+				ret = usdm_get_poc_partition_chksum(&panel->poc_dev,
 						POC_DIM_PARTITION + index,
 						&result->dim_chksum_ok,
 						&result->dim_chksum_by_calc,
@@ -3578,14 +3578,14 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 				}
 #endif
 				/* MTP */
-				ret = set_panel_poc(&panel->poc_dev, POC_OP_MTP_READ, &index);
+				ret = usdm_set_panel_poc(&panel->poc_dev, POC_OP_MTP_READ, &index);
 				if (unlikely(ret)) {
 					panel_err("failed to read mtp flash(ret %d)\n", ret);
 					state = GAMMA_FLASH_ERROR_READ_FAIL;
 					break;
 				}
 
-				ret = get_poc_partition_chksum(&panel->poc_dev,
+				ret = usdm_get_poc_partition_chksum(&panel->poc_dev,
 						POC_MTP_PARTITION + index,
 						&result->mtp_chksum_ok,
 						&result->mtp_chksum_by_calc,
@@ -3605,7 +3605,7 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 				}
 #endif
 
-				ret = get_panel_resource_size(panel, "mtp");
+				ret = usdm_get_panel_resource_size(panel, "mtp");
 				if (unlikely(ret < 0)) {
 					panel_err("failed to get resource mtp size (ret %d)\n", ret);
 					state = GAMMA_FLASH_ERROR_READ_FAIL;
@@ -3613,7 +3613,7 @@ int panel_update_dim_type(struct panel_device *panel, u32 dim_type)
 				}
 				sz_mtp_reg = ret;
 
-				ret = panel_resource_copy(panel, mtp_reg, "mtp");
+				ret = usdm_panel_resource_copy(panel, mtp_reg, "mtp");
 				if (unlikely(ret < 0)) {
 					panel_err("failed to copy resource mtp (ret %d)\n", ret);
 					state = GAMMA_FLASH_ERROR_READ_FAIL;
@@ -3954,7 +3954,7 @@ static void panel_condition_handler(struct work_struct *work)
 	switch (condition->check_state) {
 	case PRINT_NORMAL_PANEL_INFO:
 		// print rddpm
-		ret = panel_do_seqtbl_by_name(panel, PANEL_CHECK_CONDITION_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_CHECK_CONDITION_SEQ);
 		if (unlikely(ret < 0))
 			panel_err("failed to write panel check\n");
 		if (show_copr_value(panel, condition->frame_cnt))
@@ -3964,7 +3964,7 @@ static void panel_condition_handler(struct work_struct *work)
 		break;
 	case PRINT_DOZE_PANEL_INFO:
 #if 0	// it will be fixed
-		ret = panel_do_seqtbl_by_name(panel, PANEL_CHECK_CONDITION_SEQ);
+		ret = usdm_panel_do_seqtbl_by_name(panel, PANEL_CHECK_CONDITION_SEQ);
 		if (unlikely(ret < 0))
 			panel_err("failed to write panel check\n");
 #endif
@@ -4002,9 +4002,9 @@ void panel_check_ready(struct panel_device *panel)
 
 	panel_mutex_lock(&pw->lock);
 	pcc->is_panel_check = true;
-	if (panel_get_cur_state(panel) == PANEL_STATE_NORMAL)
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_NORMAL)
 		pcc->check_state = PRINT_NORMAL_PANEL_INFO;
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM)
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM)
 		pcc->check_state = PRINT_DOZE_PANEL_INFO;
 	panel_mutex_unlock(&pw->lock);
 }
@@ -4605,12 +4605,12 @@ static int panel_get_need_vote_up_count(struct panel_device *panel)
 }
 
 /*
- * int panel_vote_up_to_probe(struct panel_device *panel)
+ * int usdm_panel_vote_up_to_probe(struct panel_device *panel)
  * If all ddi modules and adapter module is ready,
  * This func calls panel_probe().
  */
 
-int panel_vote_up_to_probe(struct panel_device *panel)
+int usdm_panel_vote_up_to_probe(struct panel_device *panel)
 {
 	static struct panel_device *reserved_panel;
 	static int vote_up_count;
@@ -4638,7 +4638,7 @@ int panel_vote_up_to_probe(struct panel_device *panel)
 
 	return -EAGAIN;
 }
-EXPORT_SYMBOL(panel_vote_up_to_probe);
+EXPORT_SYMBOL(usdm_panel_vote_up_to_probe);
 
 int panel_remove(struct panel_device *panel)
 {
@@ -4720,12 +4720,12 @@ __visible_for_testing int panel_sleep_in(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 	PRINT_PANEL_STATE_BEGIN(prev_state, PANEL_STATE_ON, start);
 
-	switch (panel_get_cur_state(panel)) {
+	switch (usdm_panel_get_cur_state(panel)) {
 	case PANEL_STATE_ON:
-		panel_warn("panel already %s state\n", panel_state_names[panel_get_cur_state(panel)]);
+		panel_warn("panel already %s state\n", panel_state_names[usdm_panel_get_cur_state(panel)]);
 		goto do_exit;
 	case PANEL_STATE_NORMAL:
 	case PANEL_STATE_ALPM:
@@ -4745,12 +4745,12 @@ __visible_for_testing int panel_sleep_in(struct panel_device *panel)
 			panel_err("failed to write exit seqtbl\n");
 		break;
 	default:
-		panel_err("invalid state(%d)\n", panel_get_cur_state(panel));
+		panel_err("invalid state(%d)\n", usdm_panel_get_cur_state(panel));
 		goto do_exit;
 	}
 
 	panel_set_cur_state(panel, PANEL_STATE_ON);
-	PRINT_PANEL_STATE_END(prev_state, panel_get_cur_state(panel), start);
+	PRINT_PANEL_STATE_END(prev_state, usdm_panel_get_cur_state(panel), start);
 
 	return 0;
 
@@ -4791,10 +4791,10 @@ __visible_for_testing int panel_power_on(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 	PRINT_PANEL_STATE_BEGIN(prev_state, PANEL_STATE_ON, start);
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF) {
 		ret = __set_panel_power(panel, PANEL_POWER_ON);
 		if (ret) {
 			panel_err("failed to panel power on\n");
@@ -4806,7 +4806,7 @@ __visible_for_testing int panel_power_on(struct panel_device *panel)
 	panel_send_ubconn_notify(panel->state.connected == PANEL_STATE_OK ?
 		PANEL_EVENT_UB_CON_STATE_CONNECTED : PANEL_EVENT_UB_CON_STATE_DISCONNECTED);
 #endif
-	PRINT_PANEL_STATE_END(prev_state, panel_get_cur_state(panel), start);
+	PRINT_PANEL_STATE_END(prev_state, usdm_panel_get_cur_state(panel), start);
 
 	return 0;
 
@@ -4833,12 +4833,12 @@ __visible_for_testing int panel_power_off(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 	PRINT_PANEL_STATE_BEGIN(prev_state, PANEL_STATE_OFF, start);
 
-	switch (panel_get_cur_state(panel)) {
+	switch (usdm_panel_get_cur_state(panel)) {
 	case PANEL_STATE_OFF:
-		panel_info("panel already %s state\n", panel_state_names[panel_get_cur_state(panel)]);
+		panel_info("panel already %s state\n", panel_state_names[usdm_panel_get_cur_state(panel)]);
 		goto do_exit;
 	case PANEL_STATE_ALPM:
 	case PANEL_STATE_NORMAL:
@@ -4851,7 +4851,7 @@ __visible_for_testing int panel_power_off(struct panel_device *panel)
 		}
 		break;
 	default:
-		panel_err("invalid state(%d)\n", panel_get_cur_state(panel));
+		panel_err("invalid state(%d)\n", usdm_panel_get_cur_state(panel));
 		goto do_exit;
 	}
 
@@ -4863,7 +4863,7 @@ __visible_for_testing int panel_power_off(struct panel_device *panel)
 	if (ret)
 		panel_err("failed to aod power off\n");
 #endif
-	PRINT_PANEL_STATE_END(prev_state, panel_get_cur_state(panel), start);
+	PRINT_PANEL_STATE_END(prev_state, usdm_panel_get_cur_state(panel), start);
 
 	return 0;
 
@@ -4917,9 +4917,9 @@ __visible_for_testing int panel_reset_lp11(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ON) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ON) {
 		panel_mutex_lock(&panel_bl->lock);
 		panel_mutex_lock(&panel->op_lock);
 
@@ -4956,9 +4956,9 @@ __visible_for_testing int panel_reset_disable(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ON) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ON) {
 		panel_mutex_lock(&panel_bl->lock);
 		panel_mutex_lock(&panel->op_lock);
 
@@ -5005,13 +5005,13 @@ __visible_for_testing int panel_sleep_out(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 	PRINT_PANEL_STATE_BEGIN(prev_state, PANEL_STATE_NORMAL, start);
 
-	switch (panel_get_cur_state(panel)) {
+	switch (usdm_panel_get_cur_state(panel)) {
 	case PANEL_STATE_NORMAL:
 		panel_warn("panel already %s state\n",
-				panel_state_names[panel_get_cur_state(panel)]);
+				panel_state_names[usdm_panel_get_cur_state(panel)]);
 		goto do_exit;
 	case PANEL_STATE_ALPM:
 #ifdef CONFIG_USDM_PANEL_LPM
@@ -5059,7 +5059,7 @@ __visible_for_testing int panel_sleep_out(struct panel_device *panel)
 		retry = 3;
 		break;
 	default:
-		panel_err("invalid state(%d)\n", panel_get_cur_state(panel));
+		panel_err("invalid state(%d)\n", usdm_panel_get_cur_state(panel));
 		goto do_exit;
 	}
 	panel_set_cur_state(panel, PANEL_STATE_NORMAL);
@@ -5074,7 +5074,7 @@ __visible_for_testing int panel_sleep_out(struct panel_device *panel)
 		panel_err("failed to set hmd on seq\n");
 #endif
 	state->fsync_event_on = PANEL_FSYNC_EVENT_ON;
-	PRINT_PANEL_STATE_END(prev_state, panel_get_cur_state(panel), start);
+	PRINT_PANEL_STATE_END(prev_state, usdm_panel_get_cur_state(panel), start);
 
 	return 0;
 
@@ -5099,13 +5099,13 @@ __visible_for_testing int panel_doze(struct panel_device *panel)
 	}
 
 	state = &panel->state;
-	prev_state = panel_get_cur_state(panel);
+	prev_state = usdm_panel_get_cur_state(panel);
 	PRINT_PANEL_STATE_BEGIN(prev_state, PANEL_STATE_ALPM, start);
 
-	switch (panel_get_cur_state(panel)) {
+	switch (usdm_panel_get_cur_state(panel)) {
 	case PANEL_STATE_ALPM:
 		panel_warn("panel already %s state\n",
-				panel_state_names[panel_get_cur_state(panel)]);
+				panel_state_names[usdm_panel_get_cur_state(panel)]);
 		goto do_exit;
 	case PANEL_POWER_ON:
 	case PANEL_POWER_OFF:
@@ -5129,7 +5129,7 @@ __visible_for_testing int panel_doze(struct panel_device *panel)
 	panel_mutex_lock(&panel->work[PANEL_WORK_CHECK_CONDITION].lock);
 	clear_check_wq_var(&panel->condition_check);
 	panel_mutex_unlock(&panel->work[PANEL_WORK_CHECK_CONDITION].lock);
-	PRINT_PANEL_STATE_END(prev_state, panel_get_cur_state(panel), start);
+	PRINT_PANEL_STATE_END(prev_state, usdm_panel_get_cur_state(panel), start);
 
 do_exit:
 	return ret;
@@ -5169,7 +5169,7 @@ int panel_vrr_cb(struct panel_device *panel)
 	int ret = 0;
 
 	props = &panel->panel_data.props;
-	vrr = get_panel_vrr(panel);
+	vrr = usdm_get_panel_vrr(panel);
 	if (vrr == NULL)
 		return -EINVAL;
 
@@ -5627,7 +5627,7 @@ static int panel_seq_display_mode(struct panel_device *panel)
 	if (!check_display_mode_cond(panel))
 		return -EINVAL;
 
-	ret = panel_do_seqtbl_by_name_nolock(panel,
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel,
 			PANEL_DISPLAY_MODE_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to do display-mode-seq\n");
@@ -5770,7 +5770,7 @@ static int panel_set_ffc_seq(struct panel_device *panel, u32 dsi_freq)
 	panel_info("panel update ffc frequency %d -> %dkhz\n", origin, dsi_freq);
 	panel_set_property(panel, &props->dsi_freq, dsi_freq);
 
-	ret = panel_do_seqtbl_by_name(panel,
+	ret = usdm_panel_do_seqtbl_by_name(panel,
 			PANEL_FFC_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
@@ -5944,7 +5944,7 @@ static int panel_set_mask_layer(struct panel_device *panel, void *arg)
 	panel_mutex_lock(&panel_bl->lock);
 	panel_mutex_lock(&panel->op_lock);
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM) {
 		tx_cmd = false;
 		panel_info("tx cmd skip!(ALPM)\n");
 	}
@@ -5954,13 +5954,13 @@ static int panel_set_mask_layer(struct panel_device *panel, void *arg)
 		panel_bl_set_property(panel_bl, &panel_bl->props.smooth_transition, SMOOTH_TRANS_OFF);
 
 		if (check_seqtbl_exist(panel, PANEL_MASK_LAYER_STOP_DIMMING_SEQ) && tx_cmd)
-			panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_STOP_DIMMING_SEQ);
+			usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_STOP_DIMMING_SEQ);
 
 		panel_bl->props.mask_layer_br_hook = MASK_LAYER_HOOK_ON;
 		panel_update_brightness_cmd_skip_nolock(panel);
 
 		if (check_seqtbl_exist(panel, PANEL_MASK_LAYER_ENTER_BR_SEQ) && tx_cmd)
-			panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_ENTER_BR_SEQ);
+			usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_ENTER_BR_SEQ);
 
 		panel_info("enter (%d)->(%d)%s\n",
 			panel_bl->bd->props.brightness, panel_bl->props.mask_layer_br_target,
@@ -5978,7 +5978,7 @@ static int panel_set_mask_layer(struct panel_device *panel, void *arg)
 		panel_update_brightness_cmd_skip_nolock(panel);
 
 		if (check_seqtbl_exist(panel, PANEL_MASK_LAYER_EXIT_BR_SEQ) && tx_cmd)
-			panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_EXIT_BR_SEQ);
+			usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_MASK_LAYER_EXIT_BR_SEQ);
 
 		panel_info("exit (%d)->(%d)%s\n",
 			panel_bl->props.mask_layer_br_target, panel_bl->bd->props.brightness,
@@ -6026,17 +6026,17 @@ int panel_ioctl_event_frame_done(struct panel_device *panel, void *arg)
 		return 0;
 	}
 
-	if (panel_get_cur_state(panel) != PANEL_STATE_NORMAL &&
-			panel_get_cur_state(panel) != PANEL_STATE_ALPM) {
+	if (usdm_panel_get_cur_state(panel) != PANEL_STATE_NORMAL &&
+			usdm_panel_get_cur_state(panel) != PANEL_STATE_ALPM) {
 		panel_warn("FRAME_DONE (panel_state:%s, disp_on:%s)\n",
-				panel_state_names[panel_get_cur_state(panel)],
+				panel_state_names[usdm_panel_get_cur_state(panel)],
 				panel->state.disp_on ? "on" : "off");
 		return 0;
 	}
 
 	if (unlikely(panel->state.disp_on == PANEL_DISPLAY_OFF)) {
 		panel_info("FRAME_DONE (panel_state:%s, display on)\n",
-				panel_state_names[panel_get_cur_state(panel)]);
+				panel_state_names[usdm_panel_get_cur_state(panel)]);
 		ret = panel_display_on(panel);
 		panel_check_ready(panel);
 	}
@@ -6342,7 +6342,7 @@ static int panel_parse_gpio(struct panel_device *panel)
 
 	for_each_child_of_node(gpios_np, np) {
 		memset(&gpio, 0, sizeof(gpio));
-		if (of_get_panel_gpio(np, &gpio)) {
+		if (usdm_of_get_panel_gpio(np, &gpio)) {
 			panel_err("failed to get gpio %s\n", np->name);
 			break;
 		}
@@ -6391,7 +6391,7 @@ static int panel_parse_regulator(struct panel_device *panel)
 
 	for_each_child_of_node(regulators_np, np) {
 		memset(&regulator, 0, sizeof(regulator));
-		if (of_get_panel_regulator(np, &regulator) < 0) {
+		if (usdm_of_get_panel_regulator(np, &regulator) < 0) {
 			panel_err("failed to get regulator %s\n", np->name);
 			of_node_put(regulators_np);
 			return -EINVAL;
@@ -6458,7 +6458,7 @@ static int panel_parse_power_ctrl(struct panel_device *panel)
 		}
 		p_seq->dev_name = panel->of_node_name;
 		p_seq->name = pp->name;
-		ret = of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
+		ret = usdm_of_get_panel_power_ctrl(panel, seq_np, pp->name, p_seq);
 		if (ret < 0) {
 			panel_err("failed to get power_ctrl %s\n", pp->name);
 			break;
@@ -6757,7 +6757,7 @@ static void panel_power_off_bypass_on(struct panel_device *panel)
 		return;
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF) {
 		panel_err("panel is already off state\n");
 		return;
 	}
@@ -6815,7 +6815,7 @@ static void disp_det_handler(struct work_struct *work)
 		return panel_power_off_bypass_on(panel);
 	}
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_OFF) {
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_OFF) {
 		panel_err("panel is off state\n");
 		return;
 	}
@@ -6959,7 +6959,7 @@ void err_fg_handler(struct work_struct *data)
 		return;
 	}
 
-	switch (panel_get_cur_state(panel)) {
+	switch (usdm_panel_get_cur_state(panel)) {
 	case PANEL_STATE_ALPM:
 	case PANEL_STATE_NORMAL:
 		ret = panel_disable_irq(panel, PANEL_IRQ_ERR_FG);
@@ -7078,7 +7078,7 @@ static int panel_dpui_notifier_callback(struct notifier_block *self,
 	panel = container_of(self, struct panel_device, panel_dpui_notif);
 	panel_data = &panel->panel_data;
 
-	panel_resource_copy(panel, panel_datetime, "date");
+	usdm_panel_resource_copy(panel, panel_datetime, "date");
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%04d%02d%02d %02d%02d%02d",
 			((panel_datetime[0] & 0xF0) >> 4) + 2011, panel_datetime[0] & 0xF, panel_datetime[1] & 0x1F,
 			panel_datetime[2] & 0x1F, panel_datetime[3] & 0x3F, panel_datetime[4] & 0x3F);
@@ -7091,7 +7091,7 @@ static int panel_dpui_notifier_callback(struct notifier_block *self,
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d", get_panel_id3(panel));
 	set_dpui_field(DPUI_KEY_LCDID3, tbuf, size);
 
-	panel_resource_copy(panel, panel_coord, "coordinate");
+	usdm_panel_resource_copy(panel, panel_coord, "coordinate");
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 		panel_datetime[0], panel_datetime[1], panel_datetime[2], panel_datetime[3],
 		panel_datetime[4], panel_datetime[5], panel_datetime[6],
@@ -7099,7 +7099,7 @@ static int panel_dpui_notifier_callback(struct notifier_block *self,
 	set_dpui_field(DPUI_KEY_CELLID, tbuf, size);
 
 	/* OCTAID */
-	panel_resource_copy(panel, octa_id, "octa_id");
+	usdm_panel_resource_copy(panel, octa_id, "octa_id");
 	site = (octa_id[0] >> 4) & 0x0F;
 	rework = octa_id[0] & 0x0F;
 	poc = octa_id[1] & 0x0F;
@@ -7164,7 +7164,7 @@ int panel_fast_discharge_set(struct panel_device *panel)
 	panel_mutex_lock(&panel->io_lock);
 	panel_mutex_lock(&panel->op_lock);
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_FD_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_FD_SEQ);
 	if (unlikely(ret < 0))
 		panel_err("failed to write fast discharge seqtbl\n");
 
@@ -7279,7 +7279,7 @@ static int panel_destroy_thread(struct panel_device *panel)
 	return 0;
 }
 
-struct panel_device *panel_device_create(void)
+struct panel_device *usdm_panel_device_create(void)
 {
 	struct panel_device *panel;
 
@@ -7289,13 +7289,13 @@ struct panel_device *panel_device_create(void)
 
 	return panel;
 }
-EXPORT_SYMBOL(panel_device_create);
+EXPORT_SYMBOL(usdm_panel_device_create);
 
-void panel_device_destroy(struct panel_device *panel)
+void usdm_panel_device_destroy(struct panel_device *panel)
 {
 	kfree(panel);
 }
-EXPORT_SYMBOL(panel_device_destroy);
+EXPORT_SYMBOL(usdm_panel_device_destroy);
 
 int panel_device_register_notifiers(struct panel_device *panel)
 {
@@ -7373,7 +7373,7 @@ struct panel_drv_funcs panel_drv_funcs = {
 	.set_uevent_recovery_state = panel_set_uevent_recovery_state,
 };
 
-int panel_device_init(struct panel_device *panel)
+int usdm_panel_device_init(struct panel_device *panel)
 {
 	int ret;
 
@@ -7432,7 +7432,7 @@ int panel_device_init(struct panel_device *panel)
 	}
 
 	/* TODO: consider dual panel case */
-	set_boot_panel_id(panel, get_lk_boot_panel_id());
+	set_boot_panel_id(panel, usdm_get_lk_boot_panel_id());
 	if (panel_is_detected_in_lk(panel))
 		set_panel_id(panel, get_boot_panel_id(panel));
 	else
@@ -7539,9 +7539,9 @@ int panel_device_init(struct panel_device *panel)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_device_init);
+EXPORT_SYMBOL(usdm_panel_device_init);
 
-int panel_device_exit(struct panel_device *panel)
+int usdm_panel_device_exit(struct panel_device *panel)
 {
 	int ret;
 
@@ -7600,7 +7600,7 @@ int panel_device_exit(struct panel_device *panel)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_device_exit);
+EXPORT_SYMBOL(usdm_panel_device_exit);
 
 static int panel_drv_probe(struct platform_device *pdev)
 {
@@ -7611,14 +7611,14 @@ static int panel_drv_probe(struct platform_device *pdev)
 	if (!pdev)
 		return -EINVAL;
 
-	panel = panel_device_create();
+	panel = usdm_panel_device_create();
 	if (!panel)
 		return -ENOMEM;
 
 	panel->id = -1;
 	panel->dev = &pdev->dev;
 	platform_set_drvdata(pdev, panel);
-	ret = panel_device_init(panel);
+	ret = usdm_panel_device_init(panel);
 	if (ret < 0) {
 		panel_err("failed to initialize panel device\n");
 		goto err;
@@ -7627,7 +7627,7 @@ static int panel_drv_probe(struct platform_device *pdev)
 
 	return 0;
 err:
-	panel_device_destroy(panel);
+	usdm_panel_device_destroy(panel);
 	return ret;
 }
 
@@ -7641,7 +7641,7 @@ static int panel_drv_remove(struct platform_device *pdev)
 	list_del(&panel->list);
 	mutex_unlock(&panel_device_list_lock);
 
-	panel_device_destroy(panel);
+	usdm_panel_device_destroy(panel);
 
 	return 0;
 }

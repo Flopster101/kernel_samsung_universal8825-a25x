@@ -8,9 +8,9 @@
  */
 
 #include <linux/module.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
 
 const char *pnobj_type_to_string(u32 pnobj_type)
 {

@@ -13,10 +13,10 @@
 #include <linux/of.h>
 #include <linux/regulator/of_regulator.h>
 #include <linux/slab.h>
-#include "panel_kunit.h"
+#include "usdm_panel_kunit.h"
 
-#include "panel_regulator.h"
-#include "panel_debug.h"
+#include "usdm_panel_regulator.h"
+#include "usdm_panel_debug.h"
 
 __visible_for_testing DEFINE_REDIRECT_MOCKABLE(regulator_enable_wrapper, RETURNS(int), PARAMS(struct regulator *));
 __visible_for_testing int REAL_ID(regulator_enable_wrapper)(struct regulator *regulator)
@@ -307,7 +307,7 @@ int panel_regulator_helper_set_current_limit(struct panel_regulator *regulator, 
 	return call_panel_regulator_func(regulator, set_current_limit, uA);
 }
 
-int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator)
+int usdm_of_get_panel_regulator(struct device_node *np, struct panel_regulator *regulator)
 {
 	struct device_node *reg_np;
 
@@ -336,9 +336,9 @@ int of_get_panel_regulator(struct device_node *np, struct panel_regulator *regul
 
 	return 0;
 }
-EXPORT_SYMBOL(of_get_panel_regulator);
+EXPORT_SYMBOL(usdm_of_get_panel_regulator);
 
-struct panel_regulator *panel_regulator_create(void)
+struct panel_regulator *usdm_panel_regulator_create(void)
 {
 	struct panel_regulator *regulator;
 
@@ -350,9 +350,9 @@ struct panel_regulator *panel_regulator_create(void)
 
 	return regulator;
 }
-EXPORT_SYMBOL(panel_regulator_create);
+EXPORT_SYMBOL(usdm_panel_regulator_create);
 
-void panel_regulator_destroy(struct panel_regulator *regulator)
+void usdm_panel_regulator_destroy(struct panel_regulator *regulator)
 {
 	if (!regulator)
 		return;
@@ -360,4 +360,4 @@ void panel_regulator_destroy(struct panel_regulator *regulator)
 	regulator_put(regulator->reg);
 	kfree(regulator);
 }
-EXPORT_SYMBOL(panel_regulator_destroy);
+EXPORT_SYMBOL(usdm_panel_regulator_destroy);

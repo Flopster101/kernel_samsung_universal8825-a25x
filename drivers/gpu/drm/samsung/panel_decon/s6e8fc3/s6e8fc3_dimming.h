@@ -14,7 +14,7 @@
 #define __S6E8FC3_DIMMING_H__
 #include <linux/types.h>
 #include <linux/kernel.h>
-#include "../dimming.h"
+#include "../decon_dimming.h"
 #include "s6e8fc3.h"
 
 #define S6E8FC3_NR_TP (11)

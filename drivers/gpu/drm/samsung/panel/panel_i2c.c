@@ -11,9 +11,9 @@
 #include <linux/delay.h>
 #include <linux/i2c.h>
 
-#include "panel_drv.h"
-#include "panel_i2c.h"
-#include "panel_debug.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_i2c.h"
+#include "usdm_panel_debug.h"
 
 #define PANEL_I2C_DRIVER_NAME "panel_i2c"
 

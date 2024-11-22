@@ -16,11 +16,11 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #ifdef CONFIG_USDM_PANEL_DDI_FLASH
-#include "../panel_poc.h"
+#include "../usdm_panel_poc.h"
 #endif
-#include "../panel_drv.h"
-#include "../panel.h"
-#include "../maptbl.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel.h"
+#include "../usdm_maptbl.h"
 #include "oled_function.h"
 
 /*

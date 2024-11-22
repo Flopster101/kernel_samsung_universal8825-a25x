@@ -14,7 +14,7 @@
 #define __S6E3FC3_A25X_RESOL_H__
 
 #include <dt-bindings/display/panel-display.h>
-#include "../panel.h"
+#include "../usdm_panel.h"
 #include "s6e3fc3.h"
 #include "s6e3fc3_dimming.h"
 

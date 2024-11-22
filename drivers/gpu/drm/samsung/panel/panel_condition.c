@@ -9,21 +9,21 @@
 
 #include <linux/kernel.h>
 #include <linux/types.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_expression.h"
-#include "panel_condition.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_expression.h"
+#include "usdm_panel_condition.h"
 
-struct condinfo panel_cond_else = {
-	.base = __PNOBJ_INITIALIZER(panel_cond_else, CMD_TYPE_COND_EL),
+struct condinfo usdm_panel_cond_else = {
+	.base = __PNOBJ_INITIALIZER(usdm_panel_cond_else, CMD_TYPE_COND_EL),
 };
-EXPORT_SYMBOL(panel_cond_else);
+EXPORT_SYMBOL(usdm_panel_cond_else);
 
-struct condinfo panel_cond_endif = {
-	.base = __PNOBJ_INITIALIZER(panel_cond_endif, CMD_TYPE_COND_FI),
+struct condinfo usdm_panel_cond_endif = {
+	.base = __PNOBJ_INITIALIZER(usdm_panel_cond_endif, CMD_TYPE_COND_FI),
 };
-EXPORT_SYMBOL(panel_cond_endif);
+EXPORT_SYMBOL(usdm_panel_cond_endif);
 
 struct condinfo *create_condition(char *name,
 		unsigned int type, struct cond_rule *rule)

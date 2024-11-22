@@ -12,10 +12,10 @@
 #include <linux/regulator/consumer.h>
 #include <linux/of.h>
 #include <linux/regulator/of_regulator.h>
-#include "panel_kunit.h"
+#include "decon_panel_kunit.h"
 
-#include "panel_regulator.h"
-#include "panel_debug.h"
+#include "decon_panel_regulator.h"
+#include "decon_panel_debug.h"
 
 __visible_for_testing DEFINE_REDIRECT_MOCKABLE(regulator_enable_wrapper, RETURNS(int), PARAMS(struct regulator *));
 __visible_for_testing int REAL_ID(regulator_enable_wrapper)(struct regulator *regulator)

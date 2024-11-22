@@ -9,10 +9,10 @@
 
 #include <linux/module.h>
 #include <linux/kallsyms.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_function.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_function.h"
 
 LIST_HEAD(panel_function_list);
 
@@ -98,7 +98,7 @@ int pnobj_function_list_add(struct pnobj_func *f, struct list_head *list)
 	return 0;
 }
 
-int panel_function_insert(struct pnobj_func *f)
+int usdm_panel_function_insert(struct pnobj_func *f)
 {
 	int ret;
 
@@ -112,9 +112,9 @@ int panel_function_insert(struct pnobj_func *f)
 
 	return ret;
 }
-EXPORT_SYMBOL(panel_function_insert);
+EXPORT_SYMBOL(usdm_panel_function_insert);
 
-struct pnobj_func *panel_function_lookup(char *name)
+struct pnobj_func *usdm_panel_function_lookup(char *name)
 {
 	struct pnobj *pnobj;
 
@@ -127,9 +127,9 @@ struct pnobj_func *panel_function_lookup(char *name)
 
 	return pnobj_container_of(pnobj, struct pnobj_func);
 }
-EXPORT_SYMBOL(panel_function_lookup);
+EXPORT_SYMBOL(usdm_panel_function_lookup);
 
-int panel_function_insert_array(struct pnobj_func *array, size_t size)
+int usdm_panel_function_insert_array(struct pnobj_func *array, size_t size)
 {
 	int i, ret;
 
@@ -139,14 +139,14 @@ int panel_function_insert_array(struct pnobj_func *array, size_t size)
 			continue;
 		}
 
-		ret = panel_function_insert(&array[i]);
+		ret = usdm_panel_function_insert(&array[i]);
 		if (ret < 0)
 			return ret;
 	}
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_function_insert_array);
+EXPORT_SYMBOL(usdm_panel_function_insert_array);
 
 void panel_function_init(void)
 {

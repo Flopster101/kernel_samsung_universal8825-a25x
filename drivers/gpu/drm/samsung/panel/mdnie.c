@@ -19,19 +19,19 @@
 #include <linux/lcd.h>
 #include <linux/fb.h>
 #include <linux/pm_runtime.h>
-#include "panel_kunit.h"
-#include "panel_drv.h"
-#include "mdnie.h"
-#include "panel_debug.h"
-#include "panel_property.h"
+#include "usdm_panel_kunit.h"
+#include "usdm_panel_drv.h"
+#include "usdm_mdnie.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_property.h"
 #ifdef CONFIG_USDM_PANEL_COPR
-#include "copr.h"
+#include "usdm_copr.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_DPUI
-#include "dpui.h"
+#include "usdm_dpui.h"
 #endif
 #ifdef CONFIG_USDM_PANEL_TESTMODE
-#include "panel_testmode.h"
+#include "usdm_panel_testmode.h"
 #endif
 
 #ifdef MDNIE_SELF_TEST
@@ -314,7 +314,7 @@ static struct panel_prop_list mdnie_property_array[] = {
 __visible_for_testing int mdnie_set_property_value(struct mdnie_info *mdnie,
 		char *propname, unsigned int value)
 {
-	return panel_set_property_value(to_panel_device(mdnie),
+	return usdm_panel_set_property_value(to_panel_device(mdnie),
 				propname, value);
 }
 
@@ -420,7 +420,7 @@ int mdnie_current_state(struct mdnie_info *mdnie)
 	else
 		mdnie_mode = MDNIE_OFF_MODE;
 
-	if (panel_get_cur_state(panel) == PANEL_STATE_ALPM &&
+	if (usdm_panel_get_cur_state(panel) == PANEL_STATE_ALPM &&
 	((mdnie_mode == MDNIE_ACCESSIBILITY_MODE &&
 	(mdnie->props.accessibility == NEGATIVE ||
 	mdnie->props.accessibility == GRAYSCALE_NEGATIVE)) ||
@@ -458,7 +458,7 @@ char *mdnie_get_accessibility_sequence_name(struct mdnie_info *mdnie)
 	return accessibility_seqname_array[mdnie->props.accessibility];
 }
 
-char *mdnie_get_sequence_name(struct mdnie_info *mdnie)
+char *usdm_mdnie_get_sequence_name(struct mdnie_info *mdnie)
 {
 	char *seqname;
 	int mdnie_mode = mdnie_current_state(mdnie);
@@ -507,7 +507,7 @@ char *mdnie_get_sequence_name(struct mdnie_info *mdnie)
 
 	return seqname;
 }
-EXPORT_SYMBOL(mdnie_get_sequence_name);
+EXPORT_SYMBOL(usdm_mdnie_get_sequence_name);
 
 __visible_for_testing int mdnie_get_coordinate(struct mdnie_info *mdnie, int *x, int *y)
 {
@@ -521,7 +521,7 @@ __visible_for_testing int mdnie_get_coordinate(struct mdnie_info *mdnie, int *x,
 		return -EINVAL;
 	}
 
-	ret = panel_resource_copy(panel, coordinate, "coordinate");
+	ret = usdm_panel_resource_copy(panel, coordinate, "coordinate");
 	if (ret < 0) {
 		panel_err("failed to copy 'coordinate' resource\n");
 		return -EINVAL;
@@ -742,10 +742,10 @@ static int panel_set_mdnie(struct panel_device *panel)
 	}
 
 	ret = mdnie_do_sequence_nolock(mdnie,
-			mdnie_get_sequence_name(mdnie));
+			usdm_mdnie_get_sequence_name(mdnie));
 	if (unlikely(ret < 0)) {
 		panel_err("failed to run sequence(%s)\n",
-				mdnie_get_sequence_name(mdnie));
+				usdm_mdnie_get_sequence_name(mdnie));
 		goto err;
 	}
 
@@ -826,7 +826,7 @@ static void mdnie_update_scr_white_mode(struct mdnie_info *mdnie)
 			scr_white_mode_name[mdnie->props.scr_white_mode]);
 }
 
-int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
+int usdm_mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	if (!mdnie)
@@ -843,9 +843,9 @@ int mdnie_set_def_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_def_wrgb);
+EXPORT_SYMBOL(usdm_mdnie_set_def_wrgb);
 
-int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
+int usdm_mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	if (!mdnie)
@@ -862,24 +862,24 @@ int mdnie_set_cur_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_set_cur_wrgb);
+EXPORT_SYMBOL(usdm_mdnie_set_cur_wrgb);
 
-int mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
+int usdm_mdnie_cur_wrgb_to_byte_array(struct mdnie_info *mdnie,
 		unsigned char *dst, unsigned int stride)
 {
 	if (!mdnie || !dst || !stride)
 		return -EINVAL;
 
-	copy_to_sliced_byte_array(dst,
+	usdm_copy_to_sliced_byte_array(dst,
 			mdnie->props.cur_wrgb, 0, MAX_COLOR * stride, stride);
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_cur_wrgb_to_byte_array);
+EXPORT_SYMBOL(usdm_mdnie_cur_wrgb_to_byte_array);
 
 #define MDNIE_DEFAULT_ANTI_GLARE_RATIO (100)
 
-int mdnie_get_anti_glare_ratio(struct mdnie_info *mdnie)
+int usdm_mdnie_get_anti_glare_ratio(struct mdnie_info *mdnie)
 {
 	if (!mdnie->props.anti_glare)
 		return MDNIE_DEFAULT_ANTI_GLARE_RATIO;
@@ -890,9 +890,9 @@ int mdnie_get_anti_glare_ratio(struct mdnie_info *mdnie)
 
 	return mdnie->props.anti_glare_ratio[mdnie->props.anti_glare_level];
 }
-EXPORT_SYMBOL(mdnie_get_anti_glare_ratio);
+EXPORT_SYMBOL(usdm_mdnie_get_anti_glare_ratio);
 
-int mdnie_update_wrgb(struct mdnie_info *mdnie,
+int usdm_mdnie_update_wrgb(struct mdnie_info *mdnie,
 		unsigned char r, unsigned char g, unsigned char b)
 {
 	unsigned char src[MAX_COLOR] = { r, g, b };
@@ -910,14 +910,14 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 	}
 
 	if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_COLOR_COORDINATE) {
-		mdnie_set_def_wrgb(mdnie, r, g, b);
+		usdm_mdnie_set_def_wrgb(mdnie, r, g, b);
 		for_each_color(i) {
 			value = (int)mdnie->props.def_wrgb[i] +
 				(int)(((mdnie->props.scenario_mode == AUTO) || (mdnie->props.scenario_mode == DYNAMIC)) ?
 						mdnie->props.def_wrgb_ofs[i] : 0);
 			dst[i] = min(max(value, 0), 255);
 		}
-		mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
+		usdm_mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
 	} else if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_ADJUST_LDU) {
 		for_each_color(i) {
 			value = (int)src[i] + (int)(((mdnie->props.scenario_mode == AUTO) &&
@@ -925,9 +925,9 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 						mdnie->props.def_wrgb_ofs[i] : 0);
 			dst[i] = min(max(value, 0), 255);
 		}
-		mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
+		usdm_mdnie_set_cur_wrgb(mdnie, dst[RED], dst[GREEN], dst[BLUE]);
 	} else if (mdnie->props.scr_white_mode == SCR_WHITE_MODE_SENSOR_RGB) {
-		mdnie_set_cur_wrgb(mdnie, r, g, b);
+		usdm_mdnie_set_cur_wrgb(mdnie, r, g, b);
 	} else {
 		panel_warn("wrgb is not updated in scr_white_mode(%d)\n",
 				mdnie->props.scr_white_mode);
@@ -935,7 +935,7 @@ int mdnie_update_wrgb(struct mdnie_info *mdnie,
 
 	return 0;
 }
-EXPORT_SYMBOL(mdnie_update_wrgb);
+EXPORT_SYMBOL(usdm_mdnie_update_wrgb);
 
 int panel_mdnie_update(struct panel_device *panel)
 {
@@ -1253,7 +1253,7 @@ static ssize_t mdnie_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	struct mdnie_info *mdnie = dev_get_drvdata(dev);
-	char *seqname = mdnie_get_sequence_name(mdnie);
+	char *seqname = usdm_mdnie_get_sequence_name(mdnie);
 	int mdnie_mode = mdnie_current_state(mdnie);
 	unsigned int i, len = 0;
 
@@ -1940,7 +1940,7 @@ static int dpui_notifier_callback(struct notifier_block *self,
 
 	panel_mutex_lock(&mdnie->lock);
 
-	panel_resource_copy(panel, coordinate, "coordinate");
+	usdm_panel_resource_copy(panel, coordinate, "coordinate");
 	size = snprintf(tbuf, MAX_DPUI_VAL_LEN, "%d",
 			(coordinate[0] << 8) | coordinate[1]);
 	set_dpui_field(DPUI_KEY_WCRD_X, tbuf, size);

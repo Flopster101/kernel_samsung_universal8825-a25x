@@ -10,8 +10,8 @@
 #include <linux/fb.h>
 #include <linux/notifier.h>
 #include <linux/export.h>
-#include "dpui.h"
-#include "panel_debug.h"
+#include "decon_dpui.h"
+#include "decon_panel_debug.h"
 
 /*
  * DPUI : display use info (panel common info)
