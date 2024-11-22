@@ -8,6 +8,7 @@
 #include <linux/vmalloc.h>
 #include <linux/proc_fs.h>
 #include <linux/power_supply.h>
+#include <linux/sec_detect.h>
 
 #define TSP_TYPE_BUILTIN_FW		0
 #define TSP_TYPE_EXTERNAL_FW		1
@@ -1080,7 +1081,8 @@ extern unsigned int lpcharge;
 extern int get_lcd_attached(char *mode);
 #endif
 #if defined(CONFIG_EXYNOS_DECON_FB)
-extern int get_lcd_info(char *arg);
+extern int usdm_get_lcd_info(char *arg);
+extern int decon_get_lcd_info(char *arg);
 #endif
 
 extern void fts_set_grip_data_to_ic(struct fts_ts_info *info, u8 flag);
