@@ -11,11 +11,11 @@
 #include <asm-generic/errno-base.h>
 #include <linux/string.h>
 
-#include "panel_lib.h"
-#include "panel_debug.h"
+#include "usdm_panel_lib.h"
+#include "usdm_panel_debug.h"
 
 /* rdinfo */
-int panel_lib_rdinfo_alloc_buffer(struct rdinfo *m)
+int usdm_panel_lib_rdinfo_alloc_buffer(struct rdinfo *m)
 {
 	if (!m || !m->len)
 		return -EINVAL;
@@ -31,9 +31,9 @@ int panel_lib_rdinfo_alloc_buffer(struct rdinfo *m)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_alloc_buffer);
+EXPORT_SYMBOL(usdm_panel_lib_rdinfo_alloc_buffer);
 
-void panel_lib_rdinfo_free_buffer(struct rdinfo *m)
+void usdm_panel_lib_rdinfo_free_buffer(struct rdinfo *m)
 {
 	if (!m)
 		return;
@@ -41,9 +41,9 @@ void panel_lib_rdinfo_free_buffer(struct rdinfo *m)
 	kfree(m->data);
 	m->data = NULL;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_free_buffer);
+EXPORT_SYMBOL(usdm_panel_lib_rdinfo_free_buffer);
 
-struct rdinfo *panel_lib_rdinfo_create(u32 type, char *name, u32 addr, u32 offset, u32 len, u8 *init_data)
+struct rdinfo *usdm_panel_lib_rdinfo_create(u32 type, char *name, u32 addr, u32 offset, u32 len, u8 *init_data)
 {
 	struct rdinfo *rdi;
 	int ret;
@@ -69,7 +69,7 @@ struct rdinfo *panel_lib_rdinfo_create(u32 type, char *name, u32 addr, u32 offse
 	rdi->len = len;
 
 	if (init_data && len) {
-		ret = panel_lib_rdinfo_alloc_buffer(rdi);
+		ret = usdm_panel_lib_rdinfo_alloc_buffer(rdi);
 		if (ret < 0) {
 			panel_err("failed to alloc rdinfo buffer(ret:%d)\n", ret);
 			goto err;
@@ -84,20 +84,20 @@ err:
 	kfree(rdi);
 	return NULL;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_create);
+EXPORT_SYMBOL(usdm_panel_lib_rdinfo_create);
 
-void panel_lib_rdinfo_destroy(struct rdinfo *rdi)
+void usdm_panel_lib_rdinfo_destroy(struct rdinfo *rdi)
 {
 	if (!rdi)
 		return;
 
-	panel_lib_rdinfo_free_buffer(rdi);
+	usdm_panel_lib_rdinfo_free_buffer(rdi);
 	pnobj_deinit(&rdi->base);
 	kfree(rdi);
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_destroy);
+EXPORT_SYMBOL(usdm_panel_lib_rdinfo_destroy);
 
-int panel_lib_rdinfo_copy(struct rdinfo *dst, struct rdinfo *src)
+int usdm_panel_lib_rdinfo_copy(struct rdinfo *dst, struct rdinfo *src)
 {
 	int ret = 0;
 	struct rdinfo *temp_dst;
@@ -127,7 +127,7 @@ int panel_lib_rdinfo_copy(struct rdinfo *dst, struct rdinfo *src)
 	temp_dst->data = NULL;
 
 	if (src->data) {
-		ret = panel_lib_rdinfo_alloc_buffer(temp_dst);
+		ret = usdm_panel_lib_rdinfo_alloc_buffer(temp_dst);
 		if (ret < 0) {
 			panel_err("failed to alloc rdinfo buffer(ret:%d)\n", ret);
 			goto err;
@@ -137,16 +137,16 @@ int panel_lib_rdinfo_copy(struct rdinfo *dst, struct rdinfo *src)
 	}
 
 	if (dst->data)
-		panel_lib_rdinfo_free_buffer(dst);
+		usdm_panel_lib_rdinfo_free_buffer(dst);
 
 	memcpy(dst, temp_dst, sizeof(struct rdinfo));
 err:
 	kfree(temp_dst);
 	return ret;
 }
-EXPORT_SYMBOL(panel_lib_rdinfo_copy);
+EXPORT_SYMBOL(usdm_panel_lib_rdinfo_copy);
 
-struct res_update_info *panel_lib_res_update_info_create(u32 offset, struct rdinfo *rditbl)
+struct res_update_info *usdm_panel_lib_res_update_info_create(u32 offset, struct rdinfo *rditbl)
 {
 	struct res_update_info *resui;
 
@@ -164,15 +164,15 @@ struct res_update_info *panel_lib_res_update_info_create(u32 offset, struct rdin
 
 	return resui;
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_create);
+EXPORT_SYMBOL(usdm_panel_lib_res_update_info_create);
 
-void panel_lib_res_update_info_destroy(struct res_update_info *resui)
+void usdm_panel_lib_res_update_info_destroy(struct res_update_info *resui)
 {
 	kfree(resui);
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_destroy);
+EXPORT_SYMBOL(usdm_panel_lib_res_update_info_destroy);
 
-int panel_lib_res_update_info_copy(struct res_update_info *dst, struct res_update_info *src)
+int usdm_panel_lib_res_update_info_copy(struct res_update_info *dst, struct res_update_info *src)
 {
 	if (!dst || !src)
 		return -EINVAL;
@@ -184,9 +184,9 @@ int panel_lib_res_update_info_copy(struct res_update_info *dst, struct res_updat
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_res_update_info_copy);
+EXPORT_SYMBOL(usdm_panel_lib_res_update_info_copy);
 
-int panel_lib_resinfo_alloc_buffer(struct resinfo *m)
+int usdm_panel_lib_resinfo_alloc_buffer(struct resinfo *m)
 {
 	if (!m || !m->dlen)
 		return -EINVAL;
@@ -202,9 +202,9 @@ int panel_lib_resinfo_alloc_buffer(struct resinfo *m)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_alloc_buffer);
+EXPORT_SYMBOL(usdm_panel_lib_resinfo_alloc_buffer);
 
-void panel_lib_resinfo_free_buffer(struct resinfo *m)
+void usdm_panel_lib_resinfo_free_buffer(struct resinfo *m)
 {
 	if (!m)
 		return;
@@ -212,9 +212,9 @@ void panel_lib_resinfo_free_buffer(struct resinfo *m)
 	kfree(m->data);
 	m->data = NULL;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_free_buffer);
+EXPORT_SYMBOL(usdm_panel_lib_resinfo_free_buffer);
 
-struct resinfo *panel_lib_resinfo_create(char *name, u8 *init_data, u32 dlen, struct res_update_info *resui, u32 nr_resui)
+struct resinfo *usdm_panel_lib_resinfo_create(char *name, u8 *init_data, u32 dlen, struct res_update_info *resui, u32 nr_resui)
 {
 	struct resinfo *m;
 	int ret;
@@ -235,7 +235,7 @@ struct resinfo *panel_lib_resinfo_create(char *name, u8 *init_data, u32 dlen, st
 	m->nr_resui = nr_resui;
 
 	if (init_data) {
-		ret = panel_lib_resinfo_alloc_buffer(m);
+		ret = usdm_panel_lib_resinfo_alloc_buffer(m);
 		if (ret < 0) {
 			panel_err("failed to alloc resinfo buffer(ret:%d)\n", ret);
 			goto err;
@@ -249,20 +249,20 @@ err:
 	kfree(m);
 	return NULL;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_create);
+EXPORT_SYMBOL(usdm_panel_lib_resinfo_create);
 
-void panel_lib_resinfo_destroy(struct resinfo *m)
+void usdm_panel_lib_resinfo_destroy(struct resinfo *m)
 {
 	if (!m)
 		return;
 
-	panel_lib_resinfo_free_buffer(m);
+	usdm_panel_lib_resinfo_free_buffer(m);
 	free_pnobj_name(&m->base);
 	kfree(m);
 }
-EXPORT_SYMBOL(panel_lib_resinfo_destroy);
+EXPORT_SYMBOL(usdm_panel_lib_resinfo_destroy);
 
-int panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
+int usdm_panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
 {
 	int ret = 0;
 	struct resinfo *temp_dst;
@@ -273,7 +273,7 @@ int panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
 	if (dst == src)
 		return -EINVAL;
 
-	if (!is_valid_resource(src)) {
+	if (!usdm_is_valid_resource(src)) {
 		panel_err("invalid src resource\n");
 		return -EINVAL;
 	}
@@ -286,7 +286,7 @@ int panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
 	temp_dst->data = NULL;
 
 	if (src->data) {
-		ret = panel_lib_resinfo_alloc_buffer(temp_dst);
+		ret = usdm_panel_lib_resinfo_alloc_buffer(temp_dst);
 		if (ret < 0) {
 			panel_err("failed to alloc resinfo buffer(ret:%d)\n", ret);
 			goto err;
@@ -296,11 +296,11 @@ int panel_lib_resinfo_copy(struct resinfo *dst, struct resinfo *src)
 	}
 
 	if (dst->data)
-		panel_lib_resinfo_free_buffer(dst);
+		usdm_panel_lib_resinfo_free_buffer(dst);
 
 	memcpy(dst, temp_dst, sizeof(struct resinfo));
 err:
 	kfree(temp_dst);
 	return ret;
 }
-EXPORT_SYMBOL(panel_lib_resinfo_copy);
+EXPORT_SYMBOL(usdm_panel_lib_resinfo_copy);

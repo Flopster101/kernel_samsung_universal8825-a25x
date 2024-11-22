@@ -1,10 +1,10 @@
 #include <linux/of.h>
 #include <linux/device.h>
 
-#include "panel_debug.h"
-#include "panel_drv.h"
-#include "panel_gpio.h"
-#include "panel_regulator.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_gpio.h"
+#include "decon_panel_regulator.h"
 
 static u32 action_table[MAX_PANEL_POWER_CTRL_ACTION] = {
 	[PANEL_POWER_CTRL_ACTION_DELAY_MSLEEP] = (PARSE_VALUE),

@@ -9,8 +9,8 @@
  */
 
 #include <linux/module.h>
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
 #include "oled_common_aod.h"
 
 void oled_maptbl_copy_aod_digital_pos(struct maptbl *tbl, u8 *dst)
@@ -358,7 +358,7 @@ int oled_maptbl_getidx_aod_self_mode_pos(struct maptbl *tbl)
 		row = 0;
 		break;
 	}
-	return maptbl_index(tbl, 0, row, 0);
+	return usdm_maptbl_index(tbl, 0, row, 0);
 }
 
 void oled_maptbl_copy_aod_self_move_reset(struct maptbl *tbl, u8 *dst)
@@ -579,7 +579,7 @@ int oled_maptbl_getidx_aod_self_pattern(struct maptbl *tbl)
 		break;
 	}
 
-	return maptbl_index(tbl, 0, row, 0);
+	return usdm_maptbl_index(tbl, 0, row, 0);
 }
 
 void oled_maptbl_copy_aod_self_move_pattern(struct maptbl *tbl, u8 *dst)
@@ -593,7 +593,7 @@ void oled_maptbl_copy_aod_self_move_pattern(struct maptbl *tbl, u8 *dst)
 
 	panel = tbl->pdata;
 	aod = &panel->aod;
-	idx = maptbl_getidx(tbl);
+	idx = usdm_maptbl_getidx(tbl);
 	if (idx < 0) {
 		panel_err("failed to getidx %d\n", idx);
 		return;

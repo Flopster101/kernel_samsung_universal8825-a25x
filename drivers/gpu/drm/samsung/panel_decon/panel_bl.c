@@ -9,23 +9,23 @@
  */
 
 #include <linux/backlight.h>
-#include "panel_kunit.h"
-#include "panel.h"
-#include "panel_bl.h"
+#include "decon_panel_kunit.h"
+#include "decon_panel.h"
+#include "decon_panel_bl.h"
 #ifdef CONFIG_EXYNOS_DECON_LCD_COPR
-#include "copr.h"
+#include "decon_copr.h"
 #endif
 
-#include "timenval.h"
-#include "panel_debug.h"
+#include "decon_timenval.h"
+#include "decon_panel_debug.h"
 
 #ifdef CONFIG_PANEL_AID_DIMMING
-#include "dimming.h"
-#include "panel_dimming.h"
+#include "decon_dimming.h"
+#include "decon_panel_dimming.h"
 #endif
 
-#include "panel_drv.h"
-#include "panel_irc.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_irc.h"
 
 static char *dim_type_str[MAX_DIM_TYPE_STR] = {
 	[DIM_TYPE_STR_TABLE] = "table",

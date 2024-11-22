@@ -12,9 +12,9 @@
 #include <linux/miscdevice.h>
 #include <linux/of_platform.h>
 
-#include "panel_drv.h"
-#include "panel_spi.h"
-#include "panel_debug.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_spi.h"
+#include "usdm_panel_debug.h"
 
 #define PANEL_SPI_MAX_CMD_SIZE 16
 #define PANEL_SPI_RX_BUF_SIZE 2048
@@ -941,7 +941,7 @@ static ssize_t panel_spi_fops_read(struct file *file, char __user *buf, size_t l
 		read_done += read_size;
 	}
 
-	if (panel_log_level > 6)
+	if (usdm_panel_log_level > 6)
 		print_hex_dump(KERN_ERR, "panel_spi_read ", DUMP_PREFIX_ADDRESS, 16, 1, read_buf, read_size, false);
 
 	res = simple_read_from_buffer(buf, count, &empty_pos, read_buf, count);

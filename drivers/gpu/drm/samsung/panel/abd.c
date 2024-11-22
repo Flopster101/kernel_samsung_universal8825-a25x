@@ -45,7 +45,7 @@
 #endif
 #endif
 
-#include "abd.h"
+#include "usdm_abd.h"
 #if defined(CONFIG_SMCDSD_PANEL)
 #include "usdm_board.h"
 #include "usdm_notify.h"
@@ -217,7 +217,7 @@ static void set_mipi_rw_bypass(struct abd_protect *abd, unsigned int bypass)
 
 static inline int get_boot_lcdtype(void)
 {
-	return get_lk_boot_panel_id();
+	return usdm_get_lk_boot_panel_id();
 }
 
 static inline unsigned int get_boot_lcdconnected(void)

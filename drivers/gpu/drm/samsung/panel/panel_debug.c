@@ -10,17 +10,17 @@
 
 #include <linux/debugfs.h>
 #include <linux/time64.h>
-#include "panel_drv.h"
-#include "panel_firmware.h"
-#include "panel_debug.h"
-#include "panel_property.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_firmware.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_property.h"
 
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "usdm_panel_freq_hop.h"
 #endif
-#include "panel_obj.h"
+#include "usdm_panel_obj.h"
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP) || defined(CONFIG_USDM_ADAPTIVE_MIPI)
-#include "dev_ril_header.h"
+#include "usdm_dev_ril_header.h"
 #endif
 #include <linux/sec_panel_notifier_v2.h>
 #if defined(CONFIG_USDM_PANEL_JSON)
@@ -90,14 +90,14 @@ static int string_to_debugfs_dir_id(const char *str)
 
 static int panel_debug_log_show(struct seq_file *s)
 {
-	seq_printf(s, "%d\n", panel_log_level);
+	seq_printf(s, "%d\n", usdm_panel_log_level);
 
 	return 0;
 }
 
 static int panel_debug_cmd_log_show(struct seq_file *s)
 {
-	seq_printf(s, "%d\n", panel_cmd_log);
+	seq_printf(s, "%d\n", usdm_panel_cmd_log);
 
 	return 0;
 }
@@ -122,7 +122,7 @@ static int panel_debug_sequence_show(struct seq_file *s)
 static int panel_debug_sequence_store(struct panel_device *panel,
 		char *seqname)
 {
-	return panel_do_seqtbl_by_name(panel, seqname);
+	return usdm_panel_do_seqtbl_by_name(panel, seqname);
 }
 
 static int panel_debug_resource_show(struct seq_file *s)
@@ -134,8 +134,8 @@ static int panel_debug_resource_show(struct seq_file *s)
 	if (!buf)
 		return 0;
 
-	snprintf_resource(buf, SZ_1K,
-			find_panel_resource(panel, debugfs->name));
+	usdm_snprintf_resource(buf, SZ_1K,
+			usdm_find_panel_resource(panel, debugfs->name));
 	seq_printf(s, "%s\n", buf);
 	kfree(buf);
 
@@ -145,7 +145,7 @@ static int panel_debug_resource_show(struct seq_file *s)
 static int panel_debug_resource_store(struct panel_device *panel,
 		char *resname)
 {
-	return panel_resource_update_by_name(panel, resname);
+	return usdm_panel_resource_update_by_name(panel, resname);
 }
 
 static int panel_debug_property_show(struct seq_file *s)
@@ -157,7 +157,7 @@ static int panel_debug_property_show(struct seq_file *s)
 	if (!buf)
 		return 0;
 
-	snprintf_property(buf, SZ_1K,
+	usdm_snprintf_property(buf, SZ_1K,
 			panel_find_property(panel, debugfs->name));
 	seq_printf(s, "%s\n", buf);
 	kfree(buf);
@@ -168,7 +168,7 @@ static int panel_debug_property_show(struct seq_file *s)
 static int panel_debug_property_store(struct panel_device *panel,
 		char *propname, int value)
 {
-	return panel_property_set_value(
+	return usdm_panel_property_set_value(
 			panel_find_property(panel, propname), value);
 }
 
@@ -682,16 +682,16 @@ static ssize_t panel_debug_simple_write(struct file *file,
 		if (rc)
 			return rc;
 
-		panel_log_level = res;
-		panel_info("panel_log_level: %d\n", panel_log_level);
+		usdm_panel_log_level = res;
+		panel_info("usdm_panel_log_level: %d\n", usdm_panel_log_level);
 		break;
 	case PANEL_DEBUGFS_FILE_CMD_LOG:
 		rc = kstrtoint_from_user(buf, count, 10, &res);
 		if (rc)
 			return rc;
 
-		panel_cmd_log = res;
-		panel_info("panel_cmd_log: %d\n", panel_cmd_log);
+		usdm_panel_cmd_log = res;
+		panel_info("usdm_panel_cmd_log: %d\n", usdm_panel_cmd_log);
 		break;
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP)
 	case PANEL_DEBUGFS_FILE_FREQ_HOP:

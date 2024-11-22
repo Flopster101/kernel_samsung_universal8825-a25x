@@ -97,9 +97,9 @@ struct mafpc_info {
 	u32 abc_ctrl_cmd_len;
 };
 
-struct mafpc_device *get_mafpc_device(struct panel_device *panel);
-struct mafpc_device *mafpc_device_create(void);
-int mafpc_device_init(struct mafpc_device *mafpc);
+struct mafpc_device *usdm_get_mafpc_device(struct panel_device *panel);
+struct mafpc_device *usdm_mafpc_device_create(void);
+int usdm_mafpc_device_init(struct mafpc_device *mafpc);
 int mafpc_device_probe(struct mafpc_device *mafpc, struct mafpc_info *info);
 int mafpc_set_written_to_dev(struct mafpc_device *mafpc);
 int mafpc_clear_written_to_dev(struct mafpc_device *mafpc);

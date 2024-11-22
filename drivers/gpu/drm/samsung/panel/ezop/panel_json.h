@@ -10,9 +10,9 @@
 #ifndef __PANEL_JSON_H__
 #define __PANEL_JSON_H__
 
-#include "panel.h"
-#include "panel_obj.h"
-#include "panel_function.h"
+#include "usdm_panel.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_function.h"
 #include "jsmn.h"
 #include "json_reader.h"
 #include "json_writer.h"

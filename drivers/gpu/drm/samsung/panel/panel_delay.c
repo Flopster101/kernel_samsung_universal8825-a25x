@@ -1,8 +1,8 @@
 #include <linux/kernel.h>
 #include <linux/types.h>
-#include "panel.h"
-#include "panel_obj.h"
-#include "panel_delay.h"
+#include "usdm_panel.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_delay.h"
 
 bool is_valid_delay(struct delayinfo *delay)
 {
@@ -66,7 +66,7 @@ char *get_timer_delay_begin_name(struct timer_delay_begin_info *begin)
 }
 
 /**
- * create_delay - create a struct delayinfo structure
+ * usdm_create_delay - create a struct delayinfo structure
  * @name: pointer to a string for the name of this delay.
  * @type: type of delay.
  * @usec: microseconds to delay.
@@ -79,9 +79,9 @@ char *get_timer_delay_begin_name(struct timer_delay_begin_info *begin)
  * Returns &struct delayinfo pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_delay().
+ * making a call to usdm_destroy_delay().
  */
-struct delayinfo *create_delay(char *name, u32 type, u32 usec, u32 nframe, u32 nvsync, bool no_sleep)
+struct delayinfo *usdm_create_delay(char *name, u32 type, u32 usec, u32 nframe, u32 nvsync, bool no_sleep)
 {
 	struct delayinfo *delay;
 
@@ -104,16 +104,16 @@ struct delayinfo *create_delay(char *name, u32 type, u32 usec, u32 nframe, u32 n
 
 	return delay;
 }
-EXPORT_SYMBOL(create_delay);
+EXPORT_SYMBOL(usdm_create_delay);
 
 /**
- * destroy_delay - destroys a struct delayinfo structure
+ * usdm_destroy_delay - destroys a struct delayinfo structure
  * @delay: pointer to the struct delayinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_delay().
+ * to usdm_create_delay().
  */
-void destroy_delay(struct delayinfo *delay)
+void usdm_destroy_delay(struct delayinfo *delay)
 {
 	if (!delay)
 		return;
@@ -121,10 +121,10 @@ void destroy_delay(struct delayinfo *delay)
 	pnobj_deinit(&delay->base);
 	kfree(delay);
 }
-EXPORT_SYMBOL(destroy_delay);
+EXPORT_SYMBOL(usdm_destroy_delay);
 
 /**
- * create_timer_delay_begin - create a struct timer_delay_begin_info structure
+ * usdm_create_timer_delay_begin - create a struct timer_delay_begin_info structure
  * @name: pointer to a string for the name of this timer_delay_begin.
  * @name: pointer to a timer delay.
  *
@@ -133,9 +133,9 @@ EXPORT_SYMBOL(destroy_delay);
  * Returns &struct timer_delay_begin pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_timer_delay_begin().
+ * making a call to usdm_destroy_timer_delay_begin().
  */
-struct timer_delay_begin_info *create_timer_delay_begin(char *name, struct delayinfo *delay)
+struct timer_delay_begin_info *usdm_create_timer_delay_begin(char *name, struct delayinfo *delay)
 {
 	struct timer_delay_begin_info *begin;
 
@@ -154,18 +154,18 @@ struct timer_delay_begin_info *create_timer_delay_begin(char *name, struct delay
 
 	return begin;
 }
-EXPORT_SYMBOL(create_timer_delay_begin);
+EXPORT_SYMBOL(usdm_create_timer_delay_begin);
 
 /**
- * destroy_timer_delay_begin - destroys a struct timer_delay_begin structure
+ * usdm_destroy_timer_delay_begin - destroys a struct timer_delay_begin structure
  * @begin: pointer to the struct delayinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_delay().
+ * to usdm_create_delay().
  */
-void destroy_timer_delay_begin(struct timer_delay_begin_info *begin)
+void usdm_destroy_timer_delay_begin(struct timer_delay_begin_info *begin)
 {
 	pnobj_deinit(&begin->base);
 	kfree(begin);
 }
-EXPORT_SYMBOL(destroy_timer_delay_begin);
+EXPORT_SYMBOL(usdm_destroy_timer_delay_begin);

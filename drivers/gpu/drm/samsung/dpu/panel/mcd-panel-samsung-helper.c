@@ -15,6 +15,7 @@
 #include <linux/slab.h>
 #include <linux/errno.h>
 #include <linux/sort.h>
+#include <linux/sec_detect.h>
 #include <drm/drm_modes.h>
 #include "panel-samsung-drv.h"
 #include "mcd-panel-samsung-helper.h"
@@ -139,9 +140,15 @@ void exynos_drm_mode_set_name(struct drm_display_mode *mode, int refresh_mode)
 {
 	drm_mode_set_name(mode);
 
-	snprintf(mode->name + strlen(mode->name),
-			DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
-			drm_mode_vrefresh(mode), refresh_mode_to_str(refresh_mode));
+	if (sec_current_device == SEC_A25) {
+		snprintf(mode->name + strlen(mode->name),
+				DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
+				drm_mode_vrefresh(mode), usdm_refresh_mode_to_str(refresh_mode));
+	} else {
+		snprintf(mode->name + strlen(mode->name),
+				DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
+				drm_mode_vrefresh(mode), decon_refresh_mode_to_str(refresh_mode));
+	}
 }
 
 int drm_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, struct drm_display_mode *ddm)
@@ -165,7 +172,11 @@ int drm_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, str
 	 * 'vscan' decide how many times real display(e.g. AMOLED-PANEL)
 	 * vertical scan while one frame update.
 	 */
-	vscan = panel_mode_vscan(pdm);
+	if (sec_current_device == SEC_A25) {
+		vscan = usdm_panel_mode_vscan(pdm);
+	} else {
+		vscan = decon_panel_mode_vscan(pdm);
+	}
 	if (vscan > 1)
 		ddm->vscan = vscan;
 

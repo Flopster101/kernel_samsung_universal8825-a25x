@@ -1,7 +1,7 @@
-#include "panel_drv.h"
-#include "panel_property.h"
-#include "panel_config.h"
-#include "panel_debug.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_property.h"
+#include "usdm_panel_config.h"
+#include "usdm_panel_debug.h"
 
 int panel_apply_pnobj_config(struct panel_device *panel,
 		struct pnobj_config *pnobj_config)
@@ -11,7 +11,7 @@ int panel_apply_pnobj_config(struct panel_device *panel,
 	if (!panel || !pnobj_config)
 		return -EINVAL;
 
-	ret = panel_set_property_value(panel,
+	ret = usdm_panel_set_property_value(panel,
 			pnobj_config->prop_name, pnobj_config->value);
 	if (ret < 0) {
 		panel_err("failed to set property(%s) value\n",

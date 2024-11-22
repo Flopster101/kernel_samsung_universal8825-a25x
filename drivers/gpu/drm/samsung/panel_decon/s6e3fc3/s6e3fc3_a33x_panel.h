@@ -13,8 +13,8 @@
 #ifndef __S6E3FC3_A33X_PANEL_H__
 #define __S6E3FC3_A33X_PANEL_H__
 
-#include "../panel.h"
-#include "../panel_drv.h"
+#include "../decon_panel.h"
+#include "../decon_panel_drv.h"
 #include "s6e3fc3.h"
 #include "s6e3fc3_a33x.h"
 #include "s6e3fc3_dimming.h"

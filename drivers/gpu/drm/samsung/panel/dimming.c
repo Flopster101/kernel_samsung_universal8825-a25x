@@ -11,10 +11,10 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "dimming.h"
-#include "dimming_gamma.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_dimming.h"
+#include "usdm_dimming_gamma.h"
 
 static int NR_LUMINANCE;
 static int NR_TP;
@@ -126,7 +126,7 @@ struct gamma_curve gamma_curve_lut[] = {
 #endif	/* GENERATE_GAMMA_CURVE */
 };
 
-s64 disp_pow(s64 num, u32 digits)
+s64 usdm_disp_pow(s64 num, u32 digits)
 {
 	s64 res = num;
 	u32 i;
@@ -138,7 +138,7 @@ s64 disp_pow(s64 num, u32 digits)
 		res *= num;
 	return res;
 }
-EXPORT_SYMBOL(disp_pow);
+EXPORT_SYMBOL(usdm_disp_pow);
 
 s64 disp_round(s64 num, u32 digits)
 {
@@ -146,9 +146,9 @@ s64 disp_round(s64 num, u32 digits)
 	u64 tnum;
 
 	tnum = num * sign;
-	tnum *= disp_pow(10, digits + 1);
+	tnum *= usdm_disp_pow(10, digits + 1);
 	tnum += 5;
-	do_div(tnum, (u32)disp_pow(10, digits + 1));
+	do_div(tnum, (u32)usdm_disp_pow(10, digits + 1));
 
 	return sign * (s64)tnum;
 }
@@ -161,10 +161,10 @@ static s64 scale_down_round(s64 num, u32 digits)
 	tnum = num * sign;
 	rem = do_div(tnum, (1U << BIT_SHIFT));
 
-	rem *= disp_pow(10, digits + 1);
+	rem *= usdm_disp_pow(10, digits + 1);
 	rem >>= BIT_SHIFT;
 	rem += 5;
-	do_div(rem, (u32)disp_pow(10, digits + 1));
+	do_div(rem, (u32)usdm_disp_pow(10, digits + 1));
 
 	return sign * (s64)(tnum + rem);
 }
@@ -177,14 +177,14 @@ static s64 scale_down_rem(s64 num, u32 digits)
 	tnum = num * sign;
 	rem = do_div(tnum, (1U << BIT_SHIFT));
 
-	rem *= disp_pow(10, digits + 1);
+	rem *= usdm_disp_pow(10, digits + 1);
 	rem >>= BIT_SHIFT;
 	rem += 5;
 	do_div(rem, 10);
 
 	/* round up and minus in remainder */
-	if (rem >= (u64)disp_pow(10, digits))
-		rem -= (u64)disp_pow(10, digits);
+	if (rem >= (u64)usdm_disp_pow(10, digits))
+		rem -= (u64)usdm_disp_pow(10, digits);
 
 	return sign * rem;
 }
@@ -201,7 +201,7 @@ static int msb64(s64 num)
 }
 #endif
 
-s64 disp_div64(s64 num, s64 den)
+s64 usdm_disp_div64(s64 num, s64 den)
 {
 #if BIT_SHIFT > 26
 	if (num > ((1LL << (63 - BIT_SHIFT)) - 1)) {
@@ -232,7 +232,7 @@ s64 disp_div64(s64 num, s64 den)
 
 	return sign * tnum;
 }
-EXPORT_SYMBOL(disp_div64);
+EXPORT_SYMBOL(usdm_disp_div64);
 
 #ifdef DIMMING_CALC_PRECISE
 s64 disp_div64_round(s64 num, s64 den, u32 digits)
@@ -251,7 +251,7 @@ s64 disp_div64_round(s64 num, s64 den, u32 digits)
 	tden = den * sign_den;
 
 	rem = do_div(tnum, (u32)tden);
-	rem *= disp_pow(10, digits + 2);
+	rem *= usdm_disp_pow(10, digits + 2);
 	do_div(rem, (u32)tden);
 
 	/*
@@ -260,7 +260,7 @@ s64 disp_div64_round(s64 num, s64 den, u32 digits)
 	 * To compensate it, round_up function use (+ 6) instead of (+ 5).
 	 */
 	rem += 5;
-	do_div(rem, (u32)disp_pow(10, digits + 2));
+	do_div(rem, (u32)usdm_disp_pow(10, digits + 2));
 
 	return sign * (tnum + rem);
 }
@@ -639,7 +639,7 @@ static u64 mtp_offset_to_vregout(struct dimming_info *dim_info,
 		}
 		vreg = vsrc - VREF;
 		num = vreg * (s64)vt_voltage[offset];
-		res = vsrc - disp_div64(num, den);
+		res = vsrc - usdm_disp_div64(num, den);
 	} else if (v == TP_V0) {
 		s32 offset = tp[v].center[c] + tp[v].offset[c];
 		if ((offset > 0xF) || (offset < 0x0)) {
@@ -649,15 +649,15 @@ static u64 mtp_offset_to_vregout(struct dimming_info *dim_info,
 		}
 		vreg = vsrc - VREF;
 		num = vreg * (s64)v0_voltage[offset];
-		res = vsrc - disp_div64(num, den);
+		res = vsrc - usdm_disp_div64(num, den);
 	} else if (v == TP_V255) {
 		vreg = vsrc - VREF;
 		num = vreg * ((s64)tp[v].numerator + tp[v].center[c] + tp[v].offset[c]);
-		res = vsrc - disp_div64(num, den);
+		res = vsrc - usdm_disp_div64(num, den);
 	} else {
 		vreg = vsrc - tp[v + 1].vout[c];
 		num = vreg * ((s64)tp[v].numerator + tp[v].center[c] + tp[v].offset[c]);
-		res = vsrc - disp_div64(num, den);
+		res = vsrc - usdm_disp_div64(num, den);
 	}
 
 #ifdef DEBUG_DIMMING
@@ -726,7 +726,7 @@ static s32 mtp_vregout_to_offset(struct dimming_info *dim_info,
 			dim_lut[luminance_index].luminance, tp[v].name, color_name[c], num, den, res);
 #else
 	num -= den * ((s64)tp[v].numerator + (s64)tp[v].offset[c]);
-	res = disp_div64(num, den);
+	res = usdm_disp_div64(num, den);
 #endif
 	//if (in_range(v, dim_lut_info->rgb_color_offset_range))
 	res += rgb_offset[v][c];
@@ -795,12 +795,12 @@ s64 interpolation_round(s64 from, s64 to, int cur_step, int total_step)
 		sign = -1LL;
 	num = abs(to - from) * (s64)cur_step + (total_step / 2);
 	den = (s64)total_step;
-	num = from + sign * disp_div64(num, den);
+	num = from + sign * usdm_disp_div64(num, den);
 
 	return num;
 }
 
-s64 disp_interpolation64(s64 from, s64 to, int cur_step, int total_step)
+s64 usdm_disp_interpolation64(s64 from, s64 to, int cur_step, int total_step)
 {
 	s64 num, den;
 
@@ -809,11 +809,11 @@ s64 disp_interpolation64(s64 from, s64 to, int cur_step, int total_step)
 
 	num = (to - from) * (s64)cur_step;
 	den = (s64)total_step;
-	num = from + disp_div64(num, den);
+	num = from + usdm_disp_div64(num, den);
 
 	return num;
 }
-EXPORT_SYMBOL(disp_interpolation64);
+EXPORT_SYMBOL(usdm_disp_interpolation64);
 
 int gamma_table_add_offset(s32 (*src)[MAX_COLOR], s32 (*ofs)[MAX_COLOR],
 		s32 (*out)[MAX_COLOR], struct tp *tp, int nr_tp)
@@ -865,7 +865,7 @@ int gamma_table_interpolation(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR],
 	for (i = 0; i < nr_tp; i++) {
 		for_each_color(c) {
 			out[i][c] =
-				disp_interpolation64(from[i][c], to[i][c], cur_step, total_step);
+				usdm_disp_interpolation64(from[i][c], to[i][c], cur_step, total_step);
 #ifdef DEBUG_DIMMING
 			panel_info("from %d, to %d, out %d, cur_step %d, total_step %d\n",
 					from[i][c], to[i][c], out[i][c], cur_step, total_step);
@@ -876,7 +876,7 @@ int gamma_table_interpolation(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR],
 	return 0;
 }
 
-int gamma_table_interpolation_round(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR],
+int usdm_gamma_table_interpolation_round(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR],
 		s32 (*out)[MAX_COLOR], int nr_tp, int cur_step, int total_step)
 {
 	int i, c;
@@ -905,7 +905,7 @@ int gamma_table_interpolation_round(s32 (*from)[MAX_COLOR], s32 (*to)[MAX_COLOR]
 
 	return 0;
 }
-EXPORT_SYMBOL(gamma_table_interpolation_round);
+EXPORT_SYMBOL(usdm_gamma_table_interpolation_round);
 
 static int generate_gray_scale(struct dimming_info *dim_info)
 {
@@ -929,7 +929,7 @@ static int generate_gray_scale(struct dimming_info *dim_info)
 		for_each_color(c) {
 			v_upper = (s64)gray_scale_lut[iv_upper].vout[c];
 			v_lower = (s64)gray_scale_lut[iv_lower].vout[c];
-			vout = disp_interpolation64(v_lower, v_upper, cur_step, total_step);
+			vout = usdm_disp_interpolation64(v_lower, v_upper, cur_step, total_step);
 #ifdef DEBUG_DIMMING
 			panel_info("lower %3d, upper %3d, "
 					"cur_step %3d, total_step %3d, vout[%d]\t "
@@ -1102,7 +1102,7 @@ err:
 	return;
 }
 
-void get_dimming_gamma(struct dimming_info *dim_info, u32 luminance, u8 *output,
+void usdm_get_dimming_gamma(struct dimming_info *dim_info, u32 luminance, u8 *output,
 		void (*copy)(u8 *output, u32 value, u32 index, u32 color))
 {
 	if (unlikely(!dim_info || !output)) {
@@ -1120,7 +1120,7 @@ void get_dimming_gamma(struct dimming_info *dim_info, u32 luminance, u8 *output,
 
 	return;
 }
-EXPORT_SYMBOL(get_dimming_gamma);
+EXPORT_SYMBOL(usdm_get_dimming_gamma);
 
 void print_dimming_tp_output(struct dimming_lut *dim_lut, struct tp *tp, int size)
 {
@@ -1537,7 +1537,7 @@ void print_tbl(struct dimming_info *dim_info, s32 (*tbl)[MAX_COLOR])
 	panel_info("%s\n", buf);
 }
 
-int init_dimming_info(struct dimming_info *dim_info, struct dimming_init_info *src)
+int usdm_init_dimming_info(struct dimming_info *dim_info, struct dimming_init_info *src)
 {
 	int ilum;
 
@@ -1567,9 +1567,9 @@ int init_dimming_info(struct dimming_info *dim_info, struct dimming_init_info *s
 
 	return 0;
 }
-EXPORT_SYMBOL(init_dimming_info);
+EXPORT_SYMBOL(usdm_init_dimming_info);
 
-int init_dimming_mtp(struct dimming_info *dim_info, s32 (*mtp)[MAX_COLOR])
+int usdm_init_dimming_mtp(struct dimming_info *dim_info, s32 (*mtp)[MAX_COLOR])
 {
 	int i, c;
 	print_center_gamma(dim_info);
@@ -1583,7 +1583,7 @@ int init_dimming_mtp(struct dimming_info *dim_info, s32 (*mtp)[MAX_COLOR])
 
 	return 0;
 }
-EXPORT_SYMBOL(init_dimming_mtp);
+EXPORT_SYMBOL(usdm_init_dimming_mtp);
 
 int init_dimming_hbm_info(struct dimming_info *dim_info, s32 (*hbm_gamma_tbl)[MAX_COLOR], u32 hbm_luminance)
 {
@@ -1617,7 +1617,7 @@ int init_dimming_hbm_info(struct dimming_info *dim_info, s32 (*hbm_gamma_tbl)[MA
 	return 0;
 }
 
-int process_dimming(struct dimming_info *dim_info)
+int usdm_process_dimming(struct dimming_info *dim_info)
 {
 	int i, c, v;
 	struct tp *tp;
@@ -1694,4 +1694,4 @@ int process_dimming(struct dimming_info *dim_info)
 
 	return 0;
 }
-EXPORT_SYMBOL(process_dimming);
+EXPORT_SYMBOL(usdm_process_dimming);
