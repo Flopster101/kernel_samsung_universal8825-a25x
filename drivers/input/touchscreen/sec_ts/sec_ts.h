@@ -37,6 +37,7 @@
 #include <linux/vmalloc.h>
 //#include <linux/wakelock.h>
 #include <linux/workqueue.h>
+#include <linux/sec_detect.h>
 
 #if defined(CONFIG_TRUSTONIC_TRUSTED_UI)
 #include <linux/t-base-tui.h>
@@ -842,7 +843,8 @@ extern int get_lcd_attached(char *mode);
 #endif
 
 #if defined(CONFIG_EXYNOS_DECON_FB)
-extern int get_lcd_info(char *arg);
+extern int usdm_get_lcd_info(char *arg);
+extern int decon_get_lcd_info(char *arg);
 #endif
 
 #ifdef CONFIG_MOTOR_DRV_MAX77865

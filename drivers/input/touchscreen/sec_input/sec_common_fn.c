@@ -1001,7 +1001,11 @@ int sec_input_parse_dt(struct device *dev)
 	}
 #endif
 #if IS_ENABLED(CONFIG_EXYNOS_DPU30)
-	connected = get_lcd_info("connected");
+	if (sec_current_device == SEC_A25)
+		connected = usdm_get_lcd_info("connected");
+	else
+		connected = decon_get_lcd_info("connected");
+
 	if (connected < 0) {
 		input_err(true, dev, "%s: Failed to get lcd info\n", __func__);
 		return -EINVAL;
@@ -1014,7 +1018,10 @@ int sec_input_parse_dt(struct device *dev)
 
 	input_info(true, dev, "%s: lcd is connected\n", __func__);
 
-	lcdtype = get_lcd_info("id");
+	if (sec_current_device == SEC_A25)
+		lcdtype = usdm_get_lcd_info("id");
+	else
+		lcdtype = decon_get_lcd_info("id");
 	if (lcdtype < 0) {
 		input_err(true, dev, "%s: Failed to get lcd info\n", __func__);
 		return -EINVAL;
