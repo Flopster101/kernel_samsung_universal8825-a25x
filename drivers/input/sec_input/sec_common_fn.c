@@ -76,7 +76,10 @@ int sec_input_get_lcd_id(struct device *dev)
 #endif
 
 #if IS_ENABLED(CONFIG_EXYNOS_DPU30) || IS_ENABLED(CONFIG_MCD_PANEL) || IS_ENABLED(CONFIG_USDM_PANEL)
-	connected = get_lcd_info("connected");
+	if (!sec_needs_decon)
+		connected = usdm_get_lcd_info("connected");
+	else
+		connected = decon_get_lcd_info("connected");
 	if (connected < 0) {
 		input_err(true, dev, "%s: Failed to get lcd info(connected)\n", __func__);
 		return -EINVAL;
@@ -89,7 +92,10 @@ int sec_input_get_lcd_id(struct device *dev)
 
 	input_info(true, dev, "%s: lcd is connected\n", __func__);
 
-	lcdtype = get_lcd_info("id");
+	if (!sec_needs_decon)
+		lcdtype = usdm_get_lcd_info("id");
+	else
+		lcdtype = decon_get_lcd_info("id");
 	if (lcdtype < 0) {
 		input_err(true, dev, "%s: Failed to get lcd info(id)\n", __func__);
 		return -EINVAL;

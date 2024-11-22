@@ -42,6 +42,7 @@
 #include <linux/power_supply.h>
 #include <linux/proc_fs.h>
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 #if IS_ENABLED(CONFIG_SEC_ABC)
 #include <linux/sti/abc_common.h>
 #endif
@@ -807,7 +808,8 @@ extern int get_lcd_attached(char *mode);
 #endif
 
 #if IS_ENABLED(CONFIG_EXYNOS_DPU30) || IS_ENABLED(CONFIG_MCD_PANEL) || IS_ENABLED(CONFIG_USDM_PANEL)
-extern int get_lcd_info(char *arg);
+extern int usdm_get_lcd_info(char *arg);
+extern int decon_get_lcd_info(char *arg);
 #endif
 
 #if IS_ENABLED(CONFIG_SMCDSD_PANEL)
