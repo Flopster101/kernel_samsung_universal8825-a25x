@@ -10,10 +10,10 @@
 #include <linux/list.h>
 #include <linux/firmware.h>
 #include <linux/time64.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_function.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_function.h"
 #if defined(CONFIG_USDM_PANEL_JSON)
 #include "ezop/panel_json.h"
 #endif

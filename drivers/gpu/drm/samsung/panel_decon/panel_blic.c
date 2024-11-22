@@ -17,10 +17,10 @@
 #include <linux/regulator/machine.h>
 #include <linux/regulator/of_regulator.h>
 
-#include "panel_drv.h"
-#include "panel_blic.h"
-#include "panel_i2c.h"
-#include "panel_debug.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_blic.h"
+#include "decon_panel_i2c.h"
+#include "decon_panel_debug.h"
 
 #define BLIC_DT_NODE_NAME "blic"
 

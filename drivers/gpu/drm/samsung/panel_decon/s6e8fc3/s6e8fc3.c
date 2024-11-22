@@ -11,15 +11,15 @@
  */
  #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
-#include "../panel_kunit.h"
-#include "../panel.h"
+#include "../decon_panel_kunit.h"
+#include "../decon_panel.h"
 #include "s6e8fc3.h"
 #ifdef CONFIG_PANEL_AID_DIMMING
-#include "../dimming.h"
-#include "../panel_dimming.h"
+#include "../decon_dimming.h"
+#include "../decon_panel_dimming.h"
 #endif
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../decon_panel_drv.h"
+#include "../decon_panel_debug.h"
 
 #if IS_ENABLED(CONFIG_SEC_ABC)
 #include <linux/sti/abc_common.h>

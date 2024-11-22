@@ -8,10 +8,10 @@
  * published by the Free Software Foundation.
  */
 
-#include "panel.h"
-#include "panel_obj.h"
-#include "panel_debug.h"
-#include "panel_packet.h"
+#include "usdm_panel.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_packet.h"
 
 const char *packet_type_name[MAX_CMD_PACKET_TYPE] = {
 	[CMD_PKT_TYPE_NONE] = "PKT_NONE",
@@ -173,7 +173,7 @@ static int prepare_pktinfo_txbuf(struct pktinfo *pkt)
 }
 
 /**
- * create_tx_packet - create a struct pktinfo structure
+ * usdm_create_tx_packet - create a struct pktinfo structure
  * @name: pointer to a string for the name of this packet.
  * @type: type of packet.
  * @msg: message to tx.
@@ -186,9 +186,9 @@ static int prepare_pktinfo_txbuf(struct pktinfo *pkt)
  * Returns &struct pktinfo pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_tx_packet().
+ * making a call to usdm_destroy_tx_packet().
  */
-struct pktinfo *create_tx_packet(char *name, u32 type,
+struct pktinfo *usdm_create_tx_packet(char *name, u32 type,
 		struct panel_tx_msg *msg, struct pkt_update_info *pktui, u32 nr_pktui, u32 option)
 {
 	struct pktinfo *tx_packet;
@@ -247,16 +247,16 @@ err_alloc_data:
 
 	return NULL;
 }
-EXPORT_SYMBOL(create_tx_packet);
+EXPORT_SYMBOL(usdm_create_tx_packet);
 
 /**
- * destroy_tx_packet - destroys a struct pktinfo structure
+ * usdm_destroy_tx_packet - destroys a struct pktinfo structure
  * @tx_packet: pointer to the struct pktinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_tx_packet().
+ * to usdm_create_tx_packet().
  */
-void destroy_tx_packet(struct pktinfo *tx_packet)
+void usdm_destroy_tx_packet(struct pktinfo *tx_packet)
 {
 	if (!tx_packet)
 		return;
@@ -268,10 +268,10 @@ void destroy_tx_packet(struct pktinfo *tx_packet)
 	kvfree(tx_packet->initdata);
 	kfree(tx_packet);
 }
-EXPORT_SYMBOL(destroy_tx_packet);
+EXPORT_SYMBOL(usdm_destroy_tx_packet);
 
 /**
- * create_rx_packet - create a struct rdinfo structure
+ * usdm_create_rx_packet - create a struct rdinfo structure
  * @name: pointer to a string for the name of this packet.
  * @type: type of packet.
  *
@@ -280,9 +280,9 @@ EXPORT_SYMBOL(destroy_tx_packet);
  * Returns &struct rdinfo pointer on success, or NULL on error.
  *
  * Note, the pointer created here is to be destroyed when finished by
- * making a call to destroy_rx_packet().
+ * making a call to usdm_destroy_rx_packet().
  */
-struct rdinfo *create_rx_packet(char *name, u32 type, struct panel_rx_msg *msg)
+struct rdinfo *usdm_create_rx_packet(char *name, u32 type, struct panel_rx_msg *msg)
 {
 	struct rdinfo *rx_packet;
 
@@ -326,16 +326,16 @@ err:
 	kfree(rx_packet);
 	return NULL;
 }
-EXPORT_SYMBOL(create_rx_packet);
+EXPORT_SYMBOL(usdm_create_rx_packet);
 
 /**
- * destroy_rx_packet - destroys a struct pktinfo structure
+ * usdm_destroy_rx_packet - destroys a struct pktinfo structure
  * @rx_packet: pointer to the struct pktinfo that is to be destroyed
  *
  * Note, the pointer to be destroyed must have been created with a call
- * to create_rx_packet().
+ * to usdm_create_rx_packet().
  */
-void destroy_rx_packet(struct rdinfo *rx_packet)
+void usdm_destroy_rx_packet(struct rdinfo *rx_packet)
 {
 	if (!rx_packet)
 		return;
@@ -344,7 +344,7 @@ void destroy_rx_packet(struct rdinfo *rx_packet)
 	kvfree(rx_packet->data);
 	kfree(rx_packet);
 }
-EXPORT_SYMBOL(destroy_rx_packet);
+EXPORT_SYMBOL(usdm_destroy_rx_packet);
 
 int update_tx_packet_from_maptbl(struct pktinfo *pkt, struct pkt_update_info *pktui)
 {
@@ -368,8 +368,8 @@ int update_tx_packet_from_maptbl(struct pktinfo *pkt, struct pkt_update_info *pk
 		return -EINVAL;
 	}
 
-	if (!maptbl_is_initialized(maptbl)) {
-		ret = maptbl_init(maptbl);
+	if (!usdm_maptbl_is_initialized(maptbl)) {
+		ret = usdm_maptbl_init(maptbl);
 		if (ret < 0) {
 			panel_err("%s failed to initialize maptbl(%s)\n",
 					get_pktinfo_name(pkt), maptbl_get_name(maptbl));
@@ -380,7 +380,7 @@ int update_tx_packet_from_maptbl(struct pktinfo *pkt, struct pkt_update_info *pk
 				get_pktinfo_name(pkt), maptbl_get_name(maptbl));
 	}
 
-	ret = maptbl_copy(maptbl, txbuf + offset);
+	ret = usdm_maptbl_copy(maptbl, txbuf + offset);
 	if (ret < 0) {
 		panel_err("%s failed to copy maptbl(%s)\n",
 				get_pktinfo_name(pkt), maptbl_get_name(maptbl));

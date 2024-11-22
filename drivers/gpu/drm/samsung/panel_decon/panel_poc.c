@@ -16,13 +16,13 @@
 #include <linux/highmem.h>
 #include <linux/bug.h>
 
-#include "panel.h"
-#include "panel_bl.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_poc.h"
+#include "decon_panel.h"
+#include "decon_panel_bl.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
+#include "decon_panel_poc.h"
 #ifdef CONFIG_SUPPORT_POC_SPI
-#include "panel_spi.h"
+#include "decon_panel_spi.h"
 #endif
 
 static u8 *poc_wr_img;

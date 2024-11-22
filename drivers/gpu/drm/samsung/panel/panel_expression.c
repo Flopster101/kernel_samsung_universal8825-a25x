@@ -9,11 +9,11 @@
 
 #include <linux/kernel.h>
 #include <linux/types.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
-#include "panel_obj.h"
-#include "panel_expression.h"
-#include "panel_function.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_obj.h"
+#include "usdm_panel_expression.h"
+#include "usdm_panel_function.h"
 
 static const char * const panel_expr_type_name[] = {
 	/* operand */
@@ -541,7 +541,7 @@ static int panel_expr_data_get_value(struct panel_device *panel, struct panel_ex
 		/* not implemented */
 		value = 0;
 	} else if (data->type == PANEL_EXPR_TYPE_OPERAND_PROP) {
-		value = panel_get_property_value(panel, data->op.str);
+		value = usdm_panel_get_property_value(panel, data->op.str);
 		if (value < 0) {
 			panel_err("failed to get property(%s) value\n", data->op.str);
 			return 0;

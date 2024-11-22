@@ -13,8 +13,8 @@
 #ifndef __S6E3FC3_A25X_PANEL_MDNIE_H__
 #define __S6E3FC3_A25X_PANEL_MDNIE_H__
 
-#include "../panel.h"
-#include "../mdnie.h"
+#include "../usdm_panel.h"
+#include "../usdm_mdnie.h"
 #include "oled_function.h"
 #include "s6e3fc3_a25x_panel.h"
 #include "s6e3fc3_mdnie.h"

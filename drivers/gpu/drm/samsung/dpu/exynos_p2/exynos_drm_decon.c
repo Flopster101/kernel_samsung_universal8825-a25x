@@ -66,7 +66,8 @@
 #include <mcd_drm_decon.h>
 #include <mcd_drm_helper.h>
 #if IS_ENABLED(CONFIG_DISPLAY_USE_INFO) || IS_ENABLED(CONFIG_USDM_PANEL_DPUI)
-#include "dpui.h"
+#include "usdm_dpui.h"
+#include "decon_dpui.h"
 #endif
 #endif
 

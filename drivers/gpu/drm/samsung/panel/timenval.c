@@ -8,8 +8,8 @@
  * published by the Free Software Foundation.
  */
 
-#include "timenval.h"
-#include "panel_debug.h"
+#include "usdm_timenval.h"
+#include "usdm_panel_debug.h"
 
 int timenval_update_snapshot(struct timenval *tnv, int cur_value, struct timespec64 cur_ts)
 {

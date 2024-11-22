@@ -9,10 +9,10 @@
  */
 
 #include <linux/debugfs.h>
-#include "panel_drv.h"
-#include "panel_debug.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
 #include <linux/sec_panel_notifier_v2.h>
-#include "panel_freq_hop.h"
+#include "decon_panel_freq_hop.h"
 #if defined(CONFIG_PANEL_FREQ_HOP)
 #include <linux/dev_ril_bridge.h>
 #endif

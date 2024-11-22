@@ -22,7 +22,7 @@
 #define OLED_SELF_MASK_CRC_LEN (4)
 
 int snprintf_dump_expects(char *buf, size_t size, struct dumpinfo *dump);
-int oled_dump_show_expects(struct dumpinfo *dump);
+int usdm_oled_dump_show_expects(struct dumpinfo *dump);
 int oled_dump_show_resource(struct dumpinfo *dump);
 int oled_dump_show_resource_and_panic(struct dumpinfo *dump);
 int oled_dump_show_rddpm(struct dumpinfo *info);

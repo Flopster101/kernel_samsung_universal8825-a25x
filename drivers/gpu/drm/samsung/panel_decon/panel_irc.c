@@ -17,10 +17,10 @@
 #include <linux/bug.h>
 
 
-#include "panel_irc.h"
-#include "panel.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
+#include "decon_panel_irc.h"
+#include "decon_panel.h"
+#include "decon_panel_drv.h"
+#include "decon_panel_debug.h"
 
 
 bool is_hbm_zone(struct brightness_table *brt_tbl, int brightness)

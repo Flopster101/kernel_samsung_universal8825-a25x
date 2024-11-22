@@ -8,9 +8,9 @@
  */
 #include <linux/types.h>
 #include <linux/module.h>
-#include "panel_drv_ioctl.h"
-#include "panel_drv.h"
-#include "panel_debug.h"
+#include "usdm_panel_drv_ioctl.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel_debug.h"
 
 size_t panel_drv_ioctl_scnprintf_cmd(char *buf, size_t size, unsigned int cmd)
 {

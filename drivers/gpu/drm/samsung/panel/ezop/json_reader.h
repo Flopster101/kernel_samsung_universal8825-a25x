@@ -11,7 +11,7 @@
 #define _JSON_READER_H_
 
 #include <linux/string.h>
-#include "panel_debug.h"
+#include "usdm_panel_debug.h"
 #include "jsmn.h"
 
 typedef struct json_reader json_reader_t;

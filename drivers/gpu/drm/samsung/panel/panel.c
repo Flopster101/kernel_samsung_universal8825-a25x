@@ -14,29 +14,29 @@
 #include <video/mipi_display.h>
 #include <linux/lcd.h>
 #include <linux/spi/spi.h>
-#include "panel_kunit.h"
-#include "panel_drv.h"
-#include "panel.h"
-#include "panel_debug.h"
-#include "panel_packet.h"
-#include "panel_bl.h"
-#include "panel_dimming.h"
-#include "maptbl.h"
+#include "usdm_panel_kunit.h"
+#include "usdm_panel_drv.h"
+#include "usdm_panel.h"
+#include "usdm_panel_debug.h"
+#include "usdm_panel_packet.h"
+#include "usdm_panel_bl.h"
+#include "usdm_panel_dimming.h"
+#include "usdm_maptbl.h"
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP)
-#include "panel_freq_hop.h"
+#include "usdm_panel_freq_hop.h"
 #endif
 #if defined(CONFIG_USDM_SDP_ADAPTIVE_MIPI)
-#include "sdp_adaptive_mipi.h"
+#include "usdm_sdp_adaptive_mipi.h"
 #elif defined(CONFIG_USDM_ADAPTIVE_MIPI)
-#include "adaptive_mipi.h"
+#include "usdm_adaptive_mipi.h"
 #endif
 #ifdef CONFIG_USDM_COPR_SPI
 #include "spi.h"
 #endif
-#include "util.h"
+#include "usdm_util.h"
 
 #ifdef CONFIG_USDM_PANEL_DIMMING
-#include "dimming.h"
+#include "usdm_dimming.h"
 #endif
 
 const char *cmd_type_name[MAX_CMD_TYPE] = {
@@ -86,7 +86,7 @@ int string_to_cmd_type(const char *str)
 
 __visible_for_testing int nr_panel;
 __visible_for_testing struct common_panel_info *panel_list[MAX_PANEL];
-int register_common_panel(struct common_panel_info *info)
+int usdm_register_common_panel(struct common_panel_info *info)
 {
 	int i;
 
@@ -116,15 +116,15 @@ int register_common_panel(struct common_panel_info *info)
 
 	return 0;
 }
-EXPORT_SYMBOL(register_common_panel);
+EXPORT_SYMBOL(usdm_register_common_panel);
 
-int deregister_common_panel(struct common_panel_info *info)
+int usdm_deregister_common_panel(struct common_panel_info *info)
 {
 	/* TODO: implement deregister function using list */
 
 	return 0;
 }
-EXPORT_SYMBOL(deregister_common_panel);
+EXPORT_SYMBOL(usdm_deregister_common_panel);
 
 static struct common_panel_info *find_common_panel_with_name(const char *name)
 {
@@ -320,7 +320,7 @@ find_panel_dimming(struct panel_info *panel_data, char *name)
 	return NULL;
 }
 
-struct maptbl *find_panel_maptbl_by_substr(struct panel_device *panel, char *substr)
+struct maptbl *usdm_find_panel_maptbl_by_substr(struct panel_device *panel, char *substr)
 {
 	struct pnobj *pnobj;
 
@@ -335,7 +335,7 @@ struct maptbl *find_panel_maptbl_by_substr(struct panel_device *panel, char *sub
 
 	return pnobj_container_of(pnobj, struct maptbl);
 }
-EXPORT_SYMBOL(find_panel_maptbl_by_substr);
+EXPORT_SYMBOL(usdm_find_panel_maptbl_by_substr);
 
 __visible_for_testing u32 get_frame_delay(struct panel_device *panel, struct delayinfo *delay)
 {
@@ -573,8 +573,8 @@ int REAL_ID(panel_cmdq_flush)(struct panel_device *panel)
 		return 0;
 
 	if ((panel->adapter.funcs->write_table != NULL) &&
-		(panel_get_property_value(panel, PANEL_PROPERTY_SEPARATE_TX) == SEPARATE_TX_OFF)) {
-		if (panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_OFF)
+		(usdm_panel_get_property_value(panel, PANEL_PROPERTY_SEPARATE_TX) == SEPARATE_TX_OFF)) {
+		if (usdm_panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_OFF)
 			tx_done_wait = false;
 
 		ret = panel_dsi_write_table(panel, panel->cmdq.cmd,
@@ -583,9 +583,9 @@ int REAL_ID(panel_cmdq_flush)(struct panel_device *panel)
 			panel_err("failed to panel_dsi_write_table %d\n", ret);
 	} else if (panel->adapter.funcs->write != NULL) {
 		for (i = 0; i < panel_cmdq_get_size(panel); i++) {
-			if (panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_OFF)
+			if (usdm_panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_OFF)
 				tx_done_wait = false;
-			else if (panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_ON)
+			else if (usdm_panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_ON)
 				tx_done_wait = true;
 			else if (i == panel_cmdq_get_size(panel) - 1)
 				tx_done_wait = true;
@@ -642,7 +642,7 @@ int panel_cmdq_push(struct panel_device *panel, u8 cmd_id, const u8 *buf, int si
 	panel_dbg("cmdq[%d] id:%02X cmd:%02X size:%d\n",
 			index, cmd_id, buf[0], size);
 
-	if (panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_ON) {
+	if (usdm_panel_get_property_value(panel, PANEL_PROPERTY_WAIT_TX_DONE) == WAIT_TX_DONE_MANUAL_ON) {
 		ret = panel_cmdq_flush(panel);
 		if (ret < 0) {
 			panel_err("failed to panel_cmdq_flush %d\n", ret);
@@ -1413,7 +1413,7 @@ int panel_do_init_maptbl(struct panel_device *panel, struct maptbl *maptbl)
 		return -EINVAL;
 	}
 
-	ret = maptbl_init(maptbl);
+	ret = usdm_maptbl_init(maptbl);
 	if (ret < 0) {
 		panel_err("failed to init maptbl(%s) ret %d\n", maptbl_get_name(maptbl), ret);
 		return ret;
@@ -1695,7 +1695,7 @@ do_exit:
 	return 0;
 }
 
-int panel_do_seqtbl_by_name_nolock(struct panel_device *panel, char *seqname)
+int usdm_panel_do_seqtbl_by_name_nolock(struct panel_device *panel, char *seqname)
 {
 	struct seqinfo *seq;
 
@@ -1710,21 +1710,21 @@ int panel_do_seqtbl_by_name_nolock(struct panel_device *panel, char *seqname)
 
 	return execute_sequence_nolock(panel, seq);
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_name_nolock);
+EXPORT_SYMBOL(usdm_panel_do_seqtbl_by_name_nolock);
 
-int panel_do_seqtbl_by_name(struct panel_device *panel, char *seqname)
+int usdm_panel_do_seqtbl_by_name(struct panel_device *panel, char *seqname)
 {
 	int ret;
 
 	panel_mutex_lock(&panel->op_lock);
-	ret = panel_do_seqtbl_by_name_nolock(panel, seqname);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, seqname);
 	panel_mutex_unlock(&panel->op_lock);
 
 	return ret;
 }
-EXPORT_SYMBOL(panel_do_seqtbl_by_name);
+EXPORT_SYMBOL(usdm_panel_do_seqtbl_by_name);
 
-struct resinfo *find_panel_resource(struct panel_device *panel, char *name)
+struct resinfo *usdm_find_panel_resource(struct panel_device *panel, char *name)
 {
 	struct pnobj *pnobj;
 
@@ -1739,20 +1739,20 @@ struct resinfo *find_panel_resource(struct panel_device *panel, char *name)
 
 	return pnobj_container_of(pnobj, struct resinfo);
 }
-EXPORT_SYMBOL(find_panel_resource);
+EXPORT_SYMBOL(usdm_find_panel_resource);
 
-bool is_panel_resource_initialized(struct panel_device *panel, char *name)
+bool usdm_is_panel_resource_initialized(struct panel_device *panel, char *name)
 {
-	struct resinfo *res = find_panel_resource(panel, name);
+	struct resinfo *res = usdm_find_panel_resource(panel, name);
 
 	if (unlikely(!res)) {
 		panel_err("%s not found in resource\n", name);
 		return false;
 	}
 
-	return is_resource_initialized(res);
+	return usdm_is_resource_initialized(res);
 }
-EXPORT_SYMBOL(is_panel_resource_initialized);
+EXPORT_SYMBOL(usdm_is_panel_resource_initialized);
 
 int panel_resource_clear(struct panel_device *panel, char *name)
 {
@@ -1763,7 +1763,7 @@ int panel_resource_clear(struct panel_device *panel, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel, name);
+	res = usdm_find_panel_resource(panel, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -1773,7 +1773,7 @@ int panel_resource_clear(struct panel_device *panel, char *name)
 	return 0;
 }
 
-int panel_resource_copy(struct panel_device *panel, u8 *dst, char *name)
+int usdm_panel_resource_copy(struct panel_device *panel, u8 *dst, char *name)
 {
 	struct resinfo *res;
 
@@ -1782,16 +1782,16 @@ int panel_resource_copy(struct panel_device *panel, u8 *dst, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel, name);
+	res = usdm_find_panel_resource(panel, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
 	}
-	return copy_resource(dst, res);
+	return usdm_copy_resource(dst, res);
 }
-EXPORT_SYMBOL(panel_resource_copy);
+EXPORT_SYMBOL(usdm_panel_resource_copy);
 
-int panel_resource_copy_and_clear(struct panel_device *panel, u8 *dst, char *name)
+int usdm_panel_resource_copy_and_clear(struct panel_device *panel, u8 *dst, char *name)
 {
 	struct resinfo *res;
 	int ret;
@@ -1801,24 +1801,24 @@ int panel_resource_copy_and_clear(struct panel_device *panel, u8 *dst, char *nam
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel, name);
+	res = usdm_find_panel_resource(panel, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
 	}
 
-	if (!is_resource_initialized(res)) {
-		panel_warn("%s not initialized\n", get_resource_name(res));
+	if (!usdm_is_resource_initialized(res)) {
+		panel_warn("%s not initialized\n", usdm_get_resource_name(res));
 		return -EINVAL;
 	}
-	ret = copy_resource_slice(dst, res, 0, res->dlen);
+	ret = usdm_copy_resource_slice(dst, res, 0, res->dlen);
 	set_resource_state(res, RES_UNINITIALIZED);
 
 	return ret;
 }
-EXPORT_SYMBOL(panel_resource_copy_and_clear);
+EXPORT_SYMBOL(usdm_panel_resource_copy_and_clear);
 
-int get_panel_resource_size(struct panel_device *panel, char *name)
+int usdm_get_panel_resource_size(struct panel_device *panel, char *name)
 {
 	struct resinfo *res;
 
@@ -1827,15 +1827,15 @@ int get_panel_resource_size(struct panel_device *panel, char *name)
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel, name);
+	res = usdm_find_panel_resource(panel, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
 	}
 
-	return get_resource_size(res);
+	return usdm_get_resource_size(res);
 }
-EXPORT_SYMBOL(get_panel_resource_size);
+EXPORT_SYMBOL(usdm_get_panel_resource_size);
 
 #define MAX_READ_BYTES  (128)
 int panel_rx_nbytes(struct panel_device *panel,
@@ -1934,7 +1934,7 @@ int panel_rx_nbytes(struct panel_device *panel,
 #if IS_ENABLED(CONFIG_USDM_PANEL_ID_READ_REG_DADBDC) || \
 	IS_ENABLED(CONFIG_USDM_PANEL_ID_READ_REG_ADAEAF) || \
 	(!IS_ENABLED(CONFIG_USDM_PANEL_ID_READ_REG_04) && IS_ENABLED(CONFIG_USDM_PANEL_TFT_COMMON))
-int read_panel_id(struct panel_device *panel, u8 *buf)
+int usdm_read_panel_id(struct panel_device *panel, u8 *buf)
 {
 	int len, ret = 0;
 	int i = 0;
@@ -1963,7 +1963,7 @@ read_err:
 	return ret;
 }
 #else
-int read_panel_id(struct panel_device *panel, u8 *buf)
+int usdm_read_panel_id(struct panel_device *panel, u8 *buf)
 {
 	int len, ret = 0;
 
@@ -1991,7 +1991,7 @@ read_err:
 	return ret;
 }
 #endif
-EXPORT_SYMBOL(read_panel_id);
+EXPORT_SYMBOL(usdm_read_panel_id);
 
 __visible_for_testing struct rdinfo *find_panel_rdinfo(struct panel_device *panel, char *name)
 {
@@ -2096,15 +2096,15 @@ int panel_resource_update(struct panel_device *panel, struct resinfo *res)
 	}
 
 	panel_dbg("[panel_resource : %12s %3d bytes] %s\n",
-			get_resource_name(res), res->dlen,
-			is_resource_initialized(res) ? "INITIALIZED" : "UNINITIALIZED");
-	if (is_resource_initialized(res))
+			usdm_get_resource_name(res), res->dlen,
+			usdm_is_resource_initialized(res) ? "INITIALIZED" : "UNINITIALIZED");
+	if (usdm_is_resource_initialized(res))
 		usdm_dbg_bytes(res->data, res->dlen);
 
 	return 0;
 }
 
-int __mockable panel_resource_update_by_name(struct panel_device *panel, char *name)
+int __mockable usdm_panel_resource_update_by_name(struct panel_device *panel, char *name)
 {
 	int ret;
 	struct resinfo *res;
@@ -2114,7 +2114,7 @@ int __mockable panel_resource_update_by_name(struct panel_device *panel, char *n
 		return -EINVAL;
 	}
 
-	res = find_panel_resource(panel, name);
+	res = usdm_find_panel_resource(panel, name);
 	if (unlikely(!res)) {
 		panel_warn("%s not found in resource\n", name);
 		return -EINVAL;
@@ -2128,9 +2128,9 @@ int __mockable panel_resource_update_by_name(struct panel_device *panel, char *n
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_resource_update_by_name);
+EXPORT_SYMBOL(usdm_panel_resource_update_by_name);
 
-struct dumpinfo *find_panel_dumpinfo(struct panel_device *panel, char *name)
+struct dumpinfo *usdm_find_panel_dumpinfo(struct panel_device *panel, char *name)
 {
 	struct pnobj *pnobj;
 
@@ -2145,11 +2145,11 @@ struct dumpinfo *find_panel_dumpinfo(struct panel_device *panel, char *name)
 
 	return pnobj_container_of(pnobj, struct dumpinfo);
 }
-EXPORT_SYMBOL(find_panel_dumpinfo);
+EXPORT_SYMBOL(usdm_find_panel_dumpinfo);
 
 int panel_get_dump_result(struct panel_device *panel, char *name)
 {
-	struct dumpinfo *dump = find_panel_dumpinfo(panel, name);
+	struct dumpinfo *dump = usdm_find_panel_dumpinfo(panel, name);
 
 	if (!dump)
 		return -EINVAL;
@@ -2157,26 +2157,26 @@ int panel_get_dump_result(struct panel_device *panel, char *name)
 	return dump->result;
 }
 
-struct resinfo *panel_get_dump_resource(struct panel_device *panel, char *name)
+struct resinfo *usdm_panel_get_dump_resource(struct panel_device *panel, char *name)
 {
-	struct dumpinfo *dump = find_panel_dumpinfo(panel, name);
+	struct dumpinfo *dump = usdm_find_panel_dumpinfo(panel, name);
 
 	if (!dump)
 		return NULL;
 
 	return dump->res;
 }
-EXPORT_SYMBOL(panel_get_dump_resource);
+EXPORT_SYMBOL(usdm_panel_get_dump_resource);
 
-bool panel_is_dump_status_success(struct panel_device *panel, char *name)
+bool usdm_panel_is_dump_status_success(struct panel_device *panel, char *name)
 {
 	return panel_get_dump_result(panel, name) == DUMP_STATUS_SUCCESS;
 }
-EXPORT_SYMBOL(panel_is_dump_status_success);
+EXPORT_SYMBOL(usdm_panel_is_dump_status_success);
 
-int panel_init_dumpinfo(struct panel_device *panel, char *name)
+int usdm_panel_init_dumpinfo(struct panel_device *panel, char *name)
 {
-	struct dumpinfo *dump = find_panel_dumpinfo(panel, name);
+	struct dumpinfo *dump = usdm_find_panel_dumpinfo(panel, name);
 
 	if (!dump)
 		return -EINVAL;
@@ -2186,7 +2186,7 @@ int panel_init_dumpinfo(struct panel_device *panel, char *name)
 
 	return 0;
 }
-EXPORT_SYMBOL(panel_init_dumpinfo);
+EXPORT_SYMBOL(usdm_panel_init_dumpinfo);
 
 int panel_dumpinfo_update(struct panel_device *panel, struct dumpinfo *info)
 {
