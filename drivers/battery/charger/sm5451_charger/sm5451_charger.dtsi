@@ -1,0 +1,13 @@
+&hsi2c_5 {
+	status = "okay";
+
+	sm5451_charger: sm5451@63 {
+		compatible = "siliconmitus,sm5451";
+		reg = <0x63>;
+	};
+};
+
+/* /home/dpi/qb5_8814/workspace/P4_1716/android/kernel/kmodule/battery/suwon/charger/sm5451/sm5451_charger.a53x.dtsi */
+&sm5451_charger {
+	sm5451,freq_byp = <0x1>; /* 375kHz */
+};

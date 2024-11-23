@@ -1,0 +1,16 @@
+config FUELGAUGE_SM5714
+	tristate "Siliconmitus SM5714 Fuel Gauge"
+	default n
+	depends on I2C
+	help
+	  SM5714 is fuel-gauge systems for lithium-ion (Li+) batteries
+	  in handheld and portable equipment. The SM5714 is configured
+	  to operate with a single lithium cell
+
+config UI_SOC_PROLONGING
+	bool "Ui Soc 100% Prolonging"
+	default n
+	help
+	  Say Y here to enable
+	  Support for UI Soc prolonging.
+	  This is to enable UI Soc prolonging concept.
