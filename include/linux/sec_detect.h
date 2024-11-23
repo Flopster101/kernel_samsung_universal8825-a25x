@@ -23,7 +23,8 @@ static const char *sec_detect_label = "sec_detect: ";
 enum SEC_devices {
     DEVICE_UNKNOWN = -1,
     SEC_A25,
-    SEC_A33
+    SEC_A33,
+    SEC_A53
 };
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;

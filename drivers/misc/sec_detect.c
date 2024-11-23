@@ -51,6 +51,9 @@ int sec_detect_init(void) {
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
         sec_needs_decon = true;
+    } else if (strstr(machine_name, "A53") != NULL) {
+        sec_current_device = SEC_A53;
+        sec_needs_decon = true;
     }
     return 0;
 }
