@@ -15,6 +15,7 @@
 
 #ifndef _LINUX_SEC_H
 #define _LINUX_SEC_H
+#include <linux/types.h>
 static const char *sec_detect_label = "sec_detect: ";
 
 enum SEC_devices {
@@ -24,4 +25,5 @@ enum SEC_devices {
 };
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;
+extern bool sec_needs_decon;
 #endif
