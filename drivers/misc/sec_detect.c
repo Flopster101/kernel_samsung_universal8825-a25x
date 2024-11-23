@@ -20,6 +20,8 @@
 #include <linux/string.h>
 
 int sec_current_device = DEVICE_UNKNOWN;
+bool sec_needs_decon;
+EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
 
 int sec_detect_init(void) {
@@ -45,8 +47,10 @@ int sec_detect_init(void) {
 
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;
+        sec_needs_decon = false;
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
+        sec_needs_decon = true;
     }
     return 0;
 }
