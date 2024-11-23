@@ -1253,12 +1253,12 @@ static int sm5714_port_type_set(struct typec_port *port,
 		usbpd_data->typec_data_role, port_type);
 
 	reinit_completion(&usbpd_data->typec_reverse_completion);
-	if (port_type == TYPEC_PORT_DFP) {
+	if ((int)port_type == TYPEC_PORT_DFP) {
 		pr_info("%s : try reversing, from UFP(Sink) to DFP(Source)\n",
 			__func__);
 		usbpd_data->typec_try_state_change = TRY_ROLE_SWAP_TYPE;
 		sm5714_rprd_mode_change(usbpd_data, TYPE_C_ATTACH_DFP);
-	} else if (port_type == TYPEC_PORT_UFP) {
+	} else if ((int)port_type == TYPEC_PORT_UFP) {
 		pr_info("%s : try reversing, from DFP(Source) to UFP(Sink)\n",
 			__func__);
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
