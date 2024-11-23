@@ -41,3 +41,19 @@ config SM5714_SUPPORT_SBU
 	help
 	  If you say yes here you will get support for
 	  the sm5714 Type-C support sbu.
+
+config SUPPORT_USB_TYPEC_OPS
+	bool "Using TYPEC OPS since kernel 5.4 version"
+	depends on PDIC_SM5714
+	default n
+	help
+	  If you say yes here you will get support for
+	  the sm5714 Type-C OPS.
+
+config SM5714_DISABLE_PD
+	bool "Disable Power Delevery Operation"
+	depends on PDIC_SM5714
+	default n
+	help
+	  If you say yes here you will get support for
+	  the Disable sm5714 PD OPS.
