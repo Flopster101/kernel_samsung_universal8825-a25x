@@ -90,7 +90,10 @@ exyswd-rng.ko
 samsung_iommu.ko
 samsung-iommu-group.ko
 samsung-secure-iova.ko
+exynos-drm-decon.ko
 exynos-drm.ko
+mcd-panel-decon-samsung-drv.ko
+mcd-panel-decon-samsung-helper.ko
 mcd-panel-samsung-drv.ko
 mcd-panel-samsung-helper.ko
 mali_kbase.ko
