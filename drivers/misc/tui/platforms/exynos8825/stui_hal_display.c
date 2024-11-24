@@ -18,7 +18,9 @@
 #include <linux/pm_runtime.h>
 #include <linux/version.h>
 #include <linux/ion.h>
+#include <linux/sec_detect.h>
 #include "../../../../drivers/gpu/drm/samsung/dpu/exynos_drm_tui.h"
+#include "../../../../drivers/gpu/drm/samsung/dpu_decon/exynos_drm_tui.h"
 #include <linux/dma-heap.h>
 
 #define ION_EXYNOS_FLAG_PROTECTED       (1 << 16)
@@ -58,16 +60,24 @@ static int fb_protection_for_tui(bool tui_en)
 		return -1;
 
 	if (tui_en) {
-		ret = exynos_atomic_enter_tui();
+		if (!sec_needs_decon) 
+			ret = usdm_exynos_atomic_enter_tui();
+		else
+			ret = decon_exynos_atomic_enter_tui();
 		if (ret)
 			pr_err(TUIHW_LOG_TAG "protect error - %d\n", __func__, ret);
 	} else {
-		ret = exynos_atomic_exit_tui();
+		if (!sec_needs_decon) 
+			ret = usdm_exynos_atomic_exit_tui();
+		else
+			ret = decon_exynos_atomic_exit_tui();
 		if (ret)
 			pr_err(TUIHW_LOG_TAG "unprotect error - %d\n", ret);
 	}
-
-	exynos_tui_set_stui_funcs(stui_get_buf_info, stui_free_video_space);
+	if (!sec_needs_decon)
+		usdm_exynos_tui_set_stui_funcs(stui_get_buf_info, stui_free_video_space);
+	else
+		decon_exynos_tui_set_stui_funcs(stui_get_buf_info, stui_free_video_space);
 	pr_info(TUIHW_LOG_TAG "%s - state %d end\n", __func__, tui_en);
 	return ret;
 }
@@ -118,7 +128,10 @@ int stui_alloc_video_space(struct tui_hw_buffer *buffer)
 	size_t workbuf_size;
 	struct resolution_info lcd_info;
 
-	exynos_tui_get_resolution(&lcd_info);
+	if (!sec_needs_decon)
+		usdm_exynos_tui_get_resolution(&lcd_info);
+	else
+		decon_exynos_tui_get_resolution(&lcd_info);
 
 	pr_info(TUIHW_LOG_TAG " resolution %d * %d,mode %d\n", lcd_info.xres, lcd_info.yres, lcd_info.mode);
 	framebuf_size = (lcd_info.xres * lcd_info.yres * (DEFAULT_BPP >> 3));
@@ -181,7 +194,10 @@ int stui_get_resolution(struct tui_hw_buffer *buffer)
 {
 	struct resolution_info lcd_info;
 
-	exynos_tui_get_resolution(&lcd_info);
+	if (!sec_needs_decon)
+		usdm_exynos_tui_get_resolution(&lcd_info);
+	else
+		decon_exynos_tui_get_resolution(&lcd_info);
 
 	buffer->width = lcd_info.xres;
 	buffer->height = lcd_info.yres;
@@ -213,7 +229,10 @@ int stui_get_lcd_info(uint64_t *lcd_buf, int size)
 	unsigned int i;
 
 	pr_info(TUIHW_LOG_TAG " %s - start\n", __func__);
-	ret = exynos_tui_get_panel_info(lcd_buf, size);
+	if (!sec_needs_decon)
+		ret = usdm_exynos_tui_get_panel_info(lcd_buf, size);
+	else
+		ret = decon_exynos_tui_get_panel_info(lcd_buf, size);
 	if (!ret) {
 		for (i = 0; i < size; i++)
 			pr_info("lcd info[%u] = %lu\n", i, lcd_buf[i]);
