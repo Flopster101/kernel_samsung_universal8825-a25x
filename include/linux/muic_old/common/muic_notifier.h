@@ -21,8 +21,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
-#ifndef __MUIC_NOTIFIER_H__
-#define __MUIC_NOTIFIER_H__
+#ifndef __LEGACY_MUIC_NOTIFIER_H__
+#define __LEGACY_MUIC_NOTIFIER_H__
 
 #include <linux/muic_old/common/muic.h>
 #include <linux/muic_old/common/muic_param.h>
@@ -98,4 +98,4 @@ extern int legacy_muic_notifier_unregister(struct notifier_block *nb);
 /* Choose a proper noti. interface for a test */
 extern void legacy_muic_notifier_set_new_noti(bool flag);
 
-#endif /* __MUIC_NOTIFIER_H__ */
+#endif /* __LEGACY_MUIC_NOTIFIER_H__ */

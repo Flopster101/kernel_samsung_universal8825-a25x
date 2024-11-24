@@ -21,6 +21,7 @@
 
 #define pr_fmt(fmt)	"[MUIC_HV] " fmt
 
+#define IS_LEGACY 1
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/i2c.h>

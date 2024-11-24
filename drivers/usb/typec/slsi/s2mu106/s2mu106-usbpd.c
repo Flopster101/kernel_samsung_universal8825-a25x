@@ -15,6 +15,7 @@
  *
  */
 
+#define IS_LEGACY 1
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/i2c.h>

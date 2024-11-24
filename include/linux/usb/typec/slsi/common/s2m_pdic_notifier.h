@@ -27,8 +27,10 @@
 #define __S2M_PDIC_NOTIFIER_H__
 
 struct s2m_pdic_notifier_struct {
+#ifndef IS_LEGACY
 	muic_attached_dev_t attached_dev;
 	muic_notifier_cmd_t cmd;
+#endif
 	struct blocking_notifier_head notifier_call_chain;
 };
 
@@ -45,16 +47,20 @@ enum {
  * this function is for JUST MUIC device driver.
  * DON'T use function anywhrer else!!
  */
+#ifndef IS_LEGACY
 extern void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
 extern void s2m_pdic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void s2m_pdic_notifier_logically_detach_attached_dev(muic_attached_dev_t cur_dev);
 void s2m_pdic_notifier_attach_attached_jig_dev(muic_attached_dev_t new_dev);
+#endif
 
 /* muic notifier register/unregister API
  * for used any where want to receive muic attached device attach/detach. */
+#ifndef IS_LEGACY
 extern int s2m_pdic_notifier_register(struct notifier_block *nb,
 		notifier_fn_t notifier, muic_notifier_device_t listener);
+#endif
 extern int s2m_pdic_notifier_unregister(struct notifier_block *nb);
 
 #endif

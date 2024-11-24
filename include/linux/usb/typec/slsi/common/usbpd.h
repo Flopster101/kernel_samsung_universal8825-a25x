@@ -983,7 +983,9 @@ struct usbpd_manager_data {
 	struct delayed_work start_discover_msg_handler;
 	struct delayed_work short_check_work;
 	struct delayed_work pps_request_handler;
+#ifndef IS_LEGACY
 	muic_attached_dev_t	attached_dev;
+#endif
 
 	int pd_attached;
 	bool support_vpdo;
@@ -1098,7 +1100,9 @@ extern void usbpd_init_policy(struct usbpd_data *);
 extern void  usbpd_init_manager_val(struct usbpd_data *);
 extern int  usbpd_init_manager(struct usbpd_data *);
 extern int usbpd_manager_get_selected_voltage(struct usbpd_data *, int selected_pdo);
+#ifndef IS_LEGACY
 extern void usbpd_manager_plug_attach(struct device *, muic_attached_dev_t);
+#endif
 extern void usbpd_manager_plug_detach(struct device *dev, bool notify);
 extern void usbpd_manager_acc_detach(struct device *dev);
 extern int  usbpd_manager_match_request(struct usbpd_data *);

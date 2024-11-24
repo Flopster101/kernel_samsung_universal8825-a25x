@@ -20,6 +20,7 @@
  */
 #define pr_fmt(fmt)	"[MUIC] " fmt
 
+#define IS_LEGACY 1
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/i2c.h>
@@ -1790,7 +1791,7 @@ static bool s2mu106_muic_is_opmode_typeC(struct s2mu106_muic_data *muic_data)
 
 	muic_if = muic_data->if_data;
 
-	if (muic_if->opmode & OPMODE_PDIC)
+	if (muic_if->opmode & LEGACY_OPMODE_PDIC)
 		return true;
 	else
 		return false;
@@ -2163,7 +2164,7 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 			(muic_if->opmode ? "PDIC" : "MUIC"));
 
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_MANAGER)
-	if (muic_if->opmode == OPMODE_MUIC) {
+	if (muic_if->opmode == LEGACY_OPMODE_MUIC) {
 		s2mu106_muic_detect_dev_rid_array(muic_data);
 		s2mu106_muic_handle_attached_dev(muic_data);
 	}
@@ -2585,7 +2586,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 	pr_info("%s rid adc=%02x\n", __func__, adc);
 #if IS_ENABLED(CONFIG_SEC_FACTORY)
 	if (IS_JIG_ADC(adc)) {
-		muic_if->opmode = OPMODE_MUIC;
+		muic_if->opmode = LEGACY_OPMODE_MUIC;
 	} else {
 		_s2mu106_muic_control_rid_adc(muic_data, false);
 	}
@@ -2599,7 +2600,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 
 	pr_info("%s muic_if->opmode(%d)\n", __func__, muic_if->opmode);
 
-	if (muic_if->opmode == OPMODE_MUIC) {
+	if (muic_if->opmode == LEGACY_OPMODE_MUIC) {
 		s2mu106_muic_adc_change_isr(-1, muic_data);
 	} else {
 		s2mu106_muic_get_detect_info(muic_data);

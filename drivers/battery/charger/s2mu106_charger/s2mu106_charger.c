@@ -17,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#define IS_LEGACY 1
 #include "s2mu106_charger.h"
 #if IS_ENABLED(CONFIG_MUIC_S2MU106)
 #include <linux/muic_old/slsi/s2mu106/s2mu106-muic.h>

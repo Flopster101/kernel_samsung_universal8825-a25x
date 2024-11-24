@@ -22,8 +22,13 @@
 #ifndef __USB_TYPEC_MANAGER_NOTIFIER_H__
 #define __USB_TYPEC_MANAGER_NOTIFIER_H__
 
+#ifndef IS_LEGACY
 #include <linux/muic/common/muic.h>
 #include <linux/muic/common/muic_notifier.h>
+#else
+#include <linux/muic_old/common/muic.h>
+#include <linux/muic_old/common/muic_notifier.h>
+#endif
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 #include <linux/vbus_notifier.h>
 #endif

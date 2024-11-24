@@ -22,6 +22,7 @@
  */
 #define pr_fmt(fmt)	"[MUIC] " fmt
 
+#define IS_LEGACY 1
 #include <linux/gpio.h>
 #include <linux/i2c.h>
 #include <linux/interrupt.h>
@@ -286,7 +287,7 @@ int muic_manager_dcd_rescan(struct muic_interface_t *muic_if)
 	pr_info("%s : pdic_evt_attached(%d), is_dcdtmr_intr(%d), pdic_evt_dcdcnt(%d)\n",
 			__func__, pdic->pdic_evt_attached, muic_if->is_dcdtmr_intr, pdic->pdic_evt_dcdcnt);
 
-	if (!(muic_if->opmode & OPMODE_PDIC)) {
+	if (!(muic_if->opmode & LEGACY_OPMODE_PDIC)) {
 		pr_info("%s : it's SMD board, skip rescan", __func__);
 		goto SKIP_RESCAN;
 	}
@@ -952,10 +953,10 @@ struct muic_interface_t *legacy_muic_manager_init(void *pdata, void *drv_data)
 		goto err_reg_noti;
 	}
 #else
-	if (muic_if->opmode & OPMODE_PDIC)
+	if (muic_if->opmode & LEGACY_OPMODE_PDIC)
 		muic_manager_register_notifier(muic_if);
 	else
-		pr_info("OPMODE_MUIC PDIC NOTIFIER is not used\n");
+		pr_info("LEGACY_OPMODE_MUIC PDIC NOTIFIER is not used\n");
 #endif
 #endif
 	return muic_if;

@@ -1,5 +1,5 @@
-#ifndef MUIC_SYSFS_H
-#define MUIC_SYSFS_H
+#ifndef LEGACY_MUIC_SYSFS_H
+#define LEGACY_MUIC_SYSFS_H
 
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_SYSFS)
 extern struct device *muic_device_create(void *drvdata, const char *fmt);
@@ -21,4 +21,4 @@ static inline int legacy_muic_sysfs_init(struct muic_platform_data *muic_pdata)
 static inline void legacy_muic_sysfs_deinit(struct muic_platform_data *muic_pdata) {}
 #endif
 
-#endif /* MUIC_SYSFS_H */
+#endif /* LEGACY_MUIC_SYSFS_H */

@@ -17,8 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
-#ifndef __MUIC_INTERNAL_H__
-#define __MUIC_INTERNAL_H__
+#ifndef __LEGACY_MUIC_INTERNAL_H__
+#define __LEGACY_MUIC_INTERNAL_H__
 
 #include <linux/muic_old/common/muic.h>
 
@@ -41,9 +41,9 @@
 		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);		\
 	} while (0)
 
-enum muic_op_mode {
-	OPMODE_MUIC = 0<<0,
-	OPMODE_PDIC = 1<<0,
+enum legacy_muic_op_mode {
+	LEGACY_OPMODE_MUIC = 0<<0,
+	LEGACY_OPMODE_PDIC = 1<<0,
 };
 
 /* Slave addr = 0x4A: MUIC */
@@ -255,7 +255,7 @@ struct muic_interface_t {
 	bool 			afc_water_disable;
 #endif
 	/* Operation Mode */
-	enum muic_op_mode	opmode;
+	enum legacy_muic_op_mode	opmode;
 
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_SUPPORT_PRSWAP)
 	muic_prswap_t prswap_status;
@@ -353,4 +353,4 @@ int muic_manager_dcd_rescan(struct muic_interface_t *muic_if);
 extern int legacy_muic_manager_psy_init(struct muic_interface_t *muic_if, struct device *parent);
 #endif
 
-#endif /* __MUIC_INTERNAL_H__ */
+#endif /* __LEGACY_MUIC_INTERNAL_H__ */

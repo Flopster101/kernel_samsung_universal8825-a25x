@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef __MUIC_H__
-#define __MUIC_H__
+#ifndef __LEGACY_MUIC_H__
+#define __LEGACY_MUIC_H__
 
 #include <linux/power_supply.h>
 
@@ -634,5 +634,5 @@ extern int legacy_muic_afc_request_cause_clear(void);
 extern int legacy_muic_afc_get_request_cause(void);
 extern bool legacy_muic_is_enable_afc_request(void);
 #endif
-#endif /* __MUIC_H__ */
+#endif /* __LEGACY_MUIC_H__ */
 

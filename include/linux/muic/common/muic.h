@@ -21,6 +21,7 @@
  *
  */
 
+#ifndef IS_LEGACY
 #ifndef __MUIC_H__
 #define __MUIC_H__
 
@@ -706,3 +707,4 @@ static inline int muic_hv_charger_disable(bool en) {return 0; }
 #endif
 
 #endif /* __MUIC_H__ */
+#endif

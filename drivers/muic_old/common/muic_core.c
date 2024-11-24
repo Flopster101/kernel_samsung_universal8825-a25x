@@ -10,6 +10,7 @@
 
  #define pr_fmt(fmt)	"[MUIC] " fmt
 
+#define IS_LEGACY 1
 #include <linux/platform_device.h>
 #include <linux/i2c.h>
 #include <linux/i2c-gpio.h>

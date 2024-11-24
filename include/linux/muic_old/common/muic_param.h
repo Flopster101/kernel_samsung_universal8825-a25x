@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __LINUX_MUIC_PARAM_H__
-#define __LINUX_MUIC_PARAM_H__
+#ifndef __LINUX_LEGACY_MUIC_PARAM_H__
+#define __LINUX_LEGACY_MUIC_PARAM_H__
 
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_NOTIFIER)
 extern int legacy_get_switch_sel(void);
@@ -32,4 +32,4 @@ static inline int legacy_get_uart_sel(void) {return 0; }
 static inline int legacy_get_afc_mode(void) {return 0; }
 static inline int legacy_get_pdic_info(void) {return 1; }
 #endif
-#endif /* __LINUX_MUIC_PARAM_H__ */
+#endif /* __LINUX_LEGACY_MUIC_PARAM_H__ */

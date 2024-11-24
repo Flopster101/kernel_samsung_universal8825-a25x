@@ -1,3 +1,4 @@
+#ifndef IS_LEGACY
 #ifndef MUIC_SYSFS_H
 #define MUIC_SYSFS_H
 
@@ -13,3 +14,4 @@ static inline void muic_sysfs_deinit(struct muic_platform_data *pdata) {}
 #endif
 
 #endif /* MUIC_SYSFS_H */
+#endif

@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
+#ifndef IS_LEGACY
 #ifndef __MUIC_NOTIFIER_H__
 #define __MUIC_NOTIFIER_H__
 
@@ -110,3 +111,4 @@ extern void muic_pogo_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
 #endif /* CONFIG_MUIC_POGO */
 
 #endif /* __MUIC_NOTIFIER_H__ */
+#endif

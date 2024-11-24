@@ -20,6 +20,7 @@
  *
  */
 
+#define IS_LEGACY 1
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/gpio.h>

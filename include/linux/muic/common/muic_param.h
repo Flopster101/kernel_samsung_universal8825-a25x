@@ -18,6 +18,7 @@
  *
  */
 
+#ifndef IS_LEGACY
 #ifndef __LINUX_MUIC_PARAM_H__
 #define __LINUX_MUIC_PARAM_H__
 
@@ -33,3 +34,4 @@ static inline int get_afc_mode(void) {return 0; }
 static inline int get_pdic_info(void) {return 1; }
 #endif
 #endif /* __LINUX_MUIC_PARAM_H__ */
+#endif
