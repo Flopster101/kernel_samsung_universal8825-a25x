@@ -55,6 +55,7 @@
 #include "../../../../battery/common/sec_charging_common.h"
 #endif
 #endif
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_USB_HOST_NOTIFY) || IS_ENABLED(CONFIG_USB_HW_PARAM)
 #include <linux/usb_notify.h>
@@ -5032,6 +5033,8 @@ static struct i2c_driver s2mf301_usbpd_driver = {
 
 static int __init s2mf301_usbpd_init(void)
 {
+	if (sec_legacy_muic)
+		return 0;
 	s2mf301_err("%s\n", __func__);
 	return i2c_add_driver(&s2mf301_usbpd_driver);
 }

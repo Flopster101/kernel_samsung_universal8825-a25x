@@ -33,6 +33,7 @@
 #include <linux/muic_old/common/muic.h>
 #include <linux/mfd/slsi/s2mu106/s2mu106.h>
 #include <linux/muic_old/slsi/s2mu106/s2mu106-muic.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_SYSFS)
 #include <linux/muic_old/common/muic_sysfs.h>
@@ -2741,6 +2742,8 @@ static struct platform_driver s2mu106_muic_driver = {
 
 static int __init s2mu106_muic_init(void)
 {
+	if (!sec_legacy_muic)
+		return 0;
 	return platform_driver_register(&s2mu106_muic_driver);
 }
 

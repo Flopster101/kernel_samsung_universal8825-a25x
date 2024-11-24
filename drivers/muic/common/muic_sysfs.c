@@ -45,6 +45,7 @@
 #if IS_ENABLED(CONFIG_IF_CB_MANAGER)
 #include <linux/usb/typec/manager/if_cb_manager.h>
 #endif
+#include <linux/sec_detect.h>
 
 static ssize_t muic_sysfs_uart_en_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
@@ -675,6 +676,9 @@ static const struct attribute_group muic_sysfs_group = {
 int muic_sysfs_init(struct muic_platform_data *pdata)
 {
 	int ret;
+
+	if (sec_legacy_muic)
+		return 0;
 
 	mutex_init(&pdata->sysfs_mutex);
 

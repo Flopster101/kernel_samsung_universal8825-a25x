@@ -33,6 +33,7 @@
 #include <linux/usb/typec/common/pdic_param.h>
 
 #include <linux/mfd/slsi/s2mu106/s2mu106.h>
+#include <linux/sec_detect.h>
 
 #include <linux/muic_old/common/muic.h>
 #if IS_ENABLED(CONFIG_LEGACY_MUIC_NOTIFIER)
@@ -4770,6 +4771,8 @@ static struct i2c_driver s2mu106_usbpd_driver = {
 
 static int __init s2mu106_usbpd_init(void)
 {
+	if (!sec_legacy_muic)
+		return 0;
 	pr_err("%s\n", __func__);
 	return i2c_add_driver(&s2mu106_usbpd_driver);
 }

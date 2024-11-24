@@ -25,8 +25,10 @@
 
 #include <linux/leds-s2mu106.h>
 #include <linux/muic_old/common/muic.h>
+#include <linux/sec_detect.h>
 
 extern int muic_afc_get_voltage(void);
+extern int legacy_muic_afc_get_voltage(void);
 
 #define CAPTURE_MAX_TOTAL_CURRENT	(1500)
 #define TORCH_MAX_TOTAL_CURRENT		(150)
@@ -324,7 +326,10 @@ int flash_s2mu106_g_ctrl(struct v4l2_subdev *subdev, struct v4l2_control *ctrl)
 
 	switch (ctrl->id) {
 	case V4L2_CID_FLASH_GET_DELAYED_PREFLASH_TIME:
-		voltage = muic_afc_get_voltage();
+		if (sec_legacy_muic)
+			voltage = legacy_muic_afc_get_voltage();
+		else
+			voltage = muic_afc_get_voltage();
 		if (voltage == 9) {
 			ctrl->value = 200; /* ms */
 		} else {

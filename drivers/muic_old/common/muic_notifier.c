@@ -10,6 +10,7 @@
 #include <linux/muic_old/common/muic.h>
 #include <linux/muic_old/common/muic_notifier.h>
 #include <linux/sec_class.h>
+#include <linux/sec_detect.h>
 
 /*
   * The src & dest addresses of the noti.
@@ -410,6 +411,9 @@ EXPORT_SYMBOL(legacy_muic_notifier_logically_detach_attached_dev);
 static int muic_notifier_init(void)
 {
 	int ret = 0;
+
+	if (!sec_legacy_muic)
+		return 0;
 
 	pr_info("%s\n", __func__);
 

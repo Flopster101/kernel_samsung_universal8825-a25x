@@ -12,6 +12,7 @@
 #if IS_ENABLED(CONFIG_DRV_SAMSUNG)
 #include <linux/sec_class.h>
 #endif
+#include <linux/sec_detect.h>
 
 #define SET_MUIC_NOTIFIER_BLOCK(nb, fn, dev) do {	\
 		(nb)->notifier_call = (fn);		\
@@ -564,6 +565,9 @@ EXPORT_SYMBOL(vt_muic_notifier_detach_attached_dev);
 static int muic_notifier_init(void)
 {
 	int ret = 0;
+
+	if (sec_legacy_muic)
+		return 0;
 
 	pr_info("%s\n", __func__);
 

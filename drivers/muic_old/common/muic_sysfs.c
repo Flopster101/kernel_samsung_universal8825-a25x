@@ -39,6 +39,7 @@
 #else
 #include <linux/sec_ext.h>
 #endif
+#include <linux/sec_detect.h>
 static ssize_t muic_sysfs_show_uart_en(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -660,6 +661,9 @@ static const struct attribute_group muic_sysfs_group = {
 int legacy_muic_sysfs_init(struct muic_platform_data *muic_pdata)
 {
 	int ret;
+
+	if (!sec_legacy_muic)
+		return 0;
 	/* create sysfs group */
 #if (0)  //IS_ENABLED(CONFIG_SEC_FACTORY)
 	muic_pdata->switch_device = sec_dev_get_by_name("switch");

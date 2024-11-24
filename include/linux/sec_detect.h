@@ -27,4 +27,5 @@ enum SEC_devices {
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;
 extern bool sec_needs_decon;
+extern bool sec_legacy_muic;
 #endif

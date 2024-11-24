@@ -24,6 +24,7 @@
 #include "is-device-sensor-peri.h"
 #include "is-helper-flash-i2c.h"
 #include "is-core.h"
+#include <linux/sec_detect.h>
 
 /* FLED of PMIC */
 #define REG_FLED_CTRL0				(0x03)
@@ -487,9 +488,15 @@ static int __init flash_probe(struct device *dev, struct i2c_client *client)
 
 #ifdef CONFIG_MUIC_NOTIFIER
 	/* use to muic notifier for torch */
-	muic_notifier_register(&flash->flash_noti_ta,
-		flash_ta_notification,
-		MUIC_NOTIFY_DEV_CHARGER);
+	if (sec_legacy_muic) {
+		legacy_muic_notifier_register(&flash->flash_noti_ta,
+			flash_ta_notification,
+			MUIC_NOTIFY_DEV_CHARGER);
+	} else {
+		muic_notifier_register(&flash->flash_noti_ta,
+			flash_ta_notification,
+			MUIC_NOTIFY_DEV_CHARGER);
+	}
 #endif
 
 	v4l2_i2c_subdev_init(subdev_flash, client, &subdev_ops);

@@ -37,6 +37,7 @@
 
 #include <linux/usb/typec/common/pdic_param.h>
 #include <linux/usb_notify.h>
+#include <linux/sec_detect.h>
 
 struct m_p_l_data {
 	struct muic_platform_data *pdata;
@@ -1684,6 +1685,9 @@ EXPORT_SYMBOL_GPL(unregister_muic_platform_layer);
 static int __init muic_platform_layer_init(void)
 {
 	int ret = 0;
+
+	if (sec_legacy_muic)
+		return 0;
 
 	if (!mpl_data)
 		ret = mpl_init();

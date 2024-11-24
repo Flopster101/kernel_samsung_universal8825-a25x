@@ -21,7 +21,9 @@
 
 int sec_current_device = DEVICE_UNKNOWN;
 bool sec_needs_decon;
+bool sec_legacy_muic;
 EXPORT_SYMBOL(sec_needs_decon);
+EXPORT_SYMBOL(sec_legacy_muic);
 EXPORT_SYMBOL(sec_current_device);
 
 int sec_detect_init(void) {
@@ -48,12 +50,15 @@ int sec_detect_init(void) {
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;
         sec_needs_decon = false;
+        sec_legacy_muic = false;
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
         sec_needs_decon = true;
+        sec_legacy_muic = true;
     } else if (strstr(machine_name, "A53") != NULL) {
         sec_current_device = SEC_A53;
         sec_needs_decon = true;
+        sec_legacy_muic = false;
     }
     return 0;
 }

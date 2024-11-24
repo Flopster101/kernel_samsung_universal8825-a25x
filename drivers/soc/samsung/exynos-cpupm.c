@@ -18,6 +18,7 @@
 #include <linux/of_device.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
+#include <linux/sec_detect.h>
 
 #include <linux/ems.h>
 
@@ -39,6 +40,10 @@ static void exynos_cpupm_muic_notifier_init(void);
 #else
 static inline void exynos_cpupm_muic_notifier_init(void) {}
 #endif /* !CONFIG_SEC_PM && !CONFIG_MUIC_NOTIFIER */
+
+extern int legacy_muic_notifier_register(struct notifier_block *nb,
+		notifier_fn_t notifier, muic_notifier_device_t listener);
+extern int legacy_muic_notifier_unregister(struct notifier_block *nb);
 
 /*
  * State of CPUPM objects
@@ -1896,8 +1901,13 @@ static int exynos_cpupm_muic_notifier(struct notifier_block *nb,
 
 static void exynos_cpupm_muic_notifier_init(void)
 {
-	muic_notifier_register(&cpuidle_muic_nb, exynos_cpupm_muic_notifier,
-			MUIC_NOTIFY_DEV_CPUIDLE);
+	if (sec_legacy_muic) {
+		legacy_muic_notifier_register(&cpuidle_muic_nb, exynos_cpupm_muic_notifier,
+				MUIC_NOTIFY_DEV_CPUIDLE);
+	} else {
+		muic_notifier_register(&cpuidle_muic_nb, exynos_cpupm_muic_notifier,
+				MUIC_NOTIFY_DEV_CPUIDLE);
+	}
 }
 #endif /* CONFIG_MUIC_NOTIFIER && CONFIG_SEC_PM */
 

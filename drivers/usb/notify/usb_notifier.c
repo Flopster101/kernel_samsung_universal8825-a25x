@@ -34,6 +34,11 @@
 
 #include <linux/regulator/consumer.h>
 #include <linux/workqueue.h>
+#include <linux/sec_detect.h>
+
+extern int legacy_muic_notifier_register(struct notifier_block *nb,
+		notifier_fn_t notifier, muic_notifier_device_t listener);
+extern int legacy_muic_notifier_unregister(struct notifier_block *nb);
 
 struct usb_notifier_platform_data {
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
@@ -841,8 +846,13 @@ static int usb_notifier_probe(struct platform_device *pdev)
 #endif
 #endif
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-	muic_notifier_register(&pdata->muic_usb_nb, muic_usb_handle_notification,
-			       MUIC_NOTIFY_DEV_USB);
+	if (sec_legacy_muic) {
+		legacy_muic_notifier_register(&pdata->muic_usb_nb, muic_usb_handle_notification,
+					MUIC_NOTIFY_DEV_USB);
+	} else {
+		muic_notifier_register(&pdata->muic_usb_nb, muic_usb_handle_notification,
+					MUIC_NOTIFY_DEV_USB);
+	}
 #endif
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 	vbus_notifier_register(&pdata->vbus_nb, vbus_handle_notification,
@@ -862,7 +872,10 @@ static int usb_notifier_remove(struct platform_device *pdev)
 	pdic_notifier_unregister(&pdata->ccic_usb_nb);
 #endif
 #elif IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-	muic_notifier_unregister(&pdata->muic_usb_nb);
+	if (sec_legacy_muic)
+		legacy_muic_notifier_unregister(&pdata->muic_usb_nb);
+	else
+		muic_notifier_unregister(&pdata->muic_usb_nb);
 #endif
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 	vbus_notifier_unregister(&pdata->vbus_nb);

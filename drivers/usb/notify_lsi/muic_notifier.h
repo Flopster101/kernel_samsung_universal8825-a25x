@@ -92,6 +92,9 @@ extern int muic_ccic_notifier_unregister(struct notifier_block *nb);
 extern int muic_notifier_register(struct notifier_block *nb,
 		notifier_fn_t notifier, muic_notifier_device_t listener);
 extern int muic_notifier_unregister(struct notifier_block *nb);
+extern int legacy_muic_notifier_register(struct notifier_block *nb,
+		notifier_fn_t notifier, muic_notifier_device_t listener);
+extern int legacy_muic_notifier_unregister(struct notifier_block *nb);
 
 /* Choose a proper noti. interface for a test */
 extern void muic_notifier_set_new_noti(bool flag);

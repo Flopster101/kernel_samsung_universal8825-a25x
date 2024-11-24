@@ -13,9 +13,11 @@
 #include "sec_battery.h"
 #include "battery_logger.h"
 #include "sb_full_soc.h"
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER) && !defined(CONFIG_SEC_FACTORY)
 extern int muic_set_hiccup_mode(int on_off);
+extern int legacy_muic_set_hiccup_mode(int on_off);
 #endif
 #if defined(CONFIG_SEC_KUNIT)
 #include <kunit/mock.h>
@@ -1623,7 +1625,10 @@ void sec_bat_thermal_check(struct sec_battery_info *battery)
 #if !defined(CONFIG_SEC_FACTORY)
 				if (!sec_bat_get_lpmode()) {
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-					muic_set_hiccup_mode(1);
+					if (sec_legacy_muic)
+						legacy_muic_set_hiccup_mode(1);
+					else
+						muic_set_hiccup_mode(1);
 #endif
 					if (is_pd_wire_type(battery->cable_type) || battery->pdata->mass_with_usb_thm)
 						sec_pd_manual_ccopen_req(1);

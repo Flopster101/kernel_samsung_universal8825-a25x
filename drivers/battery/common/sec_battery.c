@@ -45,6 +45,10 @@
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER) && IS_ENABLED(CONFIG_LSI_IFPMIC)
 #include <linux/vbus_notifier.h>
 #endif
+#include <linux/sec_detect.h>
+
+extern int legacy_muic_afc_request_voltage(int cause, int voltage);
+extern int legacy_muic_hv_charger_init(void);
 
 static unsigned int __read_mostly lpcharge;
 module_param(lpcharge, uint, 0444);
@@ -800,7 +804,10 @@ __visible_for_testing int sec_bat_change_iv(void *data, int voltage)
 #if IS_ENABLED(CONFIG_MTK_CHARGER) && IS_ENABLED(CONFIG_AFC_CHARGER)
 		afc_set_voltage(voltage);
 #else
-		muic_afc_request_voltage(AFC_REQUEST_CHARGER, voltage/1000);
+		if (sec_legacy_muic)
+			legacy_muic_afc_request_voltage(AFC_REQUEST_CHARGER, voltage/1000);
+		else
+			muic_afc_request_voltage(AFC_REQUEST_CHARGER, voltage/1000);
 #endif
 #if defined(CONFIG_BC12_DEVICE)
 		battery->input_voltage = voltage;
@@ -6240,7 +6247,10 @@ static int sec_bat_set_property(struct power_supply *psy,
 				sec_vote(battery->iv_vote, VOTER_FW, false, 0);
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 #if !IS_ENABLED(CONFIG_MTK_CHARGER) || !IS_ENABLED(CONFIG_AFC_CHARGER)
-				muic_afc_request_voltage(AFC_REQUEST_MFC, SEC_INPUT_VOLTAGE_9V / 1000);
+				if (sec_legacy_muic)
+					legacy_muic_afc_request_voltage(AFC_REQUEST_MFC, SEC_INPUT_VOLTAGE_9V / 1000);
+				else
+					muic_afc_request_voltage(AFC_REQUEST_MFC, SEC_INPUT_VOLTAGE_9V / 1000);
 #endif
 #endif
 			}
@@ -8846,7 +8856,10 @@ static void sec_bat_afc_init_work(struct work_struct *work)
 	int ret = 0;
 
 #if defined(CONFIG_AFC_CHARGER_MODE)
-	ret = muic_hv_charger_init();
+	if (sec_legacy_muic)
+		ret = legacy_muic_hv_charger_init();
+	else
+		ret = muic_hv_charger_init();
 #endif
 	pr_info("%s, ret(%d)\n", __func__, ret);
 }
@@ -8966,8 +8979,13 @@ static void sec_batt_dev_init_work(struct work_struct *work)
 		usb_typec_handle_notification, MANAGER_NOTIFY_PDIC_BATTERY);
 #else
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-	muic_notifier_register(&battery->batt_nb,
-		batt_handle_notification, MUIC_NOTIFY_DEV_CHARGER);
+	if (sec_legacy_muic) {
+		legacy_muic_notifier_register(&battery->batt_nb,
+			batt_handle_notification, MUIC_NOTIFY_DEV_CHARGER);
+	} else {
+		muic_notifier_register(&battery->batt_nb,
+			batt_handle_notification, MUIC_NOTIFY_DEV_CHARGER);
+	}
 #endif
 #endif
 	value.intval = true;

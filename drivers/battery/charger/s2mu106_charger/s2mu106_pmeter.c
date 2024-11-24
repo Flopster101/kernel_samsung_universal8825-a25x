@@ -22,6 +22,7 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 
 #define VOLTAGE_9V	8000
 #define VOLTAGE_6P9V	6900

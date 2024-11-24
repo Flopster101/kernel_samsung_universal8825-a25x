@@ -36,6 +36,7 @@
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
 #endif
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MFD_S2MU106)
 #include "linux/mfd/slsi/s2mu106/s2mu106.h"
@@ -1092,6 +1093,8 @@ EXPORT_SYMBOL(legacy_muic_manager_exit);
 
 static int __init muic_manager_module_init(void)
 {
+	if (!sec_legacy_muic)
+		return 0;
 	pr_info("%s: init\n", __func__);
 
 	return 0;

@@ -51,6 +51,11 @@
 #if defined(CONFIG_SEC_FACTORY)
 #include <linux/sysfs.h>
 #endif
+#include <linux/sec_detect.h>
+
+extern int legacy_muic_notifier_register(struct notifier_block *nb,
+		notifier_fn_t notifier, muic_notifier_device_t listener);
+extern int legacy_muic_notifier_unregister(struct notifier_block *nb);
 
 #if defined(CONFIG_SEC_KUNIT)
 #include <kunit/mock.h>
@@ -1520,9 +1525,15 @@ static int manager_handle_notification_init(void)
 				manager_cable_type_handle_notification, CABLE_TYPE_NOTIFY_DEV_USB))
 			typec_manager.confirm_notifier_register |= MUIC_NOTIFIER;
 #else
-		if (!muic_notifier_register(&typec_manager.muic_nb,
-				manager_handle_muic_notification, MUIC_NOTIFY_DEV_MANAGER))
-			typec_manager.confirm_notifier_register |= MUIC_NOTIFIER;
+		if (sec_legacy_muic) {
+			if (!legacy_muic_notifier_register(&typec_manager.muic_nb,
+					manager_handle_muic_notification, MUIC_NOTIFY_DEV_MANAGER))
+				typec_manager.confirm_notifier_register |= MUIC_NOTIFIER;
+		} else {
+			if (!muic_notifier_register(&typec_manager.muic_nb,
+					manager_handle_muic_notification, MUIC_NOTIFY_DEV_MANAGER))
+				typec_manager.confirm_notifier_register |= MUIC_NOTIFIER;
+		}
 #endif
 	}
 
@@ -1728,7 +1739,10 @@ static void __exit manager_notifier_exit(void)
 #if IS_ENABLED(CONFIG_CABLE_TYPE_NOTIFIER)
 	cable_type_notifier_unregister(&typec_manager.cable_type_nb);
 #else
-	muic_notifier_unregister(&typec_manager.muic_nb);
+	if (sec_legacy_muic)
+		legacy_muic_notifier_unregister(&typec_manager.muic_nb);
+	else
+		muic_notifier_unregister(&typec_manager.muic_nb);
 #endif
 #ifdef CONFIG_USB_EXTERNAL_NOTIFY
 	usb_external_notify_unregister(&typec_manager.manager_external_notifier_nb);
