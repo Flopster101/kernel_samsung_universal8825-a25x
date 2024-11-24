@@ -66,7 +66,7 @@
 struct s2mu106_muic_data *static_data;
 /* Prototypes of the Static symbols of s2mu106-muic */
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_muic_detect_dev_pdic(struct s2mu106_muic_data *muic_data,
 		muic_attached_dev_t new_dev);
 int s2mu106_muic_bcd_rescan(struct s2mu106_muic_data *muic_data);
@@ -607,7 +607,7 @@ void s2mu106_muic_get_detect_info(struct s2mu106_muic_data *muic_data)
 	pr_info("chg_type:0x%02x\n", muic_data->reg[CHG_TYPE]);
 }
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 int s2mu106_muic_bcd_rescan(struct s2mu106_muic_data *muic_data)
 {
 	int ret = 0;
@@ -851,7 +851,7 @@ static void s2mu106_if_set_chg_det(void *mdata, bool enable)
 }
 #endif
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_if_set_cable_state(void *mdata, muic_attached_dev_t new_dev)
 {
 	struct s2mu106_muic_data *muic_data = (struct s2mu106_muic_data *)mdata;
@@ -1248,7 +1248,7 @@ static int s2mu106_muic_reg_init(struct s2mu106_muic_data *muic_data)
 	return ret;
 }
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 static void s2mu106_muic_detect_dev_pdic(struct s2mu106_muic_data *muic_data,
 	muic_attached_dev_t new_dev)
 {
@@ -1755,7 +1755,7 @@ static void s2mu106_muic_handle_attached_dev(struct s2mu106_muic_data *muic_data
 	struct muic_platform_data *muic_pdata = muic_data->pdata;
 	if (muic_data->new_dev != ATTACHED_DEV_UNKNOWN_MUIC &&
 				muic_data->new_dev != muic_pdata->attached_dev) {
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 		muic_manager_set_legacy_dev(muic_pdata->muic_if, muic_data->new_dev);
 #endif
 		muic_core_handle_attach(muic_pdata, muic_data->new_dev,
@@ -1988,7 +1988,7 @@ static irqreturn_t s2mu106_muic_vbus_off_isr(int irq, void *data)
 {
 	struct s2mu106_muic_data *muic_data = data;
 	struct muic_platform_data *muic_pdata;
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	struct muic_interface_t *muic_if;
 #endif
 
@@ -2003,7 +2003,7 @@ static irqreturn_t s2mu106_muic_vbus_off_isr(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	muic_if = muic_data->if_data;
 	if (muic_if == NULL) {
 		pr_err("%s data NULL\n", __func__);
@@ -2030,7 +2030,7 @@ static irqreturn_t s2mu106_muic_vbus_off_isr(int irq, void *data)
 			muic_core_handle_detach(muic_data->pdata);
 	}
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	if (s2mu106_muic_is_opmode_typeC(muic_data)) {
 		if (muic_core_get_pdic_cable_state(muic_pdata)
 				&& muic_if->is_pdic_attached == false) {
@@ -2126,7 +2126,7 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 {
 	struct s2mu106_muic_data *muic_data = data;
 	struct muic_platform_data *muic_pdata;
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	struct muic_interface_t *muic_if;
 #endif
 
@@ -2142,7 +2142,7 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	muic_if = muic_data->if_data;
 
 	if (muic_if == NULL) {
@@ -2162,7 +2162,7 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 			muic_data->adc, dev_to_str(muic_pdata->attached_dev),
 			(muic_if->opmode ? "PDIC" : "MUIC"));
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	if (muic_if->opmode == OPMODE_MUIC) {
 		s2mu106_muic_detect_dev_rid_array(muic_data);
 		s2mu106_muic_handle_attached_dev(muic_data);
@@ -2174,7 +2174,7 @@ static irqreturn_t s2mu106_muic_adc_change_isr(int irq, void *data)
 		muic_data->new_dev = s2mu106_muic_detect_dev_rid_device(muic_data);
 		if (MUIC_IS_ATTACHED(muic_data->new_dev) &&
 			muic_data->new_dev != muic_pdata->attached_dev) {
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 			muic_manager_set_legacy_dev(muic_pdata->muic_if, muic_data->new_dev);
 #endif
 			muic_core_handle_attach(muic_pdata, muic_data->new_dev,
@@ -2408,7 +2408,7 @@ static void s2mu106_muic_init_interface(struct s2mu106_muic_data *muic_data,
 	muic_if->set_switch_to_uart = s2mu106_if_com_to_uart;
 	muic_if->get_vbus = s2mu106_if_get_vbus;
 	muic_if->set_gpio_uart_sel = s2mu106_if_set_gpio_uart_sel;
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	muic_if->set_cable_state = s2mu106_if_set_cable_state;
 	muic_if->set_dcd_rescan = s2mu106_if_cable_recheck;
 #if IS_ENABLED(CONFIG_HV_MUIC_S2MU106_AFC)
@@ -2471,7 +2471,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 	muic_data->pdata = muic_pdata;
 	static_data = muic_data;
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	muic_if = muic_manager_init(muic_pdata, muic_data);
 #else
 	muic_if = kzalloc(sizeof(*muic_if), GFP_KERNEL);
@@ -2639,7 +2639,7 @@ static int s2mu106_muic_remove(struct platform_device *pdev)
 			muic_sysfs_deinit(muic_data->pdata);
 #endif
 
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 		if (muic_data->if_data != NULL)
 			muic_manager_exit(muic_data->if_data);
 #else
