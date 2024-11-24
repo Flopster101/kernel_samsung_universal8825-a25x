@@ -30,6 +30,7 @@
 #include <linux/dma-heap.h>
 #include <linux/dma-buf.h>
 #include "../../../../drivers/gpu/drm/samsung/dpu/exynos_drm_tui.h"
+#include "../../../../drivers/gpu/drm/samsung/dpu_decon/exynos_drm_tui.h"
 
 #define STUI_ALIGN_4KB_SZ       0x1000
 #define STUI_ALIGN_UP(size, block) ((((size) + (block) - 1) / (block)) * (block))
