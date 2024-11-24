@@ -1121,7 +1121,7 @@ static int __init exynos_drm_init(void)
 	int ret;
 
 	if (!sec_needs_decon) {
-		printk(KERN_INFO "%s Initialized Exynos DPU driver for usdm\n", sec_detect_label);
+		SEC_DETECT_LOG("Initialized Exynos DPU driver for usdm\n");
 		ret = exynos_drm_register_devices();
 		if (ret)
 			return ret;
