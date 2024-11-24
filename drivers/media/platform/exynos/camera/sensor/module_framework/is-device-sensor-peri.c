@@ -20,8 +20,8 @@
 #include "is-video.h"
 #include "is-ois-mcu.h"
 #if IS_ENABLED(CONFIG_LEDS_S2MU106_FLASH)
-#include <linux/muic/slsi/s2mu106/s2mu106-muic.h>
-#include <linux/muic/slsi/s2mu106/s2mu106-muic-hv.h>
+#include <linux/muic_old/slsi/s2mu106/s2mu106-muic.h>
+#include <linux/muic_old/slsi/s2mu106/s2mu106-muic-hv.h>
 #endif
 
 #if defined(USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL)

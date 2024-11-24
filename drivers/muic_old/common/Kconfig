@@ -1,0 +1,106 @@
+#
+# MUIC devices
+#
+
+comment "MUIC configs"
+
+config LEGACY_USE_MUIC
+    bool "Using MUIC device driver (legacy)"
+    depends on I2C
+    depends on USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for
+      the MUIC device driver.
+
+config LEGACY_MUIC_NOTIFIER
+    tristate "MUIC notifier support (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for
+      the MUIC attached device status change notification.
+
+config LEGACY_MUIC_MANAGER
+    tristate "MUIC Manager supports PDIC chip interface (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support manager for the PDIC chip.
+
+config LEGACY_MUIC_CORE
+    bool "Supports MUIC Core (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for the MUIC Core functionalities
+
+config LEGACY_MUIC_HV
+    bool "MUIC_HV (legacy)"
+    depends on LEGACY_USE_MUIC || LEGACY_MUIC_UNIVERSAL
+    default n
+    help
+      If you say yes here you will get support for the AFC.
+
+config LEGACY_MUIC_SUPPORT_PDIC
+    bool "MUIC supports PDIC chip interface (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for the PDIC chip.
+
+config LEGACY_MUIC_SUPPORT_POWERMETER
+    bool "MUIC supports PM chip interface (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for the Power Meter.
+
+config LEGACY_MUIC_SYSFS
+    bool "Using muic sysfs Features (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for the muic sysfs.
+
+config LEGACY_MUIC_USE_MODULE_PARAM
+    bool "Using module param (legacy)"
+    depends on LEGACY_MUIC_NOTIFIER
+    default n
+    help
+      If this feature is enabled, muic_core will use module_param directly.
+      Should not use extern variable and __setup for param.
+      need to add cmdline in bootloader.
+      (ex: common_muic.xxx)
+
+config LEGACY_HV_MUIC_VOLTAGE_CTRL
+    bool "Using AFC Voltage control functionality (legacy)"
+    depends on LEGACY_MUIC_HV_S2MU004_AFC || LEGACY_MUIC_HV
+    default n
+    help
+      If you say yes here you will get support for
+      the AFC voltage control functionality.
+
+config LEGACY_HICCUP_CHARGER
+    bool "Using HICCUP charger (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+        If you say yes here you will get support for
+        for the hiccup charger feature.
+
+config LEGACY_MUIC_SUPPORT_PRSWAP
+    bool "MUIC supports power role swap (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here you will get support for the power role swap.
+
+config LEGACY_SIDO_OVP
+    bool "Using SIDO(Single Input Dual Output) dual ovp structure (legacy)"
+    depends on LEGACY_USE_MUIC
+    default n
+    help
+      If you say yes here, you will get support for SIDO structure.
+      we use this feature to be distinguish MUIC operation
+      for SISO/SIDO OVP circuit design.
