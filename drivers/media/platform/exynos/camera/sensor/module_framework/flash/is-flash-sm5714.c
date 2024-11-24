@@ -203,7 +203,7 @@ static const struct v4l2_subdev_ops subdev_ops = {
 	.core = &core_ops,
 };
 
-static int __init flash_sm5714_probe(struct device *dev, struct i2c_client *client)
+static int flash_sm5714_probe(struct device *dev, struct i2c_client *client)
 {
 	int ret = 0;
 	struct is_core *core;
@@ -323,7 +323,7 @@ p_err:
 	return ret;
 }
 
-static int __init flash_sm5714_platform_probe(struct platform_device *pdev)
+static int flash_sm5714_platform_probe(struct platform_device *pdev)
 {
 	int ret = 0;
 	struct device *dev;
