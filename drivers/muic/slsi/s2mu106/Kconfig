@@ -1,0 +1,50 @@
+config MUIC_S2MU106
+	tristate "Using S2MU106 MUIC"
+	depends on USE_MUIC && MFD_S2MU106
+	default n
+	help
+	  If you say yes here you will get support for the S2MU106 MUIC chip.
+
+config HV_MUIC_S2MU106_AFC
+	tristate "Using S2MU106 MUIC AFC"
+	depends on MUIC_HV && MUIC_S2MU106
+	default n
+	help
+	  If you say yes here you will get support for the AFC.
+
+config HV_MUIC_AFC_DISABLE_ENFORCE
+	bool "Using S2MU106 MUIC AFC DISABLE ENFORCE"
+	depends on HV_MUIC_S2MU106_AFC
+	default n
+	help
+	  If you say yes here you will disable AFC charging.
+
+config MUIC_S2MU106_RID
+	bool "Using S2MU106 MUIC RID"
+	depends on MUIC_S2MU106
+	default n
+	help
+	  If you say yes here you will get support for the S2MU106 MUIC RID functions.
+
+config S2MU106_TYPEC_WATER
+	bool "Using S2MU106 Type-C Water Detection"
+	depends on MUIC_S2MU106_RID
+	default n
+	help
+	  If you say yes here you will get support for
+	  the S2MU106 Type-C Water functions.
+
+config MUIC_NOT_SUPPORT_QC
+	bool "Not using S2MU106 MUIC QC AFC"
+	depends on MUIC_HV && MUIC_S2MU106
+	default n
+	help
+	  If you say yes here you will get support for the NOT QC AFC.
+
+config MUIC_HV_SUPPORT_POGO_DOCK
+	bool "MUIC_HV_SUPPORT_POGO_DOCK"
+	depends on USE_MUIC
+	default n
+	help
+	  If you say yes here you will get support for the AFC pogo dock.
+
