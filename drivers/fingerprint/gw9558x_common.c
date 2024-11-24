@@ -16,6 +16,7 @@
 #include "fingerprint.h"
 #include "fingerprint_common.h"
 #include "gw9558x_common.h"
+#include <linux/sec_detect.h>
 
 static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
@@ -944,6 +945,9 @@ static struct platform_driver gw9558_spi_driver = {
 static int __init gw9558_init(void)
 {
 	int retval = 0;
+
+	if (sec_current_device != SEC_A53)
+		return 0;
 
 	pr_info("Entry\n");
 #ifndef ENABLE_SENSORS_FPRINT_SECURE
