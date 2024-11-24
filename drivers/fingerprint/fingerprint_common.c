@@ -1,7 +1,5 @@
 #include "fingerprint_common.h"
 
-struct debug_logger *g_logger;
-
 void set_sensor_type(const int type_value, int *result)
 {
 	if (type_value >= SENSOR_OOO) {
@@ -69,39 +67,3 @@ void set_delay_in_spi_transfer(struct spi_transfer *xfer, unsigned int usec)
 	xfer->delay_usecs = usec;
 #endif
 }
-
-#if IS_ENABLED(CONFIG_SENSORS_EC6XX)
-extern int ec6xx_init(void);
-extern void ec6xx_exit(void);
-#endif
-#if IS_ENABLED(CONFIG_SENSORS_EL7XX)
-extern int el7xx_init(void);
-extern void el7xx_exit(void);
-#endif
-
-static int __init fingerprint_init(void)
-{
-#if IS_ENABLED(CONFIG_SENSORS_EC6XX)
-	ec6xx_init();
-#endif
-#if IS_ENABLED(CONFIG_SENSORS_EL7XX)
-	el7xx_init();
-#endif
-
-	return 0;
-}
-
-static void __exit fingerprint_exit(void)
-{
-#if IS_ENABLED(CONFIG_SENSORS_EC6XX)
-	ec6xx_exit();
-#endif
-#if IS_ENABLED(CONFIG_SENSORS_EL7XX)
-	el7xx_exit();
-#endif
-}
-
-module_init(fingerprint_init);
-module_exit(fingerprint_exit);
-
-MODULE_LICENSE("GPL");

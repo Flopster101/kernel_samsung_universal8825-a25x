@@ -34,10 +34,10 @@
 
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
 
-extern struct debug_logger *g_logger;
-
 static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
+
+struct debug_logger *g_logger;
 static DECLARE_WAIT_QUEUE_HEAD(interrupt_waitq);
 
 static irqreturn_t ec6xx_fingerprint_interrupt(int irq, void *dev_id)
@@ -1365,7 +1365,7 @@ static struct platform_driver ec6xx_spi_driver = {
 
 /*-------------------------------------------------------------------------*/
 
-int __init ec6xx_init(void)
+static int __init ec6xx_init(void)
 {
 	int retval;
 
@@ -1406,7 +1406,7 @@ int __init ec6xx_init(void)
 	return retval;
 }
 
-void __exit ec6xx_exit(void)
+static void __exit ec6xx_exit(void)
 {
 	pr_info("Entry\n");
 
@@ -1418,6 +1418,9 @@ void __exit ec6xx_exit(void)
 	class_destroy(ec6xx_class);
 	unregister_chrdev(EC6XX_MAJOR, ec6xx_spi_driver.driver.name);
 }
+
+module_init(ec6xx_init);
+module_exit(ec6xx_exit);
 
 MODULE_AUTHOR("fp.sec@samsung.com");
 MODULE_DESCRIPTION("Samsung Electronics Inc. EC6XX driver");

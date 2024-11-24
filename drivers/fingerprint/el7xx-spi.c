@@ -25,7 +25,7 @@
 #include <linux/of_gpio.h>
 #include <linux/sysfs.h>
 
-extern struct debug_logger *g_logger;
+struct debug_logger *g_logger;
 
 static void el7xx_reset(struct el7xx_data *etspi)
 {
@@ -1091,7 +1091,7 @@ static struct platform_driver el7xx_spi_driver = {
 
 /*-------------------------------------------------------------------------*/
 
-int __init el7xx_init(void)
+static int __init el7xx_init(void)
 {
 	int retval = 0;
 
@@ -1131,7 +1131,7 @@ int __init el7xx_init(void)
 	return retval;
 }
 
-void __exit el7xx_exit(void)
+static void __exit el7xx_exit(void)
 {
 	pr_info("Entry\n");
 
@@ -1143,6 +1143,9 @@ void __exit el7xx_exit(void)
 	class_destroy(el7xx_class);
 	unregister_chrdev(EL7XX_MAJOR, el7xx_spi_driver.driver.name);
 }
+
+module_init(el7xx_init);
+module_exit(el7xx_exit);
 
 MODULE_AUTHOR("fp.sec@samsung.com");
 MODULE_DESCRIPTION("Samsung Electronics Inc. EL7XX driver");

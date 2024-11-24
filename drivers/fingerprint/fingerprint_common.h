@@ -35,6 +35,8 @@ struct debug_logger {
 	struct device *dev;
 };
 
+extern struct debug_logger *g_logger;
+
 void spi_get_ctrldata(struct spi_device *spi);
 void set_sensor_type(const int type_value, int *sensortype);
 int spi_clk_register(struct spi_clk_setting *clk_setting, struct device *dev);
