@@ -16,8 +16,8 @@
 #include <linux/bitops.h>
 #include "decon_panel.h"
 
-#define DRIVER_NAME "panel_spi"
-#define PANEL_SPI_DRIVER_NAME "panel_spi_driver"
+#define DRIVER_NAME "panel-decon_spi"
+#define PANEL_SPI_DRIVER_NAME "panel-decon_spi_driver"
 #define MAX_PANEL_SPI_RX_BUF	(2048)
 #define MAX_PANEL_SPI_RX_DATA	(MAX_PANEL_SPI_RX_BUF)
 #define MAX_PANEL_SPI_TX_BUF	(260)

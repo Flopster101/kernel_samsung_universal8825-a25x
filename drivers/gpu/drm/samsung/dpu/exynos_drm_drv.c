@@ -16,6 +16,7 @@
 #include <linux/platform_device.h>
 #include <linux/component.h>
 #include <linux/dma-fence.h>
+#include <linux/sec_detect.h>
 
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
@@ -54,13 +55,13 @@
 #define DRIVER_MINOR	0
 
 #if IS_ENABLED(CONFIG_DRM_PANEL_MCD_COMMON)
-int no_display;
-module_param(no_display, int, S_IRUGO);
-EXPORT_SYMBOL(no_display);
-int bypass_display;
-EXPORT_SYMBOL(bypass_display);
-int commit_retry;
-EXPORT_SYMBOL(commit_retry);
+int usdm_no_display;
+module_param(usdm_no_display, int, S_IRUGO);
+EXPORT_SYMBOL(usdm_no_display);
+int usdm_bypass_display;
+EXPORT_SYMBOL(usdm_bypass_display);
+int usdm_commit_retry;
+EXPORT_SYMBOL(usdm_commit_retry);
 #endif
 
 #define for_each_crtc_in_state(__state, crtc, __i)			\
@@ -1115,17 +1116,20 @@ fail:
 	return ret;
 }
 
-static int exynos_drm_init(void)
+static int __init exynos_drm_init(void)
 {
 	int ret;
 
-	ret = exynos_drm_register_devices();
-	if (ret)
-		return ret;
+	if (!sec_needs_decon) {
+		printk(KERN_INFO "%s Initialized Exynos DPU driver for usdm\n", sec_detect_label);
+		ret = exynos_drm_register_devices();
+		if (ret)
+			return ret;
 
-	ret = exynos_drm_register_drivers();
-	if (ret)
-		goto err_unregister_pdevs;
+		ret = exynos_drm_register_drivers();
+		if (ret)
+			goto err_unregister_pdevs;
+	}
 
 	return 0;
 
@@ -1135,7 +1139,7 @@ err_unregister_pdevs:
 	return ret;
 }
 
-static void exynos_drm_exit(void)
+static void __exit exynos_drm_exit(void)
 {
 	exynos_drm_unregister_drivers();
 	exynos_drm_unregister_devices();

@@ -120,7 +120,7 @@ static int s6e3hab_unprepare(struct drm_panel *panel)
 	ctx = container_of(panel, struct exynos_panel, panel);
 
 	panel_info(ctx, "+\n");
-	exynos_panel_set_power(ctx, false);
+	usdm_exynos_panel_set_power(ctx, false);
 	panel_info(ctx, "-\n");
 	return 0;
 }
@@ -132,7 +132,7 @@ static int s6e3hab_prepare(struct drm_panel *panel)
 	ctx = container_of(panel, struct exynos_panel, panel);
 
 	panel_info(ctx, "+\n");
-	exynos_panel_set_power(ctx, true);
+	usdm_exynos_panel_set_power(ctx, true);
 	panel_info(ctx, "-\n");
 
 	return 0;
@@ -265,7 +265,7 @@ static int s6e3hab_enable(struct drm_panel *panel)
 
 	panel_info(ctx, "+\n");
 
-	exynos_panel_reset(ctx);
+	usdm_exynos_panel_reset(ctx);
 
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xf0, 0x5a, 0x5a);
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xfc, 0x5a, 0x5a);
@@ -422,7 +422,7 @@ static const struct drm_panel_funcs s6e3hab_drm_funcs = {
 	.unprepare = s6e3hab_unprepare,
 	.prepare = s6e3hab_prepare,
 	.enable = s6e3hab_enable,
-	.get_modes = exynos_panel_get_modes,
+	.get_modes = usdm_exynos_panel_get_modes,
 };
 
 static const struct exynos_panel_funcs s6e3hab_exynos_funcs = {
@@ -450,8 +450,8 @@ static const struct of_device_id exynos_panel_of_match[] = {
 MODULE_DEVICE_TABLE(of, exynos_panel_of_match);
 
 static struct mipi_dsi_driver exynos_panel_driver = {
-	.probe = exynos_panel_probe,
-	.remove = exynos_panel_remove,
+	.probe = usdm_exynos_panel_probe,
+	.remove = usdm_exynos_panel_remove,
 	.driver = {
 		.name = "panel-samsung-s6e3hab",
 		.of_match_table = exynos_panel_of_match,

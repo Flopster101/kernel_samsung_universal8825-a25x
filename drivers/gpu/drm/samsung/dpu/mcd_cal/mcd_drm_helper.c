@@ -24,16 +24,16 @@
 #include <panel/panel-samsung-drv.h>
 #include <mcd_drm_helper.h>
 
-extern int no_display;
-extern int bypass_display;
-extern int commit_retry;
+extern int usdm_no_display;
+extern int usdm_bypass_display;
+extern int usdm_commit_retry;
 
 bool mcd_drm_check_commit_skip(struct exynos_drm_crtc *exynos_crtc, const char *caller)
 {
 	bool ret = false;
 
-	if (no_display || bypass_display) {
-		pr_info("%s: no_display: %d, bypass_display: %d\n", caller, no_display, bypass_display);
+	if (usdm_no_display || usdm_bypass_display) {
+		pr_info("%s: usdm_no_display: %d, usdm_bypass_display: %d\n", caller, usdm_no_display, usdm_bypass_display);
 		ret = true;
 	}
 
@@ -44,8 +44,8 @@ bool mcd_drm_check_commit_retry(struct exynos_drm_crtc *exynos_crtc, const char 
 {
 	bool ret = false;
 
-	if (commit_retry) {
-		pr_info("%s: commit_retry: %d\n", caller, commit_retry);
+	if (usdm_commit_retry) {
+		pr_info("%s: usdm_commit_retry: %d\n", caller, usdm_commit_retry);
 		ret = true;
 	}
 

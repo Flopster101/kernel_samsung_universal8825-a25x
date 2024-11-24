@@ -311,7 +311,7 @@ static void dsim_atomic_enable(struct drm_encoder *encoder,
 	dsim_info(dsim, "-\n");
 }
 
-void dsim_atomic_activate(struct drm_encoder *encoder)
+void usdm_dsim_atomic_activate(struct drm_encoder *encoder)
 {
 	struct dsim_device *dsim = encoder_to_dsim(encoder);
 
@@ -323,7 +323,7 @@ void dsim_atomic_activate(struct drm_encoder *encoder)
 
 	dsim_info(dsim, "-\n");
 };
-EXPORT_SYMBOL(dsim_atomic_activate);
+EXPORT_SYMBOL(usdm_dsim_atomic_activate);
 
 void dsim_enter_ulps(struct dsim_device *dsim)
 {
@@ -1582,11 +1582,11 @@ static void dsim_check_cmd_transfer_mode(struct dsim_device *dsim,
 		dsim_info(dsim, "MIPI %s command transfer\n",
 				use_lp ? "LowPower" : "HighSpeed");
 		dsim_reg_wait_pl_fifo_is_empty_timeout(dsim->id, 100000);
-		dsim_reg_set_cmd_transfer_mode(dsim->id, use_lp);
+		usdm_dsim_reg_set_cmd_transfer_mode(dsim->id, use_lp);
 	}
 }
 
-int dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
+int usdm_dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
 			      struct mipi_dsi_msg *msg, int cmd_cnt,
 			      bool wait_vsync, bool wait_fifo)
 {
@@ -1624,7 +1624,7 @@ err_exit:
 
 	return ret;
 }
-EXPORT_SYMBOL(dsim_host_cmdset_transfer);
+EXPORT_SYMBOL(usdm_dsim_host_cmdset_transfer);
 
 static int dsim_write_data(struct dsim_device *dsim, u32 id, unsigned long d0,
 		u32 d1)

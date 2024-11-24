@@ -33,18 +33,18 @@ extern void (*tui_free_video_space)(void);
 #endif
 
 /* TODO: change with self_refresh */
-bool is_tui_trans(const struct drm_crtc_state *crtc_state);
+bool usdm_is_tui_trans(const struct drm_crtc_state *crtc_state);
 int exynos_drm_atomic_check_tui(struct drm_atomic_state *state);
 
-int exynos_atomic_enter_tui(void);
-int exynos_atomic_exit_tui(void);
+int usdm_exynos_atomic_enter_tui(void);
+int usdm_exynos_atomic_exit_tui(void);
 void exynos_tui_register(struct drm_crtc *crtc);
 
-void exynos_tui_get_resolution(struct resolution_info *res_info);
+void usdm_exynos_tui_get_resolution(struct resolution_info *res_info);
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
-void exynos_tui_set_stui_funcs(struct stui_buf_info *(*func1)(void), void (*func2)(void));
+void usdm_exynos_tui_set_stui_funcs(struct stui_buf_info *(*func1)(void), void (*func2)(void));
 #endif
 
-int exynos_tui_get_panel_info(u64 *buf, int size);
+int usdm_exynos_tui_get_panel_info(u64 *buf, int size);
 
 #endif /* __EXYNOS_DRM_TUI_H__ */

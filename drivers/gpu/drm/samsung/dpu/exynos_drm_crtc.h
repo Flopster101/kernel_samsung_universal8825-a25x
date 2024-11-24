@@ -213,7 +213,7 @@ struct exynos_drm_crtc_state {
 	char *dqe_colormode_ctx;
 };
 
-int exynos_drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
+int usdm_exynos_drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
 				  uint32_t frame, uint32_t *crcs);
 static inline struct exynos_drm_crtc_state *
 to_exynos_crtc_state(const struct drm_crtc_state *state)

@@ -33,11 +33,11 @@
 #endif
 
 /* TODO: erase global variable */
-struct memlog_obj *g_log_obj;
-EXPORT_SYMBOL(g_log_obj);
+struct memlog_obj *usdm_g_log_obj;
+EXPORT_SYMBOL(usdm_g_log_obj);
 
-struct memlog_obj *g_errlog_obj;
-EXPORT_SYMBOL(g_errlog_obj);
+struct memlog_obj *usdm_g_errlog_obj;
+EXPORT_SYMBOL(usdm_g_errlog_obj);
 
 #define LOG_BUF_SIZE	256
 
@@ -756,20 +756,20 @@ static void dpu_init_memlogger(struct exynos_drm_crtc *exynos_crtc)
 
 	memlog->desc->ops = dpu_memlog_ops;
 
-	if (!g_log_obj) {
-		g_log_obj = memlog_alloc_printf(memlog->desc, DPU_MEMLOG_SIZE,
+	if (!usdm_g_log_obj) {
+		usdm_g_log_obj = memlog_alloc_printf(memlog->desc, DPU_MEMLOG_SIZE,
 				NULL, "log-mem0", 0);
-		if (!g_log_obj) {
+		if (!usdm_g_log_obj) {
 			pr_info("%s: failed to alloc dev memlog memory for log\n",
 					__func__);
 			goto err;
 		}
 	}
 
-	if (!g_errlog_obj) {
-		g_errlog_obj = memlog_alloc_printf(memlog->desc, DPU_ERRMEMLOG_SIZE,
+	if (!usdm_g_errlog_obj) {
+		usdm_g_errlog_obj = memlog_alloc_printf(memlog->desc, DPU_ERRMEMLOG_SIZE,
 				NULL, "log-mem1", 0);
-		if (!g_errlog_obj) {
+		if (!usdm_g_errlog_obj) {
 			pr_info("%s: failed to alloc dev err memlog memory for log\n",
 					__func__);
 			goto err;

@@ -1751,8 +1751,8 @@ int decon_reg_init(u32 id, struct decon_config *config)
 }
 
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-extern int no_display;
-extern int bypass_display;
+extern int usdm_no_display;
+extern int usdm_bypass_display;
 #endif
 
 int decon_reg_start(u32 id, struct decon_config *config)
@@ -1760,7 +1760,7 @@ int decon_reg_start(u32 id, struct decon_config *config)
 	int ret = 0;
 
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-	if (((no_display) || (bypass_display)) && (config->mode.op_mode == DECON_VIDEO_MODE))
+	if (((usdm_no_display) || (usdm_bypass_display)) && (config->mode.op_mode == DECON_VIDEO_MODE))
 		return ret;
 #endif
 	decon_reg_direct_on_off(id, 1);

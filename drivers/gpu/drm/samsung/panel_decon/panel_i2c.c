@@ -15,7 +15,7 @@
 #include "decon_panel_i2c.h"
 #include "decon_panel_debug.h"
 
-#define PANEL_I2C_DRIVER_NAME "panel_i2c"
+#define PANEL_I2C_DRIVER_NAME "panel-decon_i2c"
 
 #define MAX_TX_SIZE 16
 #define MAX_RX_SIZE 16

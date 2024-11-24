@@ -32,10 +32,10 @@ enum DP_BD_ITEM_LIST {
 	BD_ITEM_MAX,
 };
 
-extern void secdp_bigdata_save_item(enum DP_BD_ITEM_LIST item, ...);
-extern void secdp_bigdata_inc_error_cnt(enum DP_BD_ITEM_LIST err);
-extern void secdp_bigdata_clr_error_cnt(enum DP_BD_ITEM_LIST err);
-extern void secdp_bigdata_connection(void);
-extern void secdp_bigdata_disconnection(void);
-extern void secdp_bigdata_init(struct class *dp_class);
+extern void usdm_secdp_bigdata_save_item(enum DP_BD_ITEM_LIST item, ...);
+extern void usdm_secdp_bigdata_inc_error_cnt(enum DP_BD_ITEM_LIST err);
+extern void usdm_secdp_bigdata_clr_error_cnt(enum DP_BD_ITEM_LIST err);
+extern void usdm_secdp_bigdata_connection(void);
+extern void usdm_secdp_bigdata_disconnection(void);
+extern void usdm_secdp_bigdata_init(struct class *dp_class);
 #endif /* DISPLAYPORT_BIGDATA_H */

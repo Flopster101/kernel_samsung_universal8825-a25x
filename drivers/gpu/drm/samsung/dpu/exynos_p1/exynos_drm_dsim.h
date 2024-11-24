@@ -187,7 +187,7 @@ void dsim_exit_ulps(struct dsim_device *dsim);
 void dsim_dump(struct dsim_device *dsim);
 
 #if defined(CONFIG_EXYNOS_DMA_DSIMFC)
-ssize_t dsim_host_fcmd_transfer(struct mipi_dsi_host *host,
+ssize_t usdm_dsim_host_fcmd_transfer(struct mipi_dsi_host *host,
 			    const struct mipi_dsi_msg *msg);
 #endif
 #endif /* __EXYNOS_DRM_DSI_H__ */

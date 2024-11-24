@@ -16,7 +16,7 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #ifdef CONFIG_SUPPORT_DDI_FLASH
-#include "../panel_poc.h"
+#include "../decon_panel_poc.h"
 #endif
 
 /*

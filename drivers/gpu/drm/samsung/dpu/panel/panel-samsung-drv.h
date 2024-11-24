@@ -33,24 +33,22 @@
 #if IS_ENABLED(CONFIG_DRM_PANEL_MCD_COMMON)
 #include "../exynos_drm_drv.h"
 #include "usdm_panel_drv.h"
-#include "decon_panel_drv.h"
 #include "usdm_panel_modes.h"
-#include "decon_panel_modes.h"
 #endif
 #include "../exynos_drm_debug.h"
 
-int get_panel_log_level(void);
+int usdm_get_panel_log_level(void);
 #define panel_info(panel, fmt, ...)	\
-dpu_pr_info(drv_name((panel)), 0, get_panel_log_level(), fmt, ##__VA_ARGS__)
+dpu_pr_info(drv_name((panel)), 0, usdm_get_panel_log_level(), fmt, ##__VA_ARGS__)
 
 #define panel_warn(panel, fmt, ...)	\
-dpu_pr_warn(drv_name((panel)), 0, get_panel_log_level(), fmt, ##__VA_ARGS__)
+dpu_pr_warn(drv_name((panel)), 0, usdm_get_panel_log_level(), fmt, ##__VA_ARGS__)
 
 #define panel_err(panel, fmt, ...)	\
-dpu_pr_err(drv_name((panel)), 0, get_panel_log_level(), fmt, ##__VA_ARGS__)
+dpu_pr_err(drv_name((panel)), 0, usdm_get_panel_log_level(), fmt, ##__VA_ARGS__)
 
 #define panel_debug(panel, fmt, ...)	\
-dpu_pr_debug(drv_name((panel)), 0, get_panel_log_level(), fmt, ##__VA_ARGS__)
+dpu_pr_debug(drv_name((panel)), 0, usdm_get_panel_log_level(), fmt, ##__VA_ARGS__)
 
 #define MAX_REGULATORS		3
 #define MAX_HDR_FORMATS		4
@@ -111,9 +109,9 @@ struct mcd_drm_drv_wq {
 #define wq_to_exynos_panel(w)	\
 	container_of(w, struct exynos_panel, wqs[((w)->index)])
 
-extern int bypass_display;
+extern int usdm_bypass_display;
 extern int panel_cmd_log_level;
-extern int commit_retry;
+extern int usdm_commit_retry;
 #endif
 
 /*
@@ -284,24 +282,24 @@ static inline int exynos_dcs_get_brightness(struct exynos_panel *ctx, u16 *br)
 } while (0)
 
 void exynos_panel_active_off(struct exynos_panel *panel);
-int exynos_panel_get_modes(struct drm_panel *panel, struct drm_connector *conn);
-void exynos_panel_reset(struct exynos_panel *ctx);
-int exynos_panel_set_power(struct exynos_panel *ctx, bool on);
-void exynos_panel_set_lp_mode(struct exynos_panel *ctx, const struct exynos_panel_mode *pmode);
+int usdm_exynos_panel_get_modes(struct drm_panel *panel, struct drm_connector *conn);
+void usdm_exynos_panel_reset(struct exynos_panel *ctx);
+int usdm_exynos_panel_set_power(struct exynos_panel *ctx, bool on);
+void usdm_exynos_panel_set_lp_mode(struct exynos_panel *ctx, const struct exynos_panel_mode *pmode);
 
-int dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
+int usdm_dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
 			      struct mipi_dsi_msg *msg, int cmd_cnt,
 			      bool wait_vsync, bool wait_fifo);
-int exynos_drm_cmdset_add(struct exynos_panel *ctx, u8 type, size_t size, const u8 *data);
-int exynos_drm_cmdset_cleanup(struct exynos_panel *ctx);
-int exynos_drm_cmdset_flush(struct exynos_panel *ctx, bool wait_vsync,
+int usdm_exynos_drm_cmdset_add(struct exynos_panel *ctx, u8 type, size_t size, const u8 *data);
+int usdm_exynos_drm_cmdset_cleanup(struct exynos_panel *ctx);
+int usdm_exynos_drm_cmdset_flush(struct exynos_panel *ctx, bool wait_vsync,
 							bool wait_fifo);
 
-int exynos_panel_probe(struct mipi_dsi_device *dsi);
-int exynos_panel_remove(struct mipi_dsi_device *dsi);
+int usdm_exynos_panel_probe(struct mipi_dsi_device *dsi);
+int usdm_exynos_panel_remove(struct mipi_dsi_device *dsi);
 
 #if defined(CONFIG_EXYNOS_DMA_DSIMFC)
-int drm_mipi_fcmd_write(void *_ctx, const u8 *payload, int size, u32 align);
+int usdm_drm_mipi_fcmd_write(void *_ctx, const u8 *payload, int size, u32 align);
 #endif
 
 #endif /* _PANEL_SAMSUNG_DRV_ */

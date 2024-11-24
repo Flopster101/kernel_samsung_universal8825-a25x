@@ -58,9 +58,9 @@ struct dpp_device {
 };
 
 #ifdef CONFIG_OF
-struct dpp_device *of_find_dpp_by_node(struct device_node *np);
+struct dpp_device *usdm_of_find_dpp_by_node(struct device_node *np);
 #else
-static struct dpp_device *of_find_dpp_by_node(struct device_node *np)
+static struct dpp_device *usdm_of_find_dpp_by_node(struct device_node *np)
 {
 	return NULL;
 }

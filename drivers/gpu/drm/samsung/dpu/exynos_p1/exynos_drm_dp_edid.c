@@ -126,7 +126,7 @@ static int edid_read_block(struct dp_device *dp,
 	print_hex_dump(KERN_INFO, "EDID: ", DUMP_PREFIX_OFFSET, 16, 1,
 					buf, 128, false);
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-	dp_logger_hex_dump(buf, "EDID: ", 128);
+	usdm_dp_logger_hex_dump(buf, "EDID: ", 128);
 #endif
 
 	return 0;
@@ -695,8 +695,8 @@ static void dp_check_hmd_dev(struct dp_device *dp)
 static void dp_get_dex_adapter_type(struct dp_device *dp)
 {
 #ifdef CONFIG_SEC_DISPLAYPORT_SELFTEST
-	if (self_test_on_process()) {
-		dp->dex.adapter_type = self_test_get_dp_adapter_type();
+	if (usdm_self_test_on_process()) {
+		dp->dex.adapter_type = usdm_self_test_get_dp_adapter_type();
 		return;
 	}
 #endif
@@ -793,8 +793,8 @@ int edid_update_drm(struct dp_device *dp)
 	dp_mode_var_init(dp);
 
 #ifdef CONFIG_SEC_DISPLAYPORT_SELFTEST
-	if (self_test_on_process()) {
-		ret = self_test_get_edid(dp->rx_edid_data.edid_buf);
+	if (usdm_self_test_on_process()) {
+		ret = usdm_self_test_get_edid(dp->rx_edid_data.edid_buf);
 		dp_info(dp, "self test edid %d\n", ret);
 	} else
 #endif
@@ -1596,7 +1596,7 @@ u8 edid_read_checksum(struct dp_device *dp)
 	if (ret)
 		return ret;
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-	dp_logger_hex_dump(buf, "Test EDID: ", 128);
+	usdm_dp_logger_hex_dump(buf, "Test EDID: ", 128);
 #endif
 	block = buf[0x7e];
 	for (i = 1; i <= block; i++) {
@@ -1606,7 +1606,7 @@ u8 edid_read_checksum(struct dp_device *dp)
 		if (ret)
 			return ret;
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-		dp_logger_hex_dump(buf, "Test EDID: ", 128);
+		usdm_dp_logger_hex_dump(buf, "Test EDID: ", 128);
 #endif
 	}
 

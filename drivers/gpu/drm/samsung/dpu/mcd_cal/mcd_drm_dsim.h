@@ -25,5 +25,5 @@ struct dsim_device;
 #define DT_NAME_PMSK	"pmsk"
 
 int mcd_dsim_check_dsi_freq(struct dsim_device *dsim, unsigned int freq);
-int mcd_dsim_update_dsi_freq(struct dsim_device *dsim, unsigned int freq);
+int usdm_mcd_dsim_update_dsi_freq(struct dsim_device *dsim, unsigned int freq);
 #endif /* __MCD_DRM_DSI_H__ */

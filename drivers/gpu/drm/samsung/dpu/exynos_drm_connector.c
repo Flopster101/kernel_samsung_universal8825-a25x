@@ -23,21 +23,21 @@
 #define HDR_HLG			BIT(3)
 #define HDR_HDR10_PLUS		BIT(4)
 
-void exynos_drm_boost_bts_fps(struct exynos_drm_connector *exynos_connector,
+void usdm_exynos_drm_boost_bts_fps(struct exynos_drm_connector *exynos_connector,
 		u32 fps, ktime_t expire_time)
 {
 	exynos_connector->boost_bts_fps = fps;
 	exynos_connector->boost_expire_time = expire_time;
 }
-EXPORT_SYMBOL(exynos_drm_boost_bts_fps);
+EXPORT_SYMBOL(usdm_exynos_drm_boost_bts_fps);
 
 struct exynos_drm_connector_properties *
-exynos_drm_connector_get_properties(struct exynos_drm_connector *exynos_connector)
+usdm_exynos_drm_connector_get_properties(struct exynos_drm_connector *exynos_connector)
 {
 	return dev_get_exynos_properties(exynos_connector->base.dev,
 			DRM_MODE_OBJECT_CONNECTOR);
 }
-EXPORT_SYMBOL(exynos_drm_connector_get_properties);
+EXPORT_SYMBOL(usdm_exynos_drm_connector_get_properties);
 
 static struct drm_connector_state *
 exynos_drm_connector_duplicate_state(struct drm_connector *connector)
@@ -153,7 +153,7 @@ bool is_exynos_drm_connector(const struct drm_connector *connector)
 	return connector->funcs == &exynos_connector_funcs;
 }
 
-int exynos_drm_connector_init(struct drm_device *dev,
+int usdm_exynos_drm_connector_init(struct drm_device *dev,
 		struct exynos_drm_connector *exynos_connector,
 		const struct exynos_drm_connector_funcs *funcs,
 		int connector_type)
@@ -164,7 +164,7 @@ int exynos_drm_connector_init(struct drm_device *dev,
 			&exynos_connector_funcs,
 			DRM_MODE_CONNECTOR_DSI);
 }
-EXPORT_SYMBOL(exynos_drm_connector_init);
+EXPORT_SYMBOL(usdm_exynos_drm_connector_init);
 
 static int
 exynos_drm_connector_create_luminance_properties(struct drm_device *dev)

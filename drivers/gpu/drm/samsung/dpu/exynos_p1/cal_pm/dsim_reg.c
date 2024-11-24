@@ -1592,7 +1592,7 @@ static void dsim_reg_set_config(u32 id, struct dsim_reg_config *config,
 	/* set bta & lpdr timeout vlaues */
 	dsim_reg_set_timeout(id);
 
-	dsim_reg_set_cmd_transfer_mode(id, 0);
+	usdm_dsim_reg_set_cmd_transfer_mode(id, 0);
 	dsim_reg_set_stop_state_cnt(id);
 
 	if (config->mode == DSIM_COMMAND_MODE) {
@@ -2514,14 +2514,14 @@ void dsim_reg_set_bist(u32 id, bool en, u32 mode)
 	dsim_reg_enable_bist(id, en);
 }
 
-void dsim_reg_set_cmd_transfer_mode(u32 id, u32 lp)
+void usdm_dsim_reg_set_cmd_transfer_mode(u32 id, u32 lp)
 {
 	u32 val = lp ? ~0 : 0;
 
 	dsim_write_mask(id, DSIM_ESCMODE, val, DSIM_ESCMODE_CMD_LPDT);
 }
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-EXPORT_SYMBOL(dsim_reg_set_cmd_transfer_mode);
+EXPORT_SYMBOL(usdm_dsim_reg_set_cmd_transfer_mode);
 #endif
 
 #if defined(CONFIG_EXYNOS_DMA_DSIMFC)

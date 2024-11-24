@@ -112,16 +112,16 @@ struct exynos_drm_connector {
 	ktime_t boost_expire_time;
 };
 
-void exynos_drm_boost_bts_fps(struct exynos_drm_connector *exynos_connector,
+void usdm_exynos_drm_boost_bts_fps(struct exynos_drm_connector *exynos_connector,
 		u32 fps, ktime_t expire_time);
 bool is_exynos_drm_connector(const struct drm_connector *connector);
-int exynos_drm_connector_init(struct drm_device *dev,
+int usdm_exynos_drm_connector_init(struct drm_device *dev,
 		struct exynos_drm_connector *exynos_connector,
 		const struct exynos_drm_connector_funcs *funcs,
 		int connector_type);
 int exynos_drm_connector_create_properties(struct drm_device *dev);
 struct exynos_drm_connector_properties *
-exynos_drm_connector_get_properties(struct exynos_drm_connector *exynos_connector);
+usdm_exynos_drm_connector_get_properties(struct exynos_drm_connector *exynos_connector);
 
 static inline struct exynos_drm_connector_state *
 crtc_get_exynos_connector_state(const struct drm_atomic_state *state,

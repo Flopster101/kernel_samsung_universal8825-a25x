@@ -140,15 +140,9 @@ void exynos_drm_mode_set_name(struct drm_display_mode *mode, int refresh_mode)
 {
 	drm_mode_set_name(mode);
 
-	if (sec_current_device == SEC_A25) {
-		snprintf(mode->name + strlen(mode->name),
-				DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
-				drm_mode_vrefresh(mode), usdm_refresh_mode_to_str(refresh_mode));
-	} else {
-		snprintf(mode->name + strlen(mode->name),
-				DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
-				drm_mode_vrefresh(mode), decon_refresh_mode_to_str(refresh_mode));
-	}
+	snprintf(mode->name + strlen(mode->name),
+			DRM_DISPLAY_MODE_LEN - strlen(mode->name), "@%d%s",
+			drm_mode_vrefresh(mode), usdm_refresh_mode_to_str(refresh_mode));
 }
 
 int drm_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, struct drm_display_mode *ddm)
@@ -172,11 +166,7 @@ int drm_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, str
 	 * 'vscan' decide how many times real display(e.g. AMOLED-PANEL)
 	 * vertical scan while one frame update.
 	 */
-	if (sec_current_device == SEC_A25) {
-		vscan = usdm_panel_mode_vscan(pdm);
-	} else {
-		vscan = decon_panel_mode_vscan(pdm);
-	}
+	vscan = usdm_panel_mode_vscan(pdm);
 	if (vscan > 1)
 		ddm->vscan = vscan;
 
@@ -216,7 +206,7 @@ int exynos_panel_mode_from_panel_display_mode(struct panel_display_mode *pdm, st
 	return 0;
 }
 
-struct panel_display_mode *exynos_panel_find_panel_mode(
+struct panel_display_mode *usdm_exynos_panel_find_panel_mode(
 		struct panel_display_modes *pdms, const struct drm_display_mode *pmode)
 {
 	struct drm_display_mode t_pmode;
@@ -237,10 +227,10 @@ struct panel_display_mode *exynos_panel_find_panel_mode(
 
 	return pdm;
 }
-EXPORT_SYMBOL(exynos_panel_find_panel_mode);
+EXPORT_SYMBOL(usdm_exynos_panel_find_panel_mode);
 
 /**
- * exynos_panel_mode_create - create a new exynos panel mode
+ * usdm_exynos_panel_mode_create - create a new exynos panel mode
  * @ctx: exynos_panel
  *
  * Create a new, cleared exynos_panel_mode with kzalloc, allocate an ID for it
@@ -249,7 +239,7 @@ EXPORT_SYMBOL(exynos_panel_find_panel_mode);
  * Returns:
  * Pointer to new mode on success, NULL on error.
  */
-struct exynos_panel_mode *exynos_panel_mode_create(struct exynos_panel *ctx)
+struct exynos_panel_mode *usdm_exynos_panel_mode_create(struct exynos_panel *ctx)
 {
 	struct exynos_panel_mode *nmode;
 
@@ -259,28 +249,28 @@ struct exynos_panel_mode *exynos_panel_mode_create(struct exynos_panel *ctx)
 
 	return nmode;
 }
-EXPORT_SYMBOL(exynos_panel_mode_create);
+EXPORT_SYMBOL(usdm_exynos_panel_mode_create);
 
 
 /**
- * exynos_panel_mode_destroy - remove a mode
+ * usdm_exynos_panel_mode_destroy - remove a mode
  * @ctx: exynos_panel
  * @mode: mode to remove
  *
  * Release @mode's unique ID, then free it @mode structure itself using kfree.
  */
-void exynos_panel_mode_destroy(struct exynos_panel *ctx, struct exynos_panel_mode *mode)
+void usdm_exynos_panel_mode_destroy(struct exynos_panel *ctx, struct exynos_panel_mode *mode)
 {
 	if (!mode)
 		return;
 
 	kfree(mode);
 }
-EXPORT_SYMBOL(exynos_panel_mode_destroy);
+EXPORT_SYMBOL(usdm_exynos_panel_mode_destroy);
 
 
 /**
- * exynos_panel_desc_create - create a new exynos panel desc
+ * usdm_exynos_panel_desc_create - create a new exynos panel desc
  * @ctx: exynos_panel
  *
  * Create a new, cleared exynos_panel_desc with kzalloc, allocate an ID for it
@@ -289,7 +279,7 @@ EXPORT_SYMBOL(exynos_panel_mode_destroy);
  * Returns:
  * Pointer to new desc on success, NULL on error.
  */
-struct exynos_panel_desc *exynos_panel_desc_create(struct exynos_panel *ctx)
+struct exynos_panel_desc *usdm_exynos_panel_desc_create(struct exynos_panel *ctx)
 {
 	struct exynos_panel_desc *ndesc;
 
@@ -299,17 +289,17 @@ struct exynos_panel_desc *exynos_panel_desc_create(struct exynos_panel *ctx)
 
 	return ndesc;
 }
-EXPORT_SYMBOL(exynos_panel_desc_create);
+EXPORT_SYMBOL(usdm_exynos_panel_desc_create);
 
 
 /**
- * exynos_panel_desc_destroy - remove a desc
+ * usdm_exynos_panel_desc_destroy - remove a desc
  * @ctx: exynos_panel
  * @desc: desc to remove
  *
  * Release @desc's unique ID, then free it @desc structure itself using kfree.
  */
-void exynos_panel_desc_destroy(struct exynos_panel *ctx, struct exynos_panel_desc *desc)
+void usdm_exynos_panel_desc_destroy(struct exynos_panel *ctx, struct exynos_panel_desc *desc)
 {
 	if (!desc)
 		return;
@@ -318,7 +308,7 @@ void exynos_panel_desc_destroy(struct exynos_panel *ctx, struct exynos_panel_des
 	kfree(desc->lp_modes);
 	kfree(desc);
 }
-EXPORT_SYMBOL(exynos_panel_desc_destroy);
+EXPORT_SYMBOL(usdm_exynos_panel_desc_destroy);
 
 
 static int exynos_panel_fill_hdr_info(struct exynos_panel *ctx, struct exynos_panel_desc *desc)
@@ -352,7 +342,7 @@ static int exynos_panel_fill_hdr_info(struct exynos_panel *ctx, struct exynos_pa
 }
 
 struct exynos_panel_desc *
-exynos_panel_desc_create_from_panel_display_modes(struct exynos_panel *ctx,
+usdm_exynos_panel_desc_create_from_panel_display_modes(struct exynos_panel *ctx,
 		struct panel_display_modes *pdms)
 {
 	struct exynos_panel_desc *desc;
@@ -366,7 +356,7 @@ exynos_panel_desc_create_from_panel_display_modes(struct exynos_panel *ctx,
 	int num_unique_modes = 0;
 	int i, j;
 
-	desc = exynos_panel_desc_create(ctx);
+	desc = usdm_exynos_panel_desc_create(ctx);
 	if (!desc) {
 		dev_err(ctx->dev, "%s: could not allocate exynos_panel_desc\n", __func__);
 		return NULL;
@@ -479,10 +469,10 @@ modefail:
 	kfree(modes);
 	kfree(lp_modes);
 	kfree(unique_modes);
-	exynos_panel_desc_destroy(ctx, desc);
+	usdm_exynos_panel_desc_destroy(ctx, desc);
 	return NULL;
 }
-EXPORT_SYMBOL(exynos_panel_desc_create_from_panel_display_modes);
+EXPORT_SYMBOL(usdm_exynos_panel_desc_create_from_panel_display_modes);
 
 MODULE_AUTHOR("Gwanghui Lee <gwanghui.lee@samsung.com>");
 MODULE_DESCRIPTION("MIPI-DSI based mcd panel helper driver");

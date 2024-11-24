@@ -317,7 +317,7 @@ static void decon_mode_update_bts(struct decon_device *decon,
 	decon->bts.vfp = vm.vfront_porch;
 	decon->bts.vsa = vm.vsync_len;
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-	decon->bts.fps = mcd_decon_get_bts_fps(mode);
+	decon->bts.fps = usdm_mcd_decon_get_bts_fps(mode);
 #else
 	decon->bts.fps = drm_mode_vrefresh(mode);
 #endif
@@ -1207,7 +1207,7 @@ decon_enable(struct exynos_drm_crtc *crtc, struct drm_crtc_state *old_crtc_state
 
 	decon_info(decon, "%s +\n", __func__);
 
-	if (is_tui_trans(old_crtc_state)) {
+	if (usdm_is_tui_trans(old_crtc_state)) {
 		decon_info(decon, "tui transition : skip power enable\n");
 	} else {
 #if IS_ENABLED(CONFIG_SOC_S5E9925_EVT0)
@@ -1336,7 +1336,7 @@ static void decon_disable(struct exynos_drm_crtc *crtc)
 
 	_decon_disable(decon);
 
-	if (is_tui_trans(crtc->base.state)) {
+	if (usdm_is_tui_trans(crtc->base.state)) {
 		decon_info(decon, "tui transition : skip power disable\n");
 	} else {
 		decon_set_te_pinctrl(decon, false);
@@ -1815,7 +1815,7 @@ static int decon_parse_dt(struct decon_device *decon, struct device_node *np)
 			return -EINVAL;
 		}
 
-		decon->dpp[i] = of_find_dpp_by_node(dpp_np);
+		decon->dpp[i] = usdm_of_find_dpp_by_node(dpp_np);
 		if (!decon->dpp[i]) {
 			decon_err(decon, "can't find dpp%d structure\n", i);
 			return -EINVAL;
@@ -2188,7 +2188,7 @@ static int decon_probe(struct platform_device *pdev)
 	/* set drvdata */
 	platform_set_drvdata(pdev, decon);
 
-	exynos_recovery_register(decon);
+	usdm_exynos_recovery_register(decon);
 
 	ret = component_add(dev, &decon_component_ops);
 	if (ret)

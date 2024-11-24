@@ -1,0 +1,60 @@
+config DRM_PANEL_SAMSUNG_COMMON
+	tristate "Samsung Common panel"
+	depends on OF
+	depends on DRM_MIPI_DSI
+	select VIDEOMODE_HELPERS
+
+config DRM_PANEL_SAMSUNG_EMUL
+	tristate "Samsung EMUL DSI command mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports virtual panel on samsung emulator. It just
+	  supports to turn on and off the virtual panel. Also if proper
+	  panel driver couldn't be found, it can be chosen.
+
+config DRM_PANEL_SAMSUNG_S6E3FAB
+	tristate "Samsung S6E3FAB DSI command mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports S6E3FAB panel on samsung SoC. It supports
+	  to turn on and off the S6E3FAB panel and it can also supports
+	  panel specific features.
+
+config DRM_PANEL_SAMSUNG_S6E3FAC
+	tristate "Samsung S6E3FAC DSI command mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports S6E3FAC panel on samsung SoC. It supports
+	  to turn on and off the S6E3FAC panel and it can also supports
+	  panel specific features.
+
+config DRM_PANEL_SAMSUNG_S6E3HAB
+	tristate "Samsung S6E3HAB DSI command mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports S6E3HAB panel on samsung SoC. It supports
+	  to turn on and off the S6E3HAB panel and it can also supports
+	  panel specific features.
+
+config DRM_PANEL_SAMSUNG_S6E3FC3
+	tristate "Samsung S6E3FC3 DSI command mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports S6E3FC3 panel on samsung SoC. It supports
+	  to turn on and off the S6E3FC3 panel and it can also supports
+	  panel specific features.
+
+config DRM_PANEL_SAMSUNG_S6E8FC1
+	tristate "Samsung S6E8FC1 DSI video mode panel"
+	depends on DRM_PANEL_SAMSUNG_COMMON
+	help
+	  This driver supports S6E8FC1 panel on samsung SoC. It supports
+	  to turn on and off the S6E8FC1 panel and it can also supports
+	  panel specific features.
+
+config DRM_PANEL_MCD_COMMON
+	tristate "Samsung MCD Common panel"
+	depends on OF
+	depends on DRM_MIPI_DSI
+	select VIDEOMODE_HELPERS
+

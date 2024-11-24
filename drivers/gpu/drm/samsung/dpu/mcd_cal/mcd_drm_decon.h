@@ -18,6 +18,6 @@
 #include <drm/drm_mode.h>
 #include <drm/drm_modes.h>
 
-int mcd_decon_get_bts_fps(const struct drm_display_mode *mode);
+int usdm_mcd_decon_get_bts_fps(const struct drm_display_mode *mode);
 
 #endif /* __MCD_DRM_DECON_H__ */

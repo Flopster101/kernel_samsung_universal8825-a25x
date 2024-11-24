@@ -101,7 +101,7 @@ struct exynos_recovery {
 bool dsim_condition_check(const struct drm_crtc *crtc);
 bool customer_condition_check(const struct drm_crtc *crtc);
 
-void exynos_recovery_register(struct decon_device *decon);
+void usdm_exynos_recovery_register(struct decon_device *decon);
 int exynos_recovery_set_state(struct decon_device *decon, enum recovery_state state);
 enum recovery_state exynos_recovery_get_state(struct decon_device *decon);
 int exynos_recovery_set_mode(struct decon_device *decon, char *mode);

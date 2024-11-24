@@ -948,7 +948,7 @@ static int exynos_recovery_parse_dt(struct device_node *np,
 	return 0;
 }
 
-void exynos_recovery_register(struct decon_device *decon)
+void usdm_exynos_recovery_register(struct decon_device *decon)
 {
 	struct exynos_recovery *recovery = &decon->recovery;
 	struct device *dev = decon->dev;
@@ -976,4 +976,4 @@ void exynos_recovery_register(struct decon_device *decon)
 	exynos_recovery_set_state(decon, RECOVERY_IDLE);
 	recov_info("decon#%d recovery registered\n", decon->id);
 }
-EXPORT_SYMBOL(exynos_recovery_register);
+EXPORT_SYMBOL(usdm_exynos_recovery_register);

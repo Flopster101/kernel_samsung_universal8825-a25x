@@ -123,7 +123,7 @@ int mcd_dsim_check_dsi_freq(struct dsim_device *dsim, unsigned int freq)
 	return 0;
 }
 
-int mcd_dsim_update_dsi_freq(struct dsim_device *dsim, unsigned int freq)
+int usdm_mcd_dsim_update_dsi_freq(struct dsim_device *dsim, unsigned int freq)
 {
 	int ret;
 	struct stdphy_pms pms;
@@ -142,4 +142,4 @@ int mcd_dsim_update_dsi_freq(struct dsim_device *dsim, unsigned int freq)
 
 	return 0;
 }
-EXPORT_SYMBOL(mcd_dsim_update_dsi_freq);
+EXPORT_SYMBOL(usdm_mcd_dsim_update_dsi_freq);
