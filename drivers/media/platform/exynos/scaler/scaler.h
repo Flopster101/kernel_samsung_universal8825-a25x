@@ -632,6 +632,7 @@ int sc_ext_run_job(struct sc_ctx *ctx);
 void sc_ext_current_task_finish(struct sc_ext_dev *ext_dev, bool success);
 bool sc_ext_job_finished(struct sc_ctx *ctx);
 
-extern int exynos_dpuf_set_votf(u32 dpuf_idx, bool en);
+extern int usdm_exynos_dpuf_set_votf(u32 dpuf_idx, bool en);
+extern int decon_exynos_dpuf_set_votf(u32 dpuf_idx, bool en);
 
 #endif /* SCALER__H_ */
