@@ -110,7 +110,7 @@ static int __init oled_function_init(void)
 {
 	int ret;
 
-	if (sec_current_device == SEC_A25) {
+	if (!sec_needs_decon) {
 		printk(KERN_INFO "%s Initialized USDM OLED driver\n", sec_detect_label);
 		ret = usdm_panel_function_insert_array(usdm_oled_function_table,
 				ARRAY_SIZE(usdm_oled_function_table));
