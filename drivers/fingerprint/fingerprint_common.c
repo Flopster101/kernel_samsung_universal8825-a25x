@@ -78,10 +78,6 @@ extern void ec6xx_exit(void);
 extern int el7xx_init(void);
 extern void el7xx_exit(void);
 #endif
-#if IS_ENABLED(CONFIG_SENSORS_GW9558X)
-extern int gw9558_init(void);
-extern void gw9558_exit(void);
-#endif
 
 static int __init fingerprint_init(void)
 {
@@ -90,9 +86,6 @@ static int __init fingerprint_init(void)
 #endif
 #if IS_ENABLED(CONFIG_SENSORS_EL7XX)
 	el7xx_init();
-#endif
-#if IS_ENABLED(CONFIG_SENSORS_GW9558X)
-	gw9558_init();
 #endif
 
 	return 0;

@@ -25,7 +25,7 @@ static const struct of_device_id gw9558_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, gw9558_of_match);
 
-extern struct debug_logger *g_logger;
+struct debug_logger *g_logger;
 
 static ssize_t bfs_values_show(struct device *dev,
 				      struct device_attribute *attr, char *buf)
@@ -940,7 +940,7 @@ static struct platform_driver gw9558_spi_driver = {
 	.remove = gw9558_remove,
 };
 
-int __init gw9558_init(void)
+static int __init gw9558_init(void)
 {
 	int retval = 0;
 
@@ -956,8 +956,9 @@ int __init gw9558_init(void)
 	}
 	return retval;
 }
+module_init(gw9558_init);
 
-void __exit gw9558_exit(void)
+static void __exit gw9558_exit(void)
 {
 	pr_info("Entry\n");
 #ifndef ENABLE_SENSORS_FPRINT_SECURE
@@ -966,6 +967,7 @@ void __exit gw9558_exit(void)
 	platform_driver_unregister(&gw9558_spi_driver);
 #endif
 }
+module_exit(gw9558_exit);
 
 MODULE_AUTHOR("fp.sec@samsung.com");
 MODULE_DESCRIPTION("Samsung Electronics Inc. GW9558 driver");
