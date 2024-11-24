@@ -1,0 +1,23 @@
+#
+# PDIC devices
+#
+
+comment "PDIC configs"
+
+config PDIC_S2MU106
+  tristate "Using S2MU106 USB PD"
+  depends on PDIC_SLSI_NON_MCU
+  default n
+  help
+    If you say yes here you will get support for
+    for the S2MU106 USBPD chip.
+
+config S2MU106_PDIC_TRY_SNK
+  bool "Using Type-C try.SNK"
+  depends on I2C && (MFD_S2MU106 || PM_S2MU106)
+  default n
+  help
+    If you say yes here you will get support for
+    the S2MU106 Type-C try.SNK.
+    The device prefer to work with snk.
+    This feature is in typec specificaion.
