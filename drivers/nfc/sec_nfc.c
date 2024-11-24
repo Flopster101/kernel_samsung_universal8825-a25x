@@ -45,6 +45,7 @@
 #include <linux/sched.h>
 #include <linux/i2c.h>
 #include <linux/ktime.h>
+#include <linux/sec_detect.h>
 
 
 #if defined(CONFIG_ESE_SECURE) && defined(CONFIG_ESE_USE_TZ_API)
@@ -1586,13 +1587,15 @@ extern void st54spi_exit(void);
 static int __init sec_nfc_init(void)
 {
 #if IS_ENABLED(CONFIG_ESE_P3_LSI)
-	spip3_dev_init();
+	if (sec_current_device == SEC_A53)
+		spip3_dev_init();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST21NFC)
-	st21nfc_dev_init();
+	if (sec_current_device == SEC_A25)
+		st21nfc_dev_init();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
-	st54spi_init();
+	st54spi_init();	// What device uses this chip??
 #endif
 	return SEC_NFC_INIT(&sec_nfc_driver);
 }
@@ -1600,10 +1603,12 @@ static int __init sec_nfc_init(void)
 static void __exit sec_nfc_exit(void)
 {
 #if IS_ENABLED(CONFIG_ESE_P3_LSI)
-	spip3_dev_exit();
+	if (sec_current_device == SEC_A53)
+		spip3_dev_exit();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST21NFC)
-	st21nfc_dev_exit();
+	if (sec_current_device == SEC_A25)
+		st21nfc_dev_exit();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
 	st54spi_exit();
