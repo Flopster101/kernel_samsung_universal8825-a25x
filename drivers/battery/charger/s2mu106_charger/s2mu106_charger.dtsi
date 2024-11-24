@@ -1,0 +1,11 @@
+&smd {
+	s2mu106_charger: s2mu106-charger {
+		status = "disable";
+		compatible = "samsung,s2mu106-charger";
+	};
+
+	battery {
+		battery,otg_name = "s2mu106-otg";
+	};
+};
+
