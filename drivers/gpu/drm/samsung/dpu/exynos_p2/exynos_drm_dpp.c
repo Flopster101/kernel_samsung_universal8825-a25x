@@ -162,8 +162,8 @@ void dpp_dump(struct dpp_device *dpps[], int dpp_cnt)
 	}
 }
 
-int exynos_dpuf_set_votf(u32 dpuf_idx, bool en) { return 0; }
-EXPORT_SYMBOL(exynos_dpuf_set_votf);
+int usdm_exynos_dpuf_set_votf(u32 dpuf_idx, bool en) { return 0; }
+EXPORT_SYMBOL(usdm_exynos_dpuf_set_votf);
 
 void exynos_drm_init_resource_cnt(void)
 {
@@ -1134,7 +1134,7 @@ static int of_device_match(struct device *dev, const void *data)
 	return dev->of_node == data;
 }
 
-struct dpp_device *of_find_dpp_by_node(struct device_node *np)
+struct dpp_device *usdm_of_find_dpp_by_node(struct device_node *np)
 {
 	struct device *dev;
 
@@ -1142,7 +1142,7 @@ struct dpp_device *of_find_dpp_by_node(struct device_node *np)
 
 	return dev ? dev_get_drvdata(dev) : NULL;
 }
-EXPORT_SYMBOL(of_find_dpp_by_node);
+EXPORT_SYMBOL(usdm_of_find_dpp_by_node);
 #endif
 
 MODULE_SOFTDEP("pre: samsung_dma_heap");

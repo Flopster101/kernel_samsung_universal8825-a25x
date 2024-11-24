@@ -61,7 +61,7 @@ extern int dp_log_level;
 	do {								\
 		if (dp_log_level >= 3 && dp) {				\
 			pr_err("Displayport: "fmt, ##__VA_ARGS__);	\
-			dp_logger_print(fmt, ##__VA_ARGS__);		\
+			usdm_dp_logger_print(fmt, ##__VA_ARGS__);		\
 		}							\
 	} while (0)
 
@@ -69,7 +69,7 @@ extern int dp_log_level;
 	do {								\
 		if (dp_log_level >= 4 && dp) {				\
 			pr_warn("Displayport: "fmt, ##__VA_ARGS__);	\
-			dp_logger_print(fmt, ##__VA_ARGS__);		\
+			usdm_dp_logger_print(fmt, ##__VA_ARGS__);		\
 		}							\
 	} while (0)
 
@@ -77,7 +77,7 @@ extern int dp_log_level;
 	do {								\
 		if (dp_log_level >= 6 && dp) {				\
 			pr_info("Displayport: "fmt, ##__VA_ARGS__);	\
-			dp_logger_print(fmt, ##__VA_ARGS__);		\
+			usdm_dp_logger_print(fmt, ##__VA_ARGS__);		\
 		}							\
 	} while (0)
 
@@ -85,7 +85,7 @@ extern int dp_log_level;
 	do {								\
 		if (dp_log_level >= 7 && dp)	{			\
 			pr_info("Displayport: "fmt, ##__VA_ARGS__);	\
-			dp_logger_print(fmt, ##__VA_ARGS__);		\
+			usdm_dp_logger_print(fmt, ##__VA_ARGS__);		\
 		}							\
 	} while (0)
 
@@ -94,7 +94,7 @@ extern int dp_log_level;
 	do {							\
 		if (dp_log_level >= 7)	{			\
 			pr_debug("Displayport: "fmt, ##__VA_ARGS__);\
-			dp_logger_print("%d "fmt, id, ##__VA_ARGS__);\
+			usdm_dp_logger_print("%d "fmt, id, ##__VA_ARGS__);\
 		}						\
 	} while (0)
 
@@ -103,21 +103,21 @@ extern int dp_log_level;
 	do {							\
 		pr_info("Displayport: "fmt, ##__VA_ARGS__);	\
 		if (dp_log_level >= 7)				\
-			dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
+			usdm_dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
 	} while (0)
 
 #undef cal_log_warn
 #define cal_log_warn(id, fmt, ...)				\
 	do {							\
 		pr_warn("Displayport: "fmt, ##__VA_ARGS__);	\
-		dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
+		usdm_dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
 	} while (0)
 
 #undef cal_log_err
 #define cal_log_err(id, fmt, ...)				\
 	do {							\
 		pr_err("Displayport: "fmt, ##__VA_ARGS__);	\
-		dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
+		usdm_dp_logger_print("%d "fmt, id, ##__VA_ARGS__);	\
 	} while (0)
 
 #else /* CONFIG_SEC_DISPLAYPORT_LOGGER */
@@ -136,7 +136,7 @@ dpu_pr_debug(drv_name((dp)), 0, dp_log_level, fmt, ##__VA_ARGS__)
 
 #endif /* CONFIG_SEC_DISPLAYPORT_LOGGER */
 
-extern struct dp_device *dp_drvdata;
+extern struct dp_device *usdm_dp_drvdata;
 
 enum dp_state {
 	DP_STATE_INIT,
@@ -833,7 +833,7 @@ enum{
 
 static inline struct dp_device *get_dp_drvdata(void)
 {
-	return dp_drvdata;
+	return usdm_dp_drvdata;
 }
 
 /* EXPORTED function and variable */

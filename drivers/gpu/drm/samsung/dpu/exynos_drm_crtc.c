@@ -584,7 +584,7 @@ static void exysno_drm_crtc_early_unregister(struct drm_crtc *crtc)
 }
 
 /**
- * exynos_drm_crtc_add_crc_entry - Add entry with CRC information for a frame
+ * usdm_exynos_drm_crtc_add_crc_entry - Add entry with CRC information for a frame
  * @crtc: CRTC to which the frame belongs
  * @has_frame: whether this entry has a frame number to go with
  * @frame: number of the frame these CRCs are about
@@ -593,7 +593,7 @@ static void exysno_drm_crtc_early_unregister(struct drm_crtc *crtc)
  * NOTE : this funcation is for temporary using
  * and need to replace to dem_crtc_add_crc_entry.
  */
-int exynos_drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
+int usdm_exynos_drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
 			   uint32_t frame, uint32_t *crcs)
 {
 	struct drm_crtc_crc *crc = &crtc->crc;
@@ -638,7 +638,7 @@ int exynos_drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
 
 	return 0;
 }
-EXPORT_SYMBOL_GPL(exynos_drm_crtc_add_crc_entry);
+EXPORT_SYMBOL_GPL(usdm_exynos_drm_crtc_add_crc_entry);
 
 static const char * const exynos_crc_source[] = {"auto"};
 static int exynos_crtc_parse_crc_source(const char *source)

@@ -30,7 +30,7 @@ static int emul_unprepare(struct drm_panel *panel)
 	ctx = container_of(panel, struct exynos_panel, panel);
 
 	panel_debug(ctx, "+\n");
-	exynos_panel_set_power(ctx, false);
+	usdm_exynos_panel_set_power(ctx, false);
 	panel_debug(ctx, "-\n");
 	return 0;
 }
@@ -42,7 +42,7 @@ static int emul_prepare(struct drm_panel *panel)
 	ctx = container_of(panel, struct exynos_panel, panel);
 
 	panel_debug(ctx, "+\n");
-	exynos_panel_set_power(ctx, true);
+	usdm_exynos_panel_set_power(ctx, true);
 	panel_debug(ctx, "-\n");
 
 	return 0;
@@ -161,7 +161,7 @@ static const struct drm_panel_funcs emul_drm_funcs = {
 	.unprepare = emul_unprepare,
 	.prepare = emul_prepare,
 	.enable = emul_enable,
-	.get_modes = exynos_panel_get_modes,
+	.get_modes = usdm_exynos_panel_get_modes,
 };
 
 const struct exynos_panel_desc samsung_emul = {
@@ -178,8 +178,8 @@ static const struct of_device_id exynos_panel_of_match[] = {
 MODULE_DEVICE_TABLE(of, exynos_panel_of_match);
 
 static struct mipi_dsi_driver exynos_panel_driver = {
-	.probe = exynos_panel_probe,
-	.remove = exynos_panel_remove,
+	.probe = usdm_exynos_panel_probe,
+	.remove = usdm_exynos_panel_remove,
 	.driver = {
 		.name = "panel-samsung-emul",
 		.of_match_table = exynos_panel_of_match,

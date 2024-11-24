@@ -129,8 +129,8 @@ exynos_atomic_commit_prepare_buf_sanity(struct drm_atomic_state *old_state);
 bool exynos_atomic_commit_check_buf_sanity(struct drm_atomic_state *old_state);
 #endif
 
-extern struct memlog_obj *g_log_obj;
-extern struct memlog_obj *g_errlog_obj;
+extern struct memlog_obj *usdm_g_log_obj;
+extern struct memlog_obj *usdm_g_errlog_obj;
 #define DPU_PR_PREFIX		""
 #define DPU_PR_FMT		"%s[%d]: %s:%d "
 #define DPU_PR_ARG(name, id)	(name), (id), __func__, __LINE__
@@ -151,9 +151,9 @@ extern struct memlog_obj *g_errlog_obj;
 			pr_err(DPU_PR_PREFIX DPU_PR_FMT fmt,			\
 				DPU_PR_ARG((name), (id)), ##__VA_ARGS__);	\
 										\
-		dpu_pr_memlog((g_log_obj), (name), (id), MEMLOG_LEVEL_ERR,	\
+		dpu_pr_memlog((usdm_g_log_obj), (name), (id), MEMLOG_LEVEL_ERR,	\
 				fmt, ##__VA_ARGS__);				\
-		dpu_pr_memlog((g_errlog_obj), (name), (id), MEMLOG_LEVEL_ERR,	\
+		dpu_pr_memlog((usdm_g_errlog_obj), (name), (id), MEMLOG_LEVEL_ERR,	\
 				fmt, ##__VA_ARGS__);				\
 	} while (0)
 
@@ -163,7 +163,7 @@ extern struct memlog_obj *g_errlog_obj;
 			pr_warn(DPU_PR_PREFIX DPU_PR_FMT fmt,			\
 				DPU_PR_ARG((name), (id)), ##__VA_ARGS__);	\
 										\
-		dpu_pr_memlog(g_log_obj, name, id, MEMLOG_LEVEL_CAUTION,	\
+		dpu_pr_memlog(usdm_g_log_obj, name, id, MEMLOG_LEVEL_CAUTION,	\
 				fmt, ##__VA_ARGS__);				\
 	} while (0)
 
@@ -173,7 +173,7 @@ extern struct memlog_obj *g_errlog_obj;
 			pr_info(DPU_PR_PREFIX DPU_PR_FMT fmt,			\
 				DPU_PR_ARG((name), (id)), ##__VA_ARGS__);	\
 										\
-		dpu_pr_memlog((g_log_obj), (name), (id), MEMLOG_LEVEL_INFO,	\
+		dpu_pr_memlog((usdm_g_log_obj), (name), (id), MEMLOG_LEVEL_INFO,	\
 				fmt, ##__VA_ARGS__);				\
 	} while (0)
 
@@ -183,7 +183,7 @@ extern struct memlog_obj *g_errlog_obj;
 			pr_debug(DPU_PR_PREFIX DPU_PR_FMT fmt,			\
 				DPU_PR_ARG((name), (id)), ##__VA_ARGS__);	\
 										\
-		dpu_pr_memlog((g_log_obj), (name), (id), MEMLOG_LEVEL_DEBUG,	\
+		dpu_pr_memlog((usdm_g_log_obj), (name), (id), MEMLOG_LEVEL_DEBUG,	\
 				fmt, ##__VA_ARGS__);				\
 	} while (0)
 

@@ -1493,7 +1493,7 @@ int dsim_wr_data_fcmd(struct dsim_device *dsim,
 					msg->tx_len, fcmd->xfer_unit, true);
 }
 
-ssize_t dsim_host_fcmd_transfer(struct mipi_dsi_host *host,
+ssize_t usdm_dsim_host_fcmd_transfer(struct mipi_dsi_host *host,
 			    const struct mipi_dsi_msg *msg)
 {
 	struct dsim_device *dsim = host_to_dsi(host);
@@ -1512,7 +1512,7 @@ ssize_t dsim_host_fcmd_transfer(struct mipi_dsi_host *host,
 
 	return ret;
 }
-EXPORT_SYMBOL(dsim_host_fcmd_transfer);
+EXPORT_SYMBOL(usdm_dsim_host_fcmd_transfer);
 
 static ssize_t dsim_fcmd_write_sysfs_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
@@ -1952,7 +1952,7 @@ err_exit:
 	return ret;
 }
 
-int dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
+int usdm_dsim_host_cmdset_transfer(struct mipi_dsi_host *host,
 			      struct mipi_dsi_msg *msg, int cmd_cnt,
 			      bool wait_vsync, bool wait_fifo)
 {
@@ -1988,7 +1988,7 @@ err_exit:
 
 	return ret;
 }
-EXPORT_SYMBOL(dsim_host_cmdset_transfer);
+EXPORT_SYMBOL(usdm_dsim_host_cmdset_transfer);
 
 static int dsim_write_data(struct dsim_device *dsim, u32 id, unsigned long d0,
 		u32 d1)

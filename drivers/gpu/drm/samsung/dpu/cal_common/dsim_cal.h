@@ -214,7 +214,7 @@ void dsim_reg_set_porch(u32 id, struct dsim_reg_config *config);
 /* DSIM BIST for test */
 void dsim_reg_set_bist(u32 id, bool en, u32 mode);
 
-void dsim_reg_set_cmd_transfer_mode(u32 id, u32 lp);
+void usdm_dsim_reg_set_cmd_transfer_mode(u32 id, u32 lp);
 u32 dsim_reg_get_cmd_tansfer_mode(u32 id);
 
 #if defined(CONFIG_EXYNOS_DMA_DSIMFC)

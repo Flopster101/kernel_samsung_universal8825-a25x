@@ -77,7 +77,7 @@ static ssize_t dp_error_info_store(struct class *dev,
 
 static CLASS_ATTR_RW(dp_error_info);
 
-void secdp_bigdata_init(struct class *dp_class)
+void usdm_secdp_bigdata_init(struct class *dp_class)
 {
 	int ret;
 
@@ -111,7 +111,7 @@ void secdp_bigdata_init(struct class *dp_class)
 	secdp_bigdata_init_error(ERR_LINK_TRAIN, "ERR_LT_TRAIN", 1);
 	secdp_bigdata_init_error(ERR_INF_IRQHPD, "ERR_INF_IRQHPD", 10);
 }
-EXPORT_SYMBOL(secdp_bigdata_init);
+EXPORT_SYMBOL(usdm_secdp_bigdata_init);
 
 static void secdp_bigdata_init_item_str(enum DP_BD_ITEM_LIST item, char *val, int max_len)
 {
@@ -214,7 +214,7 @@ static void secdp_bigdata_save_item_str(enum DP_BD_ITEM_LIST item, char *val)
 	}
 }
 
-void secdp_bigdata_save_item(enum DP_BD_ITEM_LIST item, ...)
+void usdm_secdp_bigdata_save_item(enum DP_BD_ITEM_LIST item, ...)
 {
 	va_list  vl;
 
@@ -242,9 +242,9 @@ void secdp_bigdata_save_item(enum DP_BD_ITEM_LIST item, ...)
 
 	va_end(vl);
 }
-EXPORT_SYMBOL(secdp_bigdata_save_item);
+EXPORT_SYMBOL(usdm_secdp_bigdata_save_item);
 
-void secdp_bigdata_inc_error_cnt(enum DP_BD_ITEM_LIST err)
+void usdm_secdp_bigdata_inc_error_cnt(enum DP_BD_ITEM_LIST err)
 {
 	if (err >= BD_ITEM_MAX || err < 0)
 		return;
@@ -252,9 +252,9 @@ void secdp_bigdata_inc_error_cnt(enum DP_BD_ITEM_LIST err)
 	if (item_to_column[err].data && item_to_column[err].type == ERR)
 		((struct bd_error_data *)item_to_column[err].data)->count++;
 }
-EXPORT_SYMBOL(secdp_bigdata_inc_error_cnt);
+EXPORT_SYMBOL(usdm_secdp_bigdata_inc_error_cnt);
 
-void secdp_bigdata_clr_error_cnt(enum DP_BD_ITEM_LIST err)
+void usdm_secdp_bigdata_clr_error_cnt(enum DP_BD_ITEM_LIST err)
 {
 	if (err >= BD_ITEM_MAX || err < 0)
 		return;
@@ -262,7 +262,7 @@ void secdp_bigdata_clr_error_cnt(enum DP_BD_ITEM_LIST err)
 	if (item_to_column[err].data && item_to_column[err].type == ERR)
 		((struct bd_error_data *)item_to_column[err].data)->count = 0;
 }
-EXPORT_SYMBOL(secdp_bigdata_clr_error_cnt);
+EXPORT_SYMBOL(usdm_secdp_bigdata_clr_error_cnt);
 
 static void secdp_bigdata_save_data(void)
 {
@@ -329,7 +329,7 @@ static int secdp_bigdata_check_err(void)
 	return 0;
 }
 
-void secdp_bigdata_connection(void)
+void usdm_secdp_bigdata_connection(void)
 {
 	int i;
 
@@ -349,16 +349,16 @@ void secdp_bigdata_connection(void)
 			secdp_bigdata_save_item_char(i, 'X');
 			break;
 		case ERR:
-			secdp_bigdata_clr_error_cnt(i);
+			usdm_secdp_bigdata_clr_error_cnt(i);
 			break;
 		default:
 			break;
 		}
 	}
 }
-EXPORT_SYMBOL(secdp_bigdata_connection);
+EXPORT_SYMBOL(usdm_secdp_bigdata_connection);
 
-void secdp_bigdata_disconnection(void)
+void usdm_secdp_bigdata_disconnection(void)
 {
 	if (secdp_bigdata_check_err()) {
 		dp_status = STATUS_ERROR_OCCURRED;
@@ -369,4 +369,4 @@ void secdp_bigdata_disconnection(void)
 		secdp_bigdata_save_data();
 
 }
-EXPORT_SYMBOL(secdp_bigdata_disconnection);
+EXPORT_SYMBOL(usdm_secdp_bigdata_disconnection);

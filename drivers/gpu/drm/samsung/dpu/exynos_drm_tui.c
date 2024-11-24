@@ -36,7 +36,7 @@ void (*tui_free_video_space)(void);
 /* only valid for LCD display crtc */
 static struct drm_crtc *primary_crtc;
 
-bool is_tui_trans(const struct drm_crtc_state *crtc_state)
+bool usdm_is_tui_trans(const struct drm_crtc_state *crtc_state)
 {
 	struct exynos_drm_crtc_state *exynos_crtc_state =
 					to_exynos_crtc_state(crtc_state);
@@ -46,7 +46,7 @@ bool is_tui_trans(const struct drm_crtc_state *crtc_state)
 
 	return exynos_crtc_state->tui_changed;
 }
-EXPORT_SYMBOL(is_tui_trans);
+EXPORT_SYMBOL(usdm_is_tui_trans);
 
 int exynos_drm_atomic_check_tui(struct drm_atomic_state *state)
 {
@@ -123,16 +123,16 @@ free:
 }
 
 /**
- * exynos_atomic_enter_tui - save the current state and disable lcd display
+ * usdm_exynos_atomic_enter_tui - save the current state and disable lcd display
  *
  * Disable display pipeline for lcd crtc, but skip control for the panel,
  * block power and te irq. The clock(disp, int) should be guaranteed for TUI.
  * Duplicate the current atomic state and this state should be restored in
- * exynos_atomic_exit_tui().
+ * usdm_exynos_atomic_exit_tui().
  * See also:
  * drm_atomic_helper_suspend()
  */
-int exynos_atomic_enter_tui(void)
+int usdm_exynos_atomic_enter_tui(void)
 {
 	struct drm_device *dev;
 	struct drm_atomic_state *old_state, *new_state;
@@ -287,9 +287,9 @@ err_dup:
 
 	return ret;
 }
-EXPORT_SYMBOL(exynos_atomic_enter_tui);
+EXPORT_SYMBOL(usdm_exynos_atomic_enter_tui);
 
-int exynos_atomic_exit_tui(void)
+int usdm_exynos_atomic_exit_tui(void)
 {
 	struct drm_device *dev;
 	struct drm_atomic_state *suspend_state;
@@ -401,7 +401,7 @@ err:
 
 	return ret;
 }
-EXPORT_SYMBOL(exynos_atomic_exit_tui);
+EXPORT_SYMBOL(usdm_exynos_atomic_exit_tui);
 
 void exynos_tui_register(struct drm_crtc *crtc)
 {
@@ -411,7 +411,7 @@ void exynos_tui_register(struct drm_crtc *crtc)
 	return;
 }
 
-void exynos_tui_get_resolution(struct resolution_info *res_info)
+void usdm_exynos_tui_get_resolution(struct resolution_info *res_info)
 {
 	struct drm_device *dev;
 	struct drm_modeset_acquire_ctx ctx;
@@ -439,18 +439,18 @@ void exynos_tui_get_resolution(struct resolution_info *res_info)
 
 	DRM_MODESET_LOCK_ALL_END(dev, ctx, ret);
 }
-EXPORT_SYMBOL(exynos_tui_get_resolution);
+EXPORT_SYMBOL(usdm_exynos_tui_get_resolution);
 
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
-void exynos_tui_set_stui_funcs(struct stui_buf_info *(*func1)(void), void (*func2)(void))
+void usdm_exynos_tui_set_stui_funcs(struct stui_buf_info *(*func1)(void), void (*func2)(void))
 {
 	tui_get_buf_info = func1;
 	tui_free_video_space = func2;
 }
-EXPORT_SYMBOL(exynos_tui_set_stui_funcs);
+EXPORT_SYMBOL(usdm_exynos_tui_set_stui_funcs);
 #endif
 
-int exynos_tui_get_panel_info(u64 *buf, int size)
+int usdm_exynos_tui_get_panel_info(u64 *buf, int size)
 {
 	struct dsim_device *dsim_dev = get_dsim_drvdata(0);
 	struct dsim_reg_config *dsim_config = &dsim_dev->config;
@@ -569,4 +569,4 @@ int exynos_tui_get_panel_info(u64 *buf, int size)
 	pr_info("%s -\n", __func__);
 	return 0;
 }
-EXPORT_SYMBOL(exynos_tui_get_panel_info);
+EXPORT_SYMBOL(usdm_exynos_tui_get_panel_info);

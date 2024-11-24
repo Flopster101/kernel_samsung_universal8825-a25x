@@ -37,11 +37,11 @@ static int panel_log_level = 6;
 module_param(panel_log_level, int, 0644);
 MODULE_PARM_DESC(panel_log_level, "log level for panel drv [default : 6]");
 
-int get_panel_log_level(void)
+int usdm_get_panel_log_level(void)
 {
 	return panel_log_level;
 }
-EXPORT_SYMBOL(get_panel_log_level);
+EXPORT_SYMBOL(usdm_get_panel_log_level);
 static int exynos_panel_get_bts_fps(const struct exynos_panel *ctx,
 				     const struct exynos_panel_mode *pmode);
 
@@ -91,7 +91,7 @@ static inline bool is_panel_tui(struct exynos_panel *ctx)
 		ctx->exynos_connector.base.state;
 
 	if (conn_state && conn_state->crtc)
-		return is_tui_trans(conn_state->crtc->state);
+		return usdm_is_tui_trans(conn_state->crtc->state);
 
 	return false;
 }
@@ -171,7 +171,7 @@ static int exynos_panel_read_id(struct exynos_panel *ctx)
 	return 0;
 }
 
-void exynos_panel_reset(struct exynos_panel *ctx)
+void usdm_exynos_panel_reset(struct exynos_panel *ctx)
 {
 	panel_debug(ctx, "+\n");
 
@@ -189,9 +189,9 @@ void exynos_panel_reset(struct exynos_panel *ctx)
 
 	panel_debug(ctx, "-\n");
 }
-EXPORT_SYMBOL(exynos_panel_reset);
+EXPORT_SYMBOL(usdm_exynos_panel_reset);
 
-int exynos_panel_set_power(struct exynos_panel *ctx, bool on)
+int usdm_exynos_panel_set_power(struct exynos_panel *ctx, bool on)
 {
 	int ret;
 
@@ -266,7 +266,7 @@ int exynos_panel_set_power(struct exynos_panel *ctx, bool on)
 
 	return 0;
 }
-EXPORT_SYMBOL(exynos_panel_set_power);
+EXPORT_SYMBOL(usdm_exynos_panel_set_power);
 
 static int exynos_panel_parse_dt(struct exynos_panel *ctx)
 {
@@ -288,7 +288,7 @@ err:
 	return ret;
 }
 
-int exynos_panel_get_modes(struct drm_panel *panel, struct drm_connector *conn)
+int usdm_exynos_panel_get_modes(struct drm_panel *panel, struct drm_connector *conn)
 {
 	struct exynos_panel *ctx =
 		container_of(panel, struct exynos_panel, panel);
@@ -328,16 +328,16 @@ int exynos_panel_get_modes(struct drm_panel *panel, struct drm_connector *conn)
 
 	return i;
 }
-EXPORT_SYMBOL(exynos_panel_get_modes);
+EXPORT_SYMBOL(usdm_exynos_panel_get_modes);
 
-void exynos_panel_set_lp_mode(struct exynos_panel *ctx, const struct exynos_panel_mode *pmode)
+void usdm_exynos_panel_set_lp_mode(struct exynos_panel *ctx, const struct exynos_panel_mode *pmode)
 {
 	if (!ctx->enabled)
 		return;
 
 	panel_info(ctx, "enter %dhz LP mode\n", drm_mode_vrefresh(&pmode->mode));
 }
-EXPORT_SYMBOL(exynos_panel_set_lp_mode);
+EXPORT_SYMBOL(usdm_exynos_panel_set_lp_mode);
 
 static int exynos_get_brightness(struct backlight_device *bl)
 {
@@ -426,7 +426,7 @@ static void exynos_panel_connector_print_state(struct drm_printer *p,
 	drm_printf(p, "\tadjusted_fps: %d\n", exynos_conn_state->adjusted_fps);
 }
 
-int exynos_drm_cmdset_add(struct exynos_panel *ctx, u8 type, size_t size,
+int usdm_exynos_drm_cmdset_add(struct exynos_panel *ctx, u8 type, size_t size,
 			  const u8 *data)
 {
 	u8 *buf;
@@ -457,9 +457,9 @@ int exynos_drm_cmdset_add(struct exynos_panel *ctx, u8 type, size_t size,
 
 	return 0;
 }
-EXPORT_SYMBOL(exynos_drm_cmdset_add);
+EXPORT_SYMBOL(usdm_exynos_drm_cmdset_add);
 
-int exynos_drm_cmdset_cleanup(struct exynos_panel *ctx)
+int usdm_exynos_drm_cmdset_cleanup(struct exynos_panel *ctx)
 {
 	int i;
 	int msg_total = ctx->cmdset_msg_total;
@@ -480,9 +480,9 @@ int exynos_drm_cmdset_cleanup(struct exynos_panel *ctx)
 
 	return 0;
 }
-EXPORT_SYMBOL(exynos_drm_cmdset_cleanup);
+EXPORT_SYMBOL(usdm_exynos_drm_cmdset_cleanup);
 
-int exynos_drm_cmdset_flush(struct exynos_panel *ctx, bool wait_vsync,
+int usdm_exynos_drm_cmdset_flush(struct exynos_panel *ctx, bool wait_vsync,
 							bool wait_fifo)
 {
 	int ret;
@@ -498,17 +498,17 @@ int exynos_drm_cmdset_flush(struct exynos_panel *ctx, bool wait_vsync,
 	if (dsi->mode_flags & MIPI_DSI_MODE_LPM)
 		msg_head->flags |= MIPI_DSI_MSG_USE_LPM;
 
-	ret = dsim_host_cmdset_transfer(dsi->host, ctx->msg, ctx->cmdset_msg_total, wait_vsync, wait_fifo);
+	ret = usdm_dsim_host_cmdset_transfer(dsi->host, ctx->msg, ctx->cmdset_msg_total, wait_vsync, wait_fifo);
 	if (ret < 0)
 		panel_err(ctx, "failed to tx command set data\n");
 
-	ret = exynos_drm_cmdset_cleanup(ctx);
+	ret = usdm_exynos_drm_cmdset_cleanup(ctx);
 	if (ret < 0)
 		panel_err(ctx, "failed to cleanup command set data\n");
 
 	return ret;
 }
-EXPORT_SYMBOL(exynos_drm_cmdset_flush);
+EXPORT_SYMBOL(usdm_exynos_drm_cmdset_flush);
 
 static int
 exynos_panel_connector_set_property(struct exynos_drm_connector *exynos_conn,
@@ -526,7 +526,7 @@ exynos_panel_connector_get_property(struct exynos_drm_connector *exynos_conn,
 {
 	struct exynos_panel *ctx = exynos_connector_to_panel(exynos_conn);
 	const struct exynos_drm_connector_properties *p =
-		exynos_drm_connector_get_properties(&ctx->exynos_connector);
+		usdm_exynos_drm_connector_get_properties(&ctx->exynos_connector);
 
 	if (property == p->max_luminance)
 		*val = ctx->desc->max_luminance;
@@ -794,7 +794,7 @@ static int exynos_panel_attach_lp_mode(struct exynos_drm_connector *exynos_conn,
 				       const struct exynos_panel_desc *desc)
 {
 	struct exynos_drm_connector_properties *p =
-		exynos_drm_connector_get_properties(exynos_conn);
+		usdm_exynos_drm_connector_get_properties(exynos_conn);
 	struct drm_mode_modeinfo *umodes;
 	struct drm_property_blob *blob;
 	const struct exynos_panel_mode *lp_modes = desc->lp_modes;
@@ -832,7 +832,7 @@ err:
 static int exynos_panel_attach_properties(struct exynos_panel *ctx)
 {
 	const struct exynos_drm_connector_properties *p =
-		exynos_drm_connector_get_properties(&ctx->exynos_connector);
+		usdm_exynos_drm_connector_get_properties(&ctx->exynos_connector);
 	struct drm_mode_object *obj = &ctx->exynos_connector.base.base;
 	const struct exynos_panel_desc *desc = ctx->desc;
 	int ret = 0;
@@ -863,7 +863,7 @@ static int exynos_panel_bridge_attach(struct drm_bridge *bridge,
 	struct drm_connector *connector = &ctx->exynos_connector.base;
 	int ret;
 
-	ret = exynos_drm_connector_init(bridge->dev, &ctx->exynos_connector,
+	ret = usdm_exynos_drm_connector_init(bridge->dev, &ctx->exynos_connector,
 				 &exynos_panel_connector_funcs,
 				 DRM_MODE_CONNECTOR_DSI);
 	if (ret) {
@@ -931,8 +931,8 @@ static void exynos_panel_enable(struct drm_bridge *bridge)
 	}
 
 	if (ctx->desc->lp11_reset) {
-		exynos_panel_reset(ctx);
-		dsim_atomic_activate(bridge->encoder);
+		usdm_exynos_panel_reset(ctx);
+		usdm_dsim_atomic_activate(bridge->encoder);
 	}
 
 	if (drm_panel_enable(&ctx->panel))
@@ -1278,7 +1278,7 @@ void destroy_dsim_fast_cmd(struct dsim_fcmd *fcmd)
 	kfree(fcmd);
 }
 
-int drm_mipi_fcmd_write(void *_ctx, const u8 *payload, int size, u32 align)
+int usdm_drm_mipi_fcmd_write(void *_ctx, const u8 *payload, int size, u32 align)
 {
 	struct exynos_panel *ctx = (struct exynos_panel *)_ctx;
 	struct mipi_dsi_device *dsi;
@@ -1317,7 +1317,7 @@ int drm_mipi_fcmd_write(void *_ctx, const u8 *payload, int size, u32 align)
 		goto out;
 	}
 
-	ret = dsim_host_fcmd_transfer(dsi->host, &fcmd->msg);
+	ret = usdm_dsim_host_fcmd_transfer(dsi->host, &fcmd->msg);
 	if (ret < 0)
 		panel_err(ctx, "failed to transfer fast-command\n");
 
@@ -1327,7 +1327,7 @@ out:
 
 	return ret;
 }
-EXPORT_SYMBOL(drm_mipi_fcmd_write);
+EXPORT_SYMBOL(usdm_drm_mipi_fcmd_write);
 #endif
 
 static ssize_t active_off_show(struct device *dev,
@@ -1361,7 +1361,7 @@ static void notify_lp11_reset(struct exynos_panel *ctx, bool en)
 	dsim->lp11_reset = en;
 }
 
-int exynos_panel_probe(struct mipi_dsi_device *dsi)
+int usdm_exynos_panel_probe(struct mipi_dsi_device *dsi)
 {
 	struct device *dev = &dsi->dev;
 	struct exynos_panel *ctx;
@@ -1433,9 +1433,9 @@ err_panel:
 
 	return ret;
 }
-EXPORT_SYMBOL(exynos_panel_probe);
+EXPORT_SYMBOL(usdm_exynos_panel_probe);
 
-int exynos_panel_remove(struct mipi_dsi_device *dsi)
+int usdm_exynos_panel_remove(struct mipi_dsi_device *dsi)
 {
 	struct exynos_panel *ctx = mipi_dsi_get_drvdata(dsi);
 
@@ -1447,7 +1447,7 @@ int exynos_panel_remove(struct mipi_dsi_device *dsi)
 
 	return 0;
 }
-EXPORT_SYMBOL(exynos_panel_remove);
+EXPORT_SYMBOL(usdm_exynos_panel_remove);
 
 MODULE_AUTHOR("Jiun Yu <jiun.yu@samsung.com>");
 MODULE_DESCRIPTION("MIPI-DSI based Samsung common panel driver");

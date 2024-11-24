@@ -44,13 +44,13 @@ int drm_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, str
 int exynos_display_mode_from_panel_display_mode(struct panel_display_mode *pdm, struct exynos_display_mode *edm);
 int exynos_panel_mode_from_panel_display_mode(struct panel_display_mode *pdm, struct exynos_panel_mode *epm);
 void exynos_drm_mode_set_name(struct drm_display_mode *mode, int refresh_mode);
-struct panel_display_mode *exynos_panel_find_panel_mode(struct panel_display_modes *pdms,
+struct panel_display_mode *usdm_exynos_panel_find_panel_mode(struct panel_display_modes *pdms,
 		const struct drm_display_mode *pmode);
-struct exynos_panel_mode *exynos_panel_mode_create(struct exynos_panel *ctx);
-void exynos_panel_mode_destroy(struct exynos_panel *ctx, struct exynos_panel_mode *mode);
-struct exynos_panel_desc *exynos_panel_desc_create(struct exynos_panel *ctx);
-void exynos_panel_desc_destroy(struct exynos_panel *ctx, struct exynos_panel_desc *desc);
+struct exynos_panel_mode *usdm_exynos_panel_mode_create(struct exynos_panel *ctx);
+void usdm_exynos_panel_mode_destroy(struct exynos_panel *ctx, struct exynos_panel_mode *mode);
+struct exynos_panel_desc *usdm_exynos_panel_desc_create(struct exynos_panel *ctx);
+void usdm_exynos_panel_desc_destroy(struct exynos_panel *ctx, struct exynos_panel_desc *desc);
 struct exynos_panel_desc *
-exynos_panel_desc_create_from_panel_display_modes(struct exynos_panel *ctx,
+usdm_exynos_panel_desc_create_from_panel_display_modes(struct exynos_panel *ctx,
 		struct panel_display_modes *pdms);
 #endif /* __EXYNOS_PANEL_MODES_H__ */

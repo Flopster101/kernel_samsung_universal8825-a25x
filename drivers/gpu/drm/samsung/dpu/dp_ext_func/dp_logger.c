@@ -48,20 +48,20 @@ void dp_logger_print_date_time(void)
 	snprintf(tmp, sizeof(tmp), "@%02d-%02d %02d:%02d:%02d.%03lu", tm.tm_mon + 1, tm.tm_mday,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, ts.tv_nsec / 1000000);
 
-	dp_logger_print("%s\n", tmp);
+	usdm_dp_logger_print("%s\n", tmp);
 }
 
 /* set max log count, if count is -1, no limit */
-void dp_logger_set_max_count(int count)
+void usdm_dp_logger_set_max_count(int count)
 {
 	log_max_count = count;
 
 	dp_logger_print_date_time();
 	log_count = PRINT_DATE_FREQ;
 }
-EXPORT_SYMBOL(dp_logger_set_max_count);
+EXPORT_SYMBOL(usdm_dp_logger_set_max_count);
 
-void dp_logger_print(const char *fmt, ...)
+void usdm_dp_logger_print(const char *fmt, ...)
 {
 	int len;
 	va_list args;
@@ -103,9 +103,9 @@ void dp_logger_print(const char *fmt, ...)
 	memcpy(log_buf + curpos, buf, len);
 	g_curpos += len;
 }
-EXPORT_SYMBOL(dp_logger_print);
+EXPORT_SYMBOL(usdm_dp_logger_print);
 
-void dp_logger_hex_dump(void *buf, void *pref, size_t size)
+void usdm_dp_logger_hex_dump(void *buf, void *pref, size_t size)
 {
 	uint8_t *ptr = buf;
 	size_t i;
@@ -125,7 +125,7 @@ void dp_logger_hex_dump(void *buf, void *pref, size_t size)
 		len = snprintf(ptmp, 4, "%02x ", *ptr++);
 		ptmp = ptmp + len;
 		if (((i+1)%16) == 0) {
-			dp_logger_print("%s%s\n", pref, tmp);
+			usdm_dp_logger_print("%s%s\n", pref, tmp);
 			ptmp = tmp;
 		}
 	}
@@ -133,10 +133,10 @@ void dp_logger_hex_dump(void *buf, void *pref, size_t size)
 	if (i % 16) {
 		len = ptmp - tmp;
 		tmp[len] = 0x0;
-		dp_logger_print("%s%s\n", pref, tmp);
+		usdm_dp_logger_print("%s%s\n", pref, tmp);
 	}
 }
-EXPORT_SYMBOL(dp_logger_hex_dump);
+EXPORT_SYMBOL(usdm_dp_logger_hex_dump);
 
 static ssize_t dp_logger_read(struct file *file, char __user *buf, size_t len, loff_t *offset)
 {
@@ -170,7 +170,7 @@ static const struct proc_ops dp_logger_ops = {
 	.proc_read = dp_logger_read,
 };
 
-int dp_logger_init(void)
+int usdm_dp_logger_init(void)
 {
 	struct proc_dir_entry *entry;
 
@@ -185,11 +185,11 @@ int dp_logger_init(void)
 
 	proc_set_size(entry, BUF_SIZE);
 	is_dp_logger_init = 1;
-	dp_logger_print("dp logger init ok\n");
+	usdm_dp_logger_print("dp logger init ok\n");
 
 	return 0;
 }
-EXPORT_SYMBOL(dp_logger_init);
+EXPORT_SYMBOL(usdm_dp_logger_init);
 
 MODULE_DESCRIPTION("SEC Displaport logger");
 MODULE_LICENSE("GPL");
