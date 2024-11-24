@@ -2631,7 +2631,7 @@ static int fts_parse_dt(struct i2c_client *client)
 #endif
 
 #if defined(CONFIG_EXYNOS_DECON_FB)
-	if (sec_current_device == SEC_A25)
+	if (!sec_needs_decon)
 		connected = usdm_get_lcd_info("connected");
 	else
 		connected = decon_get_lcd_info("connected");
@@ -2649,7 +2649,7 @@ static int fts_parse_dt(struct i2c_client *client)
 
 	input_info(true, &client->dev, "%s: lcd is connected\n", __func__);
 
-	if (sec_current_device == SEC_A25)
+	if (!sec_needs_decon)
 		lcdtype = usdm_get_lcd_info("id");
 	else
 		lcdtype = decon_get_lcd_info("id");
