@@ -26,6 +26,7 @@
 #include <linux/dma-buf.h>
 #include <linux/dma-fence.h>
 #include <linux/sync_file.h>
+#include <linux/sec_detect.h>
 
 #include <soc/samsung/exynos-smc.h>
 
@@ -2778,7 +2779,10 @@ static void sc_vb2_buf_queue(struct vb2_buffer *vb)
 	int ret;
 
 	if (sc_buf->tws) {
-		ret = exynos_dpuf_set_votf(sc_buf->tws->sink.dpu_dma_idx, true);
+		if (!sec_needs_decon)
+			ret = usdm_exynos_dpuf_set_votf(sc_buf->tws->sink.dpu_dma_idx, true);
+		else
+			ret = decon_exynos_dpuf_set_votf(sc_buf->tws->sink.dpu_dma_idx, true);
 		if (ret < 0) {
 			dev_err(ctx->sc_dev->dev,
 				"fail to enable sink device of vOTF(err:%d)\n", ret);
@@ -3416,7 +3420,10 @@ static bool sc_clear_votf(struct sc_tws *tws)
 	if (!ret)
 		return ret;
 
-	exynos_dpuf_set_votf(tws->sink.dpu_dma_idx, false);
+	if (sec_current_device == SEC_A25)
+		usdm_exynos_dpuf_set_votf(tws->sink.dpu_dma_idx, false);
+	else
+		decon_exynos_dpuf_set_votf(tws->sink.dpu_dma_idx, false);
 
 	return true;
 }
@@ -4201,8 +4208,10 @@ static void sc_m2m_device_run(void *priv)
 			list_add_tail(&dst_sc_buf->tws->node, &sc->tws_avail_list);
 			spin_unlock_irqrestore(&sc->tws_lock, flags);
 
-			exynos_dpuf_set_votf(dst_sc_buf->tws->sink.dpu_dma_idx, false);
-
+			if (sec_current_device == SEC_A25)
+				usdm_exynos_dpuf_set_votf(dst_sc_buf->tws->sink.dpu_dma_idx, false);
+			else
+				decon_exynos_dpuf_set_votf(dst_sc_buf->tws->sink.dpu_dma_idx, false);
 			dst_sc_buf->tws = NULL;
 		}
 
