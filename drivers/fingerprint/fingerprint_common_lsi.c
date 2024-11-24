@@ -39,6 +39,7 @@ int spi_clk_register(struct spi_clk_setting *clk_setting, struct device *dev)
 
 	return 0;
 }
+EXPORT_SYMBOL(spi_clk_register);
 
 int spi_clk_unregister(struct spi_clk_setting *clk_setting)
 {
@@ -49,6 +50,7 @@ int spi_clk_unregister(struct spi_clk_setting *clk_setting)
 
 	return 0;
 }
+EXPORT_SYMBOL(spi_clk_unregister);
 
 int spi_clk_enable(struct spi_clk_setting *clk_setting)
 {
@@ -79,6 +81,7 @@ int spi_clk_enable(struct spi_clk_setting *clk_setting)
 
 	return rc;
 }
+EXPORT_SYMBOL(spi_clk_enable);
 
 int spi_clk_disable(struct spi_clk_setting *clk_setting)
 {
@@ -95,6 +98,7 @@ int spi_clk_disable(struct spi_clk_setting *clk_setting)
 
 	return 0;
 }
+EXPORT_SYMBOL(spi_clk_disable);
 
 int cpu_speedup_enable(struct boosting_config *boosting)
 {
@@ -122,6 +126,7 @@ int cpu_speedup_enable(struct boosting_config *boosting)
 
 	return retval;
 }
+EXPORT_SYMBOL(cpu_speedup_enable);
 
 int cpu_speedup_disable(struct boosting_config *boosting)
 {
@@ -148,3 +153,4 @@ int cpu_speedup_disable(struct boosting_config *boosting)
 
 	return retval;
 }
+EXPORT_SYMBOL(cpu_speedup_disable);

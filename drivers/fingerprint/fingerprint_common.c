@@ -1,5 +1,8 @@
 #include "fingerprint_common.h"
 
+struct debug_logger *g_logger;
+EXPORT_SYMBOL(g_logger);
+
 void set_sensor_type(const int type_value, int *result)
 {
 	if (type_value >= SENSOR_OOO) {
@@ -16,17 +19,20 @@ void set_sensor_type(const int type_value, int *result)
 		*result = SENSOR_UNKNOWN;
 	}
 }
+EXPORT_SYMBOL(set_sensor_type);
 
 void enable_fp_debug_timer(struct debug_logger *logger)
 {
 	mod_timer(&logger->dbg_timer, round_jiffies_up(jiffies + DEBUG_TIMER_SEC));
 }
+EXPORT_SYMBOL(enable_fp_debug_timer);
 
 void disable_fp_debug_timer(struct debug_logger *logger)
 {
 	del_timer_sync(&logger->dbg_timer);
 	cancel_work_sync(&logger->work_debug);
 }
+EXPORT_SYMBOL(disable_fp_debug_timer);
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
 void timer_func(unsigned long ptr)
@@ -57,6 +63,7 @@ int set_fp_debug_timer(struct debug_logger *logger,
 
 	return rc;
 }
+EXPORT_SYMBOL(set_fp_debug_timer);
 
 void set_delay_in_spi_transfer(struct spi_transfer *xfer, unsigned int usec)
 {
@@ -67,3 +74,5 @@ void set_delay_in_spi_transfer(struct spi_transfer *xfer, unsigned int usec)
 	xfer->delay_usecs = usec;
 #endif
 }
+
+MODULE_LICENSE("GPL");
