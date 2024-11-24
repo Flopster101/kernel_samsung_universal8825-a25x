@@ -2682,7 +2682,7 @@ int decon_exynos_panel_probe(struct mipi_dsi_device *dsi)
 	int ret = 0;
 
 	if (sec_needs_decon) {
-		printk(KERN_INFO "%s Initialized mcd common panel driver for decon\n", sec_detect_label);
+		SEC_DETECT_LOG("Initialized mcd common panel driver for decon\n");
 		ctx = devm_kzalloc(dev, sizeof(struct exynos_panel), GFP_KERNEL);
 		if (!ctx)
 			return -ENOMEM;

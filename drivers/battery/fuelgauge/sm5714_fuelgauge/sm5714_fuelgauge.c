@@ -3210,11 +3210,11 @@ static struct platform_driver sm5714_fuelgauge_driver = {
 static int __init sm5714_fuelgauge_init(void)
 {
 	if (sec_current_device != SEC_A25) {
-		printk(KERN_INFO "%s Initializing sm5714 fuelgauge driver\n", sec_detect_label);
+		SEC_DETECT_LOG("Initializing sm5714 fuelgauge driver\n");
 		pr_info("%s:\n", __func__);
 		return platform_driver_register(&sm5714_fuelgauge_driver);
 	} else {
-		printk(KERN_INFO "%s Skipped sm5714 fuelgauge driver\n", sec_detect_label);
+		SEC_DETECT_LOG("Skipped sm5714 fuelgauge driver\n");
 		return 0;
 	}
 }
