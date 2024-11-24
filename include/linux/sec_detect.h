@@ -16,7 +16,7 @@
 #ifndef _LINUX_SEC_H
 #define _LINUX_SEC_H
 #include <linux/types.h>
-static const char *sec_detect_label = "sec_detect: ";
+#define SEC_DETECT_LOG(fmt, ...) printk(KERN_INFO "sec_detect: " fmt, ##__VA_ARGS__)
 
 enum SEC_devices {
     DEVICE_UNKNOWN = -1,

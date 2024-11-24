@@ -7671,7 +7671,7 @@ static int __init panel_drv_init(void)
 	int ret;
 
 	if (!sec_needs_decon) {
-		printk(KERN_INFO "%s Initialized USDM panel driver\n", sec_detect_label);
+		SEC_DETECT_LOG("Initialized USDM panel driver\n");
 		panel_info("++\n");
 		ret = panel_create_lcd_class();
 		if (ret < 0) {
@@ -7697,7 +7697,7 @@ static int __init panel_drv_init(void)
 
 		return ret;
 	} else {
-		printk(KERN_INFO "%s Skipped USDM panel driver\n", sec_detect_label);
+		SEC_DETECT_LOG("Skipped USDM panel driver\n");
 		return 0;
 	}
 }
