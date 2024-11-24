@@ -179,7 +179,7 @@ struct panel_adapter_funcs {
 	int (*dpu_register_dump)(void *ctx);
 	int (*dpu_event_log_print)(void *ctx);
 	int (*emergency_off)(void *ctx);
-#if defined(CONFIG_PANEL_FREQ_HOP)
+#if defined(CONFIG_PANEL_FREQ_HOP) || defined(CONFIG_USDM_PANEL_FREQ_HOP) || defined(CONFIG_USDM_SDP_ADAPTIVE_MIPI) || defined(CONFIG_USDM_ADAPTIVE_MIPI)
 	int (*set_freq_hop)(void *ctx, struct freq_hop_param *param);
 #endif
 };
@@ -792,7 +792,7 @@ static inline int panel_get_rcd_info(struct panel_device *panel, void *arg) { re
 				ktime_to_ms(ktime_sub(ktime_get(), _start_))); \
 	} while (0)
 
-#define PANEL_DRV_NAME "panel-drv"
+#define PANEL_DRV_NAME "panel-drv-decon"
 
 #define PANEL_IOC_BASE	'P'
 

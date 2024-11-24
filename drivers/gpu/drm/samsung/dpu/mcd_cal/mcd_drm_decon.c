@@ -13,7 +13,7 @@
 #include <drm/drm_mode.h>
 #include <drm/drm_modes.h>
 
-int mcd_decon_get_bts_fps(const struct drm_display_mode *mode)
+int usdm_mcd_decon_get_bts_fps(const struct drm_display_mode *mode)
 {
 	unsigned int num, den, vfp;
 
@@ -34,4 +34,4 @@ int mcd_decon_get_bts_fps(const struct drm_display_mode *mode)
 
 	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
 }
-EXPORT_SYMBOL(mcd_decon_get_bts_fps);
+EXPORT_SYMBOL(usdm_mcd_decon_get_bts_fps);

@@ -101,19 +101,19 @@ module_param(forced_bist_en, int, 0644);
 static struct dp_debug_param g_dp_debug_param;
 
 extern enum hdcp22_auth_def hdcp22_auth_state;
-struct dp_device *dp_drvdata;
-EXPORT_SYMBOL(dp_drvdata);
+struct dp_device *usdm_dp_drvdata;
+EXPORT_SYMBOL(usdm_dp_drvdata);
 
 extern u32 phy_eq_hbr0_1[phy_table][4][4][5];
 extern u32 phy_eq_hbr2_3[phy_table][4][4][5];
 
 #if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DISPLAYPORT)
-struct blocking_notifier_head dp_ado_notifier_head =
-		BLOCKING_NOTIFIER_INIT(dp_ado_notifier_head);
-EXPORT_SYMBOL(dp_ado_notifier_head);
+struct blocking_notifier_head usdm_dp_ado_notifier_head =
+		BLOCKING_NOTIFIER_INIT(usdm_dp_ado_notifier_head);
+EXPORT_SYMBOL(usdm_dp_ado_notifier_head);
 #endif
 
-void dp_hdcp22_enable(u32 en);
+void usdm_dp_hdcp22_enable(u32 en);
 #if IS_ENABLED(CONFIG_EXYNOS_HDCP2)
 extern void dp_register_func_for_hdcp22(void (*func0)(u32 en),
 		int (*func1)(u32 address, u32 length, u8 *data),
@@ -547,8 +547,8 @@ static int dp_full_link_training(struct dp_device *dp)
 	}
 
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-	secdp_bigdata_save_item(BD_MAX_LANE_COUNT, lane_cnt);
-	secdp_bigdata_save_item(BD_MAX_LINK_RATE, link_rate);
+	usdm_secdp_bigdata_save_item(BD_MAX_LANE_COUNT, lane_cnt);
+	usdm_secdp_bigdata_save_item(BD_MAX_LINK_RATE, link_rate);
 #endif
 	if (link_rate > LINK_RATE_5_4Gbps) {
 		dp_info(dp, "HBR3 not support. reduce to HBR2\n");
@@ -939,9 +939,9 @@ tr_success:
 	dp_info(dp, "LANE_SET [%d] : %02x %02x %02x %02x\n",
 			eq_training_retry_no, eq_val[0], eq_val[1], eq_val[2], eq_val[3]);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-	secdp_bigdata_clr_error_cnt(ERR_LINK_TRAIN);
-	secdp_bigdata_save_item(BD_CUR_LANE_COUNT, lane_cnt);
-	secdp_bigdata_save_item(BD_CUR_LINK_RATE, link_rate);
+	usdm_secdp_bigdata_clr_error_cnt(ERR_LINK_TRAIN);
+	usdm_secdp_bigdata_save_item(BD_CUR_LANE_COUNT, lane_cnt);
+	usdm_secdp_bigdata_save_item(BD_CUR_LINK_RATE, link_rate);
 #endif
 #ifdef FEATURE_USE_DRM_EDID_PARSER
 	dp->cur_link_rate = link_rate;
@@ -962,7 +962,7 @@ static int dp_check_dfp_type(struct dp_device *dp)
 		port_type = DFP_TYPE_OTHERS;
 	dp_info(dp, "DFP type: %s(0x%X)\n", dfp[port_type], val);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-	secdp_bigdata_save_item(BD_ADAPTER_TYPE, dfp[port_type]);
+	usdm_secdp_bigdata_save_item(BD_ADAPTER_TYPE, dfp[port_type]);
 #endif
 
 	return port_type;
@@ -997,8 +997,8 @@ static int dp_read_branch_revision(struct dp_device *dp)
 		dp->sink_info.sw_ver[0] = val[1];
 		dp->sink_info.sw_ver[1] = val[2];
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_save_item(BD_ADAPTER_HWID, val[0]);
-		secdp_bigdata_save_item(BD_ADAPTER_FWVER, (val[1] << 8) | val[2]);
+		usdm_secdp_bigdata_save_item(BD_ADAPTER_HWID, val[0]);
+		usdm_secdp_bigdata_save_item(BD_ADAPTER_FWVER, (val[1] << 8) | val[2]);
 #endif
 	}
 
@@ -1094,7 +1094,7 @@ static int dp_link_training(struct dp_device *dp)
 		dp_err(dp, "failed to update edid\n");
 		//dp_debug_dump();
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-			secdp_bigdata_inc_error_cnt(ERR_EDID);
+			usdm_secdp_bigdata_inc_error_cnt(ERR_EDID);
 #endif
 	}
 
@@ -1223,7 +1223,7 @@ void dp_on_by_hpd_high(struct dp_device *dp)
 		dp_wait_decon_run(dp, 3000);
 
 #if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DISPLAYPORT)
-		blocking_notifier_call_chain(&dp_ado_notifier_head,
+		blocking_notifier_call_chain(&usdm_dp_ado_notifier_head,
 			(unsigned long)edid_audio_informs(dp), NULL);
 #endif
 	}
@@ -1241,7 +1241,7 @@ void dp_off_by_hpd_low(struct dp_device *dp)
 		|| dp->state == DP_STATE_INIT) {
 		dp_info(dp, "%s state on or init\n", __func__);
 #if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DISPLAYPORT)
-		blocking_notifier_call_chain(&dp_ado_notifier_head,
+		blocking_notifier_call_chain(&usdm_dp_ado_notifier_head,
 				(unsigned long)-1, NULL);
 		dp_info(dp, "audio info = -1\n");
 		dp_wait_audio_off_change(dp, 5000);
@@ -1285,7 +1285,7 @@ void dp_off_by_hpd_low(struct dp_device *dp)
 #endif
 		}
 #if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DISPLAYPORT)
-		blocking_notifier_call_chain(&dp_ado_notifier_head,
+		blocking_notifier_call_chain(&usdm_dp_ado_notifier_head,
 				(unsigned long)-1, NULL);
 		dp_info(dp, "audio info = -1\n");
 		dp_wait_audio_off_change(dp, 5000);
@@ -1324,7 +1324,7 @@ void dp_hpd_changed(struct dp_device *dp,
 	int ret = 0;
 
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-	dp_logger_set_max_count(500);
+	usdm_dp_logger_set_max_count(500);
 #endif
 	mutex_lock(&dp->hpd_lock);
 	if (dp->hpd_current_state == state) {
@@ -1813,12 +1813,12 @@ static void dp_hpd_irq_work(struct work_struct *work)
 			dp_info(dp, "link training in HPD IRQ work2\n");
 
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-			secdp_bigdata_inc_error_cnt(ERR_INF_IRQHPD);
+			usdm_secdp_bigdata_inc_error_cnt(ERR_INF_IRQHPD);
 #endif
 #if IS_ENABLED(CONFIG_EXYNOS_HDCP2)
 			hdcp_dplink_set_reauth();
 #endif
-			dp_hdcp22_enable(0);
+			usdm_dp_hdcp22_enable(0);
 
 			dp_link_training(dp);
 			queue_delayed_work(dp->hdcp2_wq,
@@ -1868,7 +1868,7 @@ static void dp_hpd_irq_work(struct work_struct *work)
 		if (dp_check_dpcd_lane_status(dp, val[2], val[3], val[4]) != 0) {
 			dp_info(dp, "link training in HPD IRQ work1\n");
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-			secdp_bigdata_inc_error_cnt(ERR_INF_IRQHPD);
+			usdm_secdp_bigdata_inc_error_cnt(ERR_INF_IRQHPD);
 #endif
 			dp_link_training(dp);
 
@@ -2233,7 +2233,7 @@ static int dp_set_hdr_infoframe(struct exynos_hdr_static_info *hdr_info)
 	return 0;
 }
 #endif
-int dp_audio_config(struct dp_audio_config_data *audio_config_data)
+int usdm_dp_audio_config(struct dp_audio_config_data *audio_config_data)
 {
 	struct dp_device *dp = get_dp_drvdata();
 	int ret = 0;
@@ -2259,11 +2259,11 @@ int dp_audio_config(struct dp_audio_config_data *audio_config_data)
 			int bit[] = {16, 20, 24};
 			int fs[] = {32000, 44100, 48000, 88200, 96000, 176400, 192000};
 
-			secdp_bigdata_save_item(BD_AUD_CH, audio_config_data->audio_channel_cnt);
+			usdm_secdp_bigdata_save_item(BD_AUD_CH, audio_config_data->audio_channel_cnt);
 			if (audio_config_data->audio_fs >= 0 && audio_config_data->audio_fs < 7)
-				secdp_bigdata_save_item(BD_AUD_FREQ, fs[audio_config_data->audio_fs]);
+				usdm_secdp_bigdata_save_item(BD_AUD_FREQ, fs[audio_config_data->audio_fs]);
 			if (audio_config_data->audio_bit >= 0 && audio_config_data->audio_bit < 3)
-				secdp_bigdata_save_item(BD_AUD_BIT, bit[audio_config_data->audio_bit]);
+				usdm_secdp_bigdata_save_item(BD_AUD_BIT, bit[audio_config_data->audio_bit]);
 		}
 #endif
 
@@ -2285,7 +2285,7 @@ int dp_audio_config(struct dp_audio_config_data *audio_config_data)
 
 	return ret;
 }
-EXPORT_SYMBOL(dp_audio_config);
+EXPORT_SYMBOL(usdm_dp_audio_config);
 
 void dp_audio_bist_config(struct dp_device *dp,
 		struct dp_audio_config_data audio_config_data)
@@ -2297,7 +2297,7 @@ void dp_audio_bist_config(struct dp_device *dp,
 	dp_set_audio_infoframe(dp, &audio_config_data);
 }
 
-int dp_dpcd_read_for_hdcp22(u32 address, u32 length, u8 *data)
+int usdm_dp_dpcd_read_for_hdcp22(u32 address, u32 length, u8 *data)
 {
 	struct dp_device *dp = get_dp_drvdata();
 	int ret;
@@ -2310,7 +2310,7 @@ int dp_dpcd_read_for_hdcp22(u32 address, u32 length, u8 *data)
 	return ret;
 }
 
-int dp_dpcd_write_for_hdcp22(u32 address, u32 length, u8 *data)
+int usdm_dp_dpcd_write_for_hdcp22(u32 address, u32 length, u8 *data)
 {
 	struct dp_device *dp = get_dp_drvdata();
 	int ret;
@@ -2323,7 +2323,7 @@ int dp_dpcd_write_for_hdcp22(u32 address, u32 length, u8 *data)
 	return ret;
 }
 
-void dp_hdcp22_enable(u32 en)
+void usdm_dp_hdcp22_enable(u32 en)
 {
 	if (en) {
 		dp_reg_set_hdcp22_system_enable(1);
@@ -2335,9 +2335,9 @@ void dp_hdcp22_enable(u32 en)
 		dp_reg_set_hdcp22_encryption_enable(0);
 	}
 }
-EXPORT_SYMBOL(dp_hdcp22_enable);
-EXPORT_SYMBOL(dp_dpcd_write_for_hdcp22);
-EXPORT_SYMBOL(dp_dpcd_read_for_hdcp22);
+EXPORT_SYMBOL(usdm_dp_hdcp22_enable);
+EXPORT_SYMBOL(usdm_dp_dpcd_write_for_hdcp22);
+EXPORT_SYMBOL(usdm_dp_dpcd_read_for_hdcp22);
 
 static void dp_hdcp13_run(struct work_struct *work)
 {
@@ -2373,7 +2373,7 @@ static void dp_hdcp22_run(struct work_struct *work)
 	ret = dp_hdcp22_authenticate();
 	if (ret) {
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_inc_error_cnt(ERR_HDCP_AUTH);
+		usdm_secdp_bigdata_inc_error_cnt(ERR_HDCP_AUTH);
 #endif
 		goto exit_hdcp;
 	}
@@ -2383,7 +2383,7 @@ static void dp_hdcp22_run(struct work_struct *work)
 		goto exit_hdcp;
 	}
 
-	dp_dpcd_read_for_hdcp22(DPCD_HDCP22_RX_INFO, 2, val);
+	usdm_dp_dpcd_read_for_hdcp22(DPCD_HDCP22_RX_INFO, 2, val);
 	dp_info(dp, "HDCP2.2 rx_info: 0:0x%X, 8:0x%X\n", val[1], val[0]);
 
 exit_hdcp:
@@ -2409,7 +2409,7 @@ static int dp_check_hdcp_version(struct dp_device *dp)
 	else
 		ret = HDCP_VERSION_1_3;
 #endif
-	dp_dpcd_read_for_hdcp22(DPCD_HDCP22_RX_CAPS, DPCD_HDCP22_RX_CAPS_LENGTH, val);
+	usdm_dp_dpcd_read_for_hdcp22(DPCD_HDCP22_RX_CAPS, DPCD_HDCP22_RX_CAPS_LENGTH, val);
 
 	for (i = 0; i < DPCD_HDCP22_RX_CAPS_LENGTH; i++)
 		rx_caps |= (u32)val[i] << ((DPCD_HDCP22_RX_CAPS_LENGTH - (i + 1)) * 8);
@@ -2425,9 +2425,9 @@ static int dp_check_hdcp_version(struct dp_device *dp)
 	}
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
 	if (ret == HDCP_VERSION_2_2)
-		secdp_bigdata_save_item(BD_HDCP_VER, "hdcp2");
+		usdm_secdp_bigdata_save_item(BD_HDCP_VER, "hdcp2");
 	else if (ret == HDCP_VERSION_1_3)
-		secdp_bigdata_save_item(BD_HDCP_VER, "hdcp1");
+		usdm_secdp_bigdata_save_item(BD_HDCP_VER, "hdcp1");
 #endif
 
 	return ret;
@@ -2520,8 +2520,8 @@ void dp_enable(struct drm_encoder *encoder)
 	dp->state = DP_STATE_ON;
 
 #ifdef CONFIG_SEC_DISPLAYPORT_SELFTEST
-	if (self_test_on_process()) {
-		self_test_resolution_update(dp->cur_mode.hdisplay,
+	if (usdm_self_test_on_process()) {
+		usdm_self_test_resolution_update(dp->cur_mode.hdisplay,
 				dp->cur_mode.vdisplay,
 				drm_mode_vrefresh(&dp->cur_mode));
 	}
@@ -2735,14 +2735,14 @@ static void dp_aux_sel(struct dp_device *dp)
 		gpio_direction_output(dp->gpio_sw_sel, !(dp->cal_res.dp_sw_sel));
 		dp_info(dp, "Get direction from PDIC %d\n", dp->cal_res.dp_sw_sel);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_save_item(BD_ORIENTATION,	dp->cal_res.dp_sw_sel ? "CC1" : "CC2");
+		usdm_secdp_bigdata_save_item(BD_ORIENTATION,	dp->cal_res.dp_sw_sel ? "CC1" : "CC2");
 #endif
 	} else if (gpio_is_valid(dp->gpio_usb_dir)) {
 		/* for old H/W - AUX switch is controlled by PDIC */
 		dp->cal_res.dp_sw_sel = gpio_get_value(dp->gpio_usb_dir);
 		dp_info(dp, "Get Direction From PDIC %d\n", !dp->cal_res.dp_sw_sel);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_save_item(BD_ORIENTATION,	dp->cal_res.dp_sw_sel ? "CC1" : "CC2");
+		usdm_secdp_bigdata_save_item(BD_ORIENTATION,	dp->cal_res.dp_sw_sel ? "CC1" : "CC2");
 #endif
 	}
 }
@@ -2759,7 +2759,7 @@ static int dp_usb_typec_notification_proceed(struct dp_device *dp,
 		switch (usb_typec_info->sub1) {
 		case PDIC_NOTIFY_DETACH:
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-			dp_logger_set_max_count(100);
+			usdm_dp_logger_set_max_count(100);
 #endif
 			dp_info(dp, "PDIC_NOTIFY_ID_DP_CONNECT, %x\n", usb_typec_info->sub1);
 			dp->cal_res.pdic_notify_dp_conf = PDIC_NOTIFY_DP_PIN_UNKNOWN;
@@ -2769,7 +2769,7 @@ static int dp_usb_typec_notification_proceed(struct dp_device *dp,
 			dp_hpd_changed(dp, EXYNOS_HPD_UNPLUG);
 			dp_aux_onoff(dp, 0);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-			secdp_bigdata_disconnection();
+			usdm_secdp_bigdata_disconnection();
 #endif
 			break;
 		case PDIC_NOTIFY_ATTACH:
@@ -2779,9 +2779,9 @@ static int dp_usb_typec_notification_proceed(struct dp_device *dp,
 			dp->sink_info.prod_id = usb_typec_info->sub3;
 			dp_info(dp, "VID:0x%llX, PID:0x%llX\n", dp->sink_info.ven_id, dp->sink_info.prod_id);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-			secdp_bigdata_connection();
-			secdp_bigdata_save_item(BD_ADT_VID, dp->sink_info.ven_id);
-			secdp_bigdata_save_item(BD_ADT_PID, dp->sink_info.prod_id);
+			usdm_secdp_bigdata_connection();
+			usdm_secdp_bigdata_save_item(BD_ADT_VID, dp->sink_info.ven_id);
+			usdm_secdp_bigdata_save_item(BD_ADT_PID, dp->sink_info.prod_id);
 #endif
 			break;
 		default:
@@ -2795,7 +2795,7 @@ static int dp_usb_typec_notification_proceed(struct dp_device *dp,
 				usb_typec_info->sub1);
 		dp_aux_sel(dp);
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_save_item(BD_LINK_CONFIGURE, usb_typec_info->sub1 + 'A' - 1);
+		usdm_secdp_bigdata_save_item(BD_LINK_CONFIGURE, usb_typec_info->sub1 + 'A' - 1);
 #endif
 		switch (usb_typec_info->sub1) {
 		case PDIC_NOTIFY_DP_PIN_UNKNOWN:
@@ -4283,7 +4283,7 @@ static ssize_t dp_test_store(struct class *dev,
 #if IS_ENABLED(CONFIG_EXYNOS_HDCP2)
 			hdcp_dplink_set_reauth();
 #endif
-			dp_hdcp22_enable(0);
+			usdm_dp_hdcp22_enable(0);
 			queue_delayed_work(dp->hdcp2_wq,
 					&dp->hdcp22_work, msecs_to_jiffies(0));
 		} else if (dp->hdcp_ver == HDCP_VERSION_1_3) {
@@ -4802,7 +4802,7 @@ static int dp_probe(struct platform_device *pdev)
 	char name[MAX_NAME_SIZE];
 
 #ifdef CONFIG_SEC_DISPLAYPORT_LOGGER
-	dp_logger_init();
+	usdm_dp_logger_init();
 #endif
 
 	dev_info(dev, "%s start\n", __func__);
@@ -4831,7 +4831,7 @@ static int dp_probe(struct platform_device *pdev)
 		goto err;
 #endif
 
-	dp_drvdata = dp;
+	usdm_dp_drvdata = dp;
 
 	dp->output_type = EXYNOS_DISPLAY_TYPE_DP0_SST1;
 
@@ -4986,11 +4986,11 @@ static int dp_probe(struct platform_device *pdev)
 		if (ret)
 			dp_err(dp, "failed to create class_attr_dp_sbu_sw_sel\n");
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
-		secdp_bigdata_init(dp_class);
+		usdm_secdp_bigdata_init(dp_class);
 #endif
 #ifdef CONFIG_SEC_DISPLAYPORT_SELFTEST
 		dp->hpd_changed = dp_hpd_changed;
-		self_test_init(dp, dp_class);
+		usdm_self_test_init(dp, dp_class);
 #endif
 	}
 
@@ -5017,9 +5017,9 @@ static int dp_probe(struct platform_device *pdev)
 
 #if IS_ENABLED(CONFIG_EXYNOS_HDCP2)
 	dp->drm_start_state = DRM_OFF;
-	dp_register_func_for_hdcp22(dp_hdcp22_enable,
-			dp_dpcd_read_for_hdcp22,
-			dp_dpcd_write_for_hdcp22);
+	dp_register_func_for_hdcp22(usdm_dp_hdcp22_enable,
+			usdm_dp_dpcd_read_for_hdcp22,
+			usdm_dp_dpcd_write_for_hdcp22);
 #endif
 
 #if IS_ENABLED(CONFIG_EXYNOS_ITMON)

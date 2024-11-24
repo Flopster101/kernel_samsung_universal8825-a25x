@@ -67,7 +67,6 @@
 #include <mcd_drm_helper.h>
 #if IS_ENABLED(CONFIG_DISPLAY_USE_INFO) || IS_ENABLED(CONFIG_USDM_PANEL_DPUI)
 #include "usdm_dpui.h"
-#include "decon_dpui.h"
 #endif
 #endif
 
@@ -393,7 +392,7 @@ static void decon_get_crc_data(struct exynos_drm_crtc *exynos_crtc)
 	u32 crc_data[3];
 
 	decon_reg_get_crc_data(decon->id, crc_data);
-	exynos_drm_crtc_add_crc_entry(&exynos_crtc->base, true, 0, crc_data);
+	usdm_exynos_drm_crtc_add_crc_entry(&exynos_crtc->base, true, 0, crc_data);
 
 	decon_debug(decon, "0x%08x, 0x%08x, 0x%08x\n", crc_data[0],
 		 crc_data[1], crc_data[2]);
@@ -1420,7 +1419,7 @@ decon_enable(struct exynos_drm_crtc *crtc, struct drm_crtc_state *old_crtc_state
 	decon_info(decon, "+\n");
 #endif
 
-	if (is_tui_trans(old_crtc_state)) {
+	if (usdm_is_tui_trans(old_crtc_state)) {
 		decon_info(decon, "tui transition : skip power enable\n");
 	} else {
 		exynos_pd_booton_rel("pd-dpu");
@@ -1549,7 +1548,7 @@ static void decon_disable(struct exynos_drm_crtc *crtc)
 #endif
 	_decon_disable(decon);
 
-	if (is_tui_trans(crtc->base.state)) {
+	if (usdm_is_tui_trans(crtc->base.state)) {
 		decon_info(decon, "tui transition : skip power disable\n");
 	} else {
 		decon_set_te_pinctrl(decon, false);
@@ -2029,7 +2028,7 @@ static int decon_parse_dt(struct decon_device *decon, struct device_node *np)
 			return -EINVAL;
 		}
 
-		decon->dpp[i] = of_find_dpp_by_node(dpp_np);
+		decon->dpp[i] = usdm_of_find_dpp_by_node(dpp_np);
 		if (!decon->dpp[i]) {
 			decon_err(decon, "can't find dpp%d structure\n", i);
 			return -EINVAL;
@@ -2426,7 +2425,7 @@ static int decon_probe(struct platform_device *pdev)
 	/* set drvdata */
 	platform_set_drvdata(pdev, decon);
 
-	exynos_recovery_register(decon);
+	usdm_exynos_recovery_register(decon);
 
 	ret = component_add(dev, &decon_component_ops);
 	if (ret)

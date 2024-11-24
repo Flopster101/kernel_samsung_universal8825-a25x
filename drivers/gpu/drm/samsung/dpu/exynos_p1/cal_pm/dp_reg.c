@@ -1888,9 +1888,9 @@ int dp_reg_dpcd_write(struct dp_cal_res *cal_res, u32 address, u32 length, u8 *d
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
 	if (ret == 0)
-		secdp_bigdata_clr_error_cnt(ERR_AUX);
+		usdm_secdp_bigdata_clr_error_cnt(ERR_AUX);
 	else if (dp->pdic_hpd)
-		secdp_bigdata_inc_error_cnt(ERR_AUX);
+		usdm_secdp_bigdata_inc_error_cnt(ERR_AUX);
 #endif
 #endif
 
@@ -1930,9 +1930,9 @@ int dp_reg_dpcd_read(struct dp_cal_res *cal_res, u32 address, u32 length, u8 *da
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 #ifdef CONFIG_SEC_DISPLAYPORT_BIGDATA
 	if (ret == 0)
-		secdp_bigdata_clr_error_cnt(ERR_AUX);
+		usdm_secdp_bigdata_clr_error_cnt(ERR_AUX);
 	else if (dp->pdic_hpd)
-		secdp_bigdata_inc_error_cnt(ERR_AUX);
+		usdm_secdp_bigdata_inc_error_cnt(ERR_AUX);
 #endif
 #endif
 

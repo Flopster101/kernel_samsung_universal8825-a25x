@@ -372,26 +372,26 @@ exit:
 	self_test_reconnect();
 }
 
-enum dex_support_type self_test_get_dp_adapter_type(void)
+enum dex_support_type usdm_self_test_get_dp_adapter_type(void)
 {
 	return g_test_vars.adapter_type;
 }
-EXPORT_SYMBOL(self_test_get_dp_adapter_type);
+EXPORT_SYMBOL(usdm_self_test_get_dp_adapter_type);
 
-int self_test_on_process(void)
+int usdm_self_test_on_process(void)
 {
 	return g_test_vars.test_on_process;
 }
-EXPORT_SYMBOL(self_test_on_process);
+EXPORT_SYMBOL(usdm_self_test_on_process);
 
-int self_test_get_edid(u8 *edid)
+int usdm_self_test_get_edid(u8 *edid)
 {
 	memcpy(edid, test_data[g_test_vars.data_idx].edid, 256);
 	return edid[0x7e] + 1;
 }
-EXPORT_SYMBOL(self_test_get_edid);
+EXPORT_SYMBOL(usdm_self_test_get_edid);
 
-void self_test_resolution_update(u32 xres, u32 yres, u32 fps)
+void usdm_self_test_resolution_update(u32 xres, u32 yres, u32 fps)
 {
 	dp_info(g_test_vars.dp, "%s(%d, %d, %d): %dx%d %d\n", __func__,
 			g_test_vars.data_idx, g_test_vars.dp->dex.ui_setting,
@@ -435,7 +435,7 @@ void self_test_resolution_update(u32 xres, u32 yres, u32 fps)
 	g_test_vars.waiting = 1;
 	wake_up_interruptible(&g_test_vars.test_wait);
 }
-EXPORT_SYMBOL(self_test_resolution_update);
+EXPORT_SYMBOL(usdm_self_test_resolution_update);
 
 void self_test_audio_param_update(u32 ch, u32 fs, u32 bit)
 {
@@ -497,7 +497,7 @@ static ssize_t self_test_store(struct class *dev,
 }
 static CLASS_ATTR_RW(self_test);
 
-void self_test_init(struct dp_device *dp, struct class *dp_class)
+void usdm_self_test_init(struct dp_device *dp, struct class *dp_class)
 {
 	int ret = 0;
 
@@ -508,4 +508,4 @@ void self_test_init(struct dp_device *dp, struct class *dp_class)
 	g_test_vars.dp = dp;
 	init_waitqueue_head(&g_test_vars.test_wait);
 }
-EXPORT_SYMBOL(self_test_init);
+EXPORT_SYMBOL(usdm_self_test_init);
