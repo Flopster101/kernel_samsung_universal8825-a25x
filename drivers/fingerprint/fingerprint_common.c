@@ -1,5 +1,4 @@
 #include "fingerprint_common.h"
-#include <linux/sec_detect.h>
 
 struct debug_logger *g_logger;
 
@@ -87,16 +86,13 @@ extern void gw9558_exit(void);
 static int __init fingerprint_init(void)
 {
 #if IS_ENABLED(CONFIG_SENSORS_EC6XX)
-	if (sec_current_device == SEC_A25)
-		ec6xx_init();
+	ec6xx_init();
 #endif
 #if IS_ENABLED(CONFIG_SENSORS_EL7XX)
-	if (sec_current_device == SEC_A33)
-		el7xx_init();
+	el7xx_init();
 #endif
 #if IS_ENABLED(CONFIG_SENSORS_GW9558X)
-	if (sec_current_device == SEC_A53)
-		gw9558_init();
+	gw9558_init();
 #endif
 
 	return 0;
@@ -105,16 +101,10 @@ static int __init fingerprint_init(void)
 static void __exit fingerprint_exit(void)
 {
 #if IS_ENABLED(CONFIG_SENSORS_EC6XX)
-	if (sec_current_device == SEC_A25)
-		ec6xx_exit();
+	ec6xx_exit();
 #endif
 #if IS_ENABLED(CONFIG_SENSORS_EL7XX)
-	if (sec_current_device == SEC_A33)
-		el7xx_exit();
-#endif
-#if IS_ENABLED(CONFIG_SENSORS_GW9558X)
-	if (sec_current_device == SEC_A53)
-		gw9558_exit();
+	el7xx_exit();
 #endif
 }
 
