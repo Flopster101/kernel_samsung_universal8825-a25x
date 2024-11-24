@@ -14,6 +14,7 @@
  */
 
 #include "fingerprint.h"
+#include "fingerprint_common.h"
 #include "gw9558x_common.h"
 
 static LIST_HEAD(device_list);
@@ -25,7 +26,7 @@ static const struct of_device_id gw9558_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, gw9558_of_match);
 
-struct debug_logger *g_logger;
+extern struct debug_logger *g_logger;
 
 static ssize_t bfs_values_show(struct device *dev,
 				      struct device_attribute *attr, char *buf)
