@@ -54,15 +54,7 @@ struct muic_ic_ops {
 	int (*set_switch_to_open)(void *mdata);
 	int (*set_switch_to_uart)(void *mdata, int uart_path);
 	int (*set_switch_to_usb)(void *mdata, int usb_path);
-	int (*set_com_to_otg)(void *, int usb_path);
-	int (*set_com_to_open_with_vbus)(void *);
-	int (*set_com_to_open)(void *);
-	void (*set_cable_state)(void *, muic_attached_dev_t new_dev);
-	void (*set_dcd_rescan)(void *);
 	int (*check_usb_killer)(void *mdata);
-	int (*bcd_rescan)(void *);
-	int (*control_rid_adc)(void *, bool enable);
-	int (*check_afc_ready)(void *);
 	void (*set_bypass)(void *mdata);
 
 	void (*set_chg_det)(void *mdata, bool en);
@@ -71,7 +63,6 @@ struct muic_ic_ops {
 	int (*set_water_detect)(void *mdata, bool val);
 	int (*set_hiccup_mode)(void *mdata, bool en);
 	int (*get_hiccup_mode)(void *mdata);
-	int (*set_overheat_hiccup_mode)(void *pdata, bool en);
 	int (*set_hiccup)(void *mdata, bool en);
 	void (*set_water_state)(void *, bool en);
 
