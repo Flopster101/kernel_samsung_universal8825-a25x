@@ -25,6 +25,7 @@
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/sysfs.h>
+#include <linux/sec_detect.h>
 
 extern struct debug_logger *g_logger;
 
@@ -1095,6 +1096,9 @@ static struct platform_driver el7xx_spi_driver = {
 static int __init el7xx_init(void)
 {
 	int retval = 0;
+
+	if (sec_current_device != SEC_A33)
+		return 0;
 
 	pr_info("Entry\n");
 
