@@ -149,10 +149,15 @@ i3c-hci-exynos.ko
 videobuf2-dma-sg.ko
 exynos_mfc.ko
 fimc-is.ko
+is-cis-gw1.ko
 is-cis-imx258.ko
 is-cis-4ha.ko
 is-cis-gc02m1.ko
 is-cis-gc5035.ko
+is-cis-imx616.ko
+is-cis-imx682.ko
+is-cis-hi1336.ko
+is-cis-gd2.ko
 is-cis-hi1339.ko
 is-cis-jn1.ko
 is-cis-imx355.ko
@@ -161,6 +166,7 @@ is-cis-imx582.ko
 is-cis-3l6.ko
 is-actuator-ak737x.ko
 is-flash-s2mf301.ko
+is-flash-sm5714.ko
 pablo-smc.ko
 is-device-eeprom.ko
 is-device-otprom.ko
@@ -184,6 +190,7 @@ dw_mmc.ko
 dw_mmc-pltfm.ko
 dw_mmc-exynos-sec.ko
 leds-s2mf301.ko
+leds-sm5714-fled.ko
 hid-a4tech.ko
 hid-axff.ko
 hid-belkin.ko
@@ -262,6 +269,7 @@ dropdump.ko
 mcd-panel-s6e3fc3_a25x.ko
 mcd-panel-s6e3fc3_a33x.ko
 mcd-panel-s6e8fc3_a33x.ko
+mcd-panel-s6e3fc3_a53x.ko
 usdm-panel-oled-common.ko
 muic_platform.ko
 pdic_s2mf301.ko
@@ -269,6 +277,9 @@ sb-core.ko
 mesh.ko
 fingerprint.ko
 fingerprint_sysfs.ko
+fp_ec6xx.ko
+fp_el7xx.ko
+fp_gw9558x.ko
 s2m_pdic_notifier_module.ko
 pdic_notifier_module.ko
 mcd-panel.ko
@@ -276,12 +287,17 @@ mcd-panel-decon.ko
 abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
+mfd_sm5714.ko
 hl7132_charger.ko
+sm5714-charger.ko
+sm5451-charger.ko
+sx938x.ko
 hall_ic.ko
 hall_ic_notifier.ko
 goodix_ts_berlin.ko
 isg5320a.ko
 s2mf301_fuelgauge.ko
+sm5714_fuelgauge.ko
 shub.ko
 sensor_core.ko
 mstdrv.ko
@@ -289,6 +305,7 @@ snvm.ko
 dc_vibrator.ko
 focaltech_ts_ft3519.ko
 muic_s2mf301.ko
+muic_sm5714.ko
 top_s2mf301.ko
 a96t396.ko
 s2mf301_pmeter.ko
@@ -297,6 +314,7 @@ sec-direct-charger.ko
 sec_pd.ko
 sb_wireless.ko
 sec-battery.ko
+pdic_sm5714.ko
 exynos-bts.ko
 exynos-btsops8825.ko
 spu_verify.ko
@@ -318,6 +336,7 @@ snd-soc-samsung-slif.ko
 exynos8825_audio.ko
 exynos8825_rt5665.ko
 exynos8825_rt5691.ko
+exynos8825_audio.ko
 sec_audio_sysfs.ko
 sec_audio_debug.ko
 tcp_westwood.ko
