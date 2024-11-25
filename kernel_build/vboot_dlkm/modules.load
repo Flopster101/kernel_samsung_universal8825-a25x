@@ -307,3 +307,4 @@ sec_audio_debug.ko
 tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko
+input_booster_lkm.ko
