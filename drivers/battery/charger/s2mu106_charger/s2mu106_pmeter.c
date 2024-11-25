@@ -22,7 +22,6 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/version.h>
-#include <linux/sec_detect.h>
 
 #define VOLTAGE_9V	8000
 #define VOLTAGE_6P9V	6900
@@ -1470,9 +1469,6 @@ static struct platform_driver s2mu106_pmeter_driver = {
 static int __init s2mu106_pmeter_init(void)
 {
 	int ret = 0;
-
-	if (sec_current_device != SEC_A33)
-		return 0;
 
 	ret = platform_driver_register(&s2mu106_pmeter_driver);
 

@@ -30,7 +30,6 @@
 #include <linux/of_gpio.h>
 #include <linux/kernel.h>
 #include <linux/version.h>
-#include <linux/sec_detect.h>
 
 #define I2C_RETRY_CNT	3
 
@@ -452,9 +451,6 @@ static struct i2c_driver s2mu106_i2c_driver = {
 
 static int __init s2mu106_i2c_init(void)
 {
-	if (sec_current_device != SEC_A33)
-		return 0;
-
 	pr_info("%s:%s\n", MFD_DEV_NAME, __func__);
 	return i2c_add_driver(&s2mu106_i2c_driver);
 }

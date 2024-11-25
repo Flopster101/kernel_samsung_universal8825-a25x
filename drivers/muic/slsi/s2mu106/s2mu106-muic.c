@@ -63,7 +63,6 @@
 #endif
 
 #include <linux/usb/typec/common/pdic_param.h>
-#include <linux/sec_detect.h>
 
 struct s2mu106_muic_data *static_data;
 /* Prototypes of the Static symbols of s2mu106-muic */
@@ -1442,7 +1441,6 @@ static int s2mu106_muic_set_overheat_hiccup_mode(struct s2mu106_muic_data *muic_
 	/* hiccup mode */
 	if (s2mu106_muic_overheat_hiccup_path_change_need(sdata)) {
 		if (en == true) {
-			muic_data->is_hiccup_mode = en;
 			muic_platform_handle_attach(sdata, ATTACHED_DEV_HICCUP_MUIC);
 		} else { /* Hiccup mode off */
 			_s2mu106_muic_sel_path(muic_data, S2MU106_PATH_OPEN);
@@ -2148,6 +2146,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 	mutex_init(&muic_data->bcd_rescan_mutex);
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 188)
+	wakeup_source_init(muic_data->muic_ws, "muic_wake");   // 4.19 R
 	if (!(muic_data->muic_ws)) {
 		muic_data->muic_ws = wakeup_source_create("muic_wake"); // 4.19 Q
 		if (muic_data->muic_ws)
@@ -2357,9 +2356,6 @@ static struct platform_driver s2mu106_muic_driver = {
 
 static int __init s2mu106_muic_init(void)
 {
-	if (sec_current_device != SEC_A33)
-		return 0;
-
 	return platform_driver_register(&s2mu106_muic_driver);
 }
 
