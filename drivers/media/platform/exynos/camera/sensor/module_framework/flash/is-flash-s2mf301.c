@@ -23,6 +23,7 @@
 #include "is-device-sensor-peri.h"
 #include "is-core.h"
 #include "is-sysfs.h"
+#include <linux/sec_detect.h>
 
 #include <linux/leds-s2mf301.h>
 
@@ -509,6 +510,9 @@ builtin_platform_driver(sensor_flash_s2mf301_platform_driver);
 static int __init sensor_flash_s2mf301_init_i2c(void)
 {
 	int ret;
+
+	if (sec_current_device != SEC_A25) 
+		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_s2mf301_platform_driver,
 				flash_s2mf301_platform_probe_i2c);

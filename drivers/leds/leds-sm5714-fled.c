@@ -17,6 +17,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/platform_device.h>
+#include <linux/sec_detect.h>
 
 #define SM5714_FLED_VERSION "XXX.UA1"
 
@@ -532,7 +533,7 @@ static ssize_t sm5714_rear_flash_store(struct device *dev, struct device_attribu
 
 	if (g_sm5714_fled == NULL) {
 		pr_err("sm5714-fled: %s: g_sm5714_fled NULL\n", __func__);
-		return -ENODEV;
+		return 0;
 	}
 
 	if ((buf == NULL) || kstrtouint(buf, 10, &store_value)) {
@@ -627,7 +628,7 @@ static ssize_t sm5714_rear_flash_show(struct device *dev, struct device_attribut
 
 	if (g_sm5714_fled == NULL) {
 		pr_err("sm5714-fled: %s: g_sm5714_fled is NULL\n", __func__);
-		return -ENODEV;
+		return 0;
 	}
 
 	return sprintf(buf, "%d\n", fled->pdata->led.sysfs_input_data);
@@ -835,6 +836,9 @@ static struct platform_driver sm5714_led_driver = {
 
 static int __init sm5714_led_driver_init(void)
 {
+	if (sec_current_device != SEC_A53)
+		return 0;
+
 	return platform_driver_register(&sm5714_led_driver);
 }
 module_init(sm5714_led_driver_init);

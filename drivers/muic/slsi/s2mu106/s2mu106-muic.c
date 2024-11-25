@@ -63,6 +63,7 @@
 #endif
 
 #include <linux/usb/typec/common/pdic_param.h>
+#include <linux/sec_detect.h>
 
 struct s2mu106_muic_data *static_data;
 /* Prototypes of the Static symbols of s2mu106-muic */
@@ -2356,6 +2357,9 @@ static struct platform_driver s2mu106_muic_driver = {
 
 static int __init s2mu106_muic_init(void)
 {
+	if (sec_current_device != SEC_A33)
+		return 0;
+
 	return platform_driver_register(&s2mu106_muic_driver);
 }
 

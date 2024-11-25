@@ -22,6 +22,7 @@
 #include <linux/delay.h>
 #include <linux/completion.h>
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_BATTERY_GKI)
 #include <linux/sec_batt.h>
 #endif
@@ -1654,7 +1655,7 @@ static ssize_t sm5714_sysfs_set_prop(struct _pdic_data_t *ppdic_data,
 	if (!usbpd_data) {
 		pr_info("%s : usbpd_data is null : request prop = %d\n",
 				__func__, prop);
-		return -ENODEV;
+		return 0;
 	}
 
 	switch (prop) {
@@ -2657,7 +2658,7 @@ static int sm5714_set_data_role(void *_data, int val)
 	manager = &data->manager;
 	if (!manager) {
 		pr_err("%s : manager is null\n", __func__);
-		return -ENODEV;
+		return 0;
 	}
 	pr_info("%s: dr_swap received to %s\n", __func__, val == 1 ? "DFP" : "UFP");
 
@@ -4266,6 +4267,9 @@ static struct i2c_driver sm5714_usbpd_driver = {
 
 static int __init sm5714_usbpd_typec_init(void)
 {
+	if (sec_current_device != SEC_A53)
+		return 0;
+
 	return i2c_add_driver(&sm5714_usbpd_driver);
 }
 late_initcall(sm5714_usbpd_typec_init);

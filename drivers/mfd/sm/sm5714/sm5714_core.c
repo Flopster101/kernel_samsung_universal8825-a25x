@@ -23,6 +23,7 @@
 #include <linux/mfd/sm/sm5714/sm5714-private.h>
 #include <linux/regulator/machine.h>
 #include <linux/usb_notify.h>
+#include <linux/sec_detect.h>
 #if defined (CONFIG_OF)
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
@@ -520,6 +521,9 @@ static struct i2c_driver sm5714_i2c_driver = {
 
 static int __init sm5714_i2c_init(void)
 {
+	if (sec_current_device != SEC_A53)
+		return 0;
+
 	pr_info("%s:%s\n", MFD_DEV_NAME, __func__);
 	return i2c_add_driver(&sm5714_i2c_driver);
 }

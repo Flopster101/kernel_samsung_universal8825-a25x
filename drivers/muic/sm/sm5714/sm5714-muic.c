@@ -22,6 +22,7 @@
 #include <linux/delay.h>
 #include <linux/pm_wakeup.h>
 #include <linux/switch.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 #include <linux/muic/common/muic_notifier.h>
@@ -1982,7 +1983,7 @@ static int sm5714_muic_pdic_set_hiccup_mode(int val)
 	struct sm5714_muic_data *muic_data = static_data;
 
 	if (static_data == NULL)
-		return -ENODEV;
+		return 0;
 
 	if (is_lpcharge_pdic_param())
 		return 0;
@@ -2237,7 +2238,7 @@ static int of_sm5714_muic_dt(struct device *dev,
 	np = dev->parent->of_node;
 	if (!np) {
 		pr_err("[%s:%s] could not find np\n", MUIC_DEV_NAME, __func__);
-		return -ENODEV;
+		return 0;
 	}
 
 	np_muic = of_find_node_by_name(np, "muic");
@@ -2596,6 +2597,9 @@ static struct platform_driver sm5714_muic_driver = {
 
 static int __init sm5714_muic_init(void)
 {
+	if (sec_current_device != SEC_A53)
+		return 0;
+	
 	return platform_driver_register(&sm5714_muic_driver);
 }
 late_initcall(sm5714_muic_init);

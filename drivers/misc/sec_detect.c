@@ -1,18 +1,3 @@
-/*
- * Author: @Flopster101
- * Based on AkiraNoSushi's work for the Mi439 project.
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- */
-
 #include <linux/sec_detect.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -48,12 +33,15 @@ int sec_detect_init(void) {
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;
         sec_needs_decon = false;
+        SEC_DETECT_LOG("Drivers to load: USDM panels, hl7132, s2mf301\n");
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
         sec_needs_decon = true;
+        SEC_DETECT_LOG("Drivers to load: DECON panels, s2mu106, sm5451\n");
     } else if (strstr(machine_name, "A53") != NULL) {
         sec_current_device = SEC_A53;
         sec_needs_decon = true;
+        SEC_DETECT_LOG("Drivers to load: DECON panels, sm5714, sm5451\n");
     }
     return 0;
 }

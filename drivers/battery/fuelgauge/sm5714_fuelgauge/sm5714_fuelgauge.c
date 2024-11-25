@@ -16,6 +16,7 @@
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 #include <linux/sec_detect.h>
+#include <linux/sec_detect.h>
 
 static enum power_supply_property sm5714_fuelgauge_props[] = {
 	POWER_SUPPLY_PROP_ONLINE,
@@ -3209,14 +3210,11 @@ static struct platform_driver sm5714_fuelgauge_driver = {
 
 static int __init sm5714_fuelgauge_init(void)
 {
-	if (sec_current_device != SEC_A25) {
-		SEC_DETECT_LOG("Initializing sm5714 fuelgauge driver\n");
-		pr_info("%s:\n", __func__);
-		return platform_driver_register(&sm5714_fuelgauge_driver);
-	} else {
-		SEC_DETECT_LOG("Skipped sm5714 fuelgauge driver\n");
+	if (sec_current_device != SEC_A53)
 		return 0;
-	}
+
+	pr_info("%s:\n", __func__);
+	return platform_driver_register(&sm5714_fuelgauge_driver);
 }
 
 static void __exit sm5714_fuelgauge_exit(void)

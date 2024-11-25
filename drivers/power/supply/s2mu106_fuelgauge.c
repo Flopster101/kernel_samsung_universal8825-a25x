@@ -30,6 +30,7 @@
 #include <linux/power/s2mu106_fuelgauge.h>
 #include <linux/of_gpio.h>
 #include <linux/platform_data/ntc_thermistor.h>
+#include <linux/sec_detect.h>
 
 static enum power_supply_property s2mu106_fuelgauge_props[] = {
 	POWER_SUPPLY_PROP_ONLINE,
@@ -1778,6 +1779,9 @@ static struct i2c_driver s2mu106_fuelgauge_driver = {
 
 static int __init s2mu106_fuelgauge_init(void)
 {
+	if (sec_current_device != SEC_A33)
+		return 0;
+
 	pr_info("%s\n", __func__);
 	return i2c_add_driver(&s2mu106_fuelgauge_driver);
 }

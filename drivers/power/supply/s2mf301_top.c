@@ -23,6 +23,7 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/power/ifpmic_class.h>
+#include <linux/sec_detect.h>
 
 static enum power_supply_property s2mf301_top_props[] = {
 	POWER_SUPPLY_PROP_ONLINE,
@@ -657,6 +658,9 @@ static struct platform_driver s2mf301_top_driver = {
 
 static int __init s2mf301_top_init(void)
 {
+	if (sec_current_device != SEC_A25) 
+		return 0;
+
 	pr_info("%s\n", __func__);
 	return platform_driver_register(&s2mf301_top_driver);
 }
