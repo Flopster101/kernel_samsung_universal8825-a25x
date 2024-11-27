@@ -1,0 +1,24 @@
+&spi_mosi_tsp_active {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_mosi}, FUNC_QUP8, PULL_NONE, DRV_LV3);
+};
+&spi_mosi_tsp_sleep {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_mosi}, FUNC_INPUT, PULL_DOWN, DRV_LV3);
+};
+&spi_miso_tsp_active {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_miso}, FUNC_QUP8, PULL_NONE, DRV_LV3);
+};
+&spi_miso_tsp_sleep {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_miso}, FUNC_INPUT, PULL_DOWN, DRV_LV3);
+};
+&spi_clk_tsp_active {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_clk}, FUNC_QUP8, PULL_NONE, DRV_LV3);
+};
+&spi_clk_tsp_sleep {
+	GPIO_CONFIG_PUD_DRV(${gpio_spi_clk}, FUNC_INPUT, PULL_DOWN, DRV_LV3);
+};
+
+&tsp_stm_spi {
+	sync-reportrate-120;
+	sec,bringup = <1>;
+};
+
