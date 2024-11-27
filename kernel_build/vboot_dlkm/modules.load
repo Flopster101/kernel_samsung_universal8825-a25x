@@ -271,6 +271,9 @@ sec_debug_stacktrace.ko
 sec_debug_hardlockup_info.ko
 sec_debug_sched_report.ko
 vbus_notifier.ko
+sec_tsp_dumpkey.ko
+sec_tsp_log.ko
+sec_cmd.ko
 sec_common_fn.ko
 dropdump.ko
 mcd-panel-s6e3fc3_a25x.ko
@@ -310,6 +313,7 @@ sm5714_fuelgauge.ko
 s2mu106_fuelgauge.ko
 shub.ko
 sensor_core.ko
+stm_ts.ko
 mstdrv.ko
 snvm.ko
 dc_vibrator.ko
