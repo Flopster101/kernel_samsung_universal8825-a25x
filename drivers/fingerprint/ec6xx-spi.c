@@ -1371,7 +1371,7 @@ static int __init ec6xx_init(void)
 {
 	int retval;
 
-	if (sec_current_device != SEC_A25)
+	if (sec_current_device != SEC_A25 && sec_current_device != SEC_M34)
 		return 0;
 
 	pr_info("Entry\n");
