@@ -12,6 +12,7 @@
  */
 
 #include "fingerprint.h"
+#include "fingerprint_common.h"
 #include "et5xx.h"
 
 #include <linux/kernel.h>
@@ -37,7 +38,7 @@ static DECLARE_BITMAP(minors, N_SPI_MINORS);
 static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
 
-struct debug_logger *g_logger;
+extern struct debug_logger *g_logger;
 static DECLARE_WAIT_QUEUE_HEAD(interrupt_waitq);
 
 static irqreturn_t et5xx_fingerprint_interrupt(int irq, void *dev_id)
