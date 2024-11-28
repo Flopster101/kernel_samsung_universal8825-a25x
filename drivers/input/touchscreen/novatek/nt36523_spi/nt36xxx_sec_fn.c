@@ -6040,7 +6040,7 @@ int nvt_ts_sec_fn_init(struct nvt_ts_data *ts)
 {
 	int ret;
 
-	ret = sec_cmd_init(&ts->sec, sec_cmds, ARRAY_SIZE(sec_cmds), SEC_CLASS_DEVT_TSP);
+	ret = sec_cmd_init(&ts->sec, &ts->client->dev, sec_cmds, ARRAY_SIZE(sec_cmds), SEC_CLASS_DEVT_TSP, &cmd_attr_group);
 	if (ret < 0) {
 		input_err(true, &ts->client->dev, "%s: failed to sec cmd init\n",
 			__func__);
