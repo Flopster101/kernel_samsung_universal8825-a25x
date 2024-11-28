@@ -254,6 +254,7 @@ obj-y += battery/fuelgauge/s2mu106_fuelgauge/ # ADDED BY LEGO AUTOMATICALLY: DO 
 obj-y += usb/typec/slsi/s2mu106/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += mfd/slsi/s2mu106/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += muic/slsi/s2mu106/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += input/sec_input/stm/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 
 # a53x
 obj-y += battery/charger/sm5451_charger/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
