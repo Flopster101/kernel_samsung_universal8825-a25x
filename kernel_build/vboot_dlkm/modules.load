@@ -313,6 +313,8 @@ hall_ic_notifier.ko
 focaltech_ts_ft3519.ko
 novatek_ts_nt36523.ko
 goodix_ts_berlin.ko
+himax_ts_hx831xx.ko
+wez01.ko
 isg5320a.ko
 isg6320.ko
 s2mf301_fuelgauge.ko
