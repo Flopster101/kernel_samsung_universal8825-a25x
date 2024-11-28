@@ -1,0 +1,54 @@
+menuconfig EXYNOS_DECON_LCD_TFT_COMMON
+	tristate "TFT_COMMON DDI Panel Driver"
+	depends on MCD_PANEL
+	default n
+	help
+		This enables TFT_COMMON DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_COMMON DDI.
+
+menuconfig EXYNOS_DECON_LCD_TFT_M33
+	tristate "TFT_M33 DDI Panel Driver"
+	depends on EXYNOS_DECON_LCD_TFT_COMMON
+	default n
+	help
+		This enables TFT_M33 DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_M33 DDI.
+
+menuconfig EXYNOS_DECON_LCD_TFT_GTS8L
+	tristate "TFT_GTS8L DDI Panel Driver"
+	depends on EXYNOS_DECON_LCD_TFT_COMMON
+	default n
+	help
+		This enables TFT_GTS8L DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_GTS8L DDI.
+
+menuconfig EXYNOS_DECON_LCD_TFT_A14X
+	tristate "TFT_A14X DDI Panel Driver"
+	depends on EXYNOS_DECON_LCD_TFT_COMMON
+	default n
+	help
+		This enables TFT_A14X DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_A14 DDI.
+
+menuconfig EXYNOS_DECON_LCD_TFT_M14X
+	tristate "TFT_M14X DDI Panel Driver"
+	depends on EXYNOS_DECON_LCD_TFT_COMMON
+	default n
+	help
+		This enables TFT_M14X DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_M14 DDI.
+
+menuconfig EXYNOS_DECON_LCD_TFT_BIRDIEP
+	tristate "TFT_BIRDIEP DDI Panel Driver"
+	depends on EXYNOS_DECON_LCD_TFT_COMMON
+	default n
+	help
+		This enables TFT_BIRDIEP DDI dependent panel drivers of
+		common panel driver. say Y, if you have a panel based on
+		the TFT_BIRDIEP DDI.
+

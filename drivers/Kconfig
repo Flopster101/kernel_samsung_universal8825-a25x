@@ -314,4 +314,7 @@ source "drivers/muic/sm/sm5714/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SU
 source "drivers/mfd/sm/sm5714/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/usb/typec/sm/sm5714/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 
+# m33x
+source "drivers/gpu/drm/samsung/panel_decon/tft_common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+
 endmenu
