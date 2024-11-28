@@ -284,6 +284,7 @@ sb-core.ko
 mesh.ko
 fingerprint.ko
 fingerprint_sysfs.ko
+fp_et5xx.ko
 fp_ec6xx.ko
 fp_el7xx.ko
 fp_gw9558x.ko
