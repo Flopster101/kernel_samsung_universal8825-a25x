@@ -64,6 +64,12 @@ config CAMERA_USE_AOIS
         default n
         help
           Use Camera AOIS
+config CAMERA_AAVW_UNIFIED
+        bool "This camera is aaw_a25x"
+        depends on CAMERA_VENDER_MCD_V2
+        default n
+        help
+          This camera is aaw_a25x, aaw_a25x and aav_a33x
 config CAMERA_AAW_A25X
         bool "This camera is aaw_a25x"
         depends on CAMERA_VENDER_MCD_V2
