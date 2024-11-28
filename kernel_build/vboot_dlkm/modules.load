@@ -276,12 +276,14 @@ sec_common_fn.ko
 dropdump.ko
 mcd-panel-nt36672c_m33x_00.ko
 mcd-panel-nt36672c_m33x_01.ko
+mcd-panel-hx83102e_gta4xls_00.ko
 mcd-panel-s6e3fc3_m34x.ko
 mcd-panel-s6e3fc3_a25x.ko
 mcd-panel-s6e3fc3_a33x.ko
 mcd-panel-s6e8fc3_a33x.ko
 mcd-panel-s6e3fc3_a53x.ko
 usdm-panel-oled-common.ko
+usdm-panel-tft-common.ko
 muic_platform.ko
 pdic_s2mf301.ko
 sb-core.ko
