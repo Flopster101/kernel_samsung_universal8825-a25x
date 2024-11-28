@@ -12,8 +12,8 @@
 
 #ifndef __S6E3FC3_M34X_H__
 #define __S6E3FC3_M34X_H__
-#include "../panel.h"
-#include "../panel_drv.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_drv.h"
 
 enum s6e3fc3_m34x_function {
 	S6E3FC3_M34X_MAPTBL_GETIDX_FFC,

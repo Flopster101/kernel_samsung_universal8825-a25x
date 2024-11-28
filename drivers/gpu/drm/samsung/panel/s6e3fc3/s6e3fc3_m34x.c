@@ -11,9 +11,9 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
-#include "../maptbl.h"
-#include "../panel.h"
-#include "../panel_function.h"
+#include "../usdm_maptbl.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_function.h"
 #include "s6e3fc3_m34x_panel.h"
 
 #ifdef CONFIG_USDM_FACTORY_DSC_CRC_TEST
@@ -38,31 +38,31 @@ int s6e3fc3_m34x_decoder_test(struct panel_device *panel, void *data, u32 len)
 	if (!panel)
 		return -EINVAL;
 
-	ret = panel_do_seqtbl_by_name_nolock(panel, PANEL_DECODER_TEST_SEQ);
+	ret = usdm_panel_do_seqtbl_by_name_nolock(panel, PANEL_DECODER_TEST_SEQ);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to write decoder-test seq\n");
 		return ret;
 	}
 
-	ret = panel_resource_copy(panel, read_buf1, "decoder_test1"); // 0x14 in normal voltage
+	ret = usdm_panel_resource_copy(panel, read_buf1, "decoder_test1"); // 0x14 in normal voltage
 	if (unlikely(ret < 0)) {
 		panel_err("decoder_test1 copy failed\n");
 		return -ENODATA;
 	}
 
-	ret = panel_resource_copy(panel, read_buf2, "decoder_test2"); // 0x15 in normal voltage
+	ret = usdm_panel_resource_copy(panel, read_buf2, "decoder_test2"); // 0x15 in normal voltage
 	if (unlikely(ret < 0)) {
 		panel_err("decoder_test2 copy failed\n");
 		return -ENODATA;
 	}
 
-	ret = panel_resource_copy(panel, read_buf3, "decoder_test3"); // 0x14 in low voltage
+	ret = usdm_panel_resource_copy(panel, read_buf3, "decoder_test3"); // 0x14 in low voltage
 	if (unlikely(ret < 0)) {
 		panel_err("decoder_test1 copy failed\n");
 		return -ENODATA;
 	}
 
-	ret = panel_resource_copy(panel, read_buf4, "decoder_test4"); // 0x15 in low voltage
+	ret = usdm_panel_resource_copy(panel, read_buf4, "decoder_test4"); // 0x15 in low voltage
 	if (unlikely(ret < 0)) {
 		panel_err("decoder_test2 copy failed\n");
 		return -ENODATA;
@@ -114,7 +114,7 @@ int s6e3fc3_m34x_maptbl_getidx_ffc(struct maptbl *tbl)
 		pr_info("%s: invalid dsi clock: %d\n", __func__, dsi_clk);
 		BUG();
 	}
-	return maptbl_index(tbl, 0, idx, 0);
+	return usdm_maptbl_index(tbl, 0, idx, 0);
 }
 
 struct pnobj_func s6e3fc3_m34x_function_table[MAX_S6E3FC3_M34X_FUNCTION] = {
@@ -124,15 +124,15 @@ struct pnobj_func s6e3fc3_m34x_function_table[MAX_S6E3FC3_M34X_FUNCTION] = {
 static int __init s6e3fc3_m34x_panel_init(void)
 {
 	s6e3fc3_init(&s6e3fc3_m34x_panel_info);
-	panel_function_insert_array(s6e3fc3_m34x_function_table, ARRAY_SIZE(s6e3fc3_m34x_function_table));
-	register_common_panel(&s6e3fc3_m34x_panel_info);
+	usdm_panel_function_insert_array(s6e3fc3_m34x_function_table, ARRAY_SIZE(s6e3fc3_m34x_function_table));
+	usdm_register_common_panel(&s6e3fc3_m34x_panel_info);
 
 	return 0;
 }
 
 static void __exit s6e3fc3_m34x_panel_exit(void)
 {
-	deregister_common_panel(&s6e3fc3_m34x_panel_info);
+	usdm_deregister_common_panel(&s6e3fc3_m34x_panel_info);
 }
 
 module_init(s6e3fc3_m34x_panel_init);

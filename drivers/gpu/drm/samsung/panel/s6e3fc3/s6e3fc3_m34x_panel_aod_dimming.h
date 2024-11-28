@@ -12,8 +12,8 @@
 
 #ifndef __S6E3FC3_M34X_PANEL_AOD_DIMMING_H__
 #define __S6E3FC3_M34X_PANEL_AOD_DIMMING_H__
-#include "../dimming.h"
-#include "../panel_dimming.h"
+#include "../usdm_dimming.h"
+#include "../usdm_panel_dimming.h"
 #include "s6e3fc3_dimming.h"
 
 /*
