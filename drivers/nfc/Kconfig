@@ -108,6 +108,86 @@ config ESE_USE_TZ_API
           uses S.LSI AP and TZ API.
 	  Say Y here to compile support for TZ API.
 
+config SEC_NFC_DUPLICATED_IRQ_WQ_LSI
+	bool "NFC duplicated irq wq lsi"
+	default n
+	help
+	  Enable NFC duplicated irq LSI w/a.
+	  If the interrupt occurs twice continuously, the i2c_info.
+	  read_irq value is returned to the previous value.
+	  Apply W/A received from LSI
+config SEC_NFC_DUPLICATED_IRQ_WQ_QC
+	bool "NFC duplicated irq wq qc"
+	default n
+	help
+	  Enable NFC duplicated irq QC solution.
+	  add the IRQF_NO_SUSPEND flag during interrupt registration
+	  and do not use enable_irq_wake() api to configure the GPIO
+	  as wakeup capable.
+config SEC_NFC_WAKELOCK_METHOD
+        int "nfc wakelock method"
+        default 0
+        help
+          Different functions must be used depending on the kernel version
+          for wakelock initialization.
+          0 - auto selection
+          1 - wakeup_source_init
+          2 - wakeup_source_register
+config NFC_PN547
+	bool "NXP PN547 NFC Controller Driver"
+	depends on I2C
+	default n
+	help
+	  NXP PN547 Near Field Communication controller support.
+	  This option enables device driver support for the NFC.
+	  It is used by many services. NFC is fully controlled using I2C
+	  to communication.
+config NFC_FEATURE_SN100U
+	bool "NXP SN100U Feature"
+	default n
+	help
+	  NXP SN100U Near Field Communication controller support
+	  This option enables device driver support for the NFC.
+	  It is used by many services. NFC is fully controlled using I2C
+	  to communicate the AP chip.
+config NFC_PN547_CLK_BBCLK2
+	bool "NXP PN547 NFC CLOCK Controller"
+	depends on NFC_PN547
+	default n
+	help
+	  NXP PN547 Near Field Communication controller support.
+	  This option enables device driver support for the NFC.
+	  It is used by many services. NFC is fully controlled using I2C
+	  to communicate the AP chip.
+config NFC_P61
+	bool "NXP PN547 NFC Controller Driver"
+	depends on SPI
+	default n
+	help
+	  NXP PN547 Near Field Communication controller support.
+	  This option enables device driver support for the NFC.
+	  It is used by many services. NFC is fully controlled using I2C
+	  to communication
+config NFC_PN547_ESE_SUPPORT
+	bool "NXP PN547 ESE SUPPORT"
+	depends on NFC_PN547
+	default n
+	help
+	  NXP PN547 Near Field Communication controller support.
+	  This option enables device driver support for the NFC.
+	  It is used by many services. NFC is fully controlled using I2C
+	  to communication
+config NFC_PN547_LDO_CONTROL
+	bool "PN547 NFC LDO CONTROL"
+	depends on NFC_PN547
+	default n
+	help
+	  SAMSUNG PN547 NFC LDO CONTROL feature.
+	  This feature provides support for NXP PN547 products.
+	  You should select this feature if your NFC product uses ldo control of i2c.
+	  Say Y here to compile support for NXP PN547 LDO CONTROL feature into the
+	  kernel.
+
 config SEC_NFC_LOGGER
         bool "NFC logger"
         default n
