@@ -26,7 +26,8 @@ enum SEC_devices {
     SEC_A33,
     SEC_A53,
     SEC_M33,
-    SEC_M34
+    SEC_M34,
+    SEC_GTA4XLS
 };
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;

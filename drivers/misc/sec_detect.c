@@ -60,6 +60,9 @@ int sec_detect_init(void) {
     } else if (strstr(machine_name, "M34") != NULL) {
         sec_current_device = SEC_M34;
         sec_needs_decon = false;
+    } else if (strstr(machine_name, "GTA4XLS") != NULL) {
+        sec_current_device = SEC_GTA4XLS;
+        sec_needs_decon = false;
     }
     return 0;
 }
