@@ -12,7 +12,7 @@
 #define __HX83102E_GTA4XLS_00_RESOL_H__
 
 #include <dt-bindings/display/panel-display.h>
-#include "../panel.h"
+#include "../usdm_panel.h"
 #include "tft_common.h"
 
 enum {

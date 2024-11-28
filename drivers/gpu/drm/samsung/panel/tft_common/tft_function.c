@@ -8,15 +8,15 @@
  */
 
 #include <linux/module.h>
-#include "../panel_debug.h"
-#include "../panel_function.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_panel_function.h"
 #include "tft_common.h"
 #include "tft_function.h"
 
 struct pnobj_func tft_function_table[MAX_TFT_FUNCTION] = {
 	[TFT_MAPTBL_INIT_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(TFT_MAPTBL_INIT_DEFAULT, tft_maptbl_init_default),
 	[TFT_MAPTBL_INIT_BRT] = __PNOBJ_FUNC_INITIALIZER(TFT_MAPTBL_INIT_BRT, tft_maptbl_init_brt),
-	[TFT_MAPTBL_GETIDX_BRT] = __PNOBJ_FUNC_INITIALIZER(TFT_MAPTBL_GETIDX_BRT, tft_maptbl_getidx_brt),
+	[TFT_MAPTBL_GETIDX_BRT] = __PNOBJ_FUNC_INITIALIZER(TFT_MAPTBL_GETIDX_BRT, TFT_MAPTBL_GETIDX_BRT),
 	[TFT_MAPTBL_COPY_DEFAULT] = __PNOBJ_FUNC_INITIALIZER(TFT_MAPTBL_COPY_DEFAULT, tft_maptbl_copy_default),
 };
 EXPORT_SYMBOL(tft_function_table);
@@ -25,7 +25,7 @@ static int __init tft_function_init(void)
 {
 	int ret;
 
-	ret = panel_function_insert_array(tft_function_table,
+	ret = usdm_panel_function_insert_array(tft_function_table,
 			ARRAY_SIZE(tft_function_table));
 	if (ret < 0)
 		panel_err("failed to insert tft_function_table\n");

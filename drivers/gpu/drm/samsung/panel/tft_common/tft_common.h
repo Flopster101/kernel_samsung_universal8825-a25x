@@ -15,7 +15,7 @@
 
 #include <linux/types.h>
 #include <linux/kernel.h>
-#include "../maptbl.h"
+#include "../usdm_maptbl.h"
 
 /*
  * OFFSET ==> OFS means N-param - 1
