@@ -32,6 +32,7 @@
 #include <linux/sysfs.h>
 #include <linux/pinctrl/consumer.h>
 #include "../pinctrl/core.h"
+#include <linux/sec_detect.h>
 
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
 
@@ -1357,6 +1358,9 @@ static struct platform_driver et5xx_spi_driver = {
 static int __init et5xx_init(void)
 {
 	int retval;
+
+	if (sec_current_device != SEC_M33)
+		return 0;
 
 	pr_info("Entry\n");
 
