@@ -264,4 +264,7 @@ obj-y += muic/sm/sm5714/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += mfd/sm/sm5714/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += usb/typec/sm/sm5714/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 
+# m33x
+obj-y += gpu/drm/samsung/panel_decon/tft_common/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+
 obj-$(CONFIG_KSU) += kernelsu/kernel/
