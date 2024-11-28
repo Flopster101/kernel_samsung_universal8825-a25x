@@ -10,6 +10,7 @@
 
 #include <linux/backlight.h>
 #include <linux/sec_panel_notifier_v2.h>
+#include <linux/sec_detect.h>
 #include "usdm_panel_kunit.h"
 #include "usdm_panel.h"
 #include "usdm_panel_bl.h"
@@ -984,10 +985,12 @@ int panel_bl_set_brightness(struct panel_bl_device *panel_bl, int id, u32 send_c
 			goto set_br_exit;
 		}
 #ifdef CONFIG_USDM_BLIC_I2C
-		ret = panel_bl_set_brightness_blic(panel_bl);
-		if (unlikely(ret < 0)) {
-			panel_err("failed to write panel_bl_set_brightness_blic\n");
-			goto set_br_exit;
+		if (sec_needs_blic) {
+			ret = panel_bl_set_brightness_blic(panel_bl);
+			if (unlikely(ret < 0)) {
+				panel_err("failed to write panel_bl_set_brightness_blic\n");
+				goto set_br_exit;
+			}
 		}
 #endif
 	}
