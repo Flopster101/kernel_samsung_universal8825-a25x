@@ -11,11 +11,18 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
+#include <linux/sec_detect.h>
 #include "nt36672c_m33_00_panel.h"
 
 static int __init nt36672c_m33_00_panel_init(void)
 {
-	decon_register_common_panel(&nt36672c_m33x_00_panel_info);
+	if (sec_current_device == SEC_M33) {
+		SEC_DETECT_LOG("Initialized nt36672c_m33_00 panel driver\n");
+		decon_register_common_panel(&nt36672c_m33x_00_panel_info);
+	} else {
+		SEC_DETECT_LOG("Skipped nt36672c_m33_00 panel driver\n");
+	}
+
 	return 0;
 }
 
