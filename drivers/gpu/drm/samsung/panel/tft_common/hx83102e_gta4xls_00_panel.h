@@ -13,8 +13,8 @@
 #ifndef __HX83102E_GTA4XLS_00_PANEL_H__
 #define __HX83102E_GTA4XLS_00_PANEL_H__
 
-#include "../panel.h"
-#include "../panel_drv.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_drv.h"
 #include "tft_common.h"
 #include "tft_function.h"
 #include "hx83102e_gta4xls_00_resol.h"

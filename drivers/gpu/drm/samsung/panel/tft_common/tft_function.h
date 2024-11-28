@@ -12,7 +12,7 @@
 
 #include <linux/types.h>
 #include <linux/kernel.h>
-#include "../panel_function.h"
+#include "../usdm_panel_function.h"
 
 enum tft_function {
 	TFT_MAPTBL_INIT_DEFAULT,

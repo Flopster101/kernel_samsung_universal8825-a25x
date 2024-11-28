@@ -11,11 +11,11 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
-#include "../panel.h"
-#include "../panel_drv.h"
-#include "../panel_debug.h"
-#include "../maptbl.h"
-#include "../util.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
+#include "../usdm_maptbl.h"
+#include "../usdm_util.h"
 #include "tft_common.h"
 
 static int generate_brt_step_table(struct brightness_table *brt_tbl)
@@ -52,10 +52,10 @@ static int generate_brt_step_table(struct brightness_table *brt_tbl)
 	while (i < brt_tbl->sz_brt_to_step) {
 		for (k = 1; k < brt_tbl->sz_brt; k++) {
 			for (j = 1; j <= brt_tbl->step_cnt[k]; j++, i++) {
-				brt_tbl->brt_to_step[i] = disp_interpolation64(brt_tbl->brt[k - 1] * disp_pow(10, 2),
-					brt_tbl->brt[k] * disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
+				brt_tbl->brt_to_step[i] = usdm_disp_interpolation64(brt_tbl->brt[k - 1] * usdm_disp_pow(10, 2),
+					brt_tbl->brt[k] * usdm_disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
 				brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
-				brt_tbl->brt_to_step[i] = disp_div64(brt_tbl->brt_to_step[i], disp_pow(10, 2));
+				brt_tbl->brt_to_step[i] = usdm_disp_div64(brt_tbl->brt_to_step[i], usdm_disp_pow(10, 2));
 				if (brt_tbl->brt[brt_tbl->sz_brt - 1] < brt_tbl->brt_to_step[i])
 					brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
 
@@ -125,7 +125,7 @@ int tft_maptbl_init_brt(struct maptbl *tbl)
 	return 0;
 }
 
-int tft_maptbl_getidx_brt(struct maptbl *tbl)
+int tft_usdm_maptbl_getidx_brt(struct maptbl *tbl)
 {
 	int row = 0;
 	struct panel_info *panel_data;
@@ -139,9 +139,9 @@ int tft_maptbl_getidx_brt(struct maptbl *tbl)
 	panel_bl = &panel->panel_bl;
 	panel_data = &panel->panel_data;
 
-	row = get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
+	row = usdm_get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
 
-	return maptbl_index(tbl, 0, row, 0);
+	return usdm_maptbl_index(tbl, 0, row, 0);
 }
 
 void tft_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
@@ -154,7 +154,7 @@ void tft_maptbl_copy_default(struct maptbl *tbl, u8 *dst)
 		return;
 	}
 
-	idx = maptbl_getidx(tbl);
+	idx = usdm_maptbl_getidx(tbl);
 	if (idx < 0) {
 		panel_err("failed to getidx %d\n", idx);
 		return;

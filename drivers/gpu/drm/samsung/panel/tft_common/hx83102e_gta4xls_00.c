@@ -12,7 +12,7 @@
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
 #include "hx83102e_gta4xls_00_panel.h"
-#include "../panel_debug.h"
+#include "../usdm_panel_debug.h"
 
 static int gta4xls_first_br_property_update(struct panel_property *prop)
 {
@@ -29,7 +29,7 @@ static int gta4xls_first_br_property_update(struct panel_property *prop)
 	if (index == GTA4XLS_FIRST_BR_ON)
 		panel_info("first non-zero br!\n");
 
-	return panel_property_set_value(prop, index);
+	return usdm_panel_property_set_value(prop, index);
 }
 
 static struct panel_prop_enum_item gta4xls_first_br_enum_items[MAX_GTA4XLS_FIRST_BR] = {
@@ -52,13 +52,13 @@ static int __init hx83102e_gta4xls_00_panel_init(void)
 	cpi->prop_lists[USDM_DRV_LEVEL_MODEL] = hx83102e_gta4xls_property_array;
 	cpi->num_prop_lists[USDM_DRV_LEVEL_MODEL] = ARRAY_SIZE(hx83102e_gta4xls_property_array);
 
-	register_common_panel(&hx83102e_gta4xls_00_panel_info);
+	usdm_register_common_panel(&hx83102e_gta4xls_00_panel_info);
 	return 0;
 }
 
 static void __exit hx83102e_gta4xls_00_panel_exit(void)
 {
-	deregister_common_panel(&hx83102e_gta4xls_00_panel_info);
+	usdm_deregister_common_panel(&hx83102e_gta4xls_00_panel_info);
 }
 
 module_init(hx83102e_gta4xls_00_panel_init)
