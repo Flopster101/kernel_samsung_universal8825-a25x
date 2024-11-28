@@ -11,6 +11,7 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
+#include <linux/sec_detect.h>
 #include "../usdm_maptbl.h"
 #include "../usdm_panel.h"
 #include "../usdm_panel_function.h"
@@ -123,10 +124,14 @@ struct pnobj_func s6e3fc3_m34x_function_table[MAX_S6E3FC3_M34X_FUNCTION] = {
 
 static int __init s6e3fc3_m34x_panel_init(void)
 {
-	s6e3fc3_init(&s6e3fc3_m34x_panel_info);
-	usdm_panel_function_insert_array(s6e3fc3_m34x_function_table, ARRAY_SIZE(s6e3fc3_m34x_function_table));
-	usdm_register_common_panel(&s6e3fc3_m34x_panel_info);
-
+	if (sec_current_device == SEC_M34) {
+		SEC_DETECT_LOG("Initialized s6e3fc3_m34x panel driver\n");
+		s6e3fc3_init(&s6e3fc3_m34x_panel_info);
+		usdm_panel_function_insert_array(s6e3fc3_m34x_function_table, ARRAY_SIZE(s6e3fc3_m34x_function_table));
+		usdm_register_common_panel(&s6e3fc3_m34x_panel_info);
+	} else {
+		SEC_DETECT_LOG("Skipped s6e3fc3_m34x panel driver\n");
+	}
 	return 0;
 }
 
