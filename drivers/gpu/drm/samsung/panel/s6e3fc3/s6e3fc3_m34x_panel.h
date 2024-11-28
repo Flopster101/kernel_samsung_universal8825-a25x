@@ -13,9 +13,9 @@
 #ifndef __S6E3FC3_M34X_PANEL_H__
 #define __S6E3FC3_M34X_PANEL_H__
 
-#include "../panel.h"
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../usdm_panel.h"
+#include "../usdm_panel_drv.h"
+#include "../usdm_panel_debug.h"
 #include "oled_function.h"
 #include "s6e3fc3.h"
 #include "s6e3fc3_m34x.h"
