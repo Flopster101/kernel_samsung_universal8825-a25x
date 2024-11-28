@@ -993,7 +993,7 @@ static int p61_probe(struct device *dev)
 
 	dev_set_drvdata(dev, p61_dev);
 #if defined(CONFIG_NFC_FEATURE_SN100U)
-#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_NFC_PVDD_LATE_ENABLE)
 	if (lpcharge)
 		ese_set_spi_configuration("lpm");
 	else
@@ -1014,7 +1014,7 @@ static int p61_probe(struct device *dev)
 	wake_lock_init(&p61_dev->ese_lock, WAKE_LOCK_SUSPEND, "ese_wake_lock");
 	p61_dev->device_opened = false;
 
-#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_NFC_PVDD_LATE_ENABLE)
 	if (!lpcharge) {
 #else
 	{
