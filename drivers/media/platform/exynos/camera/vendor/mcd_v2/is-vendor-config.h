@@ -26,6 +26,11 @@
 #define IS_MAX_FW_BUFFER_SIZE (4100 * 1024)
 #define IS_MAX_CAL_SIZE (64 * 1024)
 
+#if defined(CONFIG_CAMERA_AAVW_UNIFIED)
+#include "aavw_common/is-vendor-config_aavw_common.h"
+#endif
+
+#ifndef CONFIG_CAMERA_AAVW_UNIFIED
 #if defined(CONFIG_CAMERA_AAV_A53X)
 #include "aav_v53x/is-vendor-config_aav_v53x.h"
 #elif defined(CONFIG_CAMERA_AAW_A25X)
@@ -40,6 +45,7 @@
 #include "stx_v04/is-vendor-config_stx_v04.h"
 #else
 #include "aav_v33x/is-vendor-config_aav_v33x.h"
+#endif
 #endif
 
 #endif
