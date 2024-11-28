@@ -11,6 +11,7 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
+#include <linux/sec_detect.h>
 #include "hx83102e_gta4xls_00_panel.h"
 #include "../usdm_panel_debug.h"
 
@@ -49,10 +50,15 @@ static int __init hx83102e_gta4xls_00_panel_init(void)
 {
 	struct common_panel_info *cpi = &hx83102e_gta4xls_00_panel_info;
 
-	cpi->prop_lists[USDM_DRV_LEVEL_MODEL] = hx83102e_gta4xls_property_array;
-	cpi->num_prop_lists[USDM_DRV_LEVEL_MODEL] = ARRAY_SIZE(hx83102e_gta4xls_property_array);
+	if (sec_current_device == SEC_GTA4XLS) {
+		SEC_DETECT_LOG("Initialized hx83102e_gta4xls_00 panel driver\n");
+		cpi->prop_lists[USDM_DRV_LEVEL_MODEL] = hx83102e_gta4xls_property_array;
+		cpi->num_prop_lists[USDM_DRV_LEVEL_MODEL] = ARRAY_SIZE(hx83102e_gta4xls_property_array);
 
-	usdm_register_common_panel(&hx83102e_gta4xls_00_panel_info);
+		usdm_register_common_panel(&hx83102e_gta4xls_00_panel_info);
+	} else {
+		SEC_DETECT_LOG("Skipped hx83102e_gta4xls_00 panel driver\n");
+	}
 	return 0;
 }
 
