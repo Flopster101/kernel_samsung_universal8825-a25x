@@ -120,7 +120,7 @@ struct pn547_dev *get_nfcc_dev_data(void)
 #ifdef FEATURE_SN100X
 void pn547_register_ese_shutdown(void (*func)(void))
 {
-#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_NFC_PVDD_LATE_ENABLE)
 	if (!lpcharge && pn547_dev)
 #else
 	if (pn547_dev)
@@ -1746,7 +1746,8 @@ static int pn547_probe(struct i2c_client *client, const struct i2c_device_id *id
 	if (pn547_dev->clkctrl_addr != 0) {
 		unsigned int val = 0;
 
-		pn547_dev->clkctrl = ioremap_nocache(pn547_dev->clkctrl_addr, 0x4);
+		//pn547_dev->clkctrl = ioremap_nocache(pn547_dev->clkctrl_addr, 0x4);
+		pn547_dev->clkctrl = ioremap_wc(pn547_dev->clkctrl_addr, 0x4);
 		if (!pn547_dev->clkctrl) {
 			NFC_LOG_ERR("cannot remap register\n");
 			ret = -ENXIO;
@@ -2095,7 +2096,7 @@ static int __init pn547_dev_init(void)
 #else
 	NFC_LOG_INFO("Loading pn547 driver\n");
 #endif
-#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_NFC_PVDD_LATE_ENABLE)
 	if (lpcharge) {
 		NFC_LOG_ERR("LPM, Do not load nfc driver\n");
 		return 0;
@@ -2132,7 +2133,7 @@ static int __init pn547_dev_init(void)
 #else
 	NFC_LOG_INFO("Loading pn547 driver\n");
 #endif
-#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && !defined(CONFIG_NFC_PVDD_LATE_ENABLE)
 	if (lpcharge) {
 		NFC_LOG_ERR("LPM, Do not load nfc driver\n");
 		return 0;
