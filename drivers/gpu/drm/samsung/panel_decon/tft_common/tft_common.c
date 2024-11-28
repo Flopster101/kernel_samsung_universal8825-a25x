@@ -11,11 +11,11 @@
  */
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
-#include "../panel.h"
+#include "../decon_panel.h"
 #include "tft_common.h"
 
-#include "../panel_drv.h"
-#include "../panel_debug.h"
+#include "../decon_panel_drv.h"
+#include "../decon_panel_debug.h"
 
 static int generate_brt_step_table(struct brightness_table *brt_tbl)
 {
@@ -51,12 +51,12 @@ static int generate_brt_step_table(struct brightness_table *brt_tbl)
 	while (i < brt_tbl->sz_brt_to_step) {
 		for (k = 1; k < brt_tbl->sz_brt; k++) {
 			for (j = 1; j <= brt_tbl->step_cnt[k]; j++, i++) {
-				brt_tbl->brt_to_step[i] = disp_interpolation64(brt_tbl->brt[k - 1] * disp_pow(10, 2),
-					brt_tbl->brt[k] * disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
-				brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
-				brt_tbl->brt_to_step[i] = disp_div64(brt_tbl->brt_to_step[i], disp_pow(10, 2));
+				brt_tbl->brt_to_step[i] = decon_disp_interpolation64(brt_tbl->brt[k - 1] * decon_disp_pow(10, 2),
+					brt_tbl->brt[k] * decon_disp_pow(10, 2), j, brt_tbl->step_cnt[k]);
+				brt_tbl->brt_to_step[i] = decon_disp_pow_round(brt_tbl->brt_to_step[i], 2);
+				brt_tbl->brt_to_step[i] = decon_disp_div64(brt_tbl->brt_to_step[i], decon_disp_pow(10, 2));
 				if (brt_tbl->brt[brt_tbl->sz_brt - 1] < brt_tbl->brt_to_step[i])
-					brt_tbl->brt_to_step[i] = disp_pow_round(brt_tbl->brt_to_step[i], 2);
+					brt_tbl->brt_to_step[i] = decon_disp_pow_round(brt_tbl->brt_to_step[i], 2);
 
 				if (i >= brt_tbl->sz_brt_to_step) {
 					panel_err("step cnt over %d %d\n", i, brt_tbl->sz_brt_to_step);
@@ -138,9 +138,9 @@ int getidx_brt_table(struct maptbl *tbl)
 	panel_bl = &panel->panel_bl;
 	panel_data = &panel->panel_data;
 
-	row = get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
+	row = decon_get_brightness_pac_step(panel_bl, panel_bl->props.brightness);
 
-	return maptbl_index(tbl, 0, row, 0);
+	return decon_maptbl_index(tbl, 0, row, 0);
 }
 
 void copy_common_maptbl(struct maptbl *tbl, u8 *dst)
@@ -153,7 +153,7 @@ void copy_common_maptbl(struct maptbl *tbl, u8 *dst)
 		return;
 	}
 
-	idx = maptbl_getidx(tbl);
+	idx = decon_maptbl_getidx(tbl);
 	if (idx < 0) {
 		panel_err("failed to getidx %d\n", idx);
 		return;

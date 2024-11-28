@@ -15,13 +15,13 @@
 
 static int __init nt36672c_m33_00_panel_init(void)
 {
-	register_common_panel(&nt36672c_m33x_00_panel_info);
+	decon_register_common_panel(&nt36672c_m33x_00_panel_info);
 	return 0;
 }
 
 static void __exit nt36672c_m33_00_panel_exit(void)
 {
-	deregister_common_panel(&nt36672c_m33x_00_panel_info);
+	decon_deregister_common_panel(&nt36672c_m33x_00_panel_info);
 }
 
 module_init(nt36672c_m33_00_panel_init)

@@ -13,8 +13,8 @@
 #ifndef __NT36672C_M33X_00_PANEL_H__
 #define __NT36672C_M33X_00_PANEL_H__
 
-#include "../panel.h"
-#include "../panel_drv.h"
+#include "../decon_panel.h"
+#include "../decon_panel_drv.h"
 #include "tft_common.h"
 #include "nt36672c_m33_00_resol.h"
 
