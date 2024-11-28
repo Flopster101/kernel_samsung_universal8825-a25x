@@ -174,6 +174,7 @@ config SENSORS_ISG5320A
 	  If you say yes here if you use ISG5320A for grip.
 	  This option enables grip sensors using
 	  IMAGIS ISG5320A device driver for grip.
+
 config SENSORS_ISG5320A_SUB
 	depends on I2C
 	tristate "ISG5320A grip sub"
@@ -182,42 +183,113 @@ config SENSORS_ISG5320A_SUB
 	  If you say yes here if you use ISG5320A_SUB for grip sub.
 	  This option enables grip sensors using
 	  IMAGIS ISG5320A_SUB device driver for grip sub.
+
+config SENSORS_ISG6320
+	depends on I2C
+	tristate "ISG6320 grip"
+	default n
+	help
+	  If you say yes here if you use ISG6320 for grip.
+	  This option enables grip sensors using
+	  IMAGIS ISG6320 device driver for grip.
+
+config SENSORS_ISG6320_SUB
+	depends on I2C
+	tristate "ISG6320 grip sub"
+	default n
+	help
+	  If you say yes here if you use ISG6320_SUB for grip sub.
+	  This option enables grip sensors using
+	  IMAGIS ISG6320_SUB device driver for grip sub.
+
+config SENSORS_ISG6320_SUB2
+	depends on I2C
+	tristate "ISG6320 grip sub2"
+	default n
+	help
+	  If you say yes here if you use ISG6320_SUB2 for grip sub2.
+	  This option enables grip sensors using
+	  IMAGIS ISG6320_SUB2 device driver for grip sub2.
+
+config SENSORS_ISG6320_WIFI
+	depends on I2C
+	tristate "ISG6320 grip wifi"
+	default n
+	help
+	  If you say yes here if you use ISG6320_WIFI for grip wifi.
+	  This option enables grip sensors using
+	  IMAGIS ISG6320_WIFI device driver for grip wifi.
+	
 config SENSORS_SUPPORT_SLSI
 	tristate "Need to set if the driver is working based on Exynos Chip Set"
 	default n
 	help
 	  If you say yes here, the driver is working based on Exynos Chip Set.
 	  This option enable the feature that is related with Exynos Chip Set.
+
 config SENSORS_SUPPORT_QCOM
 	tristate "Need to set if the driver is working based on Snapdragon Chip Set"
 	default n
 	help
 	  If you say yes here, the driver is working based on Snapdragon Chip Set.
 	  This option enable the feature that is related with Snapdragon Chip Set.
+
 config SENSORS_SUPPORT_MTK
 	tristate "Need to set if the driver is working based on Mediatek Chip Set"
 	default n
 	help
 	  If you say yes here, the driver is working based on Mediatek Chip Set.
 	  This option enable the feature that is related with Mediatek Chip Set.
+
 config SENSORS_CORE_AP
 	tristate "Grip sensor test"
 	default n
 	help
 	  Enable grip test
 	  This option enables logs or functions for grip test.
+
 config TEST_FOR_GRIP
 	tristate "Grip sensor test"
 	default n
 	help
 	  Enable grip test
 	  This option enables logs or functions for grip test.
+
+config USE_MULTI_CHANNEL
+	tristate "Grip sensor multi chennel"
+	default n
+	help
+	  Enable grip multi channel
+	  This option enables feature that is related multi-Channel for grip Sensor.
+	  
+config UNSUPPORT_UNKNOWN_MODE
+	tristate "Unsupport unknown mode for specific regions"
+	default n
+	help
+	  This option disable grip unknown mode concept for specific project.
+
+config SUPPORT_MCC_THRESHOLD_CHANGE
+	depends on I2C
+	tristate "Change grip sensor threshold according to the MCC value"
+	default n
+	help
+	  Say Y here if you need to check mcc(mobile country code).
+	  This option enables when it is necessary to adjust the threshold
+	  according to the mcc value.
+	  Say N here if you do not need to check mcc.
+
 config SENSORS_ISG5320A_USE_BFCAL
 	tristate "ISG5320A grip bf-calibration"
 	default n
 	help
 	  Enable bf calibration for grip test
 	  This option allows some function to use bfcal instead of cfcal.
+
+config SENSORS_SKIP_CABLE_RESET
+	tristate "skip grip reset when usb/ta/data cable attached"
+	default n
+	help
+	  new ANFR concept to skip grip reset  
 
 config SENSORS_DUMP_DATA
 	tristate "Grip sensor dump log"
@@ -230,6 +302,13 @@ config SENSORS_GRIP_FAILURE_DEBUG
 	bool "Grip failure debug"
 	help
 	  Say Y here, Enable Grip failure debug flag.
+
+config SENSORS_GRIP_SCANOFF
+	bool "Grip sensor low power sleep mode"
+	default n
+	help
+	  Scan off for low current consumption of the unused grip sensor.
+	  This option is for DM USA&CAN models, user binary.
 
 config SENSORS_LOW_TEMP_COMP
 	bool "Grip condition for low temperature"
