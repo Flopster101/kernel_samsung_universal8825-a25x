@@ -14,7 +14,7 @@
 #define __NT36672C_M33X_00_RESOL_H__
 
 #include <dt-bindings/display/panel-display.h>
-#include "../panel.h"
+#include "../decon_panel.h"
 
 enum {
 	NT36672C_M33X_00_DISPLAY_MODE_1080x2408_120HS,
