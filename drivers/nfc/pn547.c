@@ -68,6 +68,7 @@
 #include <linux/signal.h>
 #include <linux/sched/signal.h>
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 
 #include "pn547.h"
 #include "cold_reset.h"
@@ -2090,6 +2091,9 @@ extern void p61_dev_exit(void);
 static int __init pn547_dev_init(void)
 {
 	int ret;
+
+	if (sec_current_device != SEC_M33)
+		return 0;
 
 #ifdef CONFIG_NFC_FEATURE_SN100U
 	NFC_LOG_INFO("Loading sn1xx driver\n");
