@@ -1590,7 +1590,7 @@ static int __init sec_nfc_init(void)
 		spip3_dev_init();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST21NFC)
-	if (sec_current_device == SEC_A25)
+	if (sec_current_device == SEC_A25 || sec_current_device == SEC_M34)
 		st21nfc_dev_init();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
@@ -1606,7 +1606,7 @@ static void __exit sec_nfc_exit(void)
 		spip3_dev_exit();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST21NFC)
-	if (sec_current_device == SEC_A25)
+	if (sec_current_device == SEC_A25 || sec_current_device == SEC_M34)
 		st21nfc_dev_exit();
 #endif
 #if IS_ENABLED(CONFIG_NFC_ST54SPI_ESE_SUPPORT)
