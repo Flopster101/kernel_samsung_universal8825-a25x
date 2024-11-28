@@ -272,3 +272,5 @@ obj-y += input/touchscreen/novatek/nt36523_spi/ # ADDED BY LEGO AUTOMATICALLY: D
 
 # gta4xls
 obj-y += gpu/drm/samsung/panel/tft_common/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += input/sec_input/wacom/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += input/touchscreen/himax/hx831xx/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT

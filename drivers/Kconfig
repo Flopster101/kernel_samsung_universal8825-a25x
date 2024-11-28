@@ -320,5 +320,7 @@ source "drivers/input/touchscreen/novatek/nt36523_spi/Kconfig" # ADDED BY LEGO A
 
 # gta4xls
 source "drivers/gpu/drm/samsung/panel/tft_common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/input/sec_input/wacom/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/input/touchscreen/himax/hx831xx/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 
 endmenu
