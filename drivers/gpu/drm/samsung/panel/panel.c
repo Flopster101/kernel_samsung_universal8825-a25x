@@ -14,6 +14,7 @@
 #include <video/mipi_display.h>
 #include <linux/lcd.h>
 #include <linux/spi/spi.h>
+#include <linux/sec_detect.h>
 #include "usdm_panel_kunit.h"
 #include "usdm_panel_drv.h"
 #include "usdm_panel.h"
@@ -1393,7 +1394,10 @@ static int panel_do_tx_packet(struct panel_device *panel, struct pktinfo *info, 
 #ifdef CONFIG_USDM_BLIC_I2C
 	case I2C_PKT_TYPE_WR:
 	case I2C_PKT_TYPE_RD:
-		ret = panel_do_i2c_packet(panel, info);
+		if (sec_needs_blic)
+			ret = panel_do_i2c_packet(panel, info);
+		else
+			ret = panel_do_dsi_tx_packet(panel, info, block);
 		break;
 #endif
 	default:

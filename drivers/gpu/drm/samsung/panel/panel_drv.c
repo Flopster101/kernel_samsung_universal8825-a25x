@@ -3035,7 +3035,8 @@ __visible_for_testing int panel_prepare(struct panel_device *panel, struct commo
 	}
 
 #ifdef CONFIG_USDM_PANEL_BLIC
-	panel_blic_prepare(panel, cpi);
+	if (sec_needs_blic)
+		panel_blic_prepare(panel, cpi);
 #endif
 
 	ret = panel_sort_command_initdata_list(panel, cpi);
@@ -3167,9 +3168,11 @@ __visible_for_testing int panel_unprepare(struct panel_device *panel)
 		panel_err("failed to unprepare prop list\n");
 
 #ifdef CONFIG_USDM_PANEL_BLIC
-	ret = panel_blic_unprepare(panel);
-	if (ret < 0)
-		panel_err("failed to unprepare panel_blic\n");
+	if (sec_needs_blic) {
+		ret = panel_blic_unprepare(panel);
+		if (ret < 0)
+			panel_err("failed to unprepare panel_blic\n");
+	}
 #endif
 #ifdef CONFIG_USDM_MDNIE
 	ret = mdnie_unprepare(&panel->mdnie);
@@ -7439,18 +7442,22 @@ int usdm_panel_device_init(struct panel_device *panel)
 		set_panel_id(panel, 0);
 
 #ifdef CONFIG_USDM_BLIC_I2C
-	ret = panel_i2c_drv_init(panel);
-	if (ret < 0) {
-		panel_err("panel-%d:failed to parse i2c\n", panel->id);
-		return ret;
+	if (sec_needs_blic) {
+		ret = panel_i2c_drv_init(panel);
+		if (ret < 0) {
+			panel_err("panel-%d:failed to parse i2c\n", panel->id);
+			return ret;
+		}
 	}
 #endif
 
 #ifdef CONFIG_USDM_PANEL_BLIC
-	ret = panel_blic_probe(panel);
-	if (ret < 0) {
-		panel_err("panel-%d:failed to parse blic\n", panel->id);
-		return ret;
+	if (sec_needs_blic) {
+		ret = panel_blic_probe(panel);
+		if (ret < 0) {
+			panel_err("panel-%d:failed to parse blic\n", panel->id);
+			return ret;
+		}
 	}
 #endif
 
