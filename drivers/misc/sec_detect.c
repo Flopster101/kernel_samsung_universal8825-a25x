@@ -21,8 +21,10 @@
 
 int sec_current_device = DEVICE_UNKNOWN;
 bool sec_needs_decon;
+bool sec_needs_blic = false;
 EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
+EXPORT_SYMBOL(sec_needs_blic);
 
 int sec_detect_init(void) {
     struct device_node *root;
@@ -63,6 +65,7 @@ int sec_detect_init(void) {
     } else if (strstr(machine_name, "GTA4XLS") != NULL) {
         sec_current_device = SEC_GTA4XLS;
         sec_needs_decon = false;
+        sec_needs_blic = true;
     }
     return 0;
 }
