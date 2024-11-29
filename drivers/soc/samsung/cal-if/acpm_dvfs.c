@@ -37,7 +37,9 @@ int exynos_acpm_set_rate(unsigned int id, unsigned long rate, bool fast_switch)
 
 	ch = fast_switch ? acpm_dvfs.fast_ch_num : acpm_dvfs.ch_num;
 
+#if defined(CONFIG_EXYNOS_DEBUG_FREQ)
 	secdbg_freq_check(id, rate);
+#endif
 	before = sched_clock();
 	ret = acpm_ipc_send_data(ch, &config);
 	after = sched_clock();
