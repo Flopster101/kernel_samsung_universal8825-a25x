@@ -14,6 +14,7 @@
 #include <video/mipi_display.h>
 #include <linux/lcd.h>
 #include <linux/spi/spi.h>
+#include <linux/sec_detect.h>
 #include "decon_panel_kunit.h"
 #include "decon_panel_drv.h"
 #include "decon_panel.h"
@@ -1961,7 +1962,10 @@ static int _panel_do_seqtbl(struct panel_device *panel,
 #ifdef CONFIG_MCD_PANEL_I2C
 		case I2C_PKT_TYPE_WR:
 		case I2C_PKT_TYPE_RD:
-			ret = panel_do_i2c_packet(panel, (struct pktinfo *)cmdtbl[i]);
+			if (sec_needs_blic)
+				ret = panel_do_i2c_packet(panel, (struct pktinfo *)cmdtbl[i]);
+			else
+				panel_warn("unknown pakcet type %d\n", type);
 			break;
 #endif
 

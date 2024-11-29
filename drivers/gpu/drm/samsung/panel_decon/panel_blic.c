@@ -16,6 +16,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/regulator/machine.h>
 #include <linux/regulator/of_regulator.h>
+#include <linux/sec_detect.h>
 
 #include "decon_panel_drv.h"
 #include "decon_panel_blic.h"
@@ -121,8 +122,10 @@ static int panel_blic_do_seq(struct panel_blic_dev *blic, enum panel_blic_seq in
 	 */
 
 #ifdef CONFIG_MCD_PANEL_I2C
-	if (blic->i2c_dev)
-		panel->i2c_dev_selected = blic->i2c_dev;
+	if (sec_needs_blic) {
+		if (blic->i2c_dev)
+			panel->i2c_dev_selected = blic->i2c_dev;
+	}
 #endif
 
 	panel_info("%s:start\n", tbl[index].name);
@@ -645,23 +648,25 @@ exit_power:
 exit:
 
 #ifdef CONFIG_MCD_PANEL_I2C
-	if (temp->i2c_reg) {
-		temp->i2c_dev = panel_blic_find_i2c_drv(temp, panel);
+	if (sec_needs_blic) {
+		if (temp->i2c_reg) {
+			temp->i2c_dev = panel_blic_find_i2c_drv(temp, panel);
 
-		if (!temp->i2c_dev) {
-			/*
-			 * In most cases, it is not error.
-			 * ex. Already i2c driver is occupied by a dualization device.
-			 * The device doesn't need to probe anymore.
-			 */
+			if (!temp->i2c_dev) {
+				/*
+				* In most cases, it is not error.
+				* ex. Already i2c driver is occupied by a dualization device.
+				* The device doesn't need to probe anymore.
+				*/
 
-			panel_warn("cancel.(%s).\n", temp->name);
-			kfree(temp);
-			return ret;
+				panel_warn("cancel.(%s).\n", temp->name);
+				kfree(temp);
+				return ret;
+			}
+
+			temp->i2c_dev->use = true;
+			temp->dev = &temp->i2c_dev->client->dev;
 		}
-
-		temp->i2c_dev->use = true;
-		temp->dev = &temp->i2c_dev->client->dev;
 	}
 #endif
 	panel->nr_blic_dev++;
