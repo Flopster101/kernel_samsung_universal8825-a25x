@@ -169,6 +169,7 @@ is-cis-4ha.ko
 is-cis-imx582.ko
 is-cis-3l6.ko
 is-actuator-ak737x.ko
+is-actuator-dw9808.ko
 is-flash-s2mf301.ko
 is-flash-sm5714.ko
 is-flash-s2mu106.ko
