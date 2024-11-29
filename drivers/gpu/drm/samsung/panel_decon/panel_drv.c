@@ -5380,18 +5380,22 @@ int decon_panel_device_init(struct panel_device *panel)
 	INIT_LIST_HEAD(&panel->panel_lut_list);
 
 #ifdef CONFIG_MCD_PANEL_I2C
-	ret = panel_i2c_drv_probe(panel);
-	if (ret < 0) {
-		panel_err("panel-%d:failed to parse i2c\n", panel->id);
-		return ret;
+	if (sec_needs_blic) {
+		ret = panel_i2c_drv_probe(panel);
+		if (ret < 0) {
+			panel_err("panel-%d:failed to parse i2c\n", panel->id);
+			return ret;
+		}
 	}
 #endif
 
 #ifdef CONFIG_MCD_PANEL_BLIC
-	ret = panel_blic_probe(panel);
-	if (ret < 0) {
-		panel_err("panel-%d:failed to parse blic\n", panel->id);
-		return ret;
+	if (sec_needs_blic) {
+		ret = panel_blic_probe(panel);
+		if (ret < 0) {
+			panel_err("panel-%d:failed to parse blic\n", panel->id);
+			return ret;
+		}
 	}
 #endif
 
