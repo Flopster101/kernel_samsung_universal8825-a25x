@@ -2156,7 +2156,7 @@ static int dsim_probe(struct platform_device *pdev)
 			phy_init(dsim->res.phy_ex);
 	}
 
-#if IS_ENABLED(CONFIG_EXYNOS_FREQ_HOP)
+#if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP)
 	if (!dsim->id)
 		dpu_init_freq_hop(dsim);
 #endif
