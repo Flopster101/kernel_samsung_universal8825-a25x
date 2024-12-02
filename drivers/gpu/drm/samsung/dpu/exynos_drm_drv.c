@@ -1120,16 +1120,17 @@ static int __init exynos_drm_init(void)
 {
 	int ret;
 
-	if (!sec_needs_decon) {
-		SEC_DETECT_LOG("Initialized Exynos DPU driver for usdm\n");
-		ret = exynos_drm_register_devices();
-		if (ret)
-			return ret;
+	if (sec_needs_decon)
+		return 0;
 
-		ret = exynos_drm_register_drivers();
-		if (ret)
-			goto err_unregister_pdevs;
-	}
+	SEC_DETECT_LOG("Initialized Exynos DPU driver for usdm\n");
+	ret = exynos_drm_register_devices();
+	if (ret)
+		return ret;
+
+	ret = exynos_drm_register_drivers();
+	if (ret)
+		goto err_unregister_pdevs;
 
 	return 0;
 
