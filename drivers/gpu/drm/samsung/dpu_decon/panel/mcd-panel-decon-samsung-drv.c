@@ -38,7 +38,7 @@
 #include "panel-samsung-drv.h"
 #include "mcd-panel-samsung-helper.h"
 #include "decon_panel_drv.h"
-#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP) || IS_ENABLED(CONFIG_USDM_PANEL_FREQ_HOP)
+#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP)
 #include "decon_panel_freq_hop.h"
 #endif
 
@@ -2242,7 +2242,7 @@ __visible_for_testing int mcd_drm_emergency_off(void *_ctx)
 	return 0;
 }
 
-#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP) || IS_ENABLED(CONFIG_USDM_PANEL_FREQ_HOP)
+#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP)
 static int mcd_drm_panel_set_osc(struct exynos_panel *ctx, u32 frequency)
 {
 	struct panel_clock_info info;
@@ -2354,7 +2354,7 @@ struct panel_adapter_funcs mcd_panel_adapter_funcs = {
 	.dpu_event_log_print = mcd_drm_dpu_event_log_print,
 	.set_commit_retry = mcd_drm_set_commit_retry,
 	.emergency_off = mcd_drm_emergency_off,
-#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP) || IS_ENABLED(CONFIG_USDM_PANEL_FREQ_HOP)
+#if IS_ENABLED(CONFIG_PANEL_FREQ_HOP)
 	.set_freq_hop = mcd_drm_set_freq_hop,
 #endif
 };

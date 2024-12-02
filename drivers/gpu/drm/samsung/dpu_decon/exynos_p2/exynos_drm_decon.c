@@ -1126,7 +1126,7 @@ static int decon_late_register(struct exynos_drm_crtc *exynos_crtc)
 	debugfs_create_x32("dta_lo_thres", 0664,
 			urgent_dent, &decon->config.urgent.dta_lo_thres);
 
-#if IS_ENABLED(CONFIG_EXYNOS_FREQ_HOP)
+#if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP)
 	dpu_freq_hop_debugfs(exynos_crtc);
 #endif
 
