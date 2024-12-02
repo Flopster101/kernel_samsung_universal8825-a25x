@@ -19,7 +19,7 @@
 #include <dsim_cal.h>
 #include <cal_config.h>
 
-#if IS_ENABLED(CONFIG_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
+#if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
 #include <exynos_drm_dsim.h>
 #endif
 
@@ -1814,7 +1814,7 @@ static void dsim_reg_set_config(u32 id, struct dsim_reg_config *config,
 }
 #endif
 
-#if IS_ENABLED(CONFIG_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
+#if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
 /*
  * To avoid HW constraints that only +/- 2.5% can be changed,
  *	set the default pll value when initialize dsim
@@ -1881,7 +1881,7 @@ static int dsim_reg_set_clocks(u32 id, struct dsim_clks *clks,
 		pll.s = dphy_pms->s;
 		pll.k = dphy_pms->k;
 
-#if IS_ENABLED(CONFIG_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
+#if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
 		clear_freq_hop_pll(clks, dphy_pms);
 #endif
 

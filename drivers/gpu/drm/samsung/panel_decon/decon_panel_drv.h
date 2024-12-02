@@ -179,7 +179,7 @@ struct panel_adapter_funcs {
 	int (*dpu_register_dump)(void *ctx);
 	int (*dpu_event_log_print)(void *ctx);
 	int (*emergency_off)(void *ctx);
-#if defined(CONFIG_PANEL_FREQ_HOP) || defined(CONFIG_USDM_PANEL_FREQ_HOP) || defined(CONFIG_USDM_SDP_ADAPTIVE_MIPI) || defined(CONFIG_USDM_ADAPTIVE_MIPI)
+#if defined(CONFIG_PANEL_FREQ_HOP)
 	int (*set_freq_hop)(void *ctx, struct freq_hop_param *param);
 #endif
 };

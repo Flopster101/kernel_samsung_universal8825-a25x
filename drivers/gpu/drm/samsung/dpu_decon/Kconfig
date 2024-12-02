@@ -79,7 +79,7 @@ config DRM_SAMSUNG_HIBERNATION_EARLY_WAKEUP
 	  This enables support for Exynos Hibernation Early Wakeup.
 	  Hibernation Early Wakeup will be performed through sysfs.
 
-config EXYNOS_FREQ_HOP
+config DECON_EXYNOS_FREQ_HOP
     tristate "Support DPHY PLL Frequency Hopping"
 	depends on DRM_SAMSUNG_DECON
 	default n
