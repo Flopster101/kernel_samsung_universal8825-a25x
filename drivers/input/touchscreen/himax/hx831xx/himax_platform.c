@@ -15,6 +15,7 @@
 
 #include "himax_platform.h"
 #include "himax_common.h"
+#include <linux/sec_detect.h>
 
 int i2c_error_count;
 
@@ -955,6 +956,9 @@ static struct i2c_driver himax_common_driver = {
 
 static int __init himax_common_init(void)
 {
+	if (!sec_needs_tbt)
+		return 0;
+
 	KI("Himax common touch panel driver init\n");
 	D("Himax check double loading\n");
 	if (g_mmi_refcnt++ > 0) {
