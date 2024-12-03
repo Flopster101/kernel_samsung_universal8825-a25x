@@ -3373,8 +3373,8 @@ int wacom_sec_init(struct wacom_i2c *wac_i2c)
 	int retval = 0;
 	int i = 0;
 
-	retval = sec_cmd_init(&wac_i2c->sec, NULL, sec_cmds, ARRAY_SIZE(sec_cmds),
-			SEC_CLASS_DEVT_WACOM, &epen_attr_group);
+	retval = sec_cmd_init(&wac_i2c->sec, sec_cmds, ARRAY_SIZE(sec_cmds),
+			SEC_CLASS_DEVT_WACOM);
 	if (retval < 0) {
 		input_err(true, &client->dev, "failed to sec_cmd_init\n");
 		return retval;
