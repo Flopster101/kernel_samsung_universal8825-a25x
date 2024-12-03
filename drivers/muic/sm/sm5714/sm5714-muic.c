@@ -22,6 +22,7 @@
 #include <linux/delay.h>
 #include <linux/pm_wakeup.h>
 #include <linux/switch.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 #include <linux/muic/common/muic_notifier.h>
@@ -2596,6 +2597,9 @@ static struct platform_driver sm5714_muic_driver = {
 
 static int __init sm5714_muic_init(void)
 {
+	if (sec_pwr_combo != DUALSM && sec_pwr_combo != SM57XX)
+		return 0;
+	
 	return platform_driver_register(&sm5714_muic_driver);
 }
 late_initcall(sm5714_muic_init);
