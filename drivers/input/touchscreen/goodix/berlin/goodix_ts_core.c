@@ -19,6 +19,7 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <linux/uaccess.h>
+#include <linux/sec_detect.h>
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 38)
 #include <linux/input/mt.h>
@@ -2680,6 +2681,9 @@ static struct platform_driver goodix_ts_driver = {
 static int __init goodix_ts_core_init(void)
 {
 	int ret;
+
+	if (!sec_needs_goodix)
+		return 0;
 
 	ts_info("Core layer init:%s", GOODIX_DRIVER_VERSION);
 	ret = goodix_i2c_bus_init();

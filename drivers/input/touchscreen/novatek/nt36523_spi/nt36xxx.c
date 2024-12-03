@@ -24,6 +24,7 @@
 #include <linux/input/mt.h>
 #include <linux/of_gpio.h>
 #include <linux/of_irq.h>
+#include <linux/sec_detect.h>
 
 #include "nt36xxx.h"
 #if NVT_TOUCH_ESD_PROTECT
@@ -3953,6 +3954,9 @@ return:
 static int32_t __init nvt_driver_init(void)
 {
 	int32_t ret = 0;
+
+	if (!sec_needs_nvt)
+		return 0;
 
 	pr_info("[sec_input] %s : start\n", __func__);
 

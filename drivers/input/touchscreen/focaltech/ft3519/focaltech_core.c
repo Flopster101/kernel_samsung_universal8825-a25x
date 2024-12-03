@@ -37,6 +37,7 @@
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
 #include <linux/of_irq.h>
+#include <linux/sec_detect.h>
 #include "focaltech_core.h"
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
 #include <linux/input/stui_inf.h>
@@ -2649,6 +2650,9 @@ static struct i2c_driver fts_ts_driver = {
 static int __init fts_ts_init(void)
 {
 	int ret = 0;
+
+	if (!sec_needs_fts)
+		return 0;
 
 	FTS_FUNC_ENTER();
 	ret = i2c_add_driver(&fts_ts_driver);
