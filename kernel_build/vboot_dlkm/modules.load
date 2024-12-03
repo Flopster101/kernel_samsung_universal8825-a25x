@@ -323,7 +323,6 @@ sm5714_fuelgauge.ko
 s2mu106_fuelgauge.ko
 shub.ko
 sensor_core.ko
-stm_ts.ko
 mstdrv.ko
 snvm.ko
 dc_vibrator.ko
