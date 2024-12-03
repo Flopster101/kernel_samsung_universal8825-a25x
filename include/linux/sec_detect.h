@@ -29,8 +29,24 @@ enum SEC_devices {
     SEC_M34,
     SEC_GTA4XLS
 };
+
+enum SEC_pwrcombos {
+    COMBO_UNKNOWN = -1,
+    HL_S2F,  // HL7132 Charger + S2MF301 PMIC
+    SM_S2U,  // SM5451 Charger + S2MU106 PMIC
+    DUALSM,  // SM5451 Charger + SM5714 PMIC
+    SM57XX   // SM5714 as charger and PMIC
+};
+
 extern enum SEC_devices sec_devices;
+extern enum SEC_pwrcombos sec_pwrcombos;
 extern int sec_current_device;
 extern bool sec_needs_decon;
 extern bool sec_needs_blic;
+extern bool sec_needs_goodix;
+extern bool sec_needs_fts;
+extern bool sec_needs_nvt;
+extern bool sec_needs_tbt;
+// extern bool sec_needs_stm;
+extern int sec_pwr_combo;
 #endif
