@@ -191,7 +191,10 @@ static unsigned int get_afm_target_max_limit(struct afm_domain *afm_dom)
 	/* Find the position of the current frequency in the frequency table. */
 	index = get_afm_freq_index(stats, afm_dom->clipped_freq);
 
-	/* Return itself */
+	/* Find target max limit that lower by "down_step" than current max limit */
+	index -= afm_dom->down_step;
+	if (index > stats->max_state)
+		index = stats->max_state;
 	ret_freq = stats->freq_table[index];
 
 	return ret_freq;
