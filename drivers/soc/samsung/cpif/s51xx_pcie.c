@@ -373,7 +373,7 @@ static void s51xx_pcie_cpl_timeout_cb(struct exynos_pcie_notify *noti)
 	if (mc->pcie_cto_retry_cnt++ < 10) {
 		pr_err("[%s][%d] retry pcie poweron !!!\n", __func__,
 				mc->pcie_cto_retry_cnt);
-		queue_work_on(2, mc->wakeup_wq, &mc->wakeup_work);
+		queue_work(mc->wakeup_wq, &mc->wakeup_work);
 	} else {
 		pr_err("[%s][%d] force crash !!!\n", __func__,
 				mc->pcie_cto_retry_cnt);
