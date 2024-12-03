@@ -21,6 +21,7 @@
 #include <linux/leds-s2mf301.h>
 #include <linux/platform_device.h>
 #include <linux/power_supply.h>
+#include <linux/sec_detect.h>
 
 #define CONTROL_I2C	0
 #define CONTROL_GPIO	1
@@ -880,6 +881,9 @@ static struct platform_driver s2mf301_led_driver = {
 
 static int __init s2mf301_led_driver_init(void)
 {
+	if (sec_pwr_combo != HL_S2F)
+		return 0;
+
 	return platform_driver_register(&s2mf301_led_driver);
 }
 module_init(s2mf301_led_driver_init);

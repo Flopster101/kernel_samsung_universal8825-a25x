@@ -65,6 +65,7 @@
 #include <linux/sec_batt.h>
 #endif
 #include <linux/usb/typec/common/pdic_param.h>
+#include <linux/sec_detect.h>
 
 struct s2mf301_muic_data *static_data;
 /* Prototypes of the Static symbols of s2mf301-muic */
@@ -2489,6 +2490,9 @@ static struct platform_driver s2mf301_muic_driver = {
 
 static int __init s2mf301_muic_init(void)
 {
+	if (sec_pwr_combo != HL_S2F)
+		return 0;
+
 	return platform_driver_register(&s2mf301_muic_driver);
 }
 

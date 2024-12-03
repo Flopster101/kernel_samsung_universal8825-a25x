@@ -61,6 +61,7 @@
 #if IS_ENABLED(CONFIG_CP_UART_NOTI)
 #include <soc/samsung/exynos-modem-ctrl.h>
 #endif
+#include <linux/sec_detect.h>
 
 #include <linux/usb/typec/common/pdic_param.h>
 
@@ -2356,6 +2357,9 @@ static struct platform_driver s2mu106_muic_driver = {
 
 static int __init s2mu106_muic_init(void)
 {
+	if (sec_pwr_combo != SM_S2U)
+		return 0;
+
 	return platform_driver_register(&s2mu106_muic_driver);
 }
 

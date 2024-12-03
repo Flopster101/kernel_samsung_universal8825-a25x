@@ -21,6 +21,7 @@
 #include "s2mu106_fuelgauge.h"
 #include <linux/of_gpio.h>
 #include "../../common/sec_charging_common.h"
+#include <linux/sec_detect.h>
 
 #define SINGLE_BYTE	1
 #define TABLE_SIZE	22
@@ -2763,6 +2764,9 @@ static struct i2c_driver s2mu106_fuelgauge_driver = {
 
 static int __init s2mu106_fuelgauge_init(void)
 {
+	if (sec_pwr_combo != SM_S2U)
+		return 0;
+
 	pr_info("%s: S2MU106 Fuelgauge Init\n", __func__);
 	return i2c_add_driver(&s2mu106_fuelgauge_driver);
 }

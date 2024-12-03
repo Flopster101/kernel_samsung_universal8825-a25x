@@ -29,6 +29,7 @@
 #include <linux/mfd/slsi/s2mf301/s2mf301.h>
 #include <linux/mfd/slsi/s2mf301/s2mf301_log.h>
 #include <linux/of_gpio.h>
+#include <linux/sec_detect.h>
 
 #define I2C_RETRY_CNT	3
 
@@ -492,6 +493,9 @@ static struct i2c_driver s2mf301_i2c_driver = {
 
 static int __init s2mf301_i2c_init(void)
 {
+	if (sec_pwr_combo != HL_S2F)
+		return 0;
+
 	s2mf301_info("%s:%s\n", MFD_DEV_NAME_, __func__);
 	return i2c_add_driver(&s2mf301_i2c_driver);
 }

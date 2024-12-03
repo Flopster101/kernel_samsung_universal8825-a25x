@@ -31,6 +31,7 @@
 #include <linux/of_gpio.h>
 #include <linux/of_device.h>
 #endif
+#include <linux/sec_detect.h>
 
 #define BITS(_end, _start)		((BIT(_end) - BIT(_start)) + BIT(_end))
 #define MIN(a, b)				((a < b) ? (a):(b))
@@ -4454,6 +4455,9 @@ static struct i2c_driver hl7132_driver = {
 static int __init hl7132_charger_init(void)
 {
 	int err;
+
+	if (sec_pwr_combo != HL_S2F)
+		return 0;
 
 	err = i2c_add_driver(&hl7132_driver);
 	if (err)

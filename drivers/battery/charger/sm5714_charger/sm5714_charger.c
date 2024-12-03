@@ -20,6 +20,7 @@
 #include "../../common/sec_charging_common.h"
 #include "sm5714_charger.h"
 #include <linux/battery/sec_pd.h>
+#include <linux/sec_detect.h>
 
 #ifdef CONFIG_USB_HOST_NOTIFY
 #include <linux/usb_notify.h>
@@ -2002,6 +2003,9 @@ static struct platform_driver sm5714_charger_driver = {
 static int __init sm5714_charger_init(void)
 {
 	int ret = 0;
+
+	if (sec_pwr_combo != DUALSM && sec_pwr_combo != SM57XX)
+		return 0;
 
 	ret = platform_driver_register(&sm5714_charger_driver);
 

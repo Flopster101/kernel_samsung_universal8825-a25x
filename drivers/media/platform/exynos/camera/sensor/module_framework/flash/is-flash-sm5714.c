@@ -22,6 +22,7 @@
 #include "is-device-sensor.h"
 #include "is-device-sensor-peri.h"
 #include "is-core.h"
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_LEDS_SM5714)
 #include <linux/sm5714.h>
@@ -368,6 +369,9 @@ builtin_platform_driver(sensor_flash_sm5714_platform_driver);
 static int __init sensor_flash_sm5714_init(void)
 {
 	int ret;
+
+	if (sec_pwr_combo != DUALSM && sec_pwr_combo != SM57XX)
+		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_sm5714_platform_driver,
 				flash_sm5714_platform_probe);
