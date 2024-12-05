@@ -2712,6 +2712,7 @@ int set_refresh_rate_mode(struct goodix_ts_core *core_data)
 
 	temp_cmd.len = 5;
 	temp_cmd.cmd = 0x9D;
+	core_data->refresh_rate = 0;
 	temp_cmd.data[0] = core_data->refresh_rate;
 	ret = core_data->hw_ops->send_cmd(core_data, &temp_cmd);
 
@@ -2740,7 +2741,7 @@ static int refresh_rate_mode_save(void *device_data)
 		return SEC_ERROR;
 	}
 
-	core_data->refresh_rate = sec->cmd_param[0];
+	core_data->refresh_rate = 0;
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	return SEC_SUCCESS;

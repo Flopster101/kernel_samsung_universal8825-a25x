@@ -1617,8 +1617,10 @@ void goodix_ts_reinit(void *data)
 	if (core_data->plat_data->pocket_mode)
 		core_data->hw_ops->pocket_mode_enable(core_data, core_data->plat_data->pocket_mode);
 
-	if (core_data->refresh_rate)
+	if (core_data->refresh_rate) {
+		core_data->refresh_rate = 0;
 		set_refresh_rate_mode(core_data);
+	}
 
 	if (core_data->flip_enable) {
 		ts_info("set cover close [%d]", core_data->plat_data->cover_type);
