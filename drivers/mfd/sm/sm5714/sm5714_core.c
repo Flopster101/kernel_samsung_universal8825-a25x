@@ -28,7 +28,6 @@
 #include <linux/of_gpio.h>
 #include <linux/pinctrl/consumer.h>
 #endif /* CONFIG_OF */
-#include <linux/sec_detect.h>
 
 static struct mfd_cell sm5714_devs[] = {
 #if IS_ENABLED(CONFIG_MUIC_SM5714)
@@ -521,9 +520,6 @@ static struct i2c_driver sm5714_i2c_driver = {
 
 static int __init sm5714_i2c_init(void)
 {
-	if (sec_pwr_combo != DUALSM && sec_pwr_combo != SM57XX)
-		return 0;
-	
 	pr_info("%s:%s\n", MFD_DEV_NAME, __func__);
 	return i2c_add_driver(&sm5714_i2c_driver);
 }

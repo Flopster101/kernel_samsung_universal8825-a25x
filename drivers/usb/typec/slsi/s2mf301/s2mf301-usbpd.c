@@ -64,7 +64,6 @@
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER) || IS_ENABLED(CONFIG_DUAL_ROLE_USB_INTF)
 #include <linux/usb/typec/slsi/common/usbpd_ext.h>
 #endif
-#include <linux/sec_detect.h>
 
 /*
 *VARIABLE DEFINITION
@@ -5033,9 +5032,6 @@ static struct i2c_driver s2mf301_usbpd_driver = {
 
 static int __init s2mf301_usbpd_init(void)
 {
-	if (sec_pwr_combo != HL_S2F)
-		return 0;
-
 	s2mf301_err("%s\n", __func__);
 	return i2c_add_driver(&s2mf301_usbpd_driver);
 }
