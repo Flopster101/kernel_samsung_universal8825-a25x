@@ -25,7 +25,6 @@
 
 #include <linux/leds-s2mu106.h>
 #include <linux/muic/muic.h>
-#include <linux/sec_detect.h>
 
 extern int muic_afc_get_voltage(void);
 
@@ -558,9 +557,6 @@ module_exit(flash_s2mu106_module_exit);
 static int __init is_sensor_flash_s2mu106_init(void)
 {
 	int ret;
-
-	if (sec_pwr_combo != SM_S2U)
-		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_s2mu106_platform_driver,
 				flash_s2mu106_platform_probe);
