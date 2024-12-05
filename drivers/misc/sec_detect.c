@@ -28,7 +28,6 @@ bool sec_needs_nvt = false; // Needs Novatek drivers?
 bool sec_needs_tbt = false; // Needs tablet drivers? (Himax and Wacom)
 // No device seems to use the STM driver.
 // bool sec_needs_stm = false; // Needs STM drivers?
-int sec_pwr_combo = COMBO_UNKNOWN;
 EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
 EXPORT_SYMBOL(sec_needs_blic);
@@ -36,7 +35,6 @@ EXPORT_SYMBOL(sec_needs_goodix);
 EXPORT_SYMBOL(sec_needs_fts);
 EXPORT_SYMBOL(sec_needs_nvt);
 EXPORT_SYMBOL(sec_needs_tbt);
-EXPORT_SYMBOL(sec_pwr_combo);
 
 int sec_detect_init(void) {
     struct device_node *root;
@@ -62,35 +60,29 @@ int sec_detect_init(void) {
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;
         sec_needs_decon = false;
-        sec_pwr_combo = HL_S2F;
         sec_needs_goodix = true;
         sec_needs_fts = true;
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
         sec_needs_decon = true;
-        sec_pwr_combo = SM_S2U;
         sec_needs_goodix = true;
         sec_needs_fts = true;
     } else if (strstr(machine_name, "A53") != NULL) {
         sec_current_device = SEC_A53;
         sec_needs_decon = true;
-        sec_pwr_combo = DUALSM;
         sec_needs_goodix = true;
     } else if (strstr(machine_name, "M33") != NULL) {
         sec_current_device = SEC_M33;
         sec_needs_decon = true;
-        sec_pwr_combo = DUALSM;
         sec_needs_nvt = true;
     } else if (strstr(machine_name, "M34") != NULL) {
         sec_current_device = SEC_M34;
         sec_needs_decon = false;
-        sec_pwr_combo = DUALSM;
         sec_needs_goodix = true;
     } else if (strstr(machine_name, "GTA4XLS") != NULL) {
         sec_current_device = SEC_GTA4XLS;
         sec_needs_decon = false;
         sec_needs_blic = true;
-        sec_pwr_combo = SM57XX;
         sec_needs_tbt = true;
     }
     return 0;
