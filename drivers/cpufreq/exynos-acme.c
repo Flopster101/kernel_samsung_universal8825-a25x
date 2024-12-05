@@ -1761,6 +1761,19 @@ static int init_domain(struct exynos_cpufreq_domain *domain,
 		fv_table[index].freq = freq_table[index];
 	}
 
+	if (cal_dfs_get_freq_volt_table(domain->cal_id, fv_table, domain->table_size)) {
+		pr_err("%s: failed to get fv table from CAL\n", __func__);
+		kfree(fv_table);
+		return -EINVAL;
+	}
+
+	/*
+	 * Apply a -25mV decrease to each voltage value.
+	 */
+	for (index = 0; index < domain->table_size; index++) {
+		fv_table[index].volt -= 25000;
+	}
+
 	/*
 	 * Allocate and initialize frequency table.
 	 * Last row of frequency table must be set to CPUFREQ_TABLE_END.
