@@ -339,3 +339,4 @@ tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko
 input_booster_lkm.ko
+binder_prio.ko
