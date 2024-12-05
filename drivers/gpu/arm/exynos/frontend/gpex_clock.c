@@ -86,7 +86,7 @@ static int gpex_clock_update_config_data_from_dt(void)
 	clk_info.gpu_max_clock = gpexbe_devicetree_get_int(gpu_max_clock);
 	clk_info.gpu_min_clock = gpexbe_devicetree_get_int(gpu_min_clock);
 	clk_info.boot_clock = gpexbe_clock_get_boot_freq();
-	clk_info.gpu_max_clock_limit = gpexbe_clock_get_max_freq();
+	clk_info.gpu_max_clock_limit = gpexbe_devicetree_get_int(gpu_max_clock);
 
 	/* TODO: rename the table_size variable to something more sensible like  row_cnt */
 	clk_info.table_size = gpexbe_devicetree_get_int(gpu_dvfs_table_size.row);
