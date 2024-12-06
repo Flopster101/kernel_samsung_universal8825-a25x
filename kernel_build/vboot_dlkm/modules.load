@@ -307,7 +307,6 @@ mfd_s2mu106.ko
 sm5451-charger.ko
 hl7132_charger.ko
 sm5714-charger.ko
-sm5451-charger.ko
 sx938x.ko
 hall_ic.ko
 hall_ic_notifier.ko
