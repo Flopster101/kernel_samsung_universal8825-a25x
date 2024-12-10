@@ -4001,13 +4001,6 @@
 			};
 		};
 
-		log_backtrace {
-			compatible = "log_backtrace";
-			alloc-ranges = <0x00 0x80000000 0x78000000>;
-			size = <0x2000>;
-			phandle = <0x9d>;
-		};
-
 		memlog_region {
 			compatible = "shared-dma-pool";
 			no-map;
@@ -4040,13 +4033,6 @@
 			compatible = "exynos,s2mpu_table";
 			reg = <0x00 0xc1800000 0x600000>;
 			phandle = <0xb2>;
-		};
-
-		abox-slog {
-			compatible = "exynos,abox_slog";
-			size = <0x2800000>;
-			alloc-ranges = <0x00 0xc0000000 0x20000000>;
-			phandle = <0xbf>;
 		};
 
 		contexthub_rmem {
@@ -4139,12 +4125,6 @@
 			alignment = <0x00 0x10000>;
 			phandle = <0x8e>;
 		};
-	};
-
-	memlog_bl_base {
-		samsung,bl-base = <0xf0000000>;
-		samsung,bl-offset = <0x290>;
-		phandle = <0x11d>;
 	};
 
 	secure-iova-domain {
