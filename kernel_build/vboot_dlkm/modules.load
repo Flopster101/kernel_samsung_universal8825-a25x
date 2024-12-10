@@ -21,9 +21,6 @@ clk-exynos-audss.ko
 pl330.ko
 samsung-dma.ko
 dss.ko
-debug-snapshot-debug-kinfo.ko
-debug-snapshot-sfrdump.ko
-debug-snapshot-qd.ko
 exynos-pmu-if.ko
 exynos-flexpmu-dbg.ko
 exynos-pd.ko
