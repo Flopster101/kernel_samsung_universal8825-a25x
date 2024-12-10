@@ -50,15 +50,16 @@ static int __init hx83102e_gta4xls_00_panel_init(void)
 {
 	struct common_panel_info *cpi = &hx83102e_gta4xls_00_panel_info;
 
-	if (sec_current_device == SEC_GTA4XLS) {
-		SEC_DETECT_LOG("Initialized hx83102e_gta4xls_00 panel driver\n");
-		cpi->prop_lists[USDM_DRV_LEVEL_MODEL] = hx83102e_gta4xls_property_array;
-		cpi->num_prop_lists[USDM_DRV_LEVEL_MODEL] = ARRAY_SIZE(hx83102e_gta4xls_property_array);
-
-		usdm_register_common_panel(&hx83102e_gta4xls_00_panel_info);
-	} else {
+	if (sec_current_device != SEC_GTA4XLS) {
 		SEC_DETECT_LOG("Skipped hx83102e_gta4xls_00 panel driver\n");
+		return 0;
 	}
+	cpi->prop_lists[USDM_DRV_LEVEL_MODEL] = hx83102e_gta4xls_property_array;
+	cpi->num_prop_lists[USDM_DRV_LEVEL_MODEL] = ARRAY_SIZE(hx83102e_gta4xls_property_array);
+
+	usdm_register_common_panel(&hx83102e_gta4xls_00_panel_info);
+
+	SEC_DETECT_LOG("Initialized hx83102e_gta4xls_00 panel driver\n");
 	return 0;
 }
 

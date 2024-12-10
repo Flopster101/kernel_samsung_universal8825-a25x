@@ -7677,36 +7677,36 @@ static int __init panel_drv_init(void)
 {
 	int ret;
 
-	if (!sec_needs_decon) {
-		SEC_DETECT_LOG("Initialized USDM panel driver\n");
-		panel_info("++\n");
-		ret = panel_create_lcd_class();
-		if (ret < 0) {
-			panel_err("panel_create_lcd_class returned %d\n", ret);
-			return -EINVAL;
-		}
-
-	#ifdef CONFIG_USDM_PANEL_MAFPC
-		ret = platform_driver_register(&mafpc_driver);
-		if (ret) {
-			panel_err("failed to register mafpc driver\n");
-			return ret;
-		}
-	#endif
-		ret = platform_driver_register(&panel_driver);
-		if (ret) {
-			panel_err("failed to register panel driver\n");
-			return ret;
-		}
-		panel_info("--\n");
-
-		usdm_abd_init();
-
-		return ret;
-	} else {
+	if (sec_needs_decon) {
 		SEC_DETECT_LOG("Skipped USDM panel driver\n");
 		return 0;
 	}
+
+	SEC_DETECT_LOG("Initialized USDM panel driver\n");
+	panel_info("++\n");
+	ret = panel_create_lcd_class();
+	if (ret < 0) {
+		panel_err("panel_create_lcd_class returned %d\n", ret);
+		return -EINVAL;
+	}
+
+#ifdef CONFIG_USDM_PANEL_MAFPC
+	ret = platform_driver_register(&mafpc_driver);
+	if (ret) {
+		panel_err("failed to register mafpc driver\n");
+		return ret;
+	}
+#endif
+	ret = platform_driver_register(&panel_driver);
+	if (ret) {
+		panel_err("failed to register panel driver\n");
+		return ret;
+	}
+	panel_info("--\n");
+
+	usdm_abd_init();
+
+	return ret;
 }
 
 static void __exit panel_drv_exit(void)

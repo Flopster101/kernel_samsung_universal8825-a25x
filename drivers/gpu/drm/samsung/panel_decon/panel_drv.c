@@ -5590,34 +5590,34 @@ static int __init panel_drv_init(void)
 {
 	int ret;
 
-	if (sec_needs_decon) {
-		SEC_DETECT_LOG("Initialized DRM DECON panel driver\n");
-		panel_info("++\n");
-		ret = panel_create_lcd_class();
-		if (ret < 0) {
-			panel_err("panel_create_lcd_class returned %d\n", ret);
-			return -EINVAL;
-		}
-
-	#ifdef CONFIG_SUPPORT_MAFPC
-		ret = platform_driver_register(&mafpc_driver);
-		if (ret) {
-			panel_err("failed to register mafpc driver\n");
-			return ret;
-		}
-	#endif
-		ret = platform_driver_register(&panel_driver);
-		if (ret) {
-			panel_err("failed to register panel driver\n");
-			return ret;
-		}
-		panel_info("--\n");
-
-		return ret;
-	} else {
+	if (!sec_needs_decon) {
 		SEC_DETECT_LOG("Skipped DRM DECON panel driver\n");
 		return 0;
 	}
+	
+	SEC_DETECT_LOG("Initialized DRM DECON panel driver\n");
+	panel_info("++\n");
+	ret = panel_create_lcd_class();
+	if (ret < 0) {
+		panel_err("panel_create_lcd_class returned %d\n", ret);
+		return -EINVAL;
+	}
+
+#ifdef CONFIG_SUPPORT_MAFPC
+	ret = platform_driver_register(&mafpc_driver);
+	if (ret) {
+		panel_err("failed to register mafpc driver\n");
+		return ret;
+	}
+#endif
+	ret = platform_driver_register(&panel_driver);
+	if (ret) {
+		panel_err("failed to register panel driver\n");
+		return ret;
+	}
+	panel_info("--\n");
+
+	return ret;
 }
 
 static void __exit panel_drv_exit(void)
