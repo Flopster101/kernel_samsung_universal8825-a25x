@@ -110,16 +110,16 @@ static int __init oled_function_init(void)
 {
 	int ret;
 
-	if (!sec_needs_decon) {
-		SEC_DETECT_LOG("Initialized USDM OLED driver\n");
-		ret = usdm_panel_function_insert_array(usdm_oled_function_table,
-				ARRAY_SIZE(usdm_oled_function_table));
-		if (ret < 0)
-			panel_err("failed to insert usdm_oled_function_table\n");
-	} else {
+	if (sec_needs_decon) {
 		SEC_DETECT_LOG("Skipped USDM OLED driver\n");
+		return 0;
 	}
+	ret = usdm_panel_function_insert_array(usdm_oled_function_table,
+	ARRAY_SIZE(usdm_oled_function_table));
+	if (ret < 0)
+		panel_err("failed to insert usdm_oled_function_table\n");
 
+	SEC_DETECT_LOG("Initialized USDM OLED driver\n");
 	return 0;
 }
 

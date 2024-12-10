@@ -43,13 +43,13 @@ int s6e3fc3_getidx_ffc_table(struct maptbl *tbl)
 
 static int __init s6e3fc3_a53x_panel_init(void)
 {
-	if (sec_current_device == SEC_A53) {
-		SEC_DETECT_LOG("Initialized s6e3fc3_a53x panel driver\n");
-		decon_register_common_panel(&s6e3fc3_a53x_panel_info);
-	} else {
+	if (sec_current_device != SEC_A53) {
 		SEC_DETECT_LOG("Skipped s6e3fc3_a53x panel driver\n");
+		return 0;
 	}
+	decon_register_common_panel(&s6e3fc3_a53x_panel_info);
 
+	SEC_DETECT_LOG("Initialized s6e3fc3_a53x panel driver\n");
 	return 0;
 }
 

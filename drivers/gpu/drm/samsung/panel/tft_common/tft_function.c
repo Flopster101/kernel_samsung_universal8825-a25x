@@ -26,16 +26,16 @@ static int __init tft_function_init(void)
 {
 	int ret;
 
-	if (sec_current_device == SEC_GTA4XLS) {
-		SEC_DETECT_LOG("Initialized usdm tft common panel driver\n");
-		ret = usdm_panel_function_insert_array(tft_function_table,
-				ARRAY_SIZE(tft_function_table));
-		if (ret < 0)
-			panel_err("failed to insert tft_function_table\n");
-	} else {
+	if (sec_current_device != SEC_GTA4XLS) {
 		SEC_DETECT_LOG("Skipped usdm tft common panel driver\n");
+		return 0;
 	}
-
+	ret = usdm_panel_function_insert_array(tft_function_table,
+			ARRAY_SIZE(tft_function_table));
+	if (ret < 0)
+		panel_err("failed to insert tft_function_table\n");
+		
+	SEC_DETECT_LOG("Initialized usdm tft common panel driver\n");
 	return 0;
 }
 
