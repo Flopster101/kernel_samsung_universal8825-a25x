@@ -6427,7 +6427,7 @@ static void binder_deferred_release(struct binder_proc *proc)
 
 	binder_release_work(proc, &proc->todo);
 	binder_release_work(proc, &proc->delivered_death);
-	binder_release_work(proc, &binder_proc_ext_entry(proc)->delivered_freeze);
+	binder_release_work(proc, &proc_wrapper(proc)->delivered_freeze);
 
 	binder_debug(BINDER_DEBUG_OPEN_CLOSE,
 		     "%s: %d threads %d, nodes %d (ref %d), refs %d, active transactions %d\n",
@@ -6716,7 +6716,7 @@ static void print_binder_proc(struct seq_file *m,
 		seq_puts(m, "  has delivered dead binder\n");
 		break;
 	}
-	list_for_each_entry(w, &binder_proc_ext_entry(proc)->delivered_freeze, entry) {
+	list_for_each_entry(w, &proc_wrapper(proc)->delivered_freeze, entry) {
 		seq_puts(m, "  has delivered freeze binder\n");
 		break;
 	}

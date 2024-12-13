@@ -702,6 +702,7 @@ check_pfn:
 out:
 	return pfn_to_page(pfn);
 }
+EXPORT_SYMBOL_GPL(_vm_normal_page);
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 struct page *vm_normal_page_pmd(struct vm_area_struct *vma, unsigned long addr,
