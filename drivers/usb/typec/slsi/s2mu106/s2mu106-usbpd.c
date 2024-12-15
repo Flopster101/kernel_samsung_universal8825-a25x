@@ -470,6 +470,7 @@ static void s2mu106_pr_swap(void *_data, int val)
 	if (val == USBPD_SINK_OFF) {
 		pd_data->pd_noti.event = PDIC_NOTIFY_EVENT_PD_PRSWAP_SNKTOSRC;
 		pd_data->pd_noti.sink_status.selected_pdo_num = 0;
+		pd_data->pd_noti.sink_status.available_pdo_num = 0;
 		pd_data->pd_noti.sink_status.current_pdo_num = 0;
 		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT,
 			PDIC_NOTIFY_ID_POWER_STATUS, 0, 0, 0);
@@ -485,6 +486,7 @@ static void s2mu106_pr_swap(void *_data, int val)
 	} else if (val == USBPD_SOURCE_OFF) {
 		pd_data->pd_noti.event = PDIC_NOTIFY_EVENT_PD_PRSWAP_SRCTOSNK;
 		pd_data->pd_noti.sink_status.selected_pdo_num = 0;
+		pd_data->pd_noti.sink_status.available_pdo_num = 0;
 		pd_data->pd_noti.sink_status.current_pdo_num = 0;
 		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT,
 			PDIC_NOTIFY_ID_POWER_STATUS, 0, 0, 0);
@@ -2382,14 +2384,25 @@ static void s2mu106_usbpd_check_rid(struct s2mu106_usbpd_data *pdic_data)
 
 int s2mu106_set_normal_mode(struct s2mu106_usbpd_data *pdic_data)
 {
+	u8 data;
 	u8 data_lpm;
+	u8 data2;
 	int ret = 0;
 	struct i2c_client *i2c = pdic_data->i2c;
 	struct device *dev = &i2c->dev;
 
+	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PLUG_CTRL_PORT, &data);
+	data &= ~(S2MU106_REG_PLUG_CTRL_MODE_MASK | S2MU106_REG_PLUG_CTRL_RP_SEL_MASK);
+	data |= S2MU106_REG_PLUG_CTRL_DRP | S2MU106_REG_PLUG_CTRL_RP80;
+
+	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PLUG_CTRL_RpRd, &data2);
+	data2 &=  ~S2MU106_REG_PLUG_CTRL_RpRd_MANUAL_MASK;
+	s2mu106_usbpd_write_reg(i2c, S2MU106_REG_PLUG_CTRL_RpRd, data2);
 
 	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PD_CTRL, &data_lpm);
 	data_lpm &= ~S2MU106_REG_LPM_EN;
+
+	s2mu106_usbpd_write_reg(i2c, S2MU106_REG_PLUG_CTRL_PORT, data);
 	s2mu106_usbpd_write_reg(i2c, S2MU106_REG_PD_CTRL, data_lpm);
 
 	pdic_data->lpm_mode = false;
@@ -2508,7 +2521,7 @@ int s2mu106_set_cable_detach_lpm_mode(struct s2mu106_usbpd_data *pdic_data)
 
 int s2mu106_set_lpm_mode(struct s2mu106_usbpd_data *pdic_data)
 {
-	u8 data_lpm, data2;
+	u8 data, data_lpm, data2;
 	int ret = 0;
 	struct i2c_client *i2c = pdic_data->i2c;
 	struct device *dev = &i2c->dev;
@@ -2517,6 +2530,9 @@ int s2mu106_set_lpm_mode(struct s2mu106_usbpd_data *pdic_data)
 	pdic_data->lpm_mode = true;
 	pdic_data->vbus_short_check_cnt = 0;
 	s2mu106_usbpd_set_cc_state(pdic_data, CC_STATE_OPEN);
+	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PLUG_CTRL_PORT, &data);
+	data &= ~(S2MU106_REG_PLUG_CTRL_MODE_MASK | S2MU106_REG_PLUG_CTRL_RP_SEL_MASK);
+	data |= S2MU106_REG_PLUG_CTRL_DFP | S2MU106_REG_PLUG_CTRL_RP0;
 	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PD_CTRL, &data_lpm);
 	data_lpm |= S2MU106_REG_LPM_EN;
 
@@ -2529,6 +2545,7 @@ int s2mu106_set_lpm_mode(struct s2mu106_usbpd_data *pdic_data)
 	ret = s2mu106_usbpd_bulk_read(i2c, S2MU106_REG_INT_STATUS0,
 			S2MU106_MAX_NUM_INT_STATUS, intr);
 
+	s2mu106_usbpd_write_reg(i2c, S2MU106_REG_PLUG_CTRL_PORT, data);
 	s2mu106_usbpd_write_reg(i2c, S2MU106_REG_PD_CTRL, data_lpm);
 
 	s2mu106_usbpd_read_reg(i2c, S2MU106_REG_PLUG_CTRL_RpRd, &data2);
@@ -3078,6 +3095,7 @@ static int type3_handle_notification(struct notifier_block *nb,
 	(!IS_ENABLED(CONFIG_SEC_FACTORY) && IS_ENABLED(CONFIG_USB_HOST_NOTIFY))
 	struct otg_notify *o_notify = get_otg_notify();
 #endif
+	mutex_lock(&pdic_data->_mutex);
 	mutex_lock(&pdic_data->lpm_mutex);
 	pr_info("%s action:%d, attached_dev:%d, lpm:%d, pdic_data->is_otg_vboost:%d, pdic_data->is_otg_reboost:%d\n",
 		__func__, (int)action, (int)attached_dev, pdic_data->lpm_mode,
@@ -3174,6 +3192,7 @@ static int type3_handle_notification(struct notifier_block *nb,
 EOH:
 #endif
 	mutex_unlock(&pdic_data->lpm_mutex);
+	mutex_unlock(&pdic_data->_mutex);
 
 	return 0;
 }
