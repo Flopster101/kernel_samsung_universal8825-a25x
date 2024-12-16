@@ -14,8 +14,8 @@ LZ_REPO="https://gitlab.com/Jprimero15/lolz_clang.git"
 
 # Other
 DEFAULT_DEFCONFIG="s5e8825-unified_defconfig"
-KERNEL_URL="https://github.com/Flopster101/a25x-oss-sec"
-AK3_URL="https://github.com/Flopster101/AnyKernel3-A25"
+KERNEL_URL="https://github.com/FlopKernel-Series/flop_s5e8825_kernel"
+AK3_URL="https://github.com/FlopKernel-Series/AnyKernel3-s5e8825"
 AK3_TEST=0
 SECONDS=0 # builtin bash timer
 DATE="$(date '+%Y%m%d-%H%M')"
