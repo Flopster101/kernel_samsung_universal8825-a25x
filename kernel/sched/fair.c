@@ -144,8 +144,11 @@ static inline struct task_struct *task_of(struct sched_entity *se);
 static void update_burst_score(struct sched_entity *se) {
 	struct task_struct *p;
 	u8 prio, prev_prio, new_prio;
+	struct load_weight lw;
 
-	if (!entity_is_task(se)) return;
+	if (!entity_is_task(se))
+		return;
+
 	p = task_of(se);
 	prio = p->static_prio - MAX_RT_PRIO;
 	prev_prio = min(39, prio + se->burst_score);
@@ -153,8 +156,17 @@ static void update_burst_score(struct sched_entity *se) {
 	se->burst_score = se->burst_penalty >> 2;
 
 	new_prio = min(39, prio + se->burst_score);
-	if (new_prio != prev_prio)
-		reweight_task(p, new_prio);
+	if (new_prio != prev_prio) {
+		if (task_has_idle_policy(p)) {
+			lw.weight = scale_load(WEIGHT_IDLEPRIO);
+			lw.inv_weight = WMULT_IDLEPRIO;
+		} else {
+			lw.weight = scale_load(sched_prio_to_weight[new_prio]);
+			lw.inv_weight = sched_prio_to_wmult[new_prio];
+		}
+
+		reweight_task(p, &lw);
+	}
 }
 
 static void update_burst_penalty(struct sched_entity *se) {
