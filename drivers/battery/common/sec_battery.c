@@ -11,6 +11,7 @@
  */
 #include <linux/battery/sb_sysfs.h>
 #include <linux/battery/sb_notify.h>
+#include <linux/sec_detect.h>
 
 #include "sec_battery.h"
 #include "sec_battery_sysfs.h"
@@ -6811,20 +6812,26 @@ static int sec_usb_get_property(struct power_supply *psy,
 {
 	struct sec_battery_info *battery = power_supply_get_drvdata(psy);
 
-	switch (psp) {
-	case POWER_SUPPLY_PROP_ONLINE:
-		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
-		/* V -> uV */
-		val->intval = battery->input_voltage * 100000;
-		return 0;
-	case POWER_SUPPLY_PROP_CURRENT_MAX:
-		/* mA -> uA */
-		val->intval = battery->pdata->charging_current[battery->cable_type].input_current_limit * 1000;
-		return 0;
-	default:
-		return -EINVAL;
+	if (sec_current_device != SEC_A33) {
+		if (psp == POWER_SUPPLY_PROP_ONLINE) {
+			// Do nothing.
+		} else if (psp == POWER_SUPPLY_PROP_VOLTAGE_MAX) {
+			/* V -> uV */
+			val->intval = battery->input_voltage * 100000;
+			return 0;
+		} else if (psp == POWER_SUPPLY_PROP_CURRENT_MAX) {
+			/* mA -> uA */
+			val->intval = battery->pdata->charging_current[battery->cable_type].input_current_limit * 1000;
+			return 0;
+		} else {
+			return -EINVAL;
+		}
+	} else {
+		if (psp != POWER_SUPPLY_PROP_ONLINE)
+			return -EINVAL;
 	}
+
+
 	if ((battery->health == POWER_SUPPLY_HEALTH_OVERVOLTAGE) ||
 		(battery->health == POWER_SUPPLY_EXT_HEALTH_UNDERVOLTAGE)) {
 		val->intval = 0;
@@ -6857,77 +6864,69 @@ static int sec_ac_get_property(struct power_supply *psy,
 	struct sec_battery_info *battery = power_supply_get_drvdata(psy);
 	enum power_supply_ext_property ext_psp = (enum power_supply_ext_property) psp;
 
-	switch ((int)psp) {
-	case POWER_SUPPLY_PROP_ONLINE:
+	if ((int)psp == POWER_SUPPLY_PROP_ONLINE) {
 		if ((battery->health == POWER_SUPPLY_HEALTH_OVERVOLTAGE) ||
-				(battery->health == POWER_SUPPLY_EXT_HEALTH_UNDERVOLTAGE)) {
+			(battery->health == POWER_SUPPLY_EXT_HEALTH_UNDERVOLTAGE)) {
 			val->intval = 0;
 			return 0;
 		}
 
-		/* Set enable=1 only if the AC charger is connected */
-		switch (battery->cable_type) {
-		case SEC_BATTERY_CABLE_TA:
-		case SEC_BATTERY_CABLE_UARTOFF:
-		case SEC_BATTERY_CABLE_LAN_HUB:
-		case SEC_BATTERY_CABLE_LO_TA:
-		case SEC_BATTERY_CABLE_UNKNOWN:
-		case SEC_BATTERY_CABLE_PREPARE_TA:
-		case SEC_BATTERY_CABLE_9V_ERR:
-		case SEC_BATTERY_CABLE_9V_UNKNOWN:
-		case SEC_BATTERY_CABLE_9V_TA:
-		case SEC_BATTERY_CABLE_12V_TA:
-		case SEC_BATTERY_CABLE_HMT_CONNECTED:
-		case SEC_BATTERY_CABLE_HMT_CHARGE:
-		case SEC_BATTERY_CABLE_HV_TA_CHG_LIMIT:
-		case SEC_BATTERY_CABLE_QC20:
-		case SEC_BATTERY_CABLE_QC30:
-		case SEC_BATTERY_CABLE_TIMEOUT:
-		case SEC_BATTERY_CABLE_SMART_OTG:
-		case SEC_BATTERY_CABLE_SMART_NOTG:
-		case SEC_BATTERY_CABLE_POGO:
-		case SEC_BATTERY_CABLE_POGO_9V:
-		case SEC_BATTERY_CABLE_PDIC_APDO:
+		// Set enable=1 only if the AC charger is connected
+		if (battery->cable_type == SEC_BATTERY_CABLE_TA ||
+			battery->cable_type == SEC_BATTERY_CABLE_UARTOFF ||
+			battery->cable_type == SEC_BATTERY_CABLE_LAN_HUB ||
+			battery->cable_type == SEC_BATTERY_CABLE_LO_TA ||
+			battery->cable_type == SEC_BATTERY_CABLE_UNKNOWN ||
+			battery->cable_type == SEC_BATTERY_CABLE_PREPARE_TA ||
+			battery->cable_type == SEC_BATTERY_CABLE_9V_ERR ||
+			battery->cable_type == SEC_BATTERY_CABLE_9V_UNKNOWN ||
+			battery->cable_type == SEC_BATTERY_CABLE_9V_TA ||
+			battery->cable_type == SEC_BATTERY_CABLE_12V_TA ||
+			battery->cable_type == SEC_BATTERY_CABLE_HMT_CONNECTED ||
+			battery->cable_type == SEC_BATTERY_CABLE_HMT_CHARGE ||
+			battery->cable_type == SEC_BATTERY_CABLE_HV_TA_CHG_LIMIT ||
+			battery->cable_type == SEC_BATTERY_CABLE_QC20 ||
+			battery->cable_type == SEC_BATTERY_CABLE_QC30 ||
+			battery->cable_type == SEC_BATTERY_CABLE_TIMEOUT ||
+			battery->cable_type == SEC_BATTERY_CABLE_SMART_OTG ||
+			battery->cable_type == SEC_BATTERY_CABLE_SMART_NOTG ||
+			battery->cable_type == SEC_BATTERY_CABLE_POGO ||
+			battery->cable_type == SEC_BATTERY_CABLE_POGO_9V ||
+			battery->cable_type == SEC_BATTERY_CABLE_PDIC_APDO) {
 			val->intval = 1;
-			break;
-		case SEC_BATTERY_CABLE_PDIC:
-		case SEC_BATTERY_CABLE_FPDO_DC:
-			val->intval = (battery->pd_usb_attached) ? 0:1;
-			break;
-		default:
+		} else if (battery->cable_type == SEC_BATTERY_CABLE_PDIC ||
+				battery->cable_type == SEC_BATTERY_CABLE_FPDO_DC) {
+			val->intval = (battery->pd_usb_attached) ? 0 : 1;
+		} else {
 			val->intval = 0;
-			break;
 		}
-		if (sec_bat_get_lpmode() && (battery->misc_event & BATT_MISC_EVENT_UNDEFINED_RANGE_TYPE))
+
+		if (sec_bat_get_lpmode() && (battery->misc_event & BATT_MISC_EVENT_UNDEFINED_RANGE_TYPE)) {
 			val->intval = 1;
-		break;
-	case POWER_SUPPLY_PROP_TEMP:
+		}
+	} else if ((int)psp == POWER_SUPPLY_PROP_TEMP) {
 		val->intval = battery->chg_temp;
-		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
+	} else if ((int)psp == POWER_SUPPLY_PROP_VOLTAGE_MAX && sec_current_device != SEC_A33) {
 		/* V -> uV */
 		val->intval = battery->input_voltage * 100000;
 		return 0;
-	case POWER_SUPPLY_PROP_CURRENT_MAX:
+	} else if ((int)psp == POWER_SUPPLY_PROP_CURRENT_MAX && sec_current_device != SEC_A33) {
 		/* mA -> uA */
 		val->intval = battery->pdata->charging_current[battery->cable_type].input_current_limit * 1000;
 		return 0;
-	case POWER_SUPPLY_EXT_PROP_MIN ... POWER_SUPPLY_EXT_PROP_MAX:
-		switch (ext_psp) {
-			case POWER_SUPPLY_EXT_PROP_WATER_DETECT:
-				if (battery->misc_event & (BATT_MISC_EVENT_UNDEFINED_RANGE_TYPE |
-					BATT_MISC_EVENT_WATER_HICCUP_TYPE)) {
-					val->intval = 1;
-					pr_info("%s: Water Detect\n", __func__);
-				} else {
-					val->intval = 0;
-				}
-				break;
-			default:
-				return -EINVAL;
+	} else if ((int)psp >= POWER_SUPPLY_EXT_PROP_MIN && (int)psp <= POWER_SUPPLY_EXT_PROP_MAX) {
+		if (ext_psp == POWER_SUPPLY_EXT_PROP_WATER_DETECT) {
+			if (battery->misc_event & (BATT_MISC_EVENT_UNDEFINED_RANGE_TYPE |
+									BATT_MISC_EVENT_WATER_HICCUP_TYPE)) {
+				val->intval = 1;
+				pr_info("%s: Water Detect\n", __func__);
+			} else {
+				val->intval = 0;
+			}
+		} else {
+			return -EINVAL;
 		}
-		break;
-	default:
+	} else {
 		return -EINVAL;
 	}
 
@@ -6941,46 +6940,38 @@ static int sec_wireless_get_property(struct power_supply *psy,
 	struct sec_battery_info *battery = power_supply_get_drvdata(psy);
 	enum power_supply_ext_property ext_psp = (enum power_supply_ext_property) psp;
 
-	switch ((int)psp) {
-	case POWER_SUPPLY_PROP_ONLINE:
+	if ((int)psp == POWER_SUPPLY_PROP_ONLINE) {
 		val->intval = is_wireless_all_type(battery->cable_type) ? 1 : 0;
-		break;
-	case POWER_SUPPLY_PROP_PRESENT:
-		val->intval = (battery->pdata->wireless_charger_name) ?
-			1 : 0;
-		break;
-	case POWER_SUPPLY_EXT_PROP_MIN ... POWER_SUPPLY_EXT_PROP_MAX:
-		switch (ext_psp) {
-		case POWER_SUPPLY_EXT_PROP_POWER_DESIGN:
-#if IS_ENABLED(CONFIG_WIRELESS_CHARGING)
-			if (battery->cable_type == SEC_BATTERY_CABLE_PREPARE_WIRELESS_20)
+	} else if ((int)psp == POWER_SUPPLY_PROP_PRESENT) {
+		val->intval = (battery->pdata->wireless_charger_name) ? 1 : 0;
+	} else if ((int)psp >= POWER_SUPPLY_EXT_PROP_MIN && (int)psp <= POWER_SUPPLY_EXT_PROP_MAX) {
+		if (ext_psp == POWER_SUPPLY_EXT_PROP_POWER_DESIGN) {
+	#if IS_ENABLED(CONFIG_WIRELESS_CHARGING)
+			if (battery->cable_type == SEC_BATTERY_CABLE_PREPARE_WIRELESS_20) {
 				val->intval = battery->wc20_power_class;
-			else
-#endif
+			} else
+	#endif
+			{
 				val->intval = 0;
-			break;
-		case POWER_SUPPLY_EXT_PROP_WIRELESS_TX_ERR:
+			}
+		} else if (ext_psp == POWER_SUPPLY_EXT_PROP_WIRELESS_TX_ERR) {
 			val->intval = battery->tx_event;
-			break;
-		case POWER_SUPPLY_EXT_PROP_WIRELESS_TX_RETRY_CASE:
+		} else if (ext_psp == POWER_SUPPLY_EXT_PROP_WIRELESS_TX_RETRY_CASE) {
 			val->intval = battery->tx_retry_case;
-			break;
-		case POWER_SUPPLY_EXT_PROP_WIRELESS_WC_STATUS:
+		} else if (ext_psp == POWER_SUPPLY_EXT_PROP_WIRELESS_WC_STATUS) {
 			val->intval = battery->wc_status;
-			break;
-		default:
+		} else {
 			return -EINVAL;
 		}
-		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
+	} else if ((int)psp == POWER_SUPPLY_PROP_VOLTAGE_MAX && sec_current_device != SEC_A33) {
 		/* V -> uV */
 		val->intval = battery->input_voltage * 100000;
 		return 0;
-	case POWER_SUPPLY_PROP_CURRENT_MAX:
+	} else if ((int)psp == POWER_SUPPLY_PROP_CURRENT_MAX && sec_current_device != SEC_A33) {
 		/* mA -> uA */
 		val->intval = battery->pdata->charging_current[battery->cable_type].input_current_limit * 1000;
 		return 0;
-	default:
+	} else {
 		return -EINVAL;
 	}
 
