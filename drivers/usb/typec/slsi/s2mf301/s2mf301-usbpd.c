@@ -4992,7 +4992,9 @@ static usbpd_phy_ops_type s2mf301_ops = {
 	.ops_get_rid			= s2mf301_usbpd_ops_get_rid,
 	.ops_sysfs_lpm_mode		= s2mf301_usbpd_ops_sysfs_lpm_mode,
 	.ops_control_option_command	= s2mf301_usbpd_ops_control_option_command,
+#if IS_ENABLED(CONFIG_HICCUP_CC_DISABLE)
 	.ops_ccopen_req			= s2mf301_usbpd_ops_ccopen_req,
+#endif
 	.set_pcp_clk			= s2mf301_usbpd_set_pcp_clk,
 #if IS_ENABLED(CONFIG_S2MF301_PDIC_SUPPORT_S2MC501)
 	.pps_enable				= s2mf301_pps_enable,
