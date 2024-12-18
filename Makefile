@@ -795,7 +795,11 @@ KBUILD_CFLAGS += -Os
 endif
 
 ifdef CONFIG_LLVM_POLLY
-KBUILD_CFLAGS	+= -mllvm -polly \
+# Detect if clang -v output contains "ClangBuiltLinux"
+SLIM_CLANG=$(shell clang -v 2>&1 | grep -o "ClangBuiltLinux")
+
+ifeq ($(SLIM_CLANG),)
+KBUILD_CFLAGS  += -mllvm -polly \
 		   -mllvm -polly-run-inliner \
 		   -mllvm -polly-ast-use-context \
 		   -mllvm -polly-detect-keep-going \
@@ -803,7 +807,7 @@ KBUILD_CFLAGS	+= -mllvm -polly \
 		   -mllvm -polly-vectorizer=stripmine
 
 ifeq ($(shell test $(CONFIG_CLANG_VERSION) -gt 130000; echo $$?),0)
-KBUILD_CFLAGS	+= -mllvm -polly-loopfusion-greedy=1 \
+KBUILD_CFLAGS  += -mllvm -polly-loopfusion-greedy=1 \
 		   -mllvm -polly-reschedule=1 \
 		   -mllvm -polly-postopts=1 \
 		   -mllvm -polly-num-threads=0 \
@@ -811,7 +815,7 @@ KBUILD_CFLAGS	+= -mllvm -polly-loopfusion-greedy=1 \
 		   -mllvm -polly-scheduling=dynamic \
 		   -mllvm -polly-scheduling-chunksize=1
 else
-KBUILD_CFLAGS	+= -mllvm -polly-opt-fusion=max
+KBUILD_CFLAGS  += -mllvm -polly-opt-fusion=max
 endif
 
 # Polly may optimise loops with dead paths beyound what the linker
@@ -819,7 +823,9 @@ endif
 # so we tell Polly to perfom proven DCE on the loops it optimises
 # in order to preserve the overall effect of the linker's DCE.
 ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
-POLLY_FLAGS	+= -mllvm -polly-run-dce
+POLLY_FLAGS    += -mllvm -polly-run-dce
+endif
+
 endif
 endif
 
