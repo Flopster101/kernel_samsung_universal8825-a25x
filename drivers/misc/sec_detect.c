@@ -22,9 +22,11 @@
 int sec_current_device = DEVICE_UNKNOWN;
 bool sec_needs_decon;
 bool sec_needs_blic = false;
+bool sec_doze = false; // Uses Samsung DRM Doze?
 EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
 EXPORT_SYMBOL(sec_needs_blic);
+EXPORT_SYMBOL(sec_doze);
 
 int sec_detect_init(void) {
     struct device_node *root;
@@ -50,18 +52,21 @@ int sec_detect_init(void) {
     if (strstr(machine_name, "A25") != NULL) {
         sec_current_device = SEC_A25;
         sec_needs_decon = false;
+        sec_doze = true;
     } else if (strstr(machine_name, "A33") != NULL) {
         sec_current_device = SEC_A33;
         sec_needs_decon = true;
     } else if (strstr(machine_name, "A53") != NULL) {
         sec_current_device = SEC_A53;
         sec_needs_decon = true;
+        sec_doze = true;
     } else if (strstr(machine_name, "M33") != NULL) {
         sec_current_device = SEC_M33;
         sec_needs_decon = true;
     } else if (strstr(machine_name, "M34") != NULL) {
         sec_current_device = SEC_M34;
         sec_needs_decon = false;
+        sec_doze = true;
     } else if (strstr(machine_name, "GTA4XLS") != NULL) {
         sec_current_device = SEC_GTA4XLS;
         sec_needs_decon = false;
