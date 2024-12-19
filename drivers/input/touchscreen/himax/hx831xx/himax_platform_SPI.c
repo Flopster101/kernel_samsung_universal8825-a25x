@@ -1126,12 +1126,14 @@ static void himax_input_notify_work(struct work_struct *work)
 	struct himax_ts_data *ts = container_of(work, struct himax_ts_data, himax_input_notify_work.work);
 
 	switch (ts->input_notify) {
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	case NOTIFIER_WACOM_PEN_HOVER_IN:
 		himax_set_ap_change_mode(SPEN_MODE, 1);
 		break;
 	case NOTIFIER_WACOM_PEN_HOVER_OUT:
 		himax_set_ap_change_mode(SPEN_MODE, 0);
 		break;
+#endif
 	default:
 		break;
 	}

@@ -68,7 +68,7 @@ int g_i_CID_MIN; /*VER for GUEST*/
 int g_f_0f_updat;
 #endif
 
-#ifdef SEC_FACTORY_MODE
+#if defined(SEC_FACTORY_MODE) && IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 extern int sec_touch_sysfs(struct himax_ts_data *data);
 extern void sec_touch_sysfs_remove(struct himax_ts_data *data);
 #endif
@@ -255,7 +255,9 @@ static ssize_t himax_self_test(struct seq_file *s, void *v)
 {
 	int val = 0x00;
 	size_t ret = 0;
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	int i = 0;
+#endif
 
 	I("%s: enter, %d\n", __func__, __LINE__);
 
@@ -2762,8 +2764,9 @@ static void himax_read_info_work(struct work_struct *work)
 	struct himax_ts_data *ts = container_of(work, struct himax_ts_data,
 			work_read_info.work);
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	himax_run_rawdata_all(ts);
-
+#endif
 	schedule_work(&ts->work_print_info.work);
 }
 
@@ -3035,7 +3038,7 @@ int himax_chip_common_init(void)
 	himax_update_register(&ts->work_update.work);
 #endif
 
-#ifdef SEC_FACTORY_MODE
+#if defined(SEC_FACTORY_MODE) && IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	err = sec_touch_sysfs(ts);
 	if (err)
 		goto err_sec_sysfs;
@@ -3058,7 +3061,7 @@ int himax_chip_common_init(void)
 	g_hx_chip_inited = true;
 	return 0;
 
-#ifdef SEC_FACTORY_MODE
+#if defined(SEC_FACTORY_MODE) && IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 //	sec_touch_sysfs_remove(ts);
 //	sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
 err_sec_sysfs:
@@ -3132,7 +3135,9 @@ void himax_chip_common_deinit(void)
 	himax_report_data_deinit();
 
 #ifdef SEC_FACTORY_MODE
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	sec_touch_sysfs_remove(ts);
+#endif
 	sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
 #endif
 
