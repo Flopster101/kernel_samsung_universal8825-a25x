@@ -16,6 +16,11 @@
 #ifndef HIMAX_COMMON_H
 #define HIMAX_COMMON_H
 
+#ifndef CONFIG_TOUCHSCREEN_HIMAX_DEBUG
+#define KI(fmt, args...) do { } while (0)
+#define KE(x...) do { } while (0)
+#endif
+
 #include <linux/uaccess.h>
 #include <linux/atomic.h>
 #include <linux/delay.h>
@@ -621,7 +626,9 @@ int himax_dev_set(struct himax_ts_data *ts);
 int himax_input_register_device(struct input_dev *input_dev);
 int himax_pinctrl_configure(struct himax_ts_data *ts, bool active);
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 void himax_run_rawdata_all(struct himax_ts_data *data);
+#endif
 
 int himax_set_ap_change_mode(int mode, int enable);
 

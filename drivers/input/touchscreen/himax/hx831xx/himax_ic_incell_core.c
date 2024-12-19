@@ -2578,8 +2578,10 @@ static void himax_mcu_resend_cmd_func(bool suspended)
 #ifdef HX_USB_DETECT_GLOBAL
 	himax_cable_detect_func(ts->usb_connected);
 #endif
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_HIMAX_INSPECT)
 	if (ts->glove_enabled)
 		himax_set_ap_change_mode(HIGH_SENSITIVITY_MODE, ts->glove_enabled);
+#endif
 }
 #endif
 
