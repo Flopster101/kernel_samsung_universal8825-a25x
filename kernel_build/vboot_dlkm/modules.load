@@ -1,7 +1,6 @@
 exynos-chipid_v2.ko
 exynos-reboot.ko
 exynos_mct.ko
-exynos_tty.ko
 clk_exynos.ko
 i2c-exynos5.ko
 ems.ko
