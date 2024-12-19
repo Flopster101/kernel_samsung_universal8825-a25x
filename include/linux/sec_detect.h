@@ -38,5 +38,6 @@ extern bool sec_needs_goodix;
 extern bool sec_needs_fts;
 extern bool sec_needs_nvt;
 extern bool sec_needs_tbt;
+extern bool sec_doze;
 // extern bool sec_needs_stm;
 #endif
