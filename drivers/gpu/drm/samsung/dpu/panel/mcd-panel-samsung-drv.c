@@ -594,7 +594,7 @@ static int exynos_panel_attach_properties(struct exynos_panel *ctx)
 	drm_object_attach_property(obj, p->fingerprint_mask, 0);
 #endif
 
-	if (IS_ENABLED(CONFIG_DRM_SAMSUNG_DOZE)) {
+	if (IS_ENABLED(CONFIG_DRM_SAMSUNG_DOZE) && sec_doze) {
 		ret = exynos_panel_attach_lp_mode(&ctx->exynos_connector, desc);
 		if (ret)
 			panel_err(ctx, "Failed to attach lp mode (%d)\n", ret);
