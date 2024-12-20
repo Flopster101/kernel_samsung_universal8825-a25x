@@ -350,7 +350,7 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 		str = "User Disable";
 		s2mu106_hv_muic_set_chgtype_usrcmd(muic_data);
 		muic_afc_request_cause_clear();
-#if IS_ENABLED(CONFIG_MUIC_MANAGER)
+#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
 	} else if (sdata->is_afc_pdic_ready == 0) {
 		str = "VBUS-CC Short";
 		pr_info("%s short detected or 56k not detected, revert dev to TA\n", __func__);
