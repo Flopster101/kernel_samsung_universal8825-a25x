@@ -18,7 +18,6 @@
  */
 
 #include "wacom_dev.h"
-#include <linux/sec_detect.h>
 
 struct wacom_i2c *g_wac_i2c;
 static void wacom_i2c_cover_handler(struct wacom_i2c *wac_i2c, char *data);
@@ -3313,9 +3312,6 @@ static struct i2c_driver wacom_i2c_driver = {
 static int __init wacom_i2c_init(void)
 {
 	int ret = 0;
-
-	if (!sec_needs_tbt)
-		return 0;
 
 	ret = i2c_add_driver(&wacom_i2c_driver);
 	if (ret)

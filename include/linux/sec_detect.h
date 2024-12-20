@@ -29,15 +29,9 @@ enum SEC_devices {
     SEC_M34,
     SEC_GTA4XLS
 };
-
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;
 extern bool sec_needs_decon;
 extern bool sec_needs_blic;
-extern bool sec_needs_goodix;
-extern bool sec_needs_fts;
-extern bool sec_needs_nvt;
-extern bool sec_needs_tbt;
 extern bool sec_doze;
-// extern bool sec_needs_stm;
 #endif
