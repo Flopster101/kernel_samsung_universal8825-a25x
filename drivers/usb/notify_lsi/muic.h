@@ -297,7 +297,7 @@ struct muic_platform_data {
 #ifndef CONFIG_MUIC_LSI_SOLUTION
 	enum muic_op_mode opmode;
 #endif
-#ifdef CONFIG_MUIC_SYSFS
+#ifdef CONFIG_MUIC_COMMON_SYSFS
 	struct device *switch_device;
 	struct mutex sysfs_mutex;
 #endif
