@@ -9,7 +9,7 @@
 #ifndef _GOODIX_TS_CORE_H_
 #define _GOODIX_TS_CORE_H_
 
-#include <linux/input/sec_input.h>
+#include "../../../sec_input/sec_input.h"
 
 extern struct device *ptsp;
 
