@@ -1526,14 +1526,14 @@ int sec_input_parse_dt(struct device *dev)
 			(!of_property_read_u32_array(np, "sec,bitmask_unload", lcd_bitmask, count))) {
 		input_info(true, dev, "%s: bitmask_unload: 0x%06X, check %d type\n",
 				__func__, lcd_bitmask[0], count - 1);
-		for (i = 1; i < count; i++) {
-			if ((lcd_type & lcd_bitmask[0]) == lcd_bitmask[i]) {
-				input_err(true, dev,
-						"%s: do not load lcdtype:0x%06X masked:0x%06X\n",
-						__func__, lcd_type, lcd_bitmask[i]);
-				return -ENODEV;
-			}
-		}
+		// for (i = 1; i < count; i++) {
+		// 	if ((lcd_type & lcd_bitmask[0]) == lcd_bitmask[i]) {
+		// 		input_err(true, dev,
+		// 				"%s: do not load lcdtype:0x%06X masked:0x%06X\n",
+		// 				__func__, lcd_type, lcd_bitmask[i]);
+		// 		return -ENODEV;
+		// 	}
+		// }
 	}
 
 	mutex_init(&pdata->irq_lock);
@@ -1806,10 +1806,10 @@ int sec_input_check_fw_name_incell(struct device *dev, const char **firmware_nam
 		else {
 			input_info(true, dev, "%s: fw_name_cnt(1), ap lcdtype=0x%06X & dt lcdtype=0x%06X\n",
 								__func__, lcdtype, dt_lcdtype);
-			if (lcdtype != dt_lcdtype) {
-				input_err(true, dev, "%s: panel mismatched, unload driver\n", __func__);
-				return -EINVAL;
-			}
+			// if (lcdtype != dt_lcdtype) {
+			// 	input_err(true, dev, "%s: panel mismatched, unload driver\n", __func__);
+			// 	return -EINVAL;
+			// }
 		}
 		fw_sel_idx = 0;
 
