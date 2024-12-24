@@ -37,7 +37,7 @@
 #include "decon_panel_vrr.h"
 
 #include "decon_panel_modes.h"
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 #include <linux/panel_notify.h>
 #endif
 

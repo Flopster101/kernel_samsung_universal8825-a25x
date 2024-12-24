@@ -767,7 +767,7 @@ struct panel_regulator *find_panel_regulator_by_node_name(struct panel_device *p
 #if defined(CONFIG_SUPPORT_FAST_DISCHARGE)
 int panel_fast_discharge_set(struct panel_device *panel);
 #endif
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 void panel_send_screen_mode_notify(int display_idx, u32 mode);
 #endif
 #ifdef CONFIG_MCD_PANEL_RCD
