@@ -420,6 +420,11 @@ static void goodix_i2c_shutdown(struct i2c_client *client)
 
 static const struct of_device_id i2c_matches[] = {
 	{.compatible = "goodix,berlin",},
+	{.compatible = "goodix,gt9897",},
+	{.compatible = "goodix,gt9966",},
+	{.compatible = "goodix,gt9916",},
+	{.compatible = "goodix,gt9885",},
+	{.compatible = "goodix,gt9886",},
 	{},
 };
 MODULE_DEVICE_TABLE(of, i2c_matches);

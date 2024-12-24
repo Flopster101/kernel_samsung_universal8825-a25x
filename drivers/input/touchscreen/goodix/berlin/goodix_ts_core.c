@@ -323,28 +323,28 @@ static int goodix_parse_update_info(struct device_node *node,
 {
 	int ret;
 
-	ret = of_property_read_u32(node, "goodix,isp_ram_reg", &ts->isp_ram_reg);
+	ret = of_property_read_u32(node, "sec,isp_ram_reg", &ts->isp_ram_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,flash_cmd_reg", &ts->flash_cmd_reg);
+	ret = of_property_read_u32(node, "sec,flash_cmd_reg", &ts->flash_cmd_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,isp_buffer_reg", &ts->isp_buffer_reg);
+	ret = of_property_read_u32(node, "sec,isp_buffer_reg", &ts->isp_buffer_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,config_data_reg", &ts->config_data_reg);
+	ret = of_property_read_u32(node, "sec,config_data_reg", &ts->config_data_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,misctl_reg", &ts->misctl_reg);
+	ret = of_property_read_u32(node, "sec,misctl_reg", &ts->misctl_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,watch_dog_reg", &ts->watch_dog_reg);
+	ret = of_property_read_u32(node, "sec,watch_dog_reg", &ts->watch_dog_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,config_id_reg", &ts->config_id_reg);
+	ret = of_property_read_u32(node, "sec,config_id_reg", &ts->config_id_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,enable_misctl_val", &ts->enable_misctl_val);
+	ret = of_property_read_u32(node, "sec,enable_misctl_val", &ts->enable_misctl_val);
 	if (ret < 0)
 		return ret;
 
@@ -359,53 +359,53 @@ static int goodix_test_prepare(struct device_node *node,
 	int size;
 	int ret;
 
-	ret = of_property_read_u32(node, "goodix,max_drv_num", &ts->max_drv_num);
+	ret = of_property_read_u32(node, "sec,max_drv_num", &ts->max_drv_num);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,max_sen_num", &ts->max_sen_num);
+	ret = of_property_read_u32(node, "sec,max_sen_num", &ts->max_sen_num);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,short_test_time_reg", &ts->short_test_time_reg);
+	ret = of_property_read_u32(node, "sec,short_test_time_reg", &ts->short_test_time_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,short_test_status_reg", &ts->short_test_status_reg);
+	ret = of_property_read_u32(node, "sec,short_test_status_reg", &ts->short_test_status_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,short_test_result_reg", &ts->short_test_result_reg);
+	ret = of_property_read_u32(node, "sec,short_test_result_reg", &ts->short_test_result_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,drv_drv_reg", &ts->drv_drv_reg);
+	ret = of_property_read_u32(node, "sec,drv_drv_reg", &ts->drv_drv_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,sen_sen_reg", &ts->sen_sen_reg);
+	ret = of_property_read_u32(node, "sec,sen_sen_reg", &ts->sen_sen_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,drv_sen_reg", &ts->drv_sen_reg);
+	ret = of_property_read_u32(node, "sec,drv_sen_reg", &ts->drv_sen_reg);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,diff_code_reg", &ts->diff_code_reg);
+	ret = of_property_read_u32(node, "sec,diff_code_reg", &ts->diff_code_reg);
 	if (ret < 0)
 		return ret;
 
 	if (ts->bus->ic_type != IC_TYPE_GT9916K) {
-		ret = of_property_read_u32(node, "goodix,production_test_addr", &ts->production_test_addr);
+		ret = of_property_read_u32(node, "sec,production_test_addr", &ts->production_test_addr);
 		if (ret < 0)
 			return ret;
 	}
-	ret = of_property_read_u32(node, "goodix,switch_cfg_cmd", &ts->switch_cfg_cmd);
+	ret = of_property_read_u32(node, "sec,switch_cfg_cmd", &ts->switch_cfg_cmd);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,switch_freq_cmd", &ts->switch_freq_cmd);
+	ret = of_property_read_u32(node, "sec,switch_freq_cmd", &ts->switch_freq_cmd);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,snr_cmd", &ts->snr_cmd);
+	ret = of_property_read_u32(node, "sec,snr_cmd", &ts->snr_cmd);
 	if (ret < 0)
 		return ret;
-	ret = of_property_read_u32(node, "goodix,sensitive_cmd", &ts->sensitive_cmd);
+	ret = of_property_read_u32(node, "sec,sensitive_cmd", &ts->sensitive_cmd);
 	if (ret < 0)
 		return ret;
 
-	prop = of_find_property(node, "goodix,drv_map", &size);
+	prop = of_find_property(node, "sec,drv_map", &size);
 	if (!prop) {
 		ts_err("can't find drv_map");
 		return -EINVAL;
@@ -416,13 +416,13 @@ static int goodix_test_prepare(struct device_node *node,
 		return -EINVAL;
 	}
 
-	ret = of_property_read_u32_array(node, "goodix,drv_map", ts->drv_map, arr_len);
+	ret = of_property_read_u32_array(node, "sec,drv_map", ts->drv_map, arr_len);
 	if (ret < 0)
 		return ret;
 
 	ts_info("drv_map array size:%d", arr_len);
 
-	prop = of_find_property(node, "goodix,sen_map", &size);
+	prop = of_find_property(node, "sec,sen_map", &size);
 	if (!prop) {
 		ts_err("can't find sen_map");
 		return -EINVAL;
@@ -433,13 +433,13 @@ static int goodix_test_prepare(struct device_node *node,
 		return -EINVAL;
 	}
 
-	ret = of_property_read_u32_array(node, "goodix,sen_map", ts->sen_map, arr_len);
+	ret = of_property_read_u32_array(node, "sec,sen_map", ts->sen_map, arr_len);
 	if (ret < 0)
 		return ret;
 
 	ts_info("sen_map array size:%d", arr_len);
 
-	ts->enable_esd_check = of_property_read_bool(node, "goodix,enable_esd_check");
+	ts->enable_esd_check = of_property_read_bool(node, "sec,enable_esd_check");
 	ts_info("esd check %s", ts->enable_esd_check ? "enable" : "disable");
 
 	return 0;
@@ -457,7 +457,7 @@ static int goodix_parse_dt(struct device *dev, struct goodix_ts_data *ts)
 	}
 
 	/* get ic type */
-	r = of_property_read_u32(node, "goodix,ic_type", &ic_type);
+	r = of_property_read_u32(node, "sec,ic_type", &ic_type);
 	if (r < 0) {
 		ts_err("can't parse sec,ic_type, exit");
 		return r;
@@ -1149,17 +1149,27 @@ static int goodix_check_update_skip(struct goodix_ts_data *ts, struct goodix_ic_
 	struct goodix_fw_version fw_version;
 	struct goodix_ic_info ic_info;
 	struct goodix_ts_hw_ops *hw_ops = ts->hw_ops;
+	int ret = 0;
 
 	ts->plat_data->img_version_of_bin[SEC_INPUT_FW_IC_VER] = fw_info_bin->ic_name_list;
 	ts->plat_data->img_version_of_bin[SEC_INPUT_FW_VER_PROJECT_ID] = fw_info_bin->project_id;
 	ts->plat_data->img_version_of_bin[SEC_INPUT_FW_MODULE_VER] = fw_info_bin->module_version;
 	ts->plat_data->img_version_of_bin[SEC_INPUT_FW_VER] = fw_info_bin->firmware_version;
 
-	if (hw_ops->read_version(ts, &fw_version))
+	ret = hw_ops->read_version(ts, &fw_version);
+	if (ret)
 		return NEED_FW_UPDATE;
 
 	if (hw_ops->get_ic_info(ts, &ic_info)) {
 		ts_err("invalid ic info, abort");
+		return NEED_FW_UPDATE;
+	}
+
+	if (ts->plat_data->bringup == 2) {
+		ts_info("bringup 2, skip fw update");
+		return SKIP_FW_UPDATE;
+	} else if (ts->plat_data->bringup == 5) {
+		ts_info("bringup 5, force fw update");
 		return NEED_FW_UPDATE;
 	}
 
@@ -1175,6 +1185,29 @@ static int goodix_check_update_skip(struct goodix_ts_data *ts, struct goodix_ic_
 		return NEED_FW_UPDATE;
 	}
 
+	if ((ts->plat_data->bringup == 3) &&
+			((ic_info.sec.ic_name_list != fw_info_bin->ic_name_list) ||
+			(ic_info.sec.project_id != fw_info_bin->project_id) ||
+			(ic_info.sec.module_version != fw_info_bin->module_version) ||
+			(ic_info.sec.firmware_version != fw_info_bin->firmware_version))) {
+		ts_info("bringup 3, force fw update because fw version is not equal");
+		return NEED_FW_UPDATE;
+	}
+
+	if (ic_info.sec.ic_name_list != fw_info_bin->ic_name_list) {
+		ts_err("ic version is not matching");
+		return SKIP_FW_UPDATE;
+	} else if (ic_info.sec.project_id != fw_info_bin->project_id) {
+		ts_err("project id is not matching");
+		return NEED_FW_UPDATE;
+	} else if (ic_info.sec.module_version != fw_info_bin->module_version) {
+		ts_err("module version is not matching");
+		return SKIP_FW_UPDATE;
+	} else if (ic_info.sec.firmware_version < fw_info_bin->firmware_version) {
+		ts_info("ic firmware version is lower than binary firmware version");
+		return NEED_FW_UPDATE;
+	}
+
 	/* compare patch vid */
 	if (fw_version.patch_vid[3] < ts->merge_bin_ver.patch_vid[3]) {
 		ts_err("WARNING:chip VID[%x] < bin VID[%x], need upgrade",
@@ -1182,8 +1215,7 @@ static int goodix_check_update_skip(struct goodix_ts_data *ts, struct goodix_ic_
 		return NEED_FW_UPDATE;
 	}
 
-	if (sec_input_need_fw_update(ts->plat_data))
-		return NEED_FW_UPDATE;
+	ts_info("ic fw version is latest, skip fw update");
 
 	return SKIP_FW_UPDATE;
 }

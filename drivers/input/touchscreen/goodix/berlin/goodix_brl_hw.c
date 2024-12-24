@@ -273,11 +273,13 @@ static int brl_reset(struct goodix_ts_data *ts, int delay)
 static int brl_irq_enable(struct goodix_ts_data *ts, bool enable)
 {
 	if (enable) {
-		sec_input_irq_enable(ts->plat_data);
+		enable_irq(ts->irq);
 		goodix_ts_blocking_notify(NOTIFY_ESD_ON, NULL);
+		ts_info("Irq enabled");
 	} else {
+		disable_irq(ts->irq);
 		goodix_ts_blocking_notify(NOTIFY_ESD_OFF, NULL);
-		sec_input_irq_disable(ts->plat_data);
+		ts_info("Irq disabled");
 	}
 
 	return 0;
