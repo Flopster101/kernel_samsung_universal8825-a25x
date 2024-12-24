@@ -11,7 +11,7 @@
 #include <linux/debugfs.h>
 #include "decon_panel_drv.h"
 #include "decon_panel_debug.h"
-#include <linux/sec_panel_notifier_v2.h>
+#include <linux/panel_notify.h>
 #include "decon_panel_freq_hop.h"
 #if defined(CONFIG_PANEL_FREQ_HOP)
 #include <linux/dev_ril_bridge.h>
@@ -22,7 +22,7 @@
 const char *panel_debugfs_name[] = {
 	[PANEL_DEBUGFS_LOG] = "log",
 	[PANEL_DEBUGFS_CMD_LOG] = "cmd_log",
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	[PANEL_DEBUGFS_PANEL_EVENT] = "panel_event",
 #endif
 #if defined(CONFIG_PANEL_FREQ_HOP)
@@ -44,7 +44,11 @@ static int panel_debug_cmd_log_show(struct seq_file *s)
 	return 0;
 }
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
+struct panel_notifier_event_data {
+   unsigned int state;
+};
+
 static int panel_debug_panel_event_show(struct seq_file *s)
 {
 	seq_printf(s, "echo <event> <state> > /d/panel/panel_event\n");
@@ -77,7 +81,7 @@ static int panel_debug_panel_event_noti(struct panel_device *panel, char *buf)
 #endif
 	evt_data.state = state;
 
-	panel_notifier_call_chain(event, &evt_data);
+	decon_panel_notifier_call_chain(event, &evt_data);
 	panel_info("event:%d state:%d\n", event, evt_data.state);
 
 	return 0;
@@ -155,7 +159,7 @@ static int panel_debug_simple_show(struct seq_file *s, void *unused)
 	case PANEL_DEBUGFS_CMD_LOG:
 		panel_debug_cmd_log_show(s);
 		break;
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	case PANEL_DEBUGFS_PANEL_EVENT:
 		panel_debug_panel_event_show(s);
 		break;
@@ -178,7 +182,7 @@ static ssize_t panel_debug_simple_write(struct file *file,
 	struct seq_file *s;
 	struct panel_debugfs *debugfs;
 	struct panel_device *panel;
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || defined(CONFIG_PANEL_FREQ_HOP)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY) || defined(CONFIG_PANEL_FREQ_HOP)
 	char argbuf[SZ_128];
 #endif
 	int rc = 0;
@@ -205,7 +209,7 @@ static ssize_t panel_debug_simple_write(struct file *file,
 		decon_panel_cmd_log = res;
 		panel_info("decon_panel_cmd_log: %d\n", decon_panel_cmd_log);
 		break;
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	case PANEL_DEBUGFS_PANEL_EVENT:
 		if (copy_from_user(argbuf, buf, count))
 			return -EOVERFLOW;

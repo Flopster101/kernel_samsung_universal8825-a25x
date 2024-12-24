@@ -32,6 +32,7 @@ mcd-panel-decon-$(CONFIG_PANEL_DEBUG) += panel_debug.o
 mcd-panel-decon-$(CONFIG_EXTEND_LIVE_CLOCK) += aod/aod_drv.o
 mcd-panel-decon-$(CONFIG_PANEL_FREQ_HOP) += panel_freq_hop.o
 mcd-panel-decon-$(CONFIG_SUPPORT_MAFPC) += mafpc/mafpc_drv.o
+mcd-panel-decon-$(CONFIG_PANEL_NOTIFY) += panel_notify.o
 mcd-panel-decon-$(CONFIG_DISPLAY_USE_INFO) += dpui.o
 mcd-panel-decon-$(CONFIG_EXYNOS_DECON_LCD_COPR) += copr.o
 mcd-panel-decon-$(CONFIG_SUPPORT_POC_SPI) += panel_poc.o panel_spi.o

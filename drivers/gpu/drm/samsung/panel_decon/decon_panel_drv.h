@@ -461,7 +461,7 @@ struct panel_thread {
 enum {
 	PANEL_DEBUGFS_LOG,
 	PANEL_DEBUGFS_CMD_LOG,
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	PANEL_DEBUGFS_PANEL_EVENT,
 #endif
 #if defined(CONFIG_PANEL_FREQ_HOP)
@@ -767,7 +767,7 @@ struct panel_regulator *find_panel_regulator_by_node_name(struct panel_device *p
 #if defined(CONFIG_SUPPORT_FAST_DISCHARGE)
 int panel_fast_discharge_set(struct panel_device *panel);
 #endif
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 void panel_send_screen_mode_notify(int display_idx, u32 mode);
 #endif
 #ifdef CONFIG_MCD_PANEL_RCD
