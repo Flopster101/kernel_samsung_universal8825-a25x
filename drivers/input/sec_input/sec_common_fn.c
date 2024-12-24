@@ -1340,7 +1340,7 @@ int sec_input_parse_dt(struct device *dev)
 	u32 ic_match_value;
 	u32 px_zone[3] = { 0 };
 	int lcd_type = 0;
-	u32 bitmask[2] = { 0 };
+	// u32 bitmask[2] = { 0 };
 
 	pdata->dev = dev;
 
@@ -1359,13 +1359,13 @@ int sec_input_parse_dt(struct device *dev)
 #endif
 	input_info(true, dev, "%s: lcdtype 0x%08X\n", __func__, lcd_type);
 
-	if (!of_property_read_u32_array(np, "sec,bitmask_unload", bitmask, 2)) {
-		if ((lcd_type != 0) && ((lcd_type >> bitmask[0]) == bitmask[1])) {
-			input_err(true, dev, "%s: do not load lcdtype:0x%08X bitmask:0x%08X\n", __func__,
-						lcd_type >> bitmask[0], bitmask[1]);
-			return -ENODEV;
-		}
-	}
+	// if (!of_property_read_u32_array(np, "sec,bitmask_unload", bitmask, 2)) {
+	// 	if ((lcd_type != 0) && ((lcd_type >> bitmask[0]) == bitmask[1])) {
+	// 		input_err(true, dev, "%s: do not load lcdtype:0x%08X bitmask:0x%08X\n", __func__,
+	// 					lcd_type >> bitmask[0], bitmask[1]);
+	// 		return -ENODEV;
+	// 	}
+	// }
 
 	pdata->tsp_icid = of_get_named_gpio(np, "sec,tsp-icid_gpio", 0);
 	if (gpio_is_valid(pdata->tsp_icid)) {
