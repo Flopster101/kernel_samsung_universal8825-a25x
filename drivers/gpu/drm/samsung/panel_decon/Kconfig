@@ -1,7 +1,6 @@
 config MCD_PANEL
 	tristate "Samsung MCD Panel Driver"
 	select BACKLIGHT_CLASS_DEVICE
-	depends on SEC_PANEL_NOTIFIER_V2
 	default n
 	help
 		Enable MCD Panel Driver.
@@ -140,6 +139,11 @@ config SELF_MOVE_3PX
 	bool "self move 3 pixel"
 	depends on MCD_PANEL
 	default n
+
+config PANEL_NOTIFY
+	bool "Support panel notifier"
+	depends on MCD_PANEL
+	default y
 
 config SUPPORT_POC_SPI
 	bool "Support poc SPI connection"

@@ -1002,7 +1002,7 @@ static const struct backlight_ops panel_backlight_ops = {
 static int panel_bl_thread(void *data)
 {
 	struct panel_bl_device *panel_bl = data;
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 	struct panel_bl_event_data bl_evt_data;
 #endif
 	int ret, brightness, acl_state;
@@ -1019,7 +1019,7 @@ static int panel_bl_thread(void *data)
 		if (should_stop)
 			break;
 
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 		bl_evt_data.display_idx = to_panel_device(panel_bl)->id;
 		bl_evt_data.brightness = panel_bl->props.brightness;
 		bl_evt_data.aor_ratio =
@@ -1027,7 +1027,7 @@ static int panel_bl_thread(void *data)
 			panel_bl->props.aor_ratio : 0;
 		bl_evt_data.acl_status =
 			(panel_bl->props.acl_pwrsave == ACL_PWRSAVE_OFF) ? 0 : 1;
-		panel_notifier_call_chain(PANEL_EVENT_BL_CHANGED, &bl_evt_data);
+		decon_panel_notifier_call_chain(PANEL_EVENT_BL_CHANGED, &bl_evt_data);
 #endif
 	}
 

@@ -622,13 +622,13 @@ int copr_reg_store(struct copr_info *copr, int index, u32 value)
 	return 0;
 }
 
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 static inline void panel_send_coprstate_notify(u32 state)
 {
 	struct panel_copr_event_data data;
 
 	data.state = state;
-	panel_notifier_call_chain(PANEL_EVENT_COPR_STATE_CHANGED, &data);
+	decon_panel_notifier_call_chain(PANEL_EVENT_COPR_STATE_CHANGED, &data);
 	panel_info("call EVENT_COPR_STATE notifier %d\n", data.state);
 }
 #endif
@@ -1492,7 +1492,7 @@ int copr_enable(struct copr_info *copr)
 	mutex_unlock(&copr->lock);
 
 	panel_info("-\n");
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 	panel_send_coprstate_notify(PANEL_EVENT_COPR_ENABLED);
 #endif
 	return 0;
@@ -1530,7 +1530,7 @@ int copr_disable(struct copr_info *copr)
 		panel_err("failed to set spio gpio\n");
 #endif
 	panel_info("-\n");
-#ifdef CONFIG_SEC_PANEL_NOTIFIER_V2
+#ifdef CONFIG_PANEL_NOTIFY
 	panel_send_coprstate_notify(PANEL_EVENT_COPR_DISABLED);
 #endif
 	return 0;
