@@ -57,10 +57,17 @@
 #include <linux/vbus_notifier.h>
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
 #include <linux/sec_panel_notifier_v2.h>
 #define STM_PANEL_DETACHED	0
 #define STM_PANEL_ATTACHED	1
+#endif
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
+#include <linux/panel_notify.h>
+#define STM_PANEL_DETACHED	0
+#define STM_PANEL_ATTACHED	1
+#endif
 #endif
 
 #include "../sec_tclm_v2.h"
@@ -459,7 +466,7 @@ struct stm_ts_data {
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 	struct notifier_block vbus_nb;
 #endif
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 	u8 panel_attached;
 	struct notifier_block lcd_nb;
 #endif
@@ -695,7 +702,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts);
 void  stm_ts_rawdata_buffer_remove(struct stm_ts_data *ts);
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 extern int panel_notifier_register(struct notifier_block *nb);
 extern int panel_notifier_unregister(struct notifier_block *nb);
 #endif

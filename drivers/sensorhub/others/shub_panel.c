@@ -23,8 +23,13 @@
 #include <linux/string.h>
 #include <linux/notifier.h>
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
+#include <linux/panel_notify.h>
+#endif
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
 #include <linux/sec_panel_notifier_v2.h>
+#endif
 #include "../sensor/light.h"
 #include "../sensormanager/shub_sensor_type.h"
 
@@ -148,7 +153,7 @@ bool is_panel_ubid_changed(void)
 	return false;
 }
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
 int send_panel_information(int display_index, struct panel_event_bl_data *evdata)
 {
 	int buf[5] = { display_index, evdata->level, evdata->aor, evdata->acl_status, evdata->gradual_acl_val };

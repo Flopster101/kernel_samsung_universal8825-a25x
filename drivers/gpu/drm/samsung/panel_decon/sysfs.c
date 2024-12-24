@@ -1258,7 +1258,7 @@ static ssize_t irc_mode_store(struct device *dev,
 	panel_data->props.irc_mode = !!value;
 	mutex_unlock(&panel->op_lock);
 	panel_update_brightness(panel);
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_screen_mode_notify(panel->id, panel_data->props.irc_mode);
 #endif
 	panel_info("irc_mode %s\n", panel_data->props.irc_mode ? "on" : "off");

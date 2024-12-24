@@ -625,7 +625,7 @@ int shub_probe(struct platform_device *pdev)
 	}
 
 	init_shub_panel();
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
 	init_shub_panel_callback();
 #endif
 #ifdef CONFIG_SHUB_DEBUG
@@ -675,7 +675,7 @@ void shub_shutdown(struct platform_device *pdev)
 
 	sensorhub_shutdown();
 	remove_shub_panel();
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SHUB_PANEL_NOTIFY)
 	remove_shub_panel_callback();
 #endif
 	remove_shub_dump();

@@ -3253,7 +3253,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #if (IS_ENABLED(CONFIG_EXYNOS_DPU30) || IS_ENABLED(CONFIG_DRM_SAMSUNG_DPU)) && IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	ts->nb.priority = 1;
 	ts->nb.notifier_call = nvt_notifier_call;
-	panel_notifier_register(&ts->nb);
+	decon_panel_notifier_register(&ts->nb);
 #endif
 
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)

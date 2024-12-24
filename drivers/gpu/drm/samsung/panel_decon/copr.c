@@ -622,7 +622,7 @@ int copr_reg_store(struct copr_info *copr, int index, u32 value)
 	return 0;
 }
 
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 static inline void panel_send_coprstate_notify(u32 state)
 {
 	struct panel_copr_event_data data;
@@ -1492,7 +1492,7 @@ int copr_enable(struct copr_info *copr)
 	mutex_unlock(&copr->lock);
 
 	panel_info("-\n");
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_coprstate_notify(PANEL_EVENT_COPR_ENABLED);
 #endif
 	return 0;
@@ -1530,7 +1530,7 @@ int copr_disable(struct copr_info *copr)
 		panel_err("failed to set spio gpio\n");
 #endif
 	panel_info("-\n");
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_coprstate_notify(PANEL_EVENT_COPR_DISABLED);
 #endif
 	return 0;

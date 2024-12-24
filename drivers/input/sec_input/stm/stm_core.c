@@ -1054,7 +1054,7 @@ int stm_ts_stop_device(void *data)
 
 	input_info(true, ts->dev, "%s\n", __func__);
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 	if (ts->panel_attached == STM_PANEL_DETACHED) {
 		input_err(true, ts->dev, "%s: panel detached(%d) skip!\n", __func__, ts->panel_attached);
 		return 0;
@@ -1090,7 +1090,7 @@ int stm_ts_start_device(void *data)
 
 	input_info(true, ts->dev, "%s\n", __func__);
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 	if (ts->panel_attached == STM_PANEL_DETACHED) {
 		input_err(true, ts->dev, "%s: panel detached(%d) skip!\n", __func__, ts->panel_attached);
 		return ret;
@@ -1351,7 +1351,7 @@ void stm_ts_release(struct stm_ts_data *ts)
 	ts->plat_data->enable = NULL;
 	ts->plat_data->disable = NULL;
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 	panel_notifier_unregister(&ts->lcd_nb);
 #endif
 
@@ -1381,7 +1381,7 @@ void stm_ts_release(struct stm_ts_data *ts)
 	ts->plat_data->power(ts->dev, false);
 }
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 static int stm_notifier_call(struct notifier_block *n, unsigned long event, void *data)
 {
 	struct stm_ts_data *ts = container_of(n, struct stm_ts_data, lcd_nb);
@@ -1463,7 +1463,7 @@ int stm_ts_probe(struct device *dev)
 						VBUS_NOTIFY_DEV_CHARGER);
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) && IS_ENABLED(CONFIG_SEC_FACTORY)
+#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
 	ts->lcd_nb.priority = 1;
 	ts->lcd_nb.notifier_call = stm_notifier_call;
 	ts->panel_attached = STM_PANEL_ATTACHED;

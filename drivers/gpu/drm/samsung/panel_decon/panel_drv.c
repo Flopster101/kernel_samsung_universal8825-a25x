@@ -740,7 +740,7 @@ static void panel_set_cur_state(struct panel_device *panel, enum panel_active_st
 	panel->state.cur_state = state;
 }
 
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 static inline void panel_send_ubconn_notify(u32 state)
 {
 	struct panel_ub_con_event_data data;
@@ -2713,7 +2713,7 @@ __visible_for_testing int panel_power_on(struct panel_device *panel)
 		}
 		panel_set_cur_state(panel, PANEL_STATE_ON);
 	}
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_ubconn_notify(panel->state.connected == PANEL_STATE_OK ?
 		PANEL_EVENT_UB_CON_CONNECTED : PANEL_EVENT_UB_CON_DISCONNECTED);
 #endif
@@ -2722,7 +2722,7 @@ __visible_for_testing int panel_power_on(struct panel_device *panel)
 	return 0;
 
 do_exit:
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_ubconn_notify(PANEL_EVENT_UB_CON_DISCONNECTED);
 #endif
 	return ret;
@@ -3014,7 +3014,7 @@ static int panel_register_cb(struct panel_device *panel, int cb_id, void *arg)
 int panel_vrr_cb(struct panel_device *panel)
 {
 	struct disp_cb_info *vrr_cb_info = &panel->cb_info[PANEL_CB_VRR];
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	struct panel_dms_data dms_data;
 	static struct panel_dms_data old_dms_data;
 #endif
@@ -3033,7 +3033,7 @@ int panel_vrr_cb(struct panel_device *panel)
 			panel_err("failed to vrr callback\n");
 	}
 
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	dms_data.fps = vrr->fps /
 		max(TE_SKIP_TO_DIV(vrr->te_sw_skip_count,
 					vrr->te_hw_skip_count), MIN_VRR_DIV_COUNT);
@@ -4148,7 +4148,7 @@ int panel_drv_set_gpios(struct panel_device *panel)
 		panel->state.disp_on = PANEL_DISPLAY_OFF;
 		panel_set_gpio_value(panel, PANEL_GPIO_RESET, 0);
 	}
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_ubconn_notify(panel->state.connected == PANEL_STATE_OK ?
 		PANEL_EVENT_UB_CON_CONNECTED : PANEL_EVENT_UB_CON_DISCONNECTED);
 #endif
@@ -4808,7 +4808,7 @@ void conn_det_handler(struct work_struct *data)
 	panel_info("%s state:%d cnt:%d\n", __func__,
 		is_disconnected, panel->panel_data.props.ub_con_cnt);
 
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	panel_send_ubconn_notify((is_disconnected ?
 		PANEL_EVENT_UB_CON_DISCONNECTED : PANEL_EVENT_UB_CON_CONNECTED));
 #endif
@@ -4893,13 +4893,13 @@ void err_fg_handler(struct work_struct *data)
 			usleep_range(10000, 11000);
 			if (err_fg_powerdown) {
 				panel_err("powerdown: err_fg is abnormal state\n");
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 				panel_send_ubconn_notify(PANEL_EVENT_UB_CON_DISCONNECTED);
 #endif
 				ret = panel_powerdown_cb(panel);
 				if (ret)
 					panel_err("failed to powerdown_cb\n");
-#ifdef CONFIG_PANEL_NOTIFY
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 				panel_send_ubconn_notify(PANEL_EVENT_UB_CON_CONNECTED);
 #endif
 			} else if (err_fg_recovery) {
