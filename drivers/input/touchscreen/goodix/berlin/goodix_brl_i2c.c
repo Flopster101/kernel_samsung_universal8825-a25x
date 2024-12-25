@@ -336,10 +336,10 @@ static int goodix_i2c_probe(struct i2c_client *client,
 	int ret = 0;
 
 	ts_info("goodix i2c probe in 2024");
-	ret = i2c_check_functionality(client->adapter,
-			I2C_FUNC_I2C);
-	if (!ret)
+	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+		ts_err("I2C not supported");
 		return -EIO;
+	}
 
 	ret = goodix_i2c_init(client);
 	if (ret < 0) {
@@ -351,37 +351,37 @@ static int goodix_i2c_probe(struct i2c_client *client,
 	goodix_i2c_bus.dev = &client->dev;
 	goodix_i2c_bus.read = goodix_i2c_read;
 	goodix_i2c_bus.write = goodix_i2c_write;
-	/* ts core device */
+
+	/* Allocate memory for platform device */
 	goodix_pdev = kzalloc(sizeof(struct platform_device), GFP_KERNEL);
-	if (!goodix_pdev)
-		return -ENOMEM;
+	if (!goodix_pdev) {
+		ret = -ENOMEM;
+		goto err_pdev_alloc;
+	}
 
 	goodix_pdev->name = GOODIX_CORE_DRIVER_NAME;
 	goodix_pdev->id = 0;
 	goodix_pdev->num_resources = 0;
-	/*
-	 * you can find this platform dev in
-	 * /sys/devices/platform/goodix_ts.0
-	 * goodix_pdev->dev.parent = &client->dev;
-	 */
+
+	/* Set platform data and release function */
 	goodix_pdev->dev.platform_data = &goodix_i2c_bus;
 	goodix_pdev->dev.release = goodix_pdev_release;
 
-	/* register platform device, then the goodix_ts_core
-	 * module will probe the touch device.
-	 */
+	/* Register platform device */
 	ret = platform_device_register(goodix_pdev);
 	if (ret) {
-		ts_err("failed register goodix platform device, %d", ret);
-		goto err_pdev;
+		ts_err("failed to register goodix platform device, %d", ret);
+		goto err_pdev_register;
 	}
-	ts_info("i2c probe out");
-	return ret;
 
-err_pdev:
+	ts_info("i2c probe out successfully");
+	return 0;
+
+err_pdev_register:
 	kfree(goodix_pdev);
 	goodix_pdev = NULL;
-	ts_info("i2c probe out, %d", ret);
+err_pdev_alloc:
+	ts_err("i2c probe out with error, %d", ret);
 	return ret;
 }
 
@@ -390,9 +390,15 @@ static int goodix_i2c_dev_remove(struct i2c_client *client)
 	if (!goodix_pdev)
 		return 0;
 
-	ts_info("called");
+	ts_info("goodix i2c device remove");
+
+	// Unregister the platform device
 	platform_device_unregister(goodix_pdev);
+
+	// Free the allocated platform device memory
+	kfree(goodix_pdev);
 	goodix_pdev = NULL;
+
 	return 0;
 }
 
