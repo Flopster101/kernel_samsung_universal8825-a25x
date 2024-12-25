@@ -264,13 +264,13 @@ abc.ko
 abc_hub.ko
 mfd_s2mf301.ko
 hl7132_charger.ko
-goodix_ts_berlin.ko
+focaltech_ts_ft3519.ko
 s2mf301_fuelgauge.ko
 shub.ko
 sensor_core.ko
 snvm.ko
 dc_vibrator.ko
-focaltech_ts_ft3519.ko
+goodix_ts_berlin.ko
 muic_s2mf301.ko
 top_s2mf301.ko
 a96t396.ko
