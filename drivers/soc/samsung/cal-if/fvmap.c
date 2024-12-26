@@ -408,7 +408,7 @@ static void optimize_rate_volt_table(struct rate_volt_header *head, unsigned int
 
 // Undervolting settings
 #define CPU_UV 5 // Percentage to undervolt for CPU.
-#define GPU_UV 6 // Percentage to undervolt for GPU.
+#define GPU_UV 5 // Percentage to undervolt for GPU.
 // Define domain IDs for undervolting
 #define DOMAIN_ID_CPUCL0 2 // Set domain_id for CPUCL0 here.
 #define DOMAIN_ID_CPUCL1 3 // Set domain_id for CPUCL1 here.
