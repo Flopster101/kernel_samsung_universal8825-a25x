@@ -95,7 +95,7 @@ DO_ZIP="1"
 BUILD_LOG=1
 
 # Pick aosp, proton, lolz or slim
-CLANG_TYPE=slim
+CLANG_TYPE=aosp
 
 ## Info message
 LINKER=ld.lld
