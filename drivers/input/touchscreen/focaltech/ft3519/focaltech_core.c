@@ -2382,7 +2382,7 @@ static int fts_ts_remove_entry(struct fts_ts_data *ts_data)
 	mutex_destroy(&ts_data->irq_lock);
 
 	FTS_FUNC_EXIT();
-	fts_data = NULL;
+	ts_data = NULL; // Set pointer to NULL to avoid use-after-free
 
 	return 0;
 }
