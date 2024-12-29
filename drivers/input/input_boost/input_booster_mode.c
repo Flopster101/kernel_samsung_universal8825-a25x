@@ -351,7 +351,7 @@ void press_timeout_func(struct work_struct* work)
 
 			tv = find_update_target(target_ib->uniq_id, res.res_id);
 			if (tv == NULL) {
-				pr_err(ITAG" Press Timeout Func :::: %d's TV No Exist(%d)\n",
+				pr_debug(ITAG" Press Timeout Func :::: %d's TV No Exist(%d)\n",
 					target_ib->uniq_id, res.res_id);
 				continue;
 			}
@@ -467,7 +467,7 @@ void release_timeout_func(struct work_struct* work)
 
 		tv = find_update_target(target_ib->uniq_id, res.res_id);
 		if (tv == NULL) {
-			pr_err(ITAG" Release Timeout Func :::: %d's TV No Exist(%d)\n",
+			pr_debug(ITAG" Release Timeout Func :::: %d's TV No Exist(%d)\n",
 				target_ib->uniq_id, res.res_id);
 			continue;
 		}
