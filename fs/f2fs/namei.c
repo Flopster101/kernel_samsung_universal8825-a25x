@@ -577,8 +577,8 @@ static struct dentry *f2fs_lookup(struct inode *dir, struct dentry *dentry,
 
 			printk_ratelimited(KERN_ERR "F2FS-fs: Invalid inode referenced: %u"
 					"at parent inode : %lu\n", ino, dir->i_ino);
-			print_block_data(sbi->sb, page->index,
-					page_address(page), 0, F2FS_BLKSIZE);
+			//print_block_data(sbi->sb, page->index,
+			//		page_address(page), 0, F2FS_BLKSIZE);
 			f2fs_bug_on(sbi, 1);
 		}
 		f2fs_put_page(page, 0);

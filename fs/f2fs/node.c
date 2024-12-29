@@ -1464,7 +1464,7 @@ static void f2fs_print_lower_node(struct f2fs_sb_info *sbi, struct page *page)
 	lock_page(page);
 	if (PageUptodate(page)) {
 		f2fs_warn(sbi, "Print lower nid block");
-		print_block_data(sbi->sb, page->index, page_address(page), 0, F2FS_BLKSIZE);
+		//print_block_data(sbi->sb, page->index, page_address(page), 0, F2FS_BLKSIZE);
 	}
 }
 static struct page *__get_node_page(struct f2fs_sb_info *sbi, pgoff_t nid,
@@ -1520,7 +1520,7 @@ page_hit:
 		err = -EINVAL;
 out_err:
 		if (PageUptodate(page)) {
-			print_block_data(sbi->sb, nid, page_address(page), 0, F2FS_BLKSIZE);
+			//print_block_data(sbi->sb, nid, page_address(page), 0, F2FS_BLKSIZE);
 			f2fs_print_lower_node(sbi, page);
 			f2fs_bug_on(sbi, 1);
 		}
@@ -2443,8 +2443,8 @@ static int scan_nat_page(struct f2fs_sb_info *sbi,
 		blk_addr = le32_to_cpu(nat_blk->entries[i].block_addr);
 
 		if (blk_addr == NEW_ADDR) {
-			print_block_data(sbi->sb, current_nat_addr(sbi, start_nid),
-				page_address(nat_page), 0, F2FS_BLKSIZE);
+			//print_block_data(sbi->sb, current_nat_addr(sbi, start_nid),
+			//	page_address(nat_page), 0, F2FS_BLKSIZE);
 			return -EINVAL;
 		}
 
