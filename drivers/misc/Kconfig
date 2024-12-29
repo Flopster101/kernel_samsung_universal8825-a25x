@@ -486,7 +486,14 @@ config SEC_DETECT
 	default m
 	help
 		Helps detect what device is currently running the kernel.
-		The following are supported: Galaxy A33, Galaxy A25.
+		The following are currently supported: Galaxy A33, A25, A53, M33, M34, Tab S6 Lite 2024.
+
+config SEC_DETECT_SYSFS
+	bool "Report running device through sysfs"
+	depends on SEC_DETECT && SYSFS
+	default y
+	help
+		Will show the currently running device through the sysfs node: /sys/kernel/sec_detect/device_name.
 
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
