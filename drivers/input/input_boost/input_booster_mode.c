@@ -94,7 +94,7 @@ void trigger_input_booster(struct work_struct *work)
 		// Make ib instance with all needed factor.
 		ib = create_ib_instance(p_IbTrigger, uniq_id);
 
-		pr_info(ITAG" IB Trigger Press :: IB Uniq Id(%d)\n", uniq_id);
+		pr_debug(ITAG" IB Trigger Press :: IB Uniq Id(%d)\n", uniq_id);
 
 		if (ib == NULL || ib->ib_dt == NULL || ib->ib_dt->res == NULL) {
 			mutex_unlock(&trigger_ib_lock);
@@ -155,7 +155,7 @@ void trigger_input_booster(struct work_struct *work)
 		mutex_unlock(&mem_lock);
 
 		mutex_lock(&ib->lock);
-		pr_info(ITAG" IB Trigger Release :: Uniq ID(%d)\n", ib->uniq_id);
+		pr_debug(ITAG" IB Trigger Release :: Uniq ID(%d)\n", ib->uniq_id);
 		ib->rel_flag = FLAG_ON;
 		if(ib->ib_dt->tail_time == 0) {
 			pr_booster(" IB tail time is 0");
@@ -290,7 +290,7 @@ void press_state_func(struct work_struct* work)
 
 	struct t_ib_info* target_ib = container_of(work, struct t_ib_info, ib_state_work[IB_HEAD]);
 
-	pr_info(ITAG" Press State Func :::: Unique_Id(%d) Head_Time(%d)\n",
+	pr_debug(ITAG" Press State Func :::: Unique_Id(%d) Head_Time(%d)\n",
 		target_ib->uniq_id, target_ib->ib_dt->head_time);
 
 	// Get_Res_List(head) and update head value.
@@ -330,7 +330,7 @@ void press_timeout_func(struct work_struct* work)
 	if (!target_ib)
 		return;
 
-	pr_info(ITAG" Press Timeout Func :::: Unique_Id(%d) Tail_Time(%d)\n",
+	pr_debug(ITAG" Press Timeout Func :::: Unique_Id(%d) Tail_Time(%d)\n",
 		target_ib->uniq_id, target_ib->ib_dt->tail_time);
 
 	int res_type;
@@ -407,7 +407,7 @@ void release_state_func(struct work_struct* work)
 
 	target_ib->isHeadFinished = 1;
 
-	pr_info(ITAG" Release State Func :::: Unique_Id(%d) Rel_Flag(%d)\n",
+	pr_debug(ITAG" Release State Func :::: Unique_Id(%d) Rel_Flag(%d)\n",
 		target_ib->uniq_id, target_ib->rel_flag);
 
 	for (res_type = 0; res_type < allowed_res_count; res_type++) {
@@ -460,7 +460,7 @@ void release_timeout_func(struct work_struct* work)
 	if(!target_ib)
 		return;
 
-	pr_info(ITAG" Release Timeout Func :::: Unique_Id(%d)\n", target_ib->uniq_id);
+	pr_debug(ITAG" Release Timeout Func :::: Unique_Id(%d)\n", target_ib->uniq_id);
 	mutex_lock(&sip_rel_lock);
 	for (res_type = 0; res_type < allowed_res_count; res_type++) {
 		res = target_ib->ib_dt->res[allowed_resources[res_type]];
@@ -569,7 +569,7 @@ void remove_ib_instance(struct t_ib_info* target_ib)
 		list_del_rcu(&(target_ib->list));
 		spin_unlock(&write_ib_lock);
 		synchronize_rcu();
-		pr_info(ITAG" Del Ib Instance's Id : %d\n", target_ib->uniq_id);
+		pr_debug(ITAG" Del Ib Instance's Id : %d\n", target_ib->uniq_id);
 		mutex_lock(&mem_lock);
 		if (target_ib != NULL) {
 			kfree(target_ib);
@@ -655,7 +655,7 @@ int parse_dtsi_str(struct device_node *np, const char *target_node, void *target
 	token = strsep(&prop_pointer, ",");
 
 	while (token != NULL) {
-		pr_info("%s %d's Type Value(%s)\n", target_node, iter, token);
+		pr_debug("%s %d's Type Value(%s)\n", target_node, iter, token);
 
 		//Release Values inserted inside array
 		if (isIntType) {
@@ -664,7 +664,7 @@ int parse_dtsi_str(struct device_node *np, const char *target_node, void *target
 				pr_err(ITAG" DTSI string value parsing fail\n");
 				return -1;
 			}
-			pr_info("Target_arr[%d] : %d\n", iter, int_target_arr_ptr[iter]);
+			pr_debug("Target_arr[%d] : %d\n", iter, int_target_arr_ptr[iter]);
 		} else {
 			copy_result = sscanf(token, "%s", &str_target_arr_ptr[iter]);
 			if (!copy_result) {
@@ -724,7 +724,7 @@ int parse_device_info(struct device_node* np, struct t_ib_device_tree* ib_device
 
 		for_each_child_of_node(resource_node, child_resource_node) {
 			int result = parse_dtsi_str(child_resource_node, "resource,id", &res_id, 1);
-			pr_info(ITAG" res_id(%d) result(%d)\n", res_id, result);
+			pr_debug(ITAG" res_id(%d) result(%d)\n", res_id, result);
 			if (result == 0 || result == -1) continue;
 
 			if (!(allowed_mask & (1<<res_id))) {
@@ -760,7 +760,7 @@ int parse_device_info(struct device_node* np, struct t_ib_device_tree* ib_device
 		}
 
 		ib_dt->label = of_get_property(cnp, "input_booster,label", NULL);
-		pr_info(ITAG"ib_dt->label : %s\n", ib_dt->label);
+		pr_debug(ITAG"ib_dt->label : %s\n", ib_dt->label);
 
 		if (of_property_read_u32(cnp, "input_booster,type", &ib_dt->type)) {
 			pr_err(ITAG" Failed to get type property\n");
@@ -862,7 +862,7 @@ void input_booster_init(void)
 		goto out;
 	}
 
-	pr_info(ITAG" resource size : %d, cluster count : %d\n",
+	pr_debug(ITAG" resource size : %d, cluster count : %d\n",
 		max_resource_count, max_cluster_count);
 
 //qos list mem alloc
@@ -882,7 +882,7 @@ void input_booster_init(void)
 	}
 
 	result = parse_dtsi_str(np, "cpu_cluster_policy", cpu_cluster_policy, 1);
-	pr_info(ITAG" Init:: Total Cpu Cluster Count : %d\n", result);
+	pr_debug(ITAG" Init:: Total Cpu Cluster Count : %d\n", result);
 	if (result < 0)
 		goto out;
 
@@ -898,7 +898,7 @@ void input_booster_init(void)
 		goto out;
 	}
 	result = parse_dtsi_str(np, "allowed_resources", allowed_resources, 1);
-	pr_info(ITAG" Init:: Total Allow Resource Count: %d\n", result);
+	pr_debug(ITAG" Init:: Total Allow Resource Count: %d\n", result);
 	allowed_res_count = result;
 	if (result < 0)
 		goto out;
@@ -924,7 +924,7 @@ void input_booster_init(void)
 		goto out;
 	}
 	result = parse_dtsi_str(np, "ib_release_values", release_val, 1);
-	pr_info(ITAG" Init:: Total Release Value Count: %d\n", result);
+	pr_debug(ITAG" Init:: Total Release Value Count: %d\n", result);
 	if (result == 0)
 		goto out;
 
@@ -936,7 +936,7 @@ void input_booster_init(void)
 // Geting the count of sub boosters.
 	num_of_mode = of_get_child_count(np);
 	//ib_dt_grp = kzalloc(sizeof(t_ib_device_tree*) * num_of_mode, GFP_KERNEL);
-	pr_info(ITAG" %s : Total IB Mode Cnt : %d\n", __func__, num_of_mode);
+	pr_debug(ITAG" %s : Total IB Mode Cnt : %d\n", __func__, num_of_mode);
 	ib_boost_modes = kzalloc(sizeof(struct t_ib_boost_mode) * num_of_mode, GFP_KERNEL);
 
 // ib_boost_modes Init
@@ -957,7 +957,7 @@ void input_booster_init(void)
 
 		//Getting Sub Booster Label
 		ib_boost_modes[boost_mode].label = of_get_property(cnp, "booster,label", NULL);
-		pr_info(ITAG" %s : Mode_label : %s\n", __func__, ib_boost_modes[boost_mode].label);
+		pr_debug(ITAG" %s : Mode_label : %s\n", __func__, ib_boost_modes[boost_mode].label);
 
 		ib_boost_modes[boost_mode].dt_count = of_get_child_count(cnp);
 		ib_dt = ib_boost_modes[boost_mode].dt =
@@ -978,7 +978,7 @@ void input_booster_init(void)
 			ib_boost_modes[boost_mode].type_to_idx_table[(ib_dt + i)->type] = i;
 		}
 
-		pr_info(ITAG"%s Total Input Device Count(%d)\n", ib_boost_modes[boost_mode].label, result);
+		pr_debug(ITAG"%s Total Input Device Count(%d)\n", ib_boost_modes[boost_mode].label, result);
 	}
 
 	ib_init_succeed = is_ib_init_succeed();
