@@ -195,6 +195,7 @@ void print_dmv_ctr_list(void){
     pr_err("====== DMV_CTR_LIST END ======\n");
 }
 
+#if 0
 static void print_block_data(unsigned long long blocknr, unsigned char *data_to_dump,
                             int start, int len)
 {
@@ -238,6 +239,7 @@ static void print_block_data(unsigned long long blocknr, unsigned char *data_to_
     }
     pr_err("---------------------------------------------------\n");
 }
+#endif
 
 int verity_handle_err_hex_debug(struct dm_verity *v, enum verity_block_type type,
         unsigned long long block, struct dm_verity_io *io, struct bvec_iter *iter)
@@ -302,15 +304,15 @@ int verity_handle_err_hex_debug(struct dm_verity *v, enum verity_block_type type
 
     if (!(strcmp(type_str, "metadata"))) {
         data = dm_bufio_read(v->bufio, block, &buf);
-        print_block_data(0, (unsigned char *)(verity_io_real_digest(v, io)), 0, v->digest_size);
-        print_block_data(0, (unsigned char *)(verity_io_want_digest(v, io)), 0, v->digest_size);
-        print_block_data((unsigned long long)block, (unsigned char *)data, 0, PAGE_SIZE);
+        //print_block_data(0, (unsigned char *)(verity_io_real_digest(v, io)), 0, v->digest_size);
+        //print_block_data(0, (unsigned char *)(verity_io_want_digest(v, io)), 0, v->digest_size);
+        //print_block_data((unsigned long long)block, (unsigned char *)data, 0, PAGE_SIZE);
     } else if (!(strcmp(type_str, "data"))) {
         bv = bio_iter_iovec(bio, *iter);
         page = kmap_atomic(bv.bv_page);
-        print_block_data(0, (unsigned char *)(verity_io_real_digest(v, io)), 0, v->digest_size);
-        print_block_data(0, (unsigned char *)(verity_io_want_digest(v, io)), 0, v->digest_size);
-        print_block_data((unsigned long long)block, (unsigned char *)page, 0, PAGE_SIZE);
+        //print_block_data(0, (unsigned char *)(verity_io_real_digest(v, io)), 0, v->digest_size);
+        //print_block_data(0, (unsigned char *)(verity_io_want_digest(v, io)), 0, v->digest_size);
+        //print_block_data((unsigned long long)block, (unsigned char *)page, 0, PAGE_SIZE);
         kunmap_atomic(page);
     } else {
         DMERR("%s: %s block : Unknown block type", v->data_dev->name, type_str);
