@@ -1175,8 +1175,8 @@ static int f2fs_readdir(struct file *file, struct dir_context *ctx)
 			struct f2fs_sb_info *sbi = F2FS_P_SB(dentry_page);
 
 			if (err == -EINVAL) {
-				print_block_data(sbi->sb, n,
-					page_address(dentry_page), 0, F2FS_BLKSIZE);
+				//print_block_data(sbi->sb, n,
+				//	page_address(dentry_page), 0, F2FS_BLKSIZE);
 				f2fs_bug_on(sbi, 1);
 			}
 

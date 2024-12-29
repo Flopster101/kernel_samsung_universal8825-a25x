@@ -4622,8 +4622,8 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 
 			err = check_block_count(sbi, start, &sit);
 			if (err) {
-				print_block_data(sbi->sb, current_sit_addr(sbi, start),
-						 page_address(page), 0,  F2FS_BLKSIZE);
+				//print_block_data(sbi->sb, current_sit_addr(sbi, start),
+				//		 page_address(page), 0,  F2FS_BLKSIZE);
 				return err;
 			}
 			seg_info_from_raw_sit(se, &sit);
@@ -4677,8 +4677,8 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 
 		err = check_block_count(sbi, start, &sit);
 		if (err) {
-			print_block_data(sbi->sb, 0, (void *)&sit, 0,
-					 sizeof(struct f2fs_sit_entry));
+			//print_block_data(sbi->sb, 0, (void *)&sit, 0,
+			//		 sizeof(struct f2fs_sit_entry));
 			break;
 		}
 		seg_info_from_raw_sit(se, &sit);

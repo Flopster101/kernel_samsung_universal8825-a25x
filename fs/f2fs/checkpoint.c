@@ -742,8 +742,8 @@ int f2fs_recover_orphan_inodes(struct f2fs_sb_info *sbi)
 
 			err = recover_orphan_inode(sbi, ino);
 			if (err) {
-				print_block_data(sbi->sb, start_blk + i,
-					page_address(page), 0, F2FS_BLKSIZE);
+				//print_block_data(sbi->sb, start_blk + i,
+				//	page_address(page), 0, F2FS_BLKSIZE);
 				f2fs_put_page(page, 1);
 				goto out;
 			}
@@ -841,7 +841,7 @@ static int get_checkpoint_version(struct f2fs_sb_info *sbi, block_t cp_addr,
 		struct f2fs_checkpoint **cp_block, struct page **cp_page,
 		unsigned long long *version)
 {
-	unsigned long blk_size = sbi->blocksize;
+	//unsigned long blk_size = sbi->blocksize;
 	size_t crc_offset = 0;
 	__u32 crc;
 
@@ -870,7 +870,7 @@ static int get_checkpoint_version(struct f2fs_sb_info *sbi, block_t cp_addr,
 	return 0;
 
 error:
-	print_block_data(sbi->sb, cp_addr, page_address(*cp_page), 0, blk_size);
+	//print_block_data(sbi->sb, cp_addr, page_address(*cp_page), 0, blk_size);
 	return -EINVAL;
 }
 
@@ -969,8 +969,8 @@ int f2fs_get_valid_checkpoint(struct f2fs_sb_info *sbi)
 	/* Sanity checking of checkpoint */
 	if (f2fs_sanity_check_ckpt(sbi)) {
 		err = -EFSCORRUPTED;
-		print_block_data(sbi->sb, cur_page->index,
-				 page_address(cur_page), 0, blk_size);
+		//print_block_data(sbi->sb, cur_page->index,
+		//		 page_address(cur_page), 0, blk_size);
 		goto free_fail_no_cp;
 	}
 

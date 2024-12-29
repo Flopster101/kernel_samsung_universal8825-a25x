@@ -936,6 +936,7 @@ static inline bool __is_discard_front_mergeable(struct discard_info *cur,
 	return __is_discard_mergeable(cur, front, max_len);
 }
 
+#if 0
 static inline void print_block_data(struct super_block *sb, sector_t blocknr,
 		      unsigned char *data_to_dump, int start, int len)
 {
@@ -986,6 +987,7 @@ static inline void print_block_data(struct super_block *sb, sector_t blocknr,
 	}
 	pr_err("-------------------------------------------------\n");
 }
+#endif
 
 
 static inline void print_bh(struct super_block *sb, struct buffer_head *bh
@@ -995,7 +997,7 @@ static inline void print_bh(struct super_block *sb, struct buffer_head *bh
 		pr_err(" print_bh: bh %pK,"
 				" bh->b_size %lu, bh->b_data %pK\n",
 				(void *) bh, bh->b_size, (void *) bh->b_data);
-		print_block_data(sb, bh->b_blocknr, bh->b_data, start, len);
+		//print_block_data(sb, bh->b_blocknr, bh->b_data, start, len);
 
 	} else {
 		pr_err(" print_bh: bh is null!\n");
