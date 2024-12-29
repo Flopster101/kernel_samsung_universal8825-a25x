@@ -91,7 +91,7 @@ void trigger_input_booster(struct work_struct *work)
 		// Make ib instance with all needed factor.
 		ib = create_ib_instance(p_IbTrigger, uniq_id);
 
-		pr_info(ITAG" IB Trigger Press :: IB Uniq Id(%d)", uniq_id);
+		pr_debug(ITAG" IB Trigger Press :: IB Uniq Id(%d)", uniq_id);
 
 		if (ib == NULL) {
 			mutex_unlock(&trigger_ib_lock);
@@ -145,7 +145,7 @@ void trigger_input_booster(struct work_struct *work)
 		mutex_unlock(&mem_lock);
 
 		mutex_lock(&ib->lock);
-		pr_info(ITAG" IB Trigger Release :: Uniq ID(%d)", ib->uniq_id);
+		pr_debug(ITAG" IB Trigger Release :: Uniq ID(%d)", ib->uniq_id);
 		ib->rel_flag = FLAG_ON;
 		if(ib->ib_dt->tail_time == 0) {
 			pr_booster(" IB tail time is 0");
@@ -265,7 +265,7 @@ void press_state_func(struct work_struct* work)
 
 	struct t_ib_info* target_ib = container_of(work, struct t_ib_info, ib_state_work[IB_HEAD]);
 
-	pr_info(ITAG" Press State Func :::: Unique_Id(%d)", target_ib->uniq_id);
+	pr_debug(ITAG" Press State Func :::: Unique_Id(%d)", target_ib->uniq_id);
 
 	// Get_Res_List(head) and update head value.
 	for (res_type = 0; res_type < allowed_res_count; res_type++) {
@@ -306,7 +306,7 @@ void press_timeout_func(struct work_struct* work)
 	if (!target_ib)
 		return;
 
-	pr_info(ITAG" Press Timeout Func :::: Unique_Id(%d) Tail_Time(%d)",
+	pr_debug(ITAG" Press Timeout Func :::: Unique_Id(%d) Tail_Time(%d)",
 		target_ib->uniq_id, target_ib->ib_dt->tail_time);
 
 	int res_type;
@@ -383,7 +383,7 @@ void release_state_func(struct work_struct* work)
 
 	target_ib->isHeadFinished = 1;
 
-	pr_info(ITAG" Release State Func :::: Unique_Id(%d) Rel_Flag(%d)",
+	pr_debug(ITAG" Release State Func :::: Unique_Id(%d) Rel_Flag(%d)",
 		target_ib->uniq_id, target_ib->rel_flag);
 
 	for (res_type = 0; res_type < allowed_res_count; res_type++) {
@@ -436,7 +436,7 @@ void release_timeout_func(struct work_struct* work)
 	if(!target_ib)
 		return;
 
-	pr_info(ITAG" Release Timeout Func :::: Unique_Id(%d)", target_ib->uniq_id);
+	pr_debug(ITAG" Release Timeout Func :::: Unique_Id(%d)", target_ib->uniq_id);
 	mutex_lock(&sip_rel_lock);
 	for (res_type = 0; res_type < allowed_res_count; res_type++) {
 		res = target_ib->ib_dt->res[allowed_resources[res_type]];
@@ -542,7 +542,7 @@ void remove_ib_instance(struct t_ib_info* target_ib)
 		list_del_rcu(&(target_ib->list));
 		spin_unlock(&write_ib_lock);
 		synchronize_rcu();
-		pr_info(ITAG" Del Ib Instance's Id : %d", target_ib->uniq_id);
+		pr_debug(ITAG" Del Ib Instance's Id : %d", target_ib->uniq_id);
 		mutex_lock(&mem_lock);
 		if (target_ib != NULL) {
 			kfree(target_ib);
@@ -723,7 +723,7 @@ void input_booster_init(void)
 
 // Geting the count of devices.
 	ndevice_in_dt = of_get_child_count(np);
-	pr_info(ITAG" %s   ndevice_in_dt : %d\n", __func__, ndevice_in_dt);
+	pr_debug(ITAG" %s   ndevice_in_dt : %d\n", __func__, ndevice_in_dt);
 
 	ib_device_trees = kzalloc(ib_dt_size * ndevice_in_dt, GFP_KERNEL);
 	if (ib_device_trees == NULL) {
@@ -753,7 +753,7 @@ void input_booster_init(void)
 		goto out;
 	}
 
-	pr_info(ITAG" resource size : %d, cluster count : %d",
+	pr_debug(ITAG" resource size : %d, cluster count : %d",
 		max_resource_count, max_cluster_count);
 
 //qos list mem alloc
@@ -772,7 +772,7 @@ void input_booster_init(void)
 		goto out;
 	}
 	result = parse_dtsi_str(np, "cpu_cluster_policy", cpu_cluster_policy, 1);
-	pr_info(ITAG" Init:: Total Cpu Cluster Count : %d", result);
+	pr_debug(ITAG" Init:: Total Cpu Cluster Count : %d", result);
 	if (result < 0)
 		goto out;
 
@@ -788,7 +788,7 @@ void input_booster_init(void)
 		goto out;
 	}
 	result = parse_dtsi_str(np, "allowed_resources", allowed_resources, 1);
-	pr_info(ITAG" Init:: Total Allow Resource Count: %d", result);
+	pr_debug(ITAG" Init:: Total Allow Resource Count: %d", result);
 	allowed_res_count = result;
 	if (result < 0)
 		goto out;
@@ -813,7 +813,7 @@ void input_booster_init(void)
 		goto out;
 	}
 	result = parse_dtsi_str(np, "ib_release_values", release_val, 1);
-	pr_info(ITAG" Init:: Total Release Value Count: %d", result);
+	pr_debug(ITAG" Init:: Total Release Value Count: %d", result);
 	if (result < 0)
 		goto out;
 
@@ -874,7 +874,7 @@ void input_booster_init(void)
 		}
 
 		ib_dt->label = of_get_property(cnp, "input_booster,label", NULL);
-		pr_info(ITAG" %s   ib_dt->label : %s\n", __func__, ib_dt->label);
+		pr_debug(ITAG" %s   ib_dt->label : %s\n", __func__, ib_dt->label);
 
 		if (of_property_read_u32(cnp, "input_booster,type", &ib_dt->type)) {
 			pr_err(ITAG" Failed to get type property\n");
@@ -896,7 +896,7 @@ void input_booster_init(void)
 	}
 
 	ib_init_succeed = is_ib_init_succeed();
-	pr_info(ITAG" Total Input Device Count(%d), IsSuccess(%d)", device_count, ib_init_succeed);
+	pr_debug(ITAG" Total Input Device Count(%d), IsSuccess(%d)", device_count, ib_init_succeed);
 	ib_init_succeed = input_booster_init_vendor();
 
 	if (ib_init_succeed)
