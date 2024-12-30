@@ -1626,7 +1626,7 @@ void pdp_hw_s_wdma_init(void __iomem *base, u32 ch)
 	PDP_SET_F(base, PDP_R_WDMA_STAT_HEIGHT, PDP_F_WDMA_STAT_HEIGHT, height);
 	PDP_SET_F(base, PDP_R_WDMA_STAT_IMG_STRIDE_1P, PDP_F_WDMA_STAT_IMG_STRIDE_1P, stride);
 
-	//info("[PDP%d] pdstat_in_size (x:%d, y:%d)", ch, roi_w, roi_h);
+	info("[PDP%d] pdstat_in_size (x:%d, y:%d)", ch, roi_w, roi_h);
 }
 
 u32 pdp_hw_g_wdma_addr(void __iomem *base)

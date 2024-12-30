@@ -674,8 +674,8 @@ int pdp_set_param(struct v4l2_subdev *subdev, struct cr_set *regs, u32 regs_size
 		dbg_pdp(0, "PDP(%pa) store RTA set, size(%d)\n", pdp, &pdp->regs_start, regs_size);
 
 		for (i = 0; i < regs_size; i++)
-			//info("[PDP%d][%d] store ofs: 0x%x, val: 0x%x\n", pdp->id,
-			//		i, regs[i].reg_addr, regs[i].reg_data);
+			info("[PDP%d][%d] store ofs: 0x%x, val: 0x%x\n", pdp->id,
+					i, regs[i].reg_addr, regs[i].reg_data);
 
 		spin_lock_irqsave(&pdp->slock_paf_s_param, flag);
 
