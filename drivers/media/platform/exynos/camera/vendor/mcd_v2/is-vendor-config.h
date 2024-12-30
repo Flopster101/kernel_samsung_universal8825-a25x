@@ -30,7 +30,7 @@
 #include "aavw_common/is-vendor-config_aavw_common.h"
 #endif
 
-#ifndef CONFIG_CAMERA_AAVW_UNIFIED
+#if !defined(CONFIG_CAMERA_AAVW_UNIFIED)
 #if defined(CONFIG_CAMERA_AAV_A53X)
 #include "aav_v53x/is-vendor-config_aav_v53x.h"
 #elif defined(CONFIG_CAMERA_AAW_A25X)
