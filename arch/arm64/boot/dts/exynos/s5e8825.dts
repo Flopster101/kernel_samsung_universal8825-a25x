@@ -4487,7 +4487,7 @@
 		gpu_voltage_offset_margin = <0x9218>;
 		gpu_tmu_control = <0x01>;
 		gpu_temp_throttling_level_num = <0x05>;
-		gpu_temp_throttling = <0xbb418 0xa50a0 0x8ed28 0x789b0 0x62638>;
+		gpu_temp_throttling = <0xbb418 0xbb418 0xbb418 0xbb418 0xa50a0>;
 		gpu_power_coeff = <0x271>;
 		ect-coeff-index = <0x02>;
 		gpu_dvfs_time_interval = <0x05>;
