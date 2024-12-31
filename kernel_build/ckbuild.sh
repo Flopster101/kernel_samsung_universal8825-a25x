@@ -159,8 +159,8 @@ else
     FK_TYPE="Vanilla"
     FK_TYPE_SHORT="V"
 fi
-ZIP_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
-TAR_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
+ZIP_PATH="$KDIR/kernel_build/FloppyKernelPermissive_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
+TAR_PATH="$KDIR/kernel_build/FloppyKernelPermissive_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
 
 echo -e "\nINFO: Build info:
 - Device: $DEVICE ($CODENAME)
@@ -336,10 +336,10 @@ build() {
     export ARCH=arm64
 
     if [ "$IS_RELEASE" == "1" ]; then
-        VERSION_STR="\"-Floppy-$FK_VER-$FK_TYPE_SHORT/release\""
+        VERSION_STR="\"-FloppyP-$FK_VER-$FK_TYPE_SHORT/release\""
         VERSION_NOAUTO="1"
     else
-        VERSION_STR="\"-Floppy-$FK_VER-$FK_TYPE_SHORT/\""
+        VERSION_STR="\"-FloppyP-$FK_VER-$FK_TYPE_SHORT/\""
     fi
 
     # Delete leftovers
