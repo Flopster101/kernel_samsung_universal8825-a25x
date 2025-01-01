@@ -40,10 +40,41 @@ static ssize_t device_name_show(struct kobject *kobj, struct kobj_attribute *att
 	return snprintf(buf, 32, "%s\n", sec_current_device_name);
 }
 
+// Sysfs attribute to show the current device model
+static ssize_t device_model_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	const char *model_name = "Unknown";
+
+	switch (sec_current_device) {
+		case SEC_A25:
+			model_name = "Galaxy A25 5G";
+			break;
+		case SEC_A33:
+			model_name = "Galaxy A33 5G";
+			break;
+		case SEC_A53:
+			model_name = "Galaxy A53 5G";
+			break;
+		case SEC_M33:
+			model_name = "Galaxy M33 5G";
+			break;
+		case SEC_M34:
+			model_name = "Galaxy M34 5G";
+			break;
+		case SEC_GTA4XLS:
+			model_name = "Galaxy Tab S6 Lite 2024";
+			break;
+	}
+
+	return snprintf(buf, 32, "%s\n", model_name);
+}
+
 static struct kobj_attribute device_name_attr = __ATTR(device_name, 0444, device_name_show, NULL);
+static struct kobj_attribute device_model_attr = __ATTR(device_model, 0444, device_model_show, NULL);
 
 static struct attribute *attrs[] = {
 	&device_name_attr.attr,
+	&device_model_attr.attr,
 	NULL,
 };
 
@@ -132,4 +163,4 @@ module_exit(sec_detect_exit);
 
 MODULE_AUTHOR("Flopster101");
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Detects the Samsung device currently running this kernel. Also exposes it in /sys/kernel/sec_detect/device_name.");
+MODULE_DESCRIPTION("Detects the Samsung device currently running this kernel. Also exposes device information through sysfs.");
