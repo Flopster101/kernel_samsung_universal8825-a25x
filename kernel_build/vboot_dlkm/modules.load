@@ -86,6 +86,8 @@ scsc_mmap.ko
 scsc_mx250_fm.ko
 scsc_bt.ko
 tzdev.ko
+tuihw.ko
+tuihw-inf.ko
 sec_detect.ko
 s2mpu13_mfd.ko
 s2mpu14_mfd.ko
