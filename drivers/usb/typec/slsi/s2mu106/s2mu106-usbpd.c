@@ -61,7 +61,6 @@
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER) || IS_ENABLED(CONFIG_DUAL_ROLE_USB_INTF)
 #include <linux/usb/typec/slsi/common/usbpd_ext.h>
 #endif
-#include <linux/sec_detect.h>
 
 /*
 *VARIABLE DEFINITION

@@ -30,7 +30,6 @@
 #include <linux/of_gpio.h>
 #include <linux/kernel.h>
 #include <linux/version.h>
-#include <linux/sec_detect.h>
 
 #define I2C_RETRY_CNT	3
 

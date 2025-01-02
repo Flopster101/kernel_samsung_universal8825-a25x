@@ -61,7 +61,6 @@
 #if IS_ENABLED(CONFIG_CP_UART_NOTI)
 #include <soc/samsung/exynos-modem-ctrl.h>
 #endif
-#include <linux/sec_detect.h>
 
 #include <linux/usb/typec/common/pdic_param.h>
 
