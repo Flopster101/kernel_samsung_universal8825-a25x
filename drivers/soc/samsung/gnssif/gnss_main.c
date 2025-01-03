@@ -436,7 +436,9 @@ static int gnss_probe(struct platform_device *pdev)
 	struct io_device *iod;
 	struct link_device *ld;
 	unsigned int size;
+#if defined(MODULE)
 	int ret = 0;
+#endif
 
 	gif_info("Exynos GNSS interface driver %s\n", get_gnssif_driver_version());
 
