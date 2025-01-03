@@ -2329,7 +2329,8 @@ static const u8 *slsi_mlme_connect_get_sec_ie(struct cfg80211_connect_params *sm
 				return NULL;
 			}
 		}
-	} else if (sme->crypto.wpa_versions == 2) {
+	} else if (sme->crypto.wpa_versions == NL80211_WPA_VERSION_2
+			|| sme->crypto.wpa_versions == NL80211_WPA_VERSION_3) {
 		/* RSN */
 		ptr = cfg80211_find_ie(WLAN_EID_RSN, sme->ie, sme->ie_len);
 
