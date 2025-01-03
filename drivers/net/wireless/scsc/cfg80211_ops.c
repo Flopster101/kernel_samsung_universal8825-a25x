@@ -1522,7 +1522,8 @@ int slsi_connect(struct wiphy *wiphy, struct net_device *dev,
 	 */
 	if (ndev_vif->probe_req_ies) {
 		if (ndev_vif->iftype == NL80211_IFTYPE_P2P_CLIENT) {
-			if (sme->crypto.wpa_versions == 2)
+			if (sme->crypto.wpa_versions == NL80211_WPA_VERSION_2
+				|| sme->crypto.wpa_versions == NL80211_WPA_VERSION_3)
 				ndev_vif->delete_probe_req_ies = true; /* Stored Probe Req can be deleted at vif
 									* deletion after WPA2 association
 									*/
