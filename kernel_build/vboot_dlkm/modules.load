@@ -266,8 +266,6 @@ legacy_s2m_pdic_notifier_module.ko
 pdic_notifier_module.ko
 mcd-panel.ko
 mcd-panel-decon.ko
-abc.ko
-abc_hub.ko
 mfd_s2mf301.ko
 mfd_sm5714.ko
 mfd_s2mu106.ko

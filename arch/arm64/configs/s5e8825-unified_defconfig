@@ -6859,7 +6859,7 @@ CONFIG_SEC_INPUT_BOOSTER_SLSI=y
 #
 # Samsung STI Options
 #
-CONFIG_SEC_STI=y
+# CONFIG_SEC_STI is not set
 
 #
 # MUIC platform configs
@@ -7045,22 +7045,18 @@ CONFIG_MCD_PANEL_BLIC=y
 #
 # Samsung ABC Options
 #
-CONFIG_SEC_ABC=m
 
 #
 # Samsung ABC Common Options
 #
-CONFIG_SEC_ABC_COMMON=m
 
 #
 # Samsung ABC Spec manager type1 options
 #
-CONFIG_SEC_ABC_SPEC_TYPE1=m
 
 #
 # Samsung ABC MOTTO Options
 #
-CONFIG_SEC_ABC_MOTTO=m
 
 #
 # Samsung ABC_COMMON KUNIT Options
@@ -7069,22 +7065,18 @@ CONFIG_SEC_ABC_MOTTO=m
 #
 # Samsung ABC Hub Options
 #
-CONFIG_SEC_ABC_HUB=m
 
 #
 # Samsung ABC Hub Core Options
 #
-CONFIG_SEC_ABC_HUB_CORE=m
 
 #
 # Samsung ABC Hub Booting Time Check Options
 #
-CONFIG_SEC_ABC_HUB_BOOTC=m
 
 #
 # Samsung ABC Hub Booting Time Check eng mode Options
 #
-# CONFIG_SEC_ABC_HUB_BOOTC_ENG is not set
 
 #
 # Samsung ABC_HUB KUNIT Options
