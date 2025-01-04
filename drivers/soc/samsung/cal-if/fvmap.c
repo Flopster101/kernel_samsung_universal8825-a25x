@@ -407,7 +407,7 @@ static void optimize_rate_volt_table(struct rate_volt_header *head, unsigned int
 }
 
 // Undervolting settings
-#define CPU_LITTLE_UV 6 // Percentage to undervolt for little cluster.
+#define CPU_LITTLE_UV 5 // Percentage to undervolt for little cluster.
 #define CPU_BIG_UV 4 // Percentage to undervolt for big cluster.
 #define GPU_UV 4 // Percentage to undervolt for GPU.
 // Define domain IDs for undervolting
