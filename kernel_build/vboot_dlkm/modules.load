@@ -88,7 +88,6 @@ scsc_bt.ko
 tzdev.ko
 tuihw.ko
 tuihw-inf.ko
-sec_detect.ko
 s2mpu13_mfd.ko
 s2mpu14_mfd.ko
 nfc_sec.ko
