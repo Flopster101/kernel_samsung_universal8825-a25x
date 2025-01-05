@@ -538,6 +538,39 @@ config EXYNOS_PTRAUTH_OVERRIDE_CFISCS
 	  only for modules to support GKI kernel.
 	  If unsure, keep default value.
 
+config SOC_S5E8825_UNDERVOLT
+	bool "Undervolting support for S5E8825 SoC"
+	depends on SOC_S5E8825
+	help
+	  Allows to undervolt the S5E8825 SoC via setting a percentage.
+
+config SOC_S5E8825_CL0_UV
+	int "Undervolting percentage for cluster 0 of S5E8825 (little cluster)"
+	range 0 100
+	depends on SOC_S5E8825_UNDERVOLT
+	default 0
+	help
+	  Percentage to undervolt the little cluster of the S5E8825 SoC.
+	  Set a value between 0 and 100.
+
+config SOC_S5E8825_CL1_UV
+	int "Undervolting percentage for cluster 1 of S5E8825 (big cluster)"
+	range 0 100
+	depends on SOC_S5E8825_UNDERVOLT
+	default 0
+	help
+	  Percentage to undervolt the big cluster of the S5E8825 SoC.
+	  Set a value between 0 and 100.
+
+config SOC_S5E8825_GPU_UV
+	int "Undervolting percentage for GPU of S5E8825"
+	range 0 100
+	depends on SOC_S5E8825_UNDERVOLT
+	default 0
+	help
+	  Percentage to undervolt the GPU of the S5E8825 SoC.
+	  Set a value between 0 and 100.
+
 source "drivers/soc/samsung/acpm/Kconfig"
 
 source "drivers/soc/samsung/debug/Kconfig"
