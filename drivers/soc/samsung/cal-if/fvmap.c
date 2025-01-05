@@ -381,6 +381,13 @@ int fvmap_get_raw_voltage_table(unsigned int id)
 	return 0;
 }
 
+#ifdef CONFIG_SOC_S5E8825_UNDERVOLT
+#define S5E8825_DMID_CPUCL0 2 // Set domain_id for CPUCL0 here.
+#define S5E8825_DMID_CPUCL1 3 // Set domain_id for CPUCL1 here.
+#define S5E8825_DMID_G3D 8 // Set domain_id for GPU (G3D)
+#define S5E8825_DMID_INTG3D 15 // Set domain_id for GPU (INTG3D)
+#endif
+
 static void fvmap_copy_from_sram(void __iomem *map_base, void __iomem *sram_base)
 {
 	volatile struct fvmap_header *fvmap_header, *header;
@@ -439,6 +446,43 @@ static void fvmap_copy_from_sram(void __iomem *map_base, void __iomem *sram_base
 				percent_margin_table[i] = volt_offset_percent;
 				cal_dfs_set_volt_margin(i | ACPM_VCLK_TYPE, volt_offset_percent);
 			}
+		}
+
+#ifdef CONFIG_SOC_S5E8825_UNDERVOLT
+#if CONFIG_SOC_S5E8825_CL0_UV != 0
+		/* Apply undervolt if the domain is CPUCL0 */
+		if (fvmap_header[i].domain_id == S5E8825_DMID_CPUCL0) {
+			for (j = 0; j < fvmap_header[i].num_of_lv; j++) {
+				old->table[j].volt = (old->table[j].volt * (100 - CONFIG_SOC_S5E8825_CL0_UV)) / 100;
+			}
+		}
+#endif
+
+#if CONFIG_SOC_S5E8825_CL1_UV != 0
+		/* Apply undervolt if the domain is CPUCL1 */
+		if (fvmap_header[i].domain_id == S5E8825_DMID_CPUCL1) {
+			for (j = 0; j < fvmap_header[i].num_of_lv; j++) {
+				old->table[j].volt = (old->table[j].volt * (100 - CONFIG_SOC_S5E8825_CL1_UV)) / 100;
+			}
+		}
+#endif
+
+#if CONFIG_SOC_S5E8825_GPU_UV != 0
+        /* Apply undervolt if the domain is G3D or INTG3D */
+        if (fvmap_header[i].domain_id == S5E8825_DMID_G3D || fvmap_header[i].domain_id == S5E8825_DMID_INTG3D) {
+            for (j = 0; j < fvmap_header[i].num_of_lv; j++) {
+                old->table[j].volt = (old->table[j].volt * (100 - CONFIG_SOC_S5E8825_GPU_UV)) / 100;
+            }
+        }
+#endif
+#endif
+
+		for (j = 0; j < fvmap_header[i].num_of_lv; j++) {
+			new->table[j].rate = old->table[j].rate;
+			new->table[j].volt = old->table[j].volt;
+#ifdef CONFIG_EXYNOS_DEBUG_INFO
+			pr_info("  lv : [%7d], volt = %d uV (%d %%) \n", new->table[j].rate, new->table[j].volt * STEP_UV, volt_offset_percent);
+#endif
 		}
 
 		for (j = 0; j < fvmap_header[i].num_of_members; j++) {
