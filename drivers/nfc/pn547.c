@@ -1906,7 +1906,7 @@ static int pn547_probe(struct i2c_client *client, const struct i2c_device_id *id
 			NFC_LOG_ERR("failed to create attr_test file\n");
 	}
 #endif
-	nfc_class = class_create(THIS_MODULE, "nfc");
+	nfc_class = class_create(THIS_MODULE, "nfc_sec");
 	if (IS_ERR(&nfc_class)) {
 		NFC_LOG_ERR("failed to create nfc class\n");
 	} else {
