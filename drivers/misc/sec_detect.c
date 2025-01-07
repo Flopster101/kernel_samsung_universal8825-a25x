@@ -125,6 +125,7 @@ int sec_detect_init(void) {
 		sec_current_device = SEC_M33;
 		strncpy(sec_current_device_name, "m33x", sizeof(sec_current_device_name));
 		sec_needs_decon = true;
+		sec_needs_blic = true;
 	} else if (strstr(machine_name, "M34") != NULL) {
 		sec_current_device = SEC_M34;
 		strncpy(sec_current_device_name, "m34x", sizeof(sec_current_device_name));
