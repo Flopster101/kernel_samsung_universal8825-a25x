@@ -5639,6 +5639,7 @@ static ssize_t clear_all_touch_count_store(struct device *dev,
 }
 #endif	// end of #if SHOW_NOT_SUPPORT_CMD
 
+#if 0
 static ssize_t scrub_position_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -5651,6 +5652,7 @@ static ssize_t scrub_position_show(struct device *dev,
 
 	return snprintf(buf, PAGE_SIZE, "%s", buff);
 }
+#endif
 
 static ssize_t sensitivity_mode_show(struct device *dev, struct device_attribute *attr,
 					char *buf)
@@ -5735,6 +5737,7 @@ static ssize_t sensitivity_mode_store(struct device *dev, struct device_attribut
 	return count;
 }
 
+#if 0
 static ssize_t prox_power_off_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -5767,6 +5770,7 @@ static ssize_t prox_power_off_store(struct device *dev,
 
 	return count;
 }
+#endif
 
 #ifdef PROXIMITY_FUNCTION
 /** virtual_prox **/
@@ -5857,6 +5861,7 @@ static ssize_t support_prox_in_aot_show(struct device *dev,
 }
 #endif
 
+#if 0
 static ssize_t read_support_feature(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -5935,6 +5940,7 @@ static ssize_t enabled_store(struct device *dev, struct device_attribute *attr,
 
 	return count;
 }
+#endif
 
 static ssize_t get_lp_dump(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -5955,18 +5961,18 @@ static DEVICE_ATTR(vendor, 0444, read_vendor_show, NULL);
 static DEVICE_ATTR(checksum, 0664, read_checksum_show, clear_checksum_store);
 static DEVICE_ATTR(all_touch_count, 0664, read_all_touch_count_show, clear_all_touch_count_store);
 #endif	// end of #if SHOW_NOT_SUPPORT_CMD
-static DEVICE_ATTR(scrub_pos, 0444, scrub_position_show, NULL);
+//static DEVICE_ATTR(scrub_pos, 0444, scrub_position_show, NULL);
 static DEVICE_ATTR(sensitivity_mode, 0664, sensitivity_mode_show, sensitivity_mode_store);
-static DEVICE_ATTR(prox_power_off, 0664, prox_power_off_show, prox_power_off_store);
+//static DEVICE_ATTR(prox_power_off, 0664, prox_power_off_show, prox_power_off_store);
 #ifdef PROXIMITY_FUNCTION
 static DEVICE_ATTR(virtual_prox, 0664, protos_event_show, protos_event_store);
 #endif
-static DEVICE_ATTR(support_feature, 0444, read_support_feature, NULL);
+//static DEVICE_ATTR(support_feature, 0444, read_support_feature, NULL);
 #if !IS_ENABLED(CONFIG_SAMSUNG_PRODUCT_SHIP)
 static DEVICE_ATTR(noise_mode, 0664, noise_mode_show, NULL);
 static DEVICE_ATTR(support_prox_in_aot, 0664, support_prox_in_aot_show, NULL);
 #endif
-static DEVICE_ATTR(enabled, 0664, enabled_show, enabled_store);
+//static DEVICE_ATTR(enabled, 0664, enabled_show, enabled_store);
 static DEVICE_ATTR(get_lp_dump, 0444, get_lp_dump, NULL);
 
 static struct attribute *cmd_attributes[] = {
@@ -5978,18 +5984,18 @@ static struct attribute *cmd_attributes[] = {
 	&dev_attr_checksum.attr,
 	&dev_attr_all_touch_count.attr,
 #endif	// end of #if SHOW_NOT_SUPPORT_CMD
-	&dev_attr_scrub_pos.attr,
+	//&dev_attr_scrub_pos.attr,
 	&dev_attr_sensitivity_mode.attr,
-	&dev_attr_prox_power_off.attr,
+	//&dev_attr_prox_power_off.attr,
 #ifdef PROXIMITY_FUNCTION
 	&dev_attr_virtual_prox.attr,
 #endif
-	&dev_attr_support_feature.attr,
+	//&dev_attr_support_feature.attr,
 #if !IS_ENABLED(CONFIG_SAMSUNG_PRODUCT_SHIP)
 	&dev_attr_noise_mode.attr,
 	&dev_attr_support_prox_in_aot.attr,
 #endif
-	&dev_attr_enabled.attr,
+	//&dev_attr_enabled.attr,
 	&dev_attr_get_lp_dump.attr,
 	NULL,
 };
