@@ -156,6 +156,7 @@ is-cis-gw1.ko
 is-cis-imx258.ko
 is-cis-4ha.ko
 is-cis-gc02m1.ko
+is-cis-gc02m2.ko
 is-cis-gc5035.ko
 is-cis-imx616.ko
 is-cis-imx682.ko
