@@ -4482,9 +4482,9 @@
 		gpu_min_clock = <0x19640>;
 		gpu_dvfs_start_clock = <0x35f48>;
 		gpu_dvfs_bl_config_clock = <0x35f48>;
-		gpu_default_voltage = <0xc0df0>;
+		gpu_default_voltage = <0xcf850>;
 		gpu_cold_minimum_vol = <0x00>;
-		gpu_voltage_offset_margin = <0x9218>;
+		gpu_voltage_offset_margin = <0x927c>;
 		gpu_tmu_control = <0x01>;
 		gpu_temp_throttling_level_num = <0x05>;
 		gpu_temp_throttling = <0xbb418 0xbb418 0xbb418 0xbb418 0xa50a0>;
