@@ -1055,11 +1055,13 @@ int sensor_gc5035_cis_stream_on(struct v4l2_subdev *subdev)
 
 	cis_data = cis->cis_data;
 
-#if !defined(DISABLE_DUAL_SYNC)
-	if ((this_device != &core->sensor[0]) && test_bit(IS_SENSOR_OPEN, &(core->sensor[0].state))) {
-		single_mode = false;
+//#if !defined(DISABLE_DUAL_SYNC)
+	if (!mcd_disable_dual_sync) {
+		if ((this_device != &core->sensor[0]) && test_bit(IS_SENSOR_OPEN, &(core->sensor[0].state))) {
+			single_mode = false;
+		}
 	}
-#endif
+//#endif
 	/* Sensor Dual sync on/off */
 	if (single_mode) {
 		/* Delay for single mode */

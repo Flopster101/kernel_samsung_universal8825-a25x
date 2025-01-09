@@ -1319,14 +1319,17 @@ int sensor_imx682_cis_stream_on(struct v4l2_subdev *subdev)
 #endif
 
 	I2C_MUTEX_LOCK(cis->i2c_lock);
-#ifdef DISABLE_DUAL_SYNC
-	info("[%s] start (single mode)\n", __func__);
-#else
-	info("[%s] start (dual master mode)\n", __func__);
+//#ifdef DISABLE_DUAL_SYNC
+	if (mcd_disable_dual_sync) {
+		info("[%s] start (single mode)\n", __func__);
+//#else
+	} else {
+		info("[%s] start (dual master mode)\n", __func__);
 
-	is_sensor_write8(client, 0x3020, 0x1);
-	is_sensor_write8(client, 0x3031, 0x1);
-#endif
+		is_sensor_write8(client, 0x3020, 0x1);
+		is_sensor_write8(client, 0x3031, 0x1);
+	}
+//#endif
 
 	/* Sensor stream on */
 	is_sensor_write8(client, SENSOR_IMX682_SETUP_MODE_SELECT_ADDR, 0x01);

@@ -85,14 +85,18 @@ static int sensor_otprom_probe(struct i2c_client *client,
 	i2c_set_clientdata(client, otprom);
 
 	if (client->dev.of_node) {
-#if defined(CAMERA_UWIDE_DUALIZED)
-		if(otprom->driver_data == ROM_ID_REAR3)
-			is_sec_set_rear3_dualized_rom_probe();
-#endif
-#if defined(FRONT_OTPROM_EEPROM)
-		if(otprom->driver_data == ROM_ID_FRONT)
-			is_sec_set_front_dualized_rom_probe();
-#endif
+//#if defined(CAMERA_UWIDE_DUALIZED)
+		if (mcd_camera_uwide_dualized) {
+			if(otprom->driver_data == ROM_ID_REAR3)
+				is_sec_set_rear3_dualized_rom_probe();
+		}
+//#endif
+//#if defined(FRONT_OTPROM_EEPROM)
+		if (mcd_front_otprom_eeprom) {
+			if(otprom->driver_data == ROM_ID_FRONT)
+				is_sec_set_front_dualized_rom_probe();
+		}
+//#endif
 		if(is_vendor_rom_parse_dt(client->dev.of_node, otprom->driver_data)) {
 			probe_err("parsing device tree is fail");
 			kfree(otprom);

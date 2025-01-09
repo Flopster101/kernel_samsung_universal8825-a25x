@@ -37,6 +37,7 @@
 #include "is-resourcemgr.h"
 #include "is-dt.h"
 #include "is-cis-imx258.h"
+// VERY SUSPICIOUS
 #if defined(USE_IMX258_13MP_FULL_SIZE)
 #include "is-cis-imx258-13M-full-setA.h"
 #include "is-cis-imx258-13M-full-setB.h"
@@ -1625,11 +1626,13 @@ static int cis_imx258_probe(struct i2c_client *client,
 	cis->ctrl_delay = N_PLUS_TWO_FRAME;
 	cis->cis_ops = &cis_ops;
 	/* belows are depend on sensor cis. MUST check sensor spec */
-#ifdef USE_IMX258_13MP_FULL_SIZE
-	cis->bayer_order = OTF_INPUT_ORDER_BAYER_BG_GR;
-#else
-	cis->bayer_order = OTF_INPUT_ORDER_BAYER_RG_GB;
-#endif
+//#ifdef USE_IMX258_13MP_FULL_SIZE
+	if (mcd_use_imx258_13mp_full_size)
+		cis->bayer_order = OTF_INPUT_ORDER_BAYER_BG_GR;
+//#else
+	else
+		cis->bayer_order = OTF_INPUT_ORDER_BAYER_RG_GB;
+//#endif
 	/* Use total gain instead of using dgain */
 	cis->use_dgain = false;
 	cis->use_vendor_total_gain = true;

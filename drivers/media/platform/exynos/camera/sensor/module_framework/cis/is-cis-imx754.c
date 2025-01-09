@@ -251,8 +251,10 @@ int sensor_imx754_cis_init(struct v4l2_subdev *subdev)
 	cis->need_mode_change = false;
 	cis->long_term_mode.sen_strm_off_on_enable = false;
 #ifdef USE_CAMERA_ADAPTIVE_MIPI
-	cis->mipi_clock_index_cur = CAM_MIPI_NOT_INITIALIZED;
-	cis->mipi_clock_index_new = CAM_MIPI_NOT_INITIALIZED;
+	if (mcd_use_camera_adaptive_mipi) {
+		cis->mipi_clock_index_cur = CAM_MIPI_NOT_INITIALIZED;
+		cis->mipi_clock_index_new = CAM_MIPI_NOT_INITIALIZED;
+	}
 #endif
 	for (idx = 0; idx < SENSOR_IMX754_MODE_MAX; ++idx)
 		start_pos_infos[idx].x_start = start_pos_infos[idx].y_start = 0;
