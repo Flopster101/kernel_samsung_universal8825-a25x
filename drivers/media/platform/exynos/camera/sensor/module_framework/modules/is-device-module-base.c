@@ -269,16 +269,18 @@ int sensor_module_deinit(struct v4l2_subdev *subdev)
 	}
 
 #ifdef USE_CAMERA_ACT_DRIVER_SOFT_LANDING
-	if (sensor_peri->actuator) {
-		flush_work(&sensor_peri->actuator->actuator_init_work);
+	if (mcd_use_camera_act_driver_soft_landing) {
+		if (sensor_peri->actuator) {
+			flush_work(&sensor_peri->actuator->actuator_init_work);
 
-		ret = is_sensor_peri_actuator_softlanding(sensor_peri);
-		if (ret)
-			err("failed to soft landing control\n");
+			ret = is_sensor_peri_actuator_softlanding(sensor_peri);
+			if (ret)
+				err("failed to soft landing control\n");
 
-		mutex_lock(&sensor_peri->actuator->control_init_lock);
-		sensor_peri->actuator->actuator_init_state = ACTUATOR_NOT_INITIALIZED;
-		mutex_unlock(&sensor_peri->actuator->control_init_lock);
+			mutex_lock(&sensor_peri->actuator->control_init_lock);
+			sensor_peri->actuator->actuator_init_state = ACTUATOR_NOT_INITIALIZED;
+			mutex_unlock(&sensor_peri->actuator->control_init_lock);
+		}
 	}
 #endif
 

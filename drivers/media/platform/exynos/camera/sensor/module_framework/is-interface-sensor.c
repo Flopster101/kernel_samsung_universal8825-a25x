@@ -2021,21 +2021,23 @@ int update_sensor_dynamic_meta(struct is_sensor_interface *itf,
 	udm->sensor.midDigitalGain = sensor_peri->cis.expecting_sensor_udm[index].midDigitalGain;
 
 #ifdef USE_OIS_HALL_DATA_FOR_VDIS
-	/* update ois hall data */
-	dm->aa.vendor_oisHallData.readTimeStamp = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.readTimeStamp;
-	dm->aa.vendor_oisHallData.counter = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.counter;
-	dm->aa.vendor_oisHallData.X_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[0];
-	dm->aa.vendor_oisHallData.Y_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[0];
-	dm->aa.vendor_oisHallData.Z_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[0];
-	dm->aa.vendor_oisHallData.X_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[1];
-	dm->aa.vendor_oisHallData.Y_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[1];
-	dm->aa.vendor_oisHallData.Z_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[1];
-	dm->aa.vendor_oisHallData.X_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[2];
-	dm->aa.vendor_oisHallData.Y_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[2];
-	dm->aa.vendor_oisHallData.Z_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[2];
-	dm->aa.vendor_oisHallData.X_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[3];
-	dm->aa.vendor_oisHallData.Y_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[3];
-	dm->aa.vendor_oisHallData.Z_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[3];
+	if (mcd_use_ois_hall_data_for_vdis) {
+		/* update ois hall data */
+		dm->aa.vendor_oisHallData.readTimeStamp = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.readTimeStamp;
+		dm->aa.vendor_oisHallData.counter = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.counter;
+		dm->aa.vendor_oisHallData.X_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[0];
+		dm->aa.vendor_oisHallData.Y_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[0];
+		dm->aa.vendor_oisHallData.Z_AngVel[0] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[0];
+		dm->aa.vendor_oisHallData.X_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[1];
+		dm->aa.vendor_oisHallData.Y_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[1];
+		dm->aa.vendor_oisHallData.Z_AngVel[1] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[1];
+		dm->aa.vendor_oisHallData.X_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[2];
+		dm->aa.vendor_oisHallData.Y_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[2];
+		dm->aa.vendor_oisHallData.Z_AngVel[2] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[2];
+		dm->aa.vendor_oisHallData.X_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.X_AngVel[3];
+		dm->aa.vendor_oisHallData.Y_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Y_AngVel[3];
+		dm->aa.vendor_oisHallData.Z_AngVel[3] = sensor_peri->cis.expecting_aa_dm[index].vendor_oisHallData.Z_AngVel[3];
+	}
 #endif
 
 	dbg_sensor(1, "[%s] (F:%d): expo(%lld), duration(%lld), sensitivity(%d), rollingShutterSkew(%lld)\n",
@@ -3947,6 +3949,9 @@ int get_delayed_preflash_time(struct is_sensor_interface *itf, u32 *delayedTime)
 	struct is_device_sensor_peri *sensor_peri = NULL;
 	struct v4l2_subdev *subdev_flash;
 	struct v4l2_control ctrl;
+
+	if (!mcd_use_leds_flash_charging_voltage_control)
+		return 0;
 
 	WARN_ON(!itf);
 	WARN_ON(itf->magic != SENSOR_INTERFACE_MAGIC);
