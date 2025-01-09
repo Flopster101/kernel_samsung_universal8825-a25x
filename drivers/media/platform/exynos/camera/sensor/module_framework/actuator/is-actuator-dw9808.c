@@ -578,18 +578,20 @@ static int sensor_dw9808_actuator_s_ctrl(struct v4l2_subdev *subdev, struct v4l2
 		}
 		break;
 #ifdef USE_CAMERA_ACT_DRIVER_SOFT_LANDING
-	case V4L2_CID_ACTUATOR_SOFT_LANDING:
-		ret = sensor_dw9808_actuator_soft_landing(subdev);
-		if(ret == HW_SOFTLANDING_FAIL) {
-			err("[%s] NRC Softlanding Failed \n",__func__);
-			goto p_err;
-		}
-		if (ret) {
-			err("[%s] Actuator Softlanding Failed  \n", __func__);
-			ret = -EINVAL;
-			goto p_err;
-		}
-		break;
+	if (mcd_use_camera_act_driver_soft_landing) {
+		case V4L2_CID_ACTUATOR_SOFT_LANDING:
+			ret = sensor_dw9808_actuator_soft_landing(subdev);
+			if(ret == HW_SOFTLANDING_FAIL) {
+				err("[%s] NRC Softlanding Failed \n",__func__);
+				goto p_err;
+			}
+			if (ret) {
+				err("[%s] Actuator Softlanding Failed  \n", __func__);
+				ret = -EINVAL;
+				goto p_err;
+			}
+			break;
+	}
 #endif
 	default:
 		err("err!!! Unknown CID(%#x)", ctrl->id);

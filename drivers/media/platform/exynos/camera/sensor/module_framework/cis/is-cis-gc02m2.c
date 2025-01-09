@@ -694,18 +694,20 @@ int sensor_gc02m2_cis_mode_change(struct v4l2_subdev *subdev, u32 mode)
 	}
 
 #ifdef APPLY_MIRROR_VERTICAL_FLIP
-	/* Page Select */
-	ret = is_sensor_addr8_write8(client, 0xfe, 0x00);
-	if (ret < 0) {
-		err("sensor gc02m2 write page select regsiter fail !!");
-		goto p_i2c_err;
-	}
+	if (mcd_apply_mirror_vertical_flip) {
+		/* Page Select */
+		ret = is_sensor_addr8_write8(client, 0xfe, 0x00);
+		if (ret < 0) {
+			err("sensor gc02m2 write page select regsiter fail !!");
+			goto p_i2c_err;
+		}
 
-	/* Apply Mirror and Vertical Flip */
-	ret = is_sensor_addr8_write8(client, 0x17, 0x83);
-	if (ret < 0) {
-		err("sensor gc02m2 write flip register select fail !!");
-		goto p_i2c_err;
+		/* Apply Mirror and Vertical Flip */
+		ret = is_sensor_addr8_write8(client, 0x17, 0x83);
+		if (ret < 0) {
+			err("sensor gc02m2 write flip register select fail !!");
+			goto p_i2c_err;
+		}
 	}
 #endif
 
@@ -907,11 +909,13 @@ int sensor_gc02m2_cis_stream_on(struct v4l2_subdev *subdev)
 
 	cis_data = cis->cis_data;
 
-#if !defined(DISABLE_DUAL_SYNC)
-	if ((this_device != &core->sensor[0]) && test_bit(IS_SENSOR_OPEN, &(core->sensor[0].state))) {
-		single_mode = false;
+//#if !defined(DISABLE_DUAL_SYNC)
+	if (!mcd_disable_dual_sync) {
+		if ((this_device != &core->sensor[0]) && test_bit(IS_SENSOR_OPEN, &(core->sensor[0].state))) {
+			single_mode = false;
+		}
 	}
-#endif
+//#endif
 
 	dbg_sensor(2, "[MOD:D:%d] %s\n", cis->id, __func__);
 
@@ -1921,11 +1925,13 @@ int cis_gc02m2_probe(struct i2c_client *client,
 	cis->cis_ops = &cis_ops;
 
 	/* belows are depend on sensor cis. MUST check sensor spec */
-#ifdef APPLY_MIRROR_VERTICAL_FLIP
-	cis->bayer_order = OTF_INPUT_ORDER_BAYER_BG_GR;
-#else
-	cis->bayer_order = OTF_INPUT_ORDER_BAYER_RG_GB;
-#endif
+//#ifdef APPLY_MIRROR_VERTICAL_FLIP
+	if (mcd_apply_mirror_vertical_flip)
+		cis->bayer_order = OTF_INPUT_ORDER_BAYER_BG_GR;
+//#else
+	else
+		cis->bayer_order = OTF_INPUT_ORDER_BAYER_RG_GB;
+//#endif
 
 	/* Use total gain instead of using dgain */
 	cis->use_dgain = false;
