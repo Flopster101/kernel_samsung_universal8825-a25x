@@ -33,6 +33,55 @@ EXPORT_SYMBOL(sec_current_device);
 EXPORT_SYMBOL(sec_needs_blic);
 EXPORT_SYMBOL(sec_doze);
 
+// Camera params
+bool mcd_disable_dual_sync = false;
+EXPORT_SYMBOL(mcd_disable_dual_sync);
+
+bool mcd_camera_rear_dual_cal = false;
+EXPORT_SYMBOL(mcd_camera_rear_dual_cal);
+
+bool mcd_use_leds_flash_charging_voltage_control = false;
+EXPORT_SYMBOL(mcd_use_leds_flash_charging_voltage_control);
+
+bool mcd_use_camera_adaptive_mipi = false;
+EXPORT_SYMBOL(mcd_use_camera_adaptive_mipi);
+
+bool mcd_use_imx258_13mp_full_size = false;
+EXPORT_SYMBOL(mcd_use_imx258_13mp_full_size);
+
+bool mcd_apply_mirror_vertical_flip = false;
+EXPORT_SYMBOL(mcd_apply_mirror_vertical_flip);
+
+bool mcd_simplify_ois_init = false;
+EXPORT_SYMBOL(mcd_simplify_ois_init);
+
+bool mcd_modify_cal_map_for_swremosaic_lib = false;
+EXPORT_SYMBOL(mcd_modify_cal_map_for_swremosaic_lib);
+
+bool mcd_front_otprom_eeprom = false;
+EXPORT_SYMBOL(mcd_front_otprom_eeprom);
+
+bool mcd_camera_uwide_dualized = false;
+EXPORT_SYMBOL(mcd_camera_uwide_dualized);
+
+bool mcd_read_dual_cal_firmware_data = false;
+EXPORT_SYMBOL(mcd_read_dual_cal_firmware_data);
+
+bool mcd_camera_front_fixed_focus = false;
+EXPORT_SYMBOL(mcd_camera_front_fixed_focus);
+
+bool mcd_config_camera_eeprom_dualized = false;
+EXPORT_SYMBOL(mcd_config_camera_eeprom_dualized);
+
+bool mcd_config_check_hw_version_for_mcu_fw_upload = false;
+EXPORT_SYMBOL(mcd_config_check_hw_version_for_mcu_fw_upload);
+
+bool mcd_use_camera_act_driver_soft_landing = false;
+EXPORT_SYMBOL(mcd_use_camera_act_driver_soft_landing);
+
+bool mcd_use_ois_hall_data_for_vdis = false;
+EXPORT_SYMBOL(mcd_use_ois_hall_data_for_vdis);
+
 #ifdef CONFIG_SEC_DETECT_SYSFS
 // Sysfs attribute to show the current device name
 static ssize_t device_name_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
@@ -84,6 +133,68 @@ static struct attribute_group attr_group = {
 
 static struct kobject *device_kobj;
 #endif
+
+void setup_camera_params(void) {
+	if (sec_current_device == SEC_A25) {
+		mcd_camera_rear_dual_cal = true;
+		mcd_use_imx258_13mp_full_size = true;
+		mcd_use_leds_flash_charging_voltage_control = true;
+		mcd_use_ois_hall_data_for_vdis = true;
+		mcd_apply_mirror_vertical_flip = true;
+		mcd_front_otprom_eeprom = true;
+		mcd_modify_cal_map_for_swremosaic_lib = true;
+		mcd_simplify_ois_init = true;
+		mcd_use_camera_adaptive_mipi = true;
+		mcd_read_dual_cal_firmware_data = true;
+	}
+
+	if (sec_current_device == SEC_A33) {
+		mcd_camera_front_fixed_focus = true;
+		mcd_camera_rear_dual_cal = true;
+		mcd_config_check_hw_version_for_mcu_fw_upload = true;
+		mcd_disable_dual_sync = true;
+		mcd_use_imx258_13mp_full_size = true;
+		mcd_use_leds_flash_charging_voltage_control = true;
+		mcd_use_ois_hall_data_for_vdis = true;
+		mcd_camera_uwide_dualized = true;
+		mcd_read_dual_cal_firmware_data = true;
+	}
+
+	if (sec_current_device == SEC_A53) {
+		mcd_camera_front_fixed_focus = true;
+		mcd_camera_rear_dual_cal = true;
+		mcd_disable_dual_sync = true;
+		mcd_use_ois_hall_data_for_vdis = true;
+		mcd_camera_uwide_dualized = true;
+		mcd_read_dual_cal_firmware_data = true;
+	}
+
+	if (sec_current_device == SEC_M33) {
+		mcd_camera_rear_dual_cal = true;
+		mcd_disable_dual_sync = true;
+		mcd_modify_cal_map_for_swremosaic_lib = true;
+		mcd_use_camera_adaptive_mipi = true;
+		mcd_use_camera_act_driver_soft_landing = true;
+		mcd_read_dual_cal_firmware_data = true;
+	}
+
+	if (sec_current_device == SEC_M34) {
+		mcd_camera_rear_dual_cal = true;
+		mcd_use_ois_hall_data_for_vdis = true;
+		mcd_apply_mirror_vertical_flip = true;
+		mcd_modify_cal_map_for_swremosaic_lib = true;
+		mcd_simplify_ois_init = true;
+		mcd_use_camera_adaptive_mipi = true;
+		mcd_read_dual_cal_firmware_data = true;
+	}
+
+	if (sec_current_device == SEC_GTA4XLS) {
+		mcd_use_camera_act_driver_soft_landing = true;
+	}
+	// mcd_disable_dual_sync = (sec_current_device == SEC_A53 || sec_current_device == SEC_A33 || sec_current_device == SEC_M33);
+	// mcd_camera_rear_dual_cal = (sec_current_device == SEC_A25 || sec_current_device == SEC_A53 || sec_current_device == SEC_A33 || sec_current_device == SEC_M33 || sec_current_device == SEC_M34);
+	// mcd_use_leds_flash_charging_voltage_control = (sec_current_device == SEC_A25 || sec_current_device == SEC_A33);
+}
 
 int sec_detect_init(void) {
 	struct device_node *root;
@@ -148,6 +259,8 @@ int sec_detect_init(void) {
 	if (retval)
 		kobject_put(device_kobj);
 #endif
+
+	setup_camera_params();
 
 	return retval;
 }

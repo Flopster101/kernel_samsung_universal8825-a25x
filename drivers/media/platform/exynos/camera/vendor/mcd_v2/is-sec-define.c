@@ -233,25 +233,29 @@ EXPORT_SYMBOL_GPL(is_sec_set_front_dualized_rom_probe);
 
 int is_sec_get_sysfs_finfo(struct is_rom_info **finfo, int rom_id)
 {
-#if defined(CAMERA_UWIDE_DUALIZED)
-	if(rom_id == ROM_ID_REAR3 && rear3_dualized_rom_probe) {
-		*finfo = &sysfs_finfo_rear3_otp;
-		rear3_dualized_rom_probe = false;
-	}
-	else {
+//#if defined(CAMERA_UWIDE_DUALIZED)
+	if (mcd_camera_uwide_dualized) {
+		if(rom_id == ROM_ID_REAR3 && rear3_dualized_rom_probe) {
+			*finfo = &sysfs_finfo_rear3_otp;
+			rear3_dualized_rom_probe = false;
+		}
+		else {
+			*finfo = &sysfs_finfo[rom_id];
+		}
+//#elif defined(FRONT_OTPROM_EEPROM)
+	} else if (mcd_front_otprom_eeprom) {
+		if(rom_id == ROM_ID_FRONT && front_dualized_rom_probe) {
+			*finfo = &sysfs_finfo_front_otp;
+			front_dualized_rom_probe = false;
+		}
+		else {
+			*finfo = &sysfs_finfo[rom_id];
+		}
+//#else
+	} else {
 		*finfo = &sysfs_finfo[rom_id];
+//#endif
 	}
-#elif defined(FRONT_OTPROM_EEPROM)
-	if(rom_id == ROM_ID_FRONT && front_dualized_rom_probe) {
-		*finfo = &sysfs_finfo_front_otp;
-		front_dualized_rom_probe = false;
-	}
-	else {
-		*finfo = &sysfs_finfo[rom_id];
-	}
-#else
-	*finfo = &sysfs_finfo[rom_id];
-#endif
 	return 0;
 }
 EXPORT_SYMBOL_GPL(is_sec_get_sysfs_finfo);
@@ -1807,7 +1811,8 @@ int is_sec_readcal_otprom_hi1339(int rom_id)
 	subdev_cis = sensor_peri->subdev_cis;
 
 #if defined(FRONT_OTPROM_EEPROM)
-	sysfs_finfo[ROM_ID_FRONT] = sysfs_finfo_front_otp;
+	if (mcd_front_otprom_eeprom)
+		sysfs_finfo[ROM_ID_FRONT] = sysfs_finfo_front_otp;
 #endif
 	is_sec_get_sysfs_finfo(&finfo, rom_id);
 	is_sec_get_cal_buf(&buf, rom_id);
@@ -2845,11 +2850,9 @@ int is_sec_readcal_otprom(int rom_id)
 		case SENSOR_NAME_GC02M1:
 			ret = is_sec_readcal_otprom_gc02m1(rom_id);
 			break;
-#if defined(CAMERA_UWIDE_DUALIZED)
 		case SENSOR_NAME_HI1336:
 			ret = is_sec_readcal_otprom_hi1336(rom_id);
 			break;
-#endif
 		case SENSOR_NAME_S5K4HA:
 			ret = is_sec_readcal_otprom_4ha(rom_id);
 			break;
@@ -4993,21 +4996,24 @@ int is_get_remosaic_cal_buf(int sensor_position, char **buf, int *size)
 	
 	start_addr = finfo->rom_xtc_cal_data_start_addr;
 
-#ifdef MODIFY_CAL_MAP_FOR_SWREMOSAIC_LIB
+//#ifdef MODIFY_CAL_MAP_FOR_SWREMOSAIC_LIB
 // Modify cal_buf for some sensors (if required)
-	switch(sensor_id) {
-		case SENSOR_NAME_S5KJN1:
-			ret = is_modify_remosaic_cal_buf(sensor_position, cal_buf, buf, size);
-			break;
-		default:
-			*buf  = &cal_buf[start_addr];
-			*size = finfo->rom_xtc_cal_data_size;
-			break;
+	if (mcd_modify_cal_map_for_swremosaic_lib) {
+		switch(sensor_id) {
+			case SENSOR_NAME_S5KJN1:
+				ret = is_modify_remosaic_cal_buf(sensor_position, cal_buf, buf, size);
+				break;
+			default:
+				*buf  = &cal_buf[start_addr];
+				*size = finfo->rom_xtc_cal_data_size;
+				break;
+		}
+//#else
+	} else {
+		*buf  = &cal_buf[start_addr];
+		*size = finfo->rom_xtc_cal_data_size;
 	}
-#else
-	*buf  = &cal_buf[start_addr];
-	*size = finfo->rom_xtc_cal_data_size;
-#endif
+//#endif
 	return ret;
 }
 

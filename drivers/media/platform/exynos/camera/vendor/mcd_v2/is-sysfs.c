@@ -1418,21 +1418,23 @@ static ssize_t camera_rear3_dualcal_show(struct device *dev,
 	}
 
 #ifdef READ_DUAL_CAL_FIRMWARE_DATA
-	info("  load multical Cal Data %s \n", DUAL_CAL_DATA_PATH);
-	copy_size = DUAL_CAL_DATA_SIZE_DEFAULT;
+	if (mcd_read_dual_cal_firmware_data) {
+		info("  load multical Cal Data %s \n", DUAL_CAL_DATA_PATH);
+		copy_size = DUAL_CAL_DATA_SIZE_DEFAULT;
 #ifdef USE_KERNEL_VFS_READ_WRITE
-	ret = is_dual_cal_read_firmware(DUAL_CAL_DATA_PATH, 0,
-			DUAL_CAL_DATA_SIZE_DEFAULT);
+		ret = is_dual_cal_read_firmware(DUAL_CAL_DATA_PATH, 0,
+				DUAL_CAL_DATA_SIZE_DEFAULT);
 #else
-	ret = is_dual_cal_read_firmware(dev, DUAL_CAL_DATA_PATH, DUAL_CAL_DATA_BIN_NAME, 0,
-			DUAL_CAL_DATA_SIZE_DEFAULT);
+		ret = is_dual_cal_read_firmware(dev, DUAL_CAL_DATA_PATH, DUAL_CAL_DATA_BIN_NAME, 0,
+				DUAL_CAL_DATA_SIZE_DEFAULT);
 #endif
-	if (ret < 0) {
-		err("CAL read %s is fail\n", DUAL_CAL_DATA_PATH);
-		return 0;
-	} else {
-		info("%s: success to get dualcal from firmware of %d", __func__, SENSOR_POSITION_REAR2);
-		memcpy(buf, dual_cal_data, copy_size);
+		if (ret < 0) {
+			err("CAL read %s is fail\n", DUAL_CAL_DATA_PATH);
+			return 0;
+		} else {
+			info("%s: success to get dualcal from firmware of %d", __func__, SENSOR_POSITION_REAR2);
+			memcpy(buf, dual_cal_data, copy_size);
+		}
 	}
 #endif
 
@@ -1455,20 +1457,22 @@ static ssize_t camera_rear3_dualcal_size_show(struct device *dev,
 	}
 
 #ifdef READ_DUAL_CAL_FIRMWARE_DATA
-	info("  load multical Cal Data %s \n", DUAL_CAL_DATA_PATH);
-	copy_size = DUAL_CAL_DATA_SIZE_DEFAULT;
+	if (mcd_read_dual_cal_firmware_data) {
+		info("  load multical Cal Data %s \n", DUAL_CAL_DATA_PATH);
+		copy_size = DUAL_CAL_DATA_SIZE_DEFAULT;
 #ifdef USE_KERNEL_VFS_READ_WRITE
-	ret = is_dual_cal_read_firmware(DUAL_CAL_DATA_PATH, 0,
-			DUAL_CAL_DATA_SIZE_DEFAULT);
+		ret = is_dual_cal_read_firmware(DUAL_CAL_DATA_PATH, 0,
+				DUAL_CAL_DATA_SIZE_DEFAULT);
 #else
-	ret = is_dual_cal_read_firmware(dev, DUAL_CAL_DATA_PATH, DUAL_CAL_DATA_BIN_NAME, 0,
-			DUAL_CAL_DATA_SIZE_DEFAULT);
+		ret = is_dual_cal_read_firmware(dev, DUAL_CAL_DATA_PATH, DUAL_CAL_DATA_BIN_NAME, 0,
+				DUAL_CAL_DATA_SIZE_DEFAULT);
 #endif
-	if (ret < 0) {
-		err("CAL read %s is fail\n", DUAL_CAL_DATA_PATH);
-		return 0;
-	} else {
-		info("%s: success to get dualcal from firmware of %d", __func__, SENSOR_POSITION_REAR2);
+		if (ret < 0) {
+			err("CAL read %s is fail\n", DUAL_CAL_DATA_PATH);
+			return 0;
+		} else {
+			info("%s: success to get dualcal from firmware of %d", __func__, SENSOR_POSITION_REAR2);
+		}
 	}
 #endif
 
@@ -2850,7 +2854,7 @@ static ssize_t camera_rear_moduleid_show(struct device *dev,
 }
 
 #if defined(CAMERA_EEPROM_SUPPORT_FRONT)
-#ifndef CAMERA_FRONT_FIXED_FOCUS
+//#ifndef CAMERA_FRONT_FIXED_FOCUS
 static ssize_t camera_front_afcal_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -2864,7 +2868,7 @@ static ssize_t camera_front_paf_cal_check_show(struct device *dev,
 	return camera_paf_cal_check_show(buf, CAM_INFO_FRONT, FNUMBER_1ST);
 }
 #endif
-#endif
+//#endif
 static ssize_t camera_front_moduleid_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -3387,12 +3391,12 @@ static DEVICE_ATTR(front_phy_tune, S_IRUGO, camera_front_phy_tune_show, NULL);
 #if defined(CAMERA_EEPROM_SUPPORT_FRONT)
 static DEVICE_ATTR(front_camfw_full, S_IRUGO, camera_front_camfw_full_show, NULL);
 static DEVICE_ATTR(front_checkfw_factory, S_IRUGO, camera_front_checkfw_factory_show, NULL);
-#ifndef CAMERA_FRONT_FIXED_FOCUS
+//#ifndef CAMERA_FRONT_FIXED_FOCUS
 static DEVICE_ATTR(front_afcal, S_IRUGO, camera_front_afcal_show, NULL);
 #ifdef CAMERA_FRONT_PAFCAL
 static DEVICE_ATTR(front_paf_cal_check, S_IRUGO, camera_front_paf_cal_check_show, NULL);
 #endif
-#endif
+//#endif
 static DEVICE_ATTR(front_mtf_exif, S_IRUGO, camera_front_mtf_exif_show, NULL);
 static DEVICE_ATTR(front_sensorid_exif, S_IRUGO, camera_front_sensorid_exif_show, NULL);
 static DEVICE_ATTR(front_moduleid, S_IRUGO, camera_front_moduleid_show, NULL);
@@ -3623,18 +3627,20 @@ int is_create_sysfs(struct is_core *core)
 			pr_err("failed to create front device file, %s\n",
 					dev_attr_front_mtf_exif.attr.name);
 		}
-#ifndef CAMERA_FRONT_FIXED_FOCUS
+//#ifndef CAMERA_FRONT_FIXED_FOCUS
+		if (!mcd_camera_front_fixed_focus) {
 #ifdef CAMERA_FRONT_PAFCAL
-		if (device_create_file(camera_front_dev, &dev_attr_front_paf_cal_check) < 0) {
-			pr_err("failed to create front device file, %s\n",
-					dev_attr_front_paf_cal_check.attr.name);
-		}
+			if (device_create_file(camera_front_dev, &dev_attr_front_paf_cal_check) < 0) {
+				pr_err("failed to create front device file, %s\n",
+						dev_attr_front_paf_cal_check.attr.name);
+			}
 #endif
-		if (device_create_file(camera_front_dev, &dev_attr_front_afcal) < 0) {
-			pr_err("failed to create front device file, %s\n",
-					dev_attr_front_afcal.attr.name);
+			if (device_create_file(camera_front_dev, &dev_attr_front_afcal) < 0) {
+				pr_err("failed to create front device file, %s\n",
+						dev_attr_front_afcal.attr.name);
+			}
 		}
-#endif
+//#endif
 		if (device_create_file(camera_front_dev, &dev_attr_front_moduleid) < 0) {
 			pr_err("failed to create front device file, %s\n",
 					dev_attr_front_moduleid.attr.name);
@@ -3767,21 +3773,23 @@ int is_create_sysfs(struct is_core *core)
 				dev_attr_rear_phy_tune.attr.name);
 		}
 #ifdef CAMERA_REAR_DUAL_CAL
-		if (device_create_file(camera_rear_dev, &dev_attr_rear_dualcal) < 0) {
-			pr_err("failed to create rear device file, %s\n",
-					dev_attr_rear_dualcal.attr.name);
-		}
-		if (device_create_file(camera_rear_dev, &dev_attr_rear2_dualcal) < 0) {
-			pr_err("failed to create rear device file, %s\n",
-					dev_attr_rear_dualcal.attr.name);
-		}
-		if (device_create_file(camera_rear_dev, &dev_attr_rear3_dualcal) < 0) {
-			pr_err("failed to create rear device file, %s\n",
-					dev_attr_rear_dualcal.attr.name);
-		}
-		if (device_create_file(camera_rear_dev, &dev_attr_rear3_dualcal_size) < 0) {
-			pr_err("failed to create rear device file, %s\n",
-					dev_attr_rear_dualcal.attr.name);
+		if (mcd_camera_rear_dual_cal) {
+			if (device_create_file(camera_rear_dev, &dev_attr_rear_dualcal) < 0) {
+				pr_err("failed to create rear device file, %s\n",
+						dev_attr_rear_dualcal.attr.name);
+			}
+			if (device_create_file(camera_rear_dev, &dev_attr_rear2_dualcal) < 0) {
+				pr_err("failed to create rear device file, %s\n",
+						dev_attr_rear_dualcal.attr.name);
+			}
+			if (device_create_file(camera_rear_dev, &dev_attr_rear3_dualcal) < 0) {
+				pr_err("failed to create rear device file, %s\n",
+						dev_attr_rear_dualcal.attr.name);
+			}
+			if (device_create_file(camera_rear_dev, &dev_attr_rear3_dualcal_size) < 0) {
+				pr_err("failed to create rear device file, %s\n",
+						dev_attr_rear_dualcal.attr.name);
+			}
 		}
 #endif
 
@@ -4128,12 +4136,14 @@ int is_destroy_sysfs(struct is_core *core)
 		device_remove_file(camera_front_dev, &dev_attr_front_caminfo);
 		device_remove_file(camera_front_dev, &dev_attr_front_camfw);
 #if defined(CAMERA_EEPROM_SUPPORT_FRONT)
-#ifndef CAMERA_FRONT_FIXED_FOCUS
-		device_remove_file(camera_front_dev, &dev_attr_front_afcal);
+//#ifndef CAMERA_FRONT_FIXED_FOCUS
+		if (!mcd_camera_front_fixed_focus) {
+			device_remove_file(camera_front_dev, &dev_attr_front_afcal);
 #ifdef CAMERA_FRONT_PAFCAL
-		device_remove_file(camera_front_dev, &dev_attr_front_paf_cal_check);
+			device_remove_file(camera_front_dev, &dev_attr_front_paf_cal_check);
 #endif
-#endif
+		}
+//#endif
 		device_remove_file(camera_front_dev, &dev_attr_front_camfw_full);
 		device_remove_file(camera_front_dev, &dev_attr_front_checkfw_factory);
 		device_remove_file(camera_front_dev, &dev_attr_front_moduleid);
@@ -4169,10 +4179,12 @@ int is_destroy_sysfs(struct is_core *core)
 		device_remove_file(camera_rear_dev, &dev_attr_rear_moduleid);
 		device_remove_file(camera_rear_dev, &dev_attr_rear_phy_tune);
 #ifdef CAMERA_REAR_DUAL_CAL
-		device_remove_file(camera_rear_dev, &dev_attr_rear_dualcal);
-		device_remove_file(camera_rear_dev, &dev_attr_rear2_dualcal);
-		device_remove_file(camera_rear_dev, &dev_attr_rear3_dualcal);
-		device_remove_file(camera_rear_dev, &dev_attr_rear3_dualcal_size);
+		if (mcd_camera_rear_dual_cal) {
+			device_remove_file(camera_rear_dev, &dev_attr_rear_dualcal);
+			device_remove_file(camera_rear_dev, &dev_attr_rear2_dualcal);
+			device_remove_file(camera_rear_dev, &dev_attr_rear3_dualcal);
+			device_remove_file(camera_rear_dev, &dev_attr_rear3_dualcal_size);
+		}
 #endif
 #ifdef CAMERA_REAR2
 		device_remove_file(camera_rear_dev, &dev_attr_rear2_caminfo);

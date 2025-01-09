@@ -1397,47 +1397,50 @@ void is_mcu_fw_update(struct is_core *core)
 
 	ret = is_mcu_fw_version(subdev);
 	if (ret) {
-#ifdef CONFIG_CHECK_HW_VERSION_FOR_MCU_FW_UPLOAD
-		int isUpload = 0;
+//#ifdef CONFIG_CHECK_HW_VERSION_FOR_MCU_FW_UPLOAD
+		if (mcd_config_check_hw_version_for_mcu_fw_upload) {
+			int isUpload = 0;
 
-		if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu))
-			isUpload = 1;
+			if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu))
+				isUpload = 1;
 
-		info("HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
-			mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
-			mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
-
-		vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
-		vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
-
-		if (vdrinfo_bin > vdrinfo_mcu)
-			isUpload = 1;
-
-		info("VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
-			mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
-			mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
-
-		if (isUpload)
-			info("Update MCU firmware!!");
-		else {
-			info("Do not update MCU firmware");
-		}
-#else
-		if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu)) {
-			info("Do not update MCU firmware. HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
+			info("HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
 				mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
 				mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
-		}
 
-		vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
-		vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
+			vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
+			vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
 
-		if (vdrinfo_bin <= vdrinfo_mcu) {
-			info("Do not update MCU firmware. VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
+			if (vdrinfo_bin > vdrinfo_mcu)
+				isUpload = 1;
+
+			info("VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
 				mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
 				mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
+
+			if (isUpload)
+				info("Update MCU firmware!!");
+			else {
+				info("Do not update MCU firmware");
+			}
+//#else
+		} else {
+			if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu)) {
+				info("Do not update MCU firmware. HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
+					mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
+					mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
+			}
+
+			vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
+			vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
+
+			if (vdrinfo_bin <= vdrinfo_mcu) {
+				info("Do not update MCU firmware. VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
+					mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
+					mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
+			}
 		}
-#endif
+//#endif
 	}
 
 	msleep(50);
@@ -2442,14 +2445,16 @@ int is_ois_init_mcu(struct v4l2_subdev *subdev)
 			if (ret < 0)
 				err("ois gyro data write is fail");
 
-#if !IS_ENABLED(SIMPLIFY_OIS_INIT)
-			ret = is_ois_set_reg_u16(client, R_OIS_CMD_XCOEF_M1_1,  ois_pinfo.wide_romdata.xcoef);
-			ret |= is_ois_set_reg_u16(client, R_OIS_CMD_YCOEF_M1_1, ois_pinfo.wide_romdata.ycoef);
+//#if !IS_ENABLED(SIMPLIFY_OIS_INIT)
+			if (!mcd_simplify_ois_init) {
+				ret = is_ois_set_reg_u16(client, R_OIS_CMD_XCOEF_M1_1,  ois_pinfo.wide_romdata.xcoef);
+				ret |= is_ois_set_reg_u16(client, R_OIS_CMD_YCOEF_M1_1, ois_pinfo.wide_romdata.ycoef);
 #ifdef CAMERA_2ND_OIS
-			ret |= is_ois_set_reg_u16(client, R_OIS_CMD_XCOEF_M2_1, ois_pinfo.tele_romdata.xcoef);
-			ret |= is_ois_set_reg_u16(client, R_OIS_CMD_YCOEF_M2_1, ois_pinfo.tele_romdata.ycoef);
+				ret |= is_ois_set_reg_u16(client, R_OIS_CMD_XCOEF_M2_1, ois_pinfo.tele_romdata.xcoef);
+				ret |= is_ois_set_reg_u16(client, R_OIS_CMD_YCOEF_M2_1, ois_pinfo.tele_romdata.ycoef);
 #endif
-#endif
+			}
+//#endif
 
 			if (ret < 0)
 				err("ois coef data write is fail");
@@ -2540,9 +2545,7 @@ int is_ois_set_ggfadeupdown_mcu(struct v4l2_subdev *subdev, int up, int down)
 	u8 status = 0;
 	int retries = 100;
 	u8 data[2];
-#if !IS_ENABLED(SIMPLIFY_OIS_INIT)
 	u8 write_data[4] = {0, };
-#endif
 #ifdef USE_OIS_SLEEP_MODE
 	u8 read_sensorStart = 0;
 #endif
@@ -2620,19 +2623,21 @@ int is_ois_set_ggfadeupdown_mcu(struct v4l2_subdev *subdev, int up, int down)
 	 * write 0x3F558106
 	 * write 0x3F558106
 	 */
-#if !IS_ENABLED(SIMPLIFY_OIS_INIT)
-	write_data[0] = 0x06;
-	write_data[1] = 0x81;
-	write_data[2] = 0x55;
-	write_data[3] = 0x3F;
-	is_ois_set_reg_multi(client, R_OIS_CMD_ANGLE_COMP1, write_data, 4);
+//#if !IS_ENABLED(SIMPLIFY_OIS_INIT)
+	if (!mcd_simplify_ois_init) {
+		write_data[0] = 0x06;
+		write_data[1] = 0x81;
+		write_data[2] = 0x55;
+		write_data[3] = 0x3F;
+		is_ois_set_reg_multi(client, R_OIS_CMD_ANGLE_COMP1, write_data, 4);
 
-	write_data[0] = 0x06;
-	write_data[1] = 0x81;
-	write_data[2] = 0x55;
-	write_data[3] = 0x3F;
-	is_ois_set_reg_multi(client, R_OIS_CMD_ANGLE_COMP5, write_data, 4);
-#endif
+		write_data[0] = 0x06;
+		write_data[1] = 0x81;
+		write_data[2] = 0x55;
+		write_data[3] = 0x3F;
+		is_ois_set_reg_multi(client, R_OIS_CMD_ANGLE_COMP5, write_data, 4);
+	}
+//#endif
 
 #ifdef USE_OIS_SLEEP_MODE
 	/* if camera is already started, skip VDIS setting */

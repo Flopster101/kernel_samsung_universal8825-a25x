@@ -963,23 +963,25 @@ void is_sensor_ctl_frame_evt(struct is_device_sensor *device)
 			}
 
 #ifdef USE_OIS_HALL_DATA_FOR_VDIS
-			cur_frame_duration = is_sensor_convert_ns_to_us(sensor_peri->cis.cur_sensor_uctrl.frameDuration);
-			/* in case of under 60fps, enable ois hall data */
-			if (cur_frame_duration >= 16666) {
-				if(cur_frame_duration == 16666) /* in case of 60fps - fix frame index error*/
-					dm_index[2] = (applied_frame_number + 1) % EXPECT_DM_NUM;
+			if (mcd_use_ois_hall_data_for_vdis) {
+				cur_frame_duration = is_sensor_convert_ns_to_us(sensor_peri->cis.cur_sensor_uctrl.frameDuration);
+				/* in case of under 60fps, enable ois hall data */
+				if (cur_frame_duration >= 16666) {
+					if(cur_frame_duration == 16666) /* in case of 60fps - fix frame index error*/
+						dm_index[2] = (applied_frame_number + 1) % EXPECT_DM_NUM;
 
-				memset(&hall_data, 0, sizeof(hall_data));
-				ret = CALL_OISOPS(sensor_peri->mcu->ois, ois_get_hall_data, sensor_peri->subdev_mcu, &hall_data);
-				if (ret < 0) {
-					err("[SEN:%d] v4l2_subdev_call(ois_get_hall_data) is fail(%d)", ret);
-					goto p_err;
+					memset(&hall_data, 0, sizeof(hall_data));
+					ret = CALL_OISOPS(sensor_peri->mcu->ois, ois_get_hall_data, sensor_peri->subdev_mcu, &hall_data);
+					if (ret < 0) {
+						err("[SEN:%d] v4l2_subdev_call(ois_get_hall_data) is fail(%d)", ret);
+						goto p_err;
+					}
+
+					hashkey = module_ctl->sensor_frame_number % IS_TIMESTAMP_HASH_KEY;
+					timestamp = device->timestampboot[hashkey];
+					hall_data.readTimeStamp = timestamp;
+					is_sensor_ctl_update_hall_data(device, module_ctl, dm_index, &hall_data);
 				}
-
-				hashkey = module_ctl->sensor_frame_number % IS_TIMESTAMP_HASH_KEY;
-				timestamp = device->timestampboot[hashkey];
-				hall_data.readTimeStamp = timestamp;
-				is_sensor_ctl_update_hall_data(device, module_ctl, dm_index, &hall_data);
 			}
 #endif
 		}

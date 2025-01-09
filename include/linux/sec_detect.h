@@ -37,6 +37,24 @@ extern bool sec_needs_decon;
 extern bool sec_needs_blic;
 extern bool sec_doze;
 
+// Camera params
+extern bool mcd_disable_dual_sync;
+extern bool mcd_camera_rear_dual_cal;
+extern bool mcd_use_leds_flash_charging_voltage_control;
+extern bool mcd_use_camera_adaptive_mipi;
+extern bool mcd_use_imx258_13mp_full_size;
+extern bool mcd_apply_mirror_vertical_flip;
+extern bool mcd_simplify_ois_init;
+extern bool mcd_camera_front_fixed_focus;
+extern bool mcd_modify_cal_map_for_swremosaic_lib;
+extern bool mcd_front_otprom_eeprom;
+extern bool mcd_camera_uwide_dualized;
+extern bool mcd_read_dual_cal_firmware_data;
+extern bool mcd_config_camera_eeprom_dualized;
+extern bool mcd_config_check_hw_version_for_mcu_fw_upload;
+extern bool mcd_use_camera_act_driver_soft_landing;
+extern bool mcd_use_ois_hall_data_for_vdis;
+
 #ifdef CONFIG_SEC_DETECT_SYSFS
 extern char sec_current_device_name[32];
 #endif
