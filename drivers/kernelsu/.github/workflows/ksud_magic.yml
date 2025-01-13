@@ -1,4 +1,4 @@
-name: Build ksud
+name: Build ksud_magic
 on:
   workflow_call:
     inputs:
@@ -31,7 +31,7 @@ jobs:
     - name: Prepare LKM fies
       if: ${{ inputs.pack_lkm }}
       run: |
-        cp android*-lkm/*_kernelsu.ko ./userspace/ksud/bin/aarch64/
+        cp android*-lkm/*_kernelsu.ko ./userspace/ksud_magic/bin/aarch64/
         
     - name: Setup rustup
       run: |
@@ -40,18 +40,18 @@ jobs:
         rustup target add aarch64-apple-darwin
     - uses: Swatinem/rust-cache@v2
       with:
-        workspaces: userspace/ksud
+        workspaces: userspace/ksud_magic
         cache-targets: false
 
     - name: Install cross
       run: |
         cargo install cross --git https://github.com/cross-rs/cross --rev 66845c1 --force
 
-    - name: Build ksud
-      run: CROSS_NO_WARNINGS=0 cross build --target ${{ inputs.target }} --release --manifest-path ./userspace/ksud/Cargo.toml
+    - name: Build ksud_magic
+      run: CROSS_NO_WARNINGS=0 cross build --target ${{ inputs.target }} --release --manifest-path ./userspace/ksud_magic/Cargo.toml
 
-    - name: Upload ksud artifact
+    - name: Upload ksud_magic artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ksud-${{ inputs.target }}
-        path: userspace/ksud/target/**/release/ksud*
+        name: ksud_magic-${{ inputs.target }}
+        path: userspace/ksud_magic/target/**/release/ksud*

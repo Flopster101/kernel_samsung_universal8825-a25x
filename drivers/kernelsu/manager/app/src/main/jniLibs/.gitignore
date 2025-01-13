@@ -1,2 +1,2 @@
-libksud.so
-libsusfs.so
+libksud_overlayfs.so
+libksud_magic.so
