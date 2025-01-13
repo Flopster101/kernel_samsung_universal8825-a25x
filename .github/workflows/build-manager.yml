@@ -7,7 +7,8 @@ on:
       - '.github/workflows/build-manager.yml'
       - 'manager/**'
       - 'kernel/**'
-      - 'userspace/ksud/**'
+      - 'userspace/ksud_overlayfs**'
+      - 'userspace/ksud_magic/**'
   pull_request:
     branches: [ "next" ]
     paths:
@@ -20,20 +21,32 @@ jobs:
     uses: ./.github/workflows/build-lkm.yml
     secrets: inherit
 
-  build-ksud:
+  build-ksud_overlayfs:
     needs: build-lkm
     strategy:
       matrix:
         include:
           - target: aarch64-linux-android
             os: ubuntu-latest
-    uses: ./.github/workflows/ksud.yml
+    uses: ./.github/workflows/ksud_overlayfs.yml
+    with:
+      target: ${{ matrix.target }}
+      os: ${{ matrix.os }}
+  
+  build-ksud_magic:
+    needs: build-ksud_overlayfs
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            os: ubuntu-latest
+    uses: ./.github/workflows/ksud_magic.yml
     with:
       target: ${{ matrix.target }}
       os: ${{ matrix.os }}
 
   build-manager:
-    needs: build-ksud
+    needs: build-ksud_magic
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,15 +82,26 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Download arm64 ksud
+      - name: Download arm64 ksud_overlayfs
         uses: actions/download-artifact@v4
         with:
-          name: ksud-aarch64-linux-android
-          path: .
-
-      - name: Copy ksud to app jniLibs
+          name: ksud_overlayfs-aarch64-linux-android
+          path: ksud_overlayfs
+        
+      - name: Copy ksud_overlayfs to app jniLibs
         run: |
-          cp -f ../aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud.so
+          cp -f ../ksud_overlayfs/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_overlayfs.so
+      
+      - name: Download arm64 ksud_magic
+        uses: actions/download-artifact@v4
+        with:
+          name: ksud_magic-aarch64-linux-android
+          path: ksud_magic
+        
+      - name: Copy ksud_magic to app jniLibs
+        run: |
+          cp -f ../ksud_magic/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_magic.so
+          
 
       - name: Build with Gradle
         run: |

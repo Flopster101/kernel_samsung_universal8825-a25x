@@ -96,6 +96,7 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.ConfirmResult
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
+import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.DownloadListener
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.download
@@ -120,8 +121,8 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
 
     LaunchedEffect(Unit) {
         if (viewModel.moduleList.isEmpty() || viewModel.isNeedRefresh) {
-            viewModel.sortEnabledFirst = prefs.getBoolean("module_sort_enabled_first", false)
-            viewModel.sortActionFirst = prefs.getBoolean("module_sort_action_first", false)
+            viewModel.sortAToZ = prefs.getBoolean("module_sort_a_to_z", true)
+            viewModel.sortZToA = prefs.getBoolean("module_sort_z_to_a", false)
             viewModel.fetchModuleList()
         }
     }
@@ -152,43 +153,51 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                             imageVector = Icons.Filled.MoreVert,
                             contentDescription = stringResource(id = R.string.settings)
                         )
-                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                            showDropdown = false
-                        }) {
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.module_sort_action_first))
-                            }, trailingIcon = {
-                                Checkbox(viewModel.sortActionFirst, null)
-                            }, onClick = {
-                                viewModel.sortActionFirst =
-                                    !viewModel.sortActionFirst
-                                prefs.edit()
-                                    .putBoolean(
-                                        "module_sort_action_first",
-                                        viewModel.sortActionFirst
-                                    )
-                                    .apply()
-                                scope.launch {
-                                    viewModel.fetchModuleList()
+                        DropdownMenu(
+                            expanded = showDropdown,
+                            onDismissRequest = {
+                                showDropdown = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.module_sort_a_to_z))
+                                },
+                                trailingIcon = {
+                                    Checkbox(checked = viewModel.sortAToZ, onCheckedChange = null)
+                                },
+                                onClick = {
+                                    viewModel.sortAToZ = !viewModel.sortAToZ
+                                    viewModel.sortZToA = false
+                                    prefs.edit()
+                                        .putBoolean("module_sort_a_to_z", viewModel.sortAToZ)
+                                        .putBoolean("module_sort_z_to_a", false)
+                                        .apply()
+                                    scope.launch {
+                                        viewModel.fetchModuleList()
+                                    }
                                 }
-                            })
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.module_sort_enabled_first))
-                            }, trailingIcon = {
-                                Checkbox(viewModel.sortEnabledFirst, null)
-                            }, onClick = {
-                                viewModel.sortEnabledFirst =
-                                    !viewModel.sortEnabledFirst
-                                prefs.edit()
-                                    .putBoolean(
-                                        "module_sort_enabled_first",
-                                        viewModel.sortEnabledFirst
-                                    )
-                                    .apply()
-                                scope.launch {
-                                    viewModel.fetchModuleList()
+                            )
+
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.module_sort_z_to_a))
+                                },
+                                trailingIcon = {
+                                    Checkbox(checked = viewModel.sortZToA, onCheckedChange = null)
+                                },
+                                onClick = {
+                                    viewModel.sortZToA = !viewModel.sortZToA
+                                    viewModel.sortAToZ = false
+                                    prefs.edit()
+                                        .putBoolean("module_sort_z_to_a", viewModel.sortZToA)
+                                        .putBoolean("module_sort_a_to_z", false)
+                                        .apply()
+                                    scope.launch {
+                                        viewModel.fetchModuleList()
+                                    }
                                 }
-                            })
+                            )
                         }
                     }
                 },
@@ -232,8 +241,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
     ) { innerPadding ->
         // confirmation dialog
         if (showConfirmDialog && zipUri != null) {
-            // extract the module name from the zipUri
-            val moduleName = zipUri?.lastPathSegment?.substringAfterLast('/') ?: "Unknown Module"
+            val moduleName = getFileName(context, zipUri!!)
 
             AlertDialog(
                 onDismissRequest = { showConfirmDialog = false },
@@ -243,7 +251,6 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(FlashScreenDestination(FlashIt.FlashModule(zipUri!!)))
 
                         viewModel.markNeedRefresh()
-
                     }) {
                         Text(stringResource(R.string.confirm))
                     }
@@ -253,14 +260,15 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         Text(stringResource(android.R.string.cancel))
                     }
                 },
-                title = { Text(stringResource(R.string.confirm_module_installation)) },
-                text = { 
+                title = { Text(stringResource(R.string.module)) },
+                text = {
                     Text(
                         stringResource(R.string.module_install_prompt_with_name, moduleName)
-                    ) 
+                    )
                 }
             )
         }
+
 
         when {
             hasMagisk -> {
@@ -489,7 +497,7 @@ private fun ModuleList(
             },
         ) {
             when {
-                !viewModel.isDummy -> {
+                !viewModel.isOverlayAvailable -> {
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize(),
@@ -574,7 +582,7 @@ private fun ModuleList(
                                 }
                             },
                             onClick = {
-                                onClickModule(it.id, it.name, it.hasWebUi)
+                                onClickModule(it.dirId, it.name, it.hasWebUi)
                             }
                         )
 
