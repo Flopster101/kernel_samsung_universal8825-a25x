@@ -24,10 +24,6 @@
 #include "internal.h"
 #include "mount.h"
 
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-extern void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *stat);
-#endif
-
 /**
  * generic_fillattr - Fill in the basic attributes from the inode struct
  * @inode: Inode to use as the source
@@ -39,16 +35,6 @@ extern void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *
  */
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-	if (unlikely(inode->i_state & 67108864)) {
-		susfs_sus_ino_for_generic_fillattr(inode->i_ino, stat);
-		stat->mode = inode->i_mode;
-		stat->rdev = inode->i_rdev;
-		stat->uid = inode->i_uid;
-		stat->gid = inode->i_gid;
-		return;
-	}
-#endif
 	stat->dev = inode->i_sb->s_dev;
 	stat->ino = inode->i_ino;
 	stat->mode = inode->i_mode;
@@ -189,7 +175,6 @@ extern int ksu_handle_stat(int *dfd, const char __user **filename_user, int *fla
  *
  * 0 will be returned on success, and a -ve error code if unsuccessful.
  */
-
 static int vfs_statx(int dfd, const char __user *filename, int flags,
 	      struct kstat *stat, u32 request_mask)
 {
