@@ -37,15 +37,15 @@
 
 /*
  * inode->i_state => storing flag 'INODE_STATE_'
- * mount->mnt.android_kabi_reserved4 => storing original mnt_id
- * task_struct->android_kabi_reserved8 => storing last valid fake mnt_id
- * task_struct->android_kabi_reserved7 => storing flag 'TASK_STRUCT_KABI'
+ * mount->mnt.susfs_orig_mnt_id => storing original mnt_id
+ * task_struct->susfs_last_fake_mnt_id => storing last valid fake mnt_id
+ * task_struct->susfs_task_state => storing flag 'TASK_STRUCT_KABI'
  */
 
-#define INODE_STATE_SUS_PATH 16777216 // 1 << 24
-#define INODE_STATE_SUS_MOUNT 33554432 // 1 << 25
-#define INODE_STATE_SUS_KSTAT 67108864 // 1 << 26
-#define INODE_STATE_OPEN_REDIRECT 134217728 // 1 << 27
+#define INODE_STATE_SUS_PATH BIT(24)
+#define INODE_STATE_SUS_MOUNT BIT(25)
+#define INODE_STATE_SUS_KSTAT BIT(26)
+#define INODE_STATE_OPEN_REDIRECT BIT(27)
 
 #define TASK_STRUCT_NON_ROOT_USER_APP_PROC BIT(24)
 
