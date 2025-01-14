@@ -11,13 +11,13 @@
 
 //IMX258ES1_SEC(0ATH5)_26MHz_Mirror-Flip_RegisterSetting_ver1.00-0.23_210201.xlsx
 
-#ifndef IS_CIS_IMX258_SET_A_H
-#define IS_CIS_IMX258_SET_A_H
+#ifndef IS_CIS_IMX258FULL_SET_A_H
+#define IS_CIS_IMX258FULL_SET_A_H
 
 #include "is-cis.h"
 #include "is-cis-imx258.h"
 
-const u32 sensor_imx258_setfile_A_Global[] = {
+const u32 sensor_imx258full_setfile_A_Global[] = {
 	// Init External Clock Setting
 	0x0136, 0x1A, 0x01,
 	0x0137, 0x00, 0x01,
@@ -258,7 +258,7 @@ const u32 sensor_imx258_setfile_A_Global[] = {
 };
 
 /* 4:3, 16x10 margin */
-const u32 sensor_imx258_setfile_A_4128x3096_30fps[] = {
+const u32 sensor_imx258full_setfile_A_4128x3096_30fps[] = {
 	// Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -369,7 +369,7 @@ const u32 sensor_imx258_setfile_A_4128x3096_30fps[] = {
 	0x0B06, 0x00, 0x01,
 };
 
-const u32 sensor_imx258_setfile_A_4128x2324_30fps[] = {
+const u32 sensor_imx258full_setfile_A_4128x2324_30fps[] = {
 	// Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -481,7 +481,7 @@ const u32 sensor_imx258_setfile_A_4128x2324_30fps[] = {
 };
 
 /* 4:3, 16x10 margin */
-const u32 sensor_imx258_setfile_A_3408x2556_30fps[] = {
+const u32 sensor_imx258full_setfile_A_3408x2556_30fps[] = {
 	// Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -592,7 +592,7 @@ const u32 sensor_imx258_setfile_A_3408x2556_30fps[] = {
 	0x0B06, 0x00, 0x01,
 };
 
-const u32 sensor_imx258_setfile_A_3712x2556_30fps[] = {
+const u32 sensor_imx258full_setfile_A_3712x2556_30fps[] = {
 	// Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -703,7 +703,7 @@ const u32 sensor_imx258_setfile_A_3712x2556_30fps[] = {
 	0x0B06, 0x00, 0x01,
 };
 
-const u32 sensor_imx258_setfile_A_1028x772_60fps[] = {
+const u32 sensor_imx258full_setfile_A_1028x772_60fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -850,23 +850,23 @@ const struct sensor_pll_info_compact sensor_imx258_pllinfo_A_1028x772_60fps = {
 	5352,                        /* line_length_pck */
 };
 
-static const u32 *sensor_imx258_setfiles_A[] = {
-	sensor_imx258_setfile_A_4128x3096_30fps,
-	sensor_imx258_setfile_A_4128x2324_30fps,
-	sensor_imx258_setfile_A_3408x2556_30fps,
-	sensor_imx258_setfile_A_3712x2556_30fps,
-	sensor_imx258_setfile_A_1028x772_60fps,
+static const u32 *sensor_imx258full_setfiles_A[] = {
+	sensor_imx258full_setfile_A_4128x3096_30fps,
+	sensor_imx258full_setfile_A_4128x2324_30fps,
+	sensor_imx258full_setfile_A_3408x2556_30fps,
+	sensor_imx258full_setfile_A_3712x2556_30fps,
+	sensor_imx258full_setfile_A_1028x772_60fps,
 };
 
-static const u32 sensor_imx258_setfile_A_sizes[] = {
-	ARRAY_SIZE(sensor_imx258_setfile_A_4128x3096_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_4128x2324_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_3408x2556_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_3712x2556_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_1028x772_60fps),
+static const u32 sensor_imx258full_setfile_A_sizes[] = {
+	ARRAY_SIZE(sensor_imx258full_setfile_A_4128x3096_30fps),
+	ARRAY_SIZE(sensor_imx258full_setfile_A_4128x2324_30fps),
+	ARRAY_SIZE(sensor_imx258full_setfile_A_3408x2556_30fps),
+	ARRAY_SIZE(sensor_imx258full_setfile_A_3712x2556_30fps),
+	ARRAY_SIZE(sensor_imx258full_setfile_A_1028x772_60fps),
 };
 
-static const struct sensor_pll_info_compact *sensor_imx258_pllinfos_A[] = {
+static const struct sensor_pll_info_compact *sensor_imx258full_pllinfos_A[] = {
 	&sensor_imx258_pllinfo_A_4128x3096_30fps,
 	&sensor_imx258_pllinfo_A_4128x2324_30fps,
 	&sensor_imx258_pllinfo_A_3712x2556_30fps,
@@ -874,10 +874,10 @@ static const struct sensor_pll_info_compact *sensor_imx258_pllinfos_A[] = {
 	&sensor_imx258_pllinfo_A_1028x772_60fps,
 };
 
-static const struct cam_mipi_sensor_mode sensor_imx258_setfile_A_mipi_sensor_mode[] = {
+static const struct cam_mipi_sensor_mode sensor_imx258full_setfile_A_mipi_sensor_mode[] = {
 };
 
-const int sensor_imx258_setfile_A_verify_sensor_mode[] = {
+const int sensor_imx258full_setfile_A_verify_sensor_mode[] = {
 };
 
 #endif
