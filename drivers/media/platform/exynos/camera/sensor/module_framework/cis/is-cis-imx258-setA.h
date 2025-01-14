@@ -17,7 +17,7 @@
 #include "is-cis.h"
 #include "is-cis-imx258.h"
 
-const u32 sensor_imx258_setfile_A_Global[] = {
+const u32 sensor_imx258nofull_setfile_A_Global[] = {
 	0x0136, 0x1A, 0x01,
 	0x0137, 0x00, 0x01,
 	0x3051, 0x00, 0x01,
@@ -254,7 +254,7 @@ const u32 sensor_imx258_setfile_A_Global[] = {
 };
 
 /* A-1 */
-const u32 sensor_imx258_setfile_A_4000x3000_30fps[] = {
+const u32 sensor_imx258nofull_setfile_A_4000x3000_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -345,7 +345,7 @@ const u32 sensor_imx258_setfile_A_4000x3000_30fps[] = {
 };
 
 /* J-1 */
-const u32 sensor_imx258_setfile_A_2000x1500_60fps[] = {
+const u32 sensor_imx258nofull_setfile_A_2000x1500_60fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -450,7 +450,7 @@ const u32 sensor_imx258_setfile_A_2000x1500_60fps[] = {
 };
 
 /* K-1 */
-const u32 sensor_imx258_setfile_A_2000x1128_60fps[] = {
+const u32 sensor_imx258nofull_setfile_A_2000x1128_60fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -555,7 +555,7 @@ const u32 sensor_imx258_setfile_A_2000x1128_60fps[] = {
 };
 
 /* M-1 */
-const u32 sensor_imx258_setfile_A_1000x750_120fps[] = {
+const u32 sensor_imx258nofull_setfile_A_1000x750_120fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -660,7 +660,7 @@ const u32 sensor_imx258_setfile_A_1000x750_120fps[] = {
 };
 
 /* B-1 */
-const u32 sensor_imx258_setfile_A_4000x2256_30fps[] = {
+const u32 sensor_imx258nofull_setfile_A_4000x2256_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -751,7 +751,7 @@ const u32 sensor_imx258_setfile_A_4000x2256_30fps[] = {
 };
 
 /* P-1 */
-const u32 sensor_imx258_setfile_A_2800x2100_30fps[] = {
+const u32 sensor_imx258nofull_setfile_A_2800x2100_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -888,25 +888,25 @@ const struct sensor_pll_info_compact sensor_imx258_pllinfo_A_2800x2100_30fps = {
 	3236,				/* frame_length_lines */
 	5352,				/* line_length_pck */
 };
-static const u32 *sensor_imx258_setfiles_A[] = {
-	sensor_imx258_setfile_A_4000x3000_30fps,
-	sensor_imx258_setfile_A_4000x2256_30fps,
-	sensor_imx258_setfile_A_2000x1128_60fps,
-	sensor_imx258_setfile_A_2000x1500_60fps,
-	sensor_imx258_setfile_A_1000x750_120fps,
-	sensor_imx258_setfile_A_2800x2100_30fps,
+static const u32 *sensor_imx258nofull_setfiles_A[] = {
+	sensor_imx258nofull_setfile_A_4000x3000_30fps,
+	sensor_imx258nofull_setfile_A_4000x2256_30fps,
+	sensor_imx258nofull_setfile_A_2000x1128_60fps,
+	sensor_imx258nofull_setfile_A_2000x1500_60fps,
+	sensor_imx258nofull_setfile_A_1000x750_120fps,
+	sensor_imx258nofull_setfile_A_2800x2100_30fps,
 };
 
-static const u32 sensor_imx258_setfile_A_sizes[] = {
-	ARRAY_SIZE(sensor_imx258_setfile_A_4000x3000_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_4000x2256_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_2000x1128_60fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_2000x1500_60fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_1000x750_120fps),
-	ARRAY_SIZE(sensor_imx258_setfile_A_2800x2100_30fps),
+static const u32 sensor_imx258nofull_setfile_A_sizes[] = {
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_4000x3000_30fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_4000x2256_30fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_2000x1128_60fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_2000x1500_60fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_1000x750_120fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_A_2800x2100_30fps),
 };
 
-static const struct sensor_pll_info_compact *sensor_imx258_pllinfos_A[] = {
+static const struct sensor_pll_info_compact *sensor_imx258nofull_pllinfos_A[] = {
 	&sensor_imx258_pllinfo_A_4000x3000_30fps,
 	&sensor_imx258_pllinfo_A_4000x2256_30fps,
 	&sensor_imx258_pllinfo_A_2000x1128_60fps,
@@ -924,35 +924,35 @@ enum {
 	CAM_IMX258_SET_A_all_632p667_MHZ = 3,
 };
 
-static const u32 sensor_imx258_setfile_A_mipi_all_554_mhz[] = {
+static const u32 sensor_imx258nofull_setfile_A_mipi_all_554_mhz[] = {
 	0x030F, 0x80, 0x01,
 };
 
-static const u32 sensor_imx258_setfile_A_mipi_all_585_mhz[] = {
+static const u32 sensor_imx258nofull_setfile_A_mipi_all_585_mhz[] = {
 	0x030F, 0x87, 0x01,
 };
 
-static const u32 sensor_imx258_setfile_A_mipi_all_619_mhz[] = {
+static const u32 sensor_imx258nofull_setfile_A_mipi_all_619_mhz[] = {
 	0x030F, 0x8F, 0x01,
 };
 
-static const u32 sensor_imx258_setfile_A_mipi_all_632_mhz[] = {
+static const u32 sensor_imx258nofull_setfile_A_mipi_all_632_mhz[] = {
 	0x030F, 0x92, 0x01,
 };
 
-static const struct cam_mipi_setting sensor_imx258_setfile_A_mipi_setting_all[] = {
+static const struct cam_mipi_setting sensor_imx258nofull_setfile_A_mipi_setting_all[] = {
 	{ "554p667 MHz", 1109,
-	  sensor_imx258_setfile_A_mipi_all_554_mhz, ARRAY_SIZE(sensor_imx258_setfile_A_mipi_all_554_mhz) },
+	  sensor_imx258nofull_setfile_A_mipi_all_554_mhz, ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_all_554_mhz) },
 	{ "585 MHz", 1170,
-	  sensor_imx258_setfile_A_mipi_all_585_mhz, ARRAY_SIZE(sensor_imx258_setfile_A_mipi_all_585_mhz) },
+	  sensor_imx258nofull_setfile_A_mipi_all_585_mhz, ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_all_585_mhz) },
 	{ "619p667 MHz", 1239,
-	  sensor_imx258_setfile_A_mipi_all_619_mhz, ARRAY_SIZE(sensor_imx258_setfile_A_mipi_all_619_mhz) },
+	  sensor_imx258nofull_setfile_A_mipi_all_619_mhz, ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_all_619_mhz) },
 	{ "632p667 MHz", 1265,
-	  sensor_imx258_setfile_A_mipi_all_632_mhz, ARRAY_SIZE(sensor_imx258_setfile_A_mipi_all_632_mhz) },
+	  sensor_imx258nofull_setfile_A_mipi_all_632_mhz, ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_all_632_mhz) },
 };
 
 /* must be sorted. if not, trigger panic in fimc_is_vendor_verify_mipi_channel */
-static const struct cam_mipi_channel sensor_imx258_setfile_A_mipi_channel_all[] = {
+static const struct cam_mipi_channel sensor_imx258nofull_setfile_A_mipi_channel_all[] = {
 	{ CAM_RAT_BAND(CAM_RAT_1_GSM, CAM_BAND_001_GSM_GSM850), 0, 0, CAM_IMX258_SET_A_all_632p667_MHZ },
 	{ CAM_RAT_BAND(CAM_RAT_1_GSM, CAM_BAND_002_GSM_EGSM900), 0, 0, CAM_IMX258_SET_A_all_585_MHZ },
 	{ CAM_RAT_BAND(CAM_RAT_1_GSM, CAM_BAND_003_GSM_DCS1800), 0, 0, CAM_IMX258_SET_A_all_632p667_MHZ },
@@ -1259,36 +1259,36 @@ static const struct cam_mipi_channel sensor_imx258_setfile_A_mipi_channel_all[] 
 	{ CAM_RAT_BAND(CAM_RAT_7_NR5G, CAM_BAND_326_NR5G_N071), 129961, 130380, CAM_IMX258_SET_A_all_554p667_MHZ },
 };
 
-static const struct cam_mipi_sensor_mode sensor_imx258_setfile_A_mipi_sensor_mode[] = {
+static const struct cam_mipi_sensor_mode sensor_imx258nofull_setfile_A_mipi_sensor_mode[] = {
 	{ SENSOR_IMX258_4000X3000_30FPS,
-		sensor_imx258_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_channel_all),
-		sensor_imx258_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_setting_all)
+		sensor_imx258nofull_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_channel_all),
+		sensor_imx258nofull_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_setting_all)
 	},
 	{ SENSOR_IMX258_4000X2252_30FPS,
-		sensor_imx258_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_channel_all),
-		sensor_imx258_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_setting_all)
+		sensor_imx258nofull_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_channel_all),
+		sensor_imx258nofull_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_setting_all)
 	},
 	{ SENSOR_IMX258_2000X1128_60FPS,
-		sensor_imx258_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_channel_all),
-		sensor_imx258_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_setting_all)
+		sensor_imx258nofull_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_channel_all),
+		sensor_imx258nofull_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_setting_all)
 	},
 	{ SENSOR_IMX258_2000X1500_60FPS,
-		sensor_imx258_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_channel_all),
-		sensor_imx258_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_setting_all)
+		sensor_imx258nofull_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_channel_all),
+		sensor_imx258nofull_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_setting_all)
 	},
 	{ SENSOR_IMX258_1000X750_120FPS,
 		NULL, 0,
 		NULL, 0
 	},
 	{ SENSOR_IMX258_2800X2100_30FPS,
-		sensor_imx258_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_channel_all),
-		sensor_imx258_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258_setfile_A_mipi_setting_all)
+		sensor_imx258nofull_setfile_A_mipi_channel_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_channel_all),
+		sensor_imx258nofull_setfile_A_mipi_setting_all,	ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_setting_all)
 	},
 };
 
 /* structure for only verifying channel list. to prevent redundant checking */
-const int sensor_imx258_setfile_A_verify_sensor_mode[] = {
-	SENSOR_IMX258_4000X3000_30FPS, /* sensor_imx258_setfile_A_mipi_channel_all */
+const int sensor_imx258nofull_setfile_A_verify_sensor_mode[] = {
+	SENSOR_IMX258_4000X3000_30FPS, /* sensor_imx258nofull_setfile_A_mipi_channel_all */
 };
 
 #endif
