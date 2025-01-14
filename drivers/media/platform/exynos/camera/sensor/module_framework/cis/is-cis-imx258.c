@@ -37,14 +37,13 @@
 #include "is-resourcemgr.h"
 #include "is-dt.h"
 #include "is-cis-imx258.h"
-// VERY SUSPICIOUS
-#if defined(USE_IMX258_13MP_FULL_SIZE)
+//#if defined(USE_IMX258_13MP_FULL_SIZE)
 #include "is-cis-imx258-13M-full-setA.h"
 #include "is-cis-imx258-13M-full-setB.h"
-#else
+//#else
 #include "is-cis-imx258-setA.h"
 #include "is-cis-imx258-setB.h"
-#endif
+//#endif
 
 #include "is-helper-i2c.h"
 
@@ -1643,39 +1642,76 @@ static int cis_imx258_probe(struct i2c_client *client,
 		setfile = "default";
 	}
 
-	if (strcmp(setfile, "default") == 0 ||
-			strcmp(setfile, "setA") == 0) {
-		probe_info("%s setfile_A\n", __func__);
-		sensor_imx258_global = sensor_imx258_setfile_A_Global;
-		sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258_setfile_A_Global);
-		sensor_imx258_setfiles = sensor_imx258_setfiles_A;
-		sensor_imx258_setfile_sizes = sensor_imx258_setfile_A_sizes;
-		sensor_imx258_pllinfos = sensor_imx258_pllinfos_A;
-		sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258_setfiles_A);
-		cis->mipi_sensor_mode = sensor_imx258_setfile_A_mipi_sensor_mode;
-		cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258_setfile_A_mipi_sensor_mode);
-		verify_sensor_mode = sensor_imx258_setfile_A_verify_sensor_mode;
-		verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258_setfile_A_verify_sensor_mode);
-	} else if (strcmp(setfile, "setB") == 0) {
-		probe_info("%s setfile_B\n", __func__);
-		sensor_imx258_global = sensor_imx258_setfile_B_Global;
-		sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258_setfile_B_Global);
-		sensor_imx258_setfiles = sensor_imx258_setfiles_B;
-		sensor_imx258_setfile_sizes = sensor_imx258_setfile_B_sizes;
-		sensor_imx258_pllinfos = sensor_imx258_pllinfos_B;
-		sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258_setfiles_B);
+	if (mcd_use_imx258_13mp_full_size) {
+		if (strcmp(setfile, "default") == 0 ||
+				strcmp(setfile, "setA") == 0) {
+			probe_info("%s setfile_A\n", __func__);
+			sensor_imx258_global = sensor_imx258full_setfile_A_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258full_setfile_A_Global);
+			sensor_imx258_setfiles = sensor_imx258full_setfiles_A;
+			sensor_imx258_setfile_sizes = sensor_imx258full_setfile_A_sizes;
+			sensor_imx258_pllinfos = sensor_imx258full_pllinfos_A;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258full_setfiles_A);
+			cis->mipi_sensor_mode = sensor_imx258full_setfile_A_mipi_sensor_mode;
+			cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258full_setfile_A_mipi_sensor_mode);
+			verify_sensor_mode = sensor_imx258full_setfile_A_verify_sensor_mode;
+			verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258full_setfile_A_verify_sensor_mode);
+		} else if (strcmp(setfile, "setB") == 0) {
+			probe_info("%s setfile_B\n", __func__);
+			sensor_imx258_global = sensor_imx258full_setfile_B_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258full_setfile_B_Global);
+			sensor_imx258_setfiles = sensor_imx258full_setfiles_B;
+			sensor_imx258_setfile_sizes = sensor_imx258full_setfile_B_sizes;
+			sensor_imx258_pllinfos = sensor_imx258full_pllinfos_B;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258full_setfiles_B);
+		} else {
+			err("%s setfile index out of bound, take default (setfile_A)", __func__);
+			sensor_imx258_global = sensor_imx258full_setfile_A_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258full_setfile_A_Global);
+			sensor_imx258_setfiles = sensor_imx258full_setfiles_A;
+			sensor_imx258_setfile_sizes = sensor_imx258full_setfile_A_sizes;
+			sensor_imx258_pllinfos = sensor_imx258full_pllinfos_A;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258full_setfiles_A);
+			cis->mipi_sensor_mode = sensor_imx258full_setfile_A_mipi_sensor_mode;
+			cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258full_setfile_A_mipi_sensor_mode);
+			verify_sensor_mode = sensor_imx258full_setfile_A_verify_sensor_mode;
+			verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258full_setfile_A_verify_sensor_mode);
+		}
 	} else {
-		err("%s setfile index out of bound, take default (setfile_A)", __func__);
-		sensor_imx258_global = sensor_imx258_setfile_A_Global;
-		sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258_setfile_A_Global);
-		sensor_imx258_setfiles = sensor_imx258_setfiles_A;
-		sensor_imx258_setfile_sizes = sensor_imx258_setfile_A_sizes;
-		sensor_imx258_pllinfos = sensor_imx258_pllinfos_A;
-		sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258_setfiles_A);
-		cis->mipi_sensor_mode = sensor_imx258_setfile_A_mipi_sensor_mode;
-		cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258_setfile_A_mipi_sensor_mode);
-		verify_sensor_mode = sensor_imx258_setfile_A_verify_sensor_mode;
-		verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258_setfile_A_verify_sensor_mode);
+		if (strcmp(setfile, "default") == 0 ||
+				strcmp(setfile, "setA") == 0) {
+			probe_info("%s setfile_A\n", __func__);
+			sensor_imx258_global = sensor_imx258nofull_setfile_A_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_Global);
+			sensor_imx258_setfiles = sensor_imx258nofull_setfiles_A;
+			sensor_imx258_setfile_sizes = sensor_imx258nofull_setfile_A_sizes;
+			sensor_imx258_pllinfos = sensor_imx258nofull_pllinfos_A;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258nofull_setfiles_A);
+			cis->mipi_sensor_mode = sensor_imx258nofull_setfile_A_mipi_sensor_mode;
+			cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_sensor_mode);
+			verify_sensor_mode = sensor_imx258nofull_setfile_A_verify_sensor_mode;
+			verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_verify_sensor_mode);
+		} else if (strcmp(setfile, "setB") == 0) {
+			probe_info("%s setfile_B\n", __func__);
+			sensor_imx258_global = sensor_imx258nofull_setfile_B_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258nofull_setfile_B_Global);
+			sensor_imx258_setfiles = sensor_imx258nofull_setfiles_B;
+			sensor_imx258_setfile_sizes = sensor_imx258nofull_setfile_B_sizes;
+			sensor_imx258_pllinfos = sensor_imx258nofull_pllinfos_B;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258nofull_setfiles_B);
+		} else {
+			err("%s setfile index out of bound, take default (setfile_A)", __func__);
+			sensor_imx258_global = sensor_imx258nofull_setfile_A_Global;
+			sensor_imx258_global_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_Global);
+			sensor_imx258_setfiles = sensor_imx258nofull_setfiles_A;
+			sensor_imx258_setfile_sizes = sensor_imx258nofull_setfile_A_sizes;
+			sensor_imx258_pllinfos = sensor_imx258nofull_pllinfos_A;
+			sensor_imx258_max_setfile_num = ARRAY_SIZE(sensor_imx258nofull_setfiles_A);
+			cis->mipi_sensor_mode = sensor_imx258nofull_setfile_A_mipi_sensor_mode;
+			cis->mipi_sensor_mode_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_mipi_sensor_mode);
+			verify_sensor_mode = sensor_imx258nofull_setfile_A_verify_sensor_mode;
+			verify_sensor_mode_size = ARRAY_SIZE(sensor_imx258nofull_setfile_A_verify_sensor_mode);
+		}
 	}
 
 	if (cis->vendor_use_adaptive_mipi) {

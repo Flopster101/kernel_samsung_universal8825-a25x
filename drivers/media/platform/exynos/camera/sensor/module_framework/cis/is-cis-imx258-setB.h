@@ -17,7 +17,7 @@
 #include "is-cis.h"
 #include "is-cis-imx258.h"
 
-const u32 sensor_imx258_setfile_B_Global[] = {
+const u32 sensor_imx258nofull_setfile_B_Global[] = {
 	0x0136, 0x1A, 0x01,
 	0x0137, 0x00, 0x01,
 	0x3051, 0x00, 0x01,
@@ -254,7 +254,7 @@ const u32 sensor_imx258_setfile_B_Global[] = {
 };
 
 /* A-1 */
-const u32 sensor_imx258_setfile_B_4000x3000_30fps[] = {
+const u32 sensor_imx258nofull_setfile_B_4000x3000_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -345,7 +345,7 @@ const u32 sensor_imx258_setfile_B_4000x3000_30fps[] = {
 };
 
 /* J-1 */
-const u32 sensor_imx258_setfile_B_2000x1500_60fps[] = {
+const u32 sensor_imx258nofull_setfile_B_2000x1500_60fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -450,7 +450,7 @@ const u32 sensor_imx258_setfile_B_2000x1500_60fps[] = {
 };
 
 /* K-1 */
-const u32 sensor_imx258_setfile_B_2000x1128_60fps[] = {
+const u32 sensor_imx258nofull_setfile_B_2000x1128_60fps[] = {
 //Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -555,7 +555,7 @@ const u32 sensor_imx258_setfile_B_2000x1128_60fps[] = {
 };
 
 /* M-1 */
-const u32 sensor_imx258_setfile_B_1000x750_120fps[] = {
+const u32 sensor_imx258nofull_setfile_B_1000x750_120fps[] = {
 	//Output format Setting
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
@@ -660,7 +660,7 @@ const u32 sensor_imx258_setfile_B_1000x750_120fps[] = {
 };
 
 /* B-1 */
-const u32 sensor_imx258_setfile_B_4000x2256_30fps[] = {
+const u32 sensor_imx258nofull_setfile_B_4000x2256_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -751,7 +751,7 @@ const u32 sensor_imx258_setfile_B_4000x2256_30fps[] = {
 };
 
 /* P-1 */
-const u32 sensor_imx258_setfile_B_2800x2100_30fps[] = {
+const u32 sensor_imx258nofull_setfile_B_2800x2100_30fps[] = {
 	0x0112, 0x0A, 0x01,
 	0x0113, 0x0A, 0x01,
 	0x0114, 0x03, 0x01,
@@ -889,25 +889,25 @@ const struct sensor_pll_info_compact sensor_imx258_pllinfo_B_2800x2100_30fps = {
 	5352,				/* line_length_pck */
 };
 
-static const u32 *sensor_imx258_setfiles_B[] = {
-	sensor_imx258_setfile_B_4000x3000_30fps,
-	sensor_imx258_setfile_B_4000x2256_30fps,
-	sensor_imx258_setfile_B_2000x1128_60fps,
-	sensor_imx258_setfile_B_2000x1500_60fps,
-	sensor_imx258_setfile_B_1000x750_120fps,
-	sensor_imx258_setfile_B_2800x2100_30fps,
+static const u32 *sensor_imx258nofull_setfiles_B[] = {
+	sensor_imx258nofull_setfile_B_4000x3000_30fps,
+	sensor_imx258nofull_setfile_B_4000x2256_30fps,
+	sensor_imx258nofull_setfile_B_2000x1128_60fps,
+	sensor_imx258nofull_setfile_B_2000x1500_60fps,
+	sensor_imx258nofull_setfile_B_1000x750_120fps,
+	sensor_imx258nofull_setfile_B_2800x2100_30fps,
 };
 
-static const u32 sensor_imx258_setfile_B_sizes[] = {
-	ARRAY_SIZE(sensor_imx258_setfile_B_4000x3000_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_B_4000x2256_30fps),
-	ARRAY_SIZE(sensor_imx258_setfile_B_2000x1128_60fps),
-	ARRAY_SIZE(sensor_imx258_setfile_B_2000x1500_60fps),
-	ARRAY_SIZE(sensor_imx258_setfile_B_1000x750_120fps),
-	ARRAY_SIZE(sensor_imx258_setfile_B_2800x2100_30fps),
+static const u32 sensor_imx258nofull_setfile_B_sizes[] = {
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_4000x3000_30fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_4000x2256_30fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_2000x1128_60fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_2000x1500_60fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_1000x750_120fps),
+	ARRAY_SIZE(sensor_imx258nofull_setfile_B_2800x2100_30fps),
 };
 
-static const struct sensor_pll_info_compact *sensor_imx258_pllinfos_B[] = {
+static const struct sensor_pll_info_compact *sensor_imx258nofull_pllinfos_B[] = {
 	&sensor_imx258_pllinfo_B_4000x3000_30fps,
 	&sensor_imx258_pllinfo_B_4000x2256_30fps,
 	&sensor_imx258_pllinfo_B_2000x1128_60fps,
