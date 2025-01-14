@@ -186,6 +186,9 @@ void setup_camera_params(void) {
 		mcd_simplify_ois_init = true;
 		mcd_use_camera_adaptive_mipi = true;
 		mcd_read_dual_cal_firmware_data = true;
+		// Although this option below is not enabled in the stock header, it is required for flash to work in video mode.
+		// The reason for that is unknown.
+		mcd_use_leds_flash_charging_voltage_control = true;
 	}
 
 	if (sec_current_device == SEC_GTA4XLS) {
