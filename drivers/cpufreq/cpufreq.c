@@ -31,6 +31,7 @@
 #include <linux/tick.h>
 #include <trace/events/power.h>
 #include <trace/hooks/cpufreq.h>
+#include <linux/binfmts.h>
 
 static LIST_HEAD(cpufreq_policy_list);
 
@@ -789,6 +790,9 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 {
 	char str_governor[16];
 	int ret;
+
+    if (task_is_booster(current))
+		return -EINVAL;
 
 	ret = sscanf(buf, "%15s", str_governor);
 	if (ret != 1)
