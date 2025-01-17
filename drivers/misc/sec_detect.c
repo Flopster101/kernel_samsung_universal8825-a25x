@@ -28,12 +28,14 @@ char sec_current_device_name[32] = "Unknown";
 bool sec_needs_decon;
 bool sec_needs_blic = false;
 bool sec_doze = false; // Uses Samsung DRM Doze?
+bool sec_lcd_device = false;
 // No device seems to use the STM driver.
 // bool sec_needs_stm = false; // Needs STM drivers?
 EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
 EXPORT_SYMBOL(sec_needs_blic);
 EXPORT_SYMBOL(sec_doze);
+EXPORT_SYMBOL(sec_lcd_device);
 
 // Camera params
 bool mcd_disable_dual_sync = false;
@@ -242,6 +244,7 @@ int sec_detect_init(void) {
 		strncpy(sec_current_device_name, "m33x", sizeof(sec_current_device_name));
 		sec_needs_decon = true;
 		sec_needs_blic = true;
+		sec_lcd_device = true;
 	} else if (strstr(machine_name, "M34") != NULL) {
 		sec_current_device = SEC_M34;
 		strncpy(sec_current_device_name, "m34x", sizeof(sec_current_device_name));
