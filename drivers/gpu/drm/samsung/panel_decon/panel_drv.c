@@ -1595,8 +1595,10 @@ static int panel_prepare(struct panel_device *panel, struct common_panel_info *i
 #endif
 	/* backlight IC table */
 #ifdef CONFIG_MCD_PANEL_BLIC
-	panel_data->blic_data_tbl = info->blic_data_tbl;
-	panel_data->nr_blic_data_tbl = info->nr_blic_data_tbl;
+	if (sec_needs_blic) {
+		panel_data->blic_data_tbl = info->blic_data_tbl;
+		panel_data->nr_blic_data_tbl = info->nr_blic_data_tbl;
+	}
 #endif
 #ifdef CONFIG_MCD_PANEL_RCD
 	panel_data->rcd_data = info->rcd_data;
