@@ -1960,13 +1960,11 @@ static int _panel_do_seqtbl(struct panel_device *panel,
 			break;
 #endif
 #ifdef CONFIG_MCD_PANEL_I2C
-		case I2C_PKT_TYPE_WR:
-		case I2C_PKT_TYPE_RD:
-			if (sec_needs_blic)
+		if (sec_needs_blic) {
+			case I2C_PKT_TYPE_WR:
+			case I2C_PKT_TYPE_RD:
 				ret = panel_do_i2c_packet(panel, (struct pktinfo *)cmdtbl[i]);
-			else
-				panel_warn("unknown pakcet type %d\n", type);
-			break;
+		}
 #endif
 
 		case CMD_TYPE_COND_IF:
