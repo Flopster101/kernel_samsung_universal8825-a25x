@@ -186,7 +186,7 @@ void dpu_init_freq_hop(struct dsim_device *dsim)
 	const struct dsim_pll_params *pll_params = dsim->pll_params;
 
 	if (IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP) &&
-	    (dsim->config.mode == DSIM_COMMAND_MODE)) {
+		(dsim->config.mode == DSIM_COMMAND_MODE) && (!sec_lcd_device)) {
 		dsim->freq_hop.enabled = true;
 		dsim->freq_hop.target_m = pll_params->params[0]->m;
 		dsim->freq_hop.request_m = pll_params->params[0]->m;

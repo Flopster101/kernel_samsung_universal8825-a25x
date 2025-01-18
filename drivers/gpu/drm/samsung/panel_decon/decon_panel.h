@@ -15,6 +15,7 @@
 #include <linux/backlight.h>
 #include <linux/spi/spi.h>
 #include <linux/sysfs.h>
+#include <linux/sec_detect.h>
 #include "decon_panel_kunit.h"
 #include "decon_maptbl.h"
 #include "decon_util.h"
