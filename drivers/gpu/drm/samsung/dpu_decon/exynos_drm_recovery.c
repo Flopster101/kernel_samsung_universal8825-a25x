@@ -548,7 +548,8 @@ static void exynos_recovery_handler(struct work_struct *work)
 			recov_info("recovery condition not matched\n");
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
 #if IS_ENABLED(CONFIG_DISPLAY_USE_INFO) || IS_ENABLED(CONFIG_USDM_PANEL_DPUI)
-			log_decon_bigdata(decon);
+			if (!sec_lcd_device)
+				log_decon_bigdata(decon);
 #endif
 #endif
 			dpu_dump(exynos_crtc);

@@ -497,17 +497,21 @@ static void panel_bl_update_acl_state(struct panel_bl_device *panel_bl)
 	}
 #endif
 #ifdef CONFIG_SUPPORT_AOD_BL
-	if (panel_bl->props.id == PANEL_BL_SUBDEV_TYPE_AOD) {
-		panel_bl->props.acl_opr = 0;
-		panel_bl->props.acl_pwrsave = ACL_PWRSAVE_OFF;
-		return;
+	if (!sec_lcd_device) {
+		if (panel_bl->props.id == PANEL_BL_SUBDEV_TYPE_AOD) {
+			panel_bl->props.acl_opr = 0;
+			panel_bl->props.acl_pwrsave = ACL_PWRSAVE_OFF;
+			return;
+		}
 	}
 #endif
 #ifdef CONFIG_SUPPORT_MASK_LAYER
-	if (panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON) {
-		panel_bl->props.acl_opr = 0;
-		panel_bl->props.acl_pwrsave = ACL_PWRSAVE_OFF;
-		return;
+	if (!sec_lcd_device) {
+		if (panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON) {
+			panel_bl->props.acl_opr = 0;
+			panel_bl->props.acl_pwrsave = ACL_PWRSAVE_OFF;
+			return;
+		}
 	}
 #endif
 	if (panel_data->props.adaptive_control > 100) {
@@ -827,11 +831,13 @@ int panel_bl_set_brightness(struct panel_bl_device *panel_bl, int id, u32 send_c
 	}
 
 #ifdef CONFIG_PANEL_VRR_BRIDGE
-	if (panel_vrr_bridge_is_supported(panel) &&
-			!panel_vrr_bridge_is_reached_target_nolock(panel)) {
-		panel->panel_data.props.panel_mode =
-			panel->panel_data.props.target_panel_mode;
-		need_update_display_mode = true;
+	if (!sec_lcd_device) {
+		if (panel_vrr_bridge_is_supported(panel) &&
+				!panel_vrr_bridge_is_reached_target_nolock(panel)) {
+			panel->panel_data.props.panel_mode =
+				panel->panel_data.props.target_panel_mode;
+			need_update_display_mode = true;
+		}
 	}
 #endif
 #if defined(CONFIG_PANEL_DISPLAY_MODE)
@@ -847,8 +853,10 @@ int panel_bl_set_brightness(struct panel_bl_device *panel_bl, int id, u32 send_c
 		index = PANEL_HMD_BL_SEQ;
 #endif
 #ifdef CONFIG_SUPPORT_AOD_BL
-	if (id == PANEL_BL_SUBDEV_TYPE_AOD)
-		index = PANEL_ALPM_SET_BL_SEQ;
+	if (!sec_lcd_device) {
+		if (id == PANEL_BL_SUBDEV_TYPE_AOD)
+			index = PANEL_ALPM_SET_BL_SEQ;
+	}
 #endif
 
 #ifdef CONFIG_EVASION_DISP_DET
@@ -936,18 +944,22 @@ int _panel_update_brightness(struct panel_device *panel, u32 send_cmd)
 	}
 
 #ifdef CONFIG_SUPPORT_MASK_LAYER
-	if (panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON) {
-		brightness = panel_bl->props.mask_layer_br_target;
-		panel_info("mask_layer_br_hook (%d)->(%d)\n",
-			bd->props.brightness, panel_bl->props.mask_layer_br_target);
+	if (!sec_lcd_device) {
+		if (panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON) {
+			brightness = panel_bl->props.mask_layer_br_target;
+			panel_info("mask_layer_br_hook (%d)->(%d)\n",
+				bd->props.brightness, panel_bl->props.mask_layer_br_target);
+		}
 	}
 #endif
 
 	panel_bl->subdev[PANEL_BL_SUBDEV_TYPE_DISP].brightness =
 		panel_bl_subdev_get_valid_brightness(panel_bl, PANEL_BL_SUBDEV_TYPE_DISP, brightness);
 #ifdef CONFIG_SUPPORT_AOD_BL
-	panel_bl->subdev[PANEL_BL_SUBDEV_TYPE_AOD].brightness =
-		panel_bl_subdev_get_valid_brightness(panel_bl, PANEL_BL_SUBDEV_TYPE_AOD, brightness);
+	if (!sec_lcd_device) {
+		panel_bl->subdev[PANEL_BL_SUBDEV_TYPE_AOD].brightness =
+			panel_bl_subdev_get_valid_brightness(panel_bl, PANEL_BL_SUBDEV_TYPE_AOD, brightness);
+	}
 #endif
 
 	id = panel_bl->props.id;
