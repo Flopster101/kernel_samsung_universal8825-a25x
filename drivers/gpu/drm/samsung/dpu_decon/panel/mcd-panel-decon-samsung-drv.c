@@ -207,7 +207,8 @@ static void exynos_panel_connector_print_state(struct drm_printer *p,
 	drm_printf(p, "\thdr_formats: 0x%x\n", desc->hdr_formats);
 	drm_printf(p, "\tadjusted_fps: %d\n", exynos_conn_state->adjusted_fps);
 #if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-	drm_printf(p, "\tfingerprint_mask_req: 0x%x\n", exynos_conn_state->fingerprint_mask);
+	if (!sec_lcd_device)
+		drm_printf(p, "\tfingerprint_mask_req: 0x%x\n", exynos_conn_state->fingerprint_mask);
 #endif
 }
 
@@ -301,9 +302,15 @@ exynos_panel_connector_set_property(struct exynos_drm_connector *exynos_conn,
 			struct drm_property *property, uint64_t val)
 {
 #if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-	struct exynos_panel *ctx = exynos_connector_to_panel(exynos_conn);
-	const struct exynos_drm_connector_properties *p =
-		decon_exynos_drm_connector_get_properties(&ctx->exynos_connector);
+	struct exynos_panel *ctx;
+	const struct exynos_drm_connector_properties *p;
+
+	// Don't even assign values to the pointers unless the condition is met.
+	if (sec_lcd_device)
+		return 0;
+
+	ctx = exynos_connector_to_panel(exynos_conn);
+	p = decon_exynos_drm_connector_get_properties(&ctx->exynos_connector);
 
 	if (property == p->fingerprint_mask)
 		exynos_conn_state->fingerprint_mask = val;
@@ -331,8 +338,12 @@ exynos_panel_connector_get_property(struct exynos_drm_connector *exynos_conn,
 	else if (property == p->adjusted_fps)
 		*val = exynos_conn_state->adjusted_fps;
 #if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-	else if (property == p->fingerprint_mask)
-		*val = ctx->fingerprint_mask;
+	else if (property == p->fingerprint_mask) {
+		if (!sec_lcd_device)
+			*val = ctx->fingerprint_mask;
+		else
+			return -EINVAL;
+	}
 #endif
 	else
 		return -EINVAL;
@@ -591,7 +602,8 @@ static int exynos_panel_attach_properties(struct exynos_panel *ctx)
 	drm_object_attach_property(obj, p->hdr_formats, 0);
 	drm_object_attach_property(obj, p->adjusted_fps, 0);
 #if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-	drm_object_attach_property(obj, p->fingerprint_mask, 0);
+	if (!sec_lcd_device)
+		drm_object_attach_property(obj, p->fingerprint_mask, 0);
 #endif
 
 	if (IS_ENABLED(CONFIG_DRM_SAMSUNG_DOZE) && sec_doze) {

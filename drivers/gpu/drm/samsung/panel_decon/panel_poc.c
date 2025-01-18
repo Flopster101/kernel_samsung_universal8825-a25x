@@ -1144,13 +1144,15 @@ int decon_set_panel_poc(struct panel_poc_device *poc_dev, u32 cmd, void *arg)
 			return ret;
 		}
 #ifdef CONFIG_DISPLAY_USE_INFO
-		poc_info->erase_trycount++;
+		if (!sec_lcd_device)
+			poc_info->erase_trycount++;
 #endif
 		ret = poc_erase(panel, addr, len);
 		if (unlikely(ret < 0)) {
 			panel_err("failed to write poc-erase-seq\n");
 #ifdef CONFIG_DISPLAY_USE_INFO
-			poc_info->erase_failcount++;
+			if (!sec_lcd_device)
+				poc_info->erase_failcount++;
 #endif
 			poc_info->erased = false;
 		} else {
@@ -2027,15 +2029,17 @@ int panel_poc_probe(struct panel_device *panel, struct panel_poc_data *poc_data)
 			poc_info->total_size * sizeof(u8), GFP_KERNEL);
 
 #ifdef CONFIG_DISPLAY_USE_INFO
-	poc_info->total_trycount = -1;
-	poc_info->total_failcount = -1;
+	if (!sec_lcd_device) {
+		poc_info->total_trycount = -1;
+		poc_info->total_failcount = -1;
 
-	if (!initialized) {
-		poc_dev->poc_notif.notifier_call = poc_notifier_callback;
-		ret = decon_dpui_logging_register(&poc_dev->poc_notif, DPUI_TYPE_PANEL);
-		if (ret) {
-			panel_err("failed to register dpui notifier callback\n");
-			goto exit_probe;
+		if (!initialized) {
+			poc_dev->poc_notif.notifier_call = poc_notifier_callback;
+			ret = decon_dpui_logging_register(&poc_dev->poc_notif, DPUI_TYPE_PANEL);
+			if (ret) {
+				panel_err("failed to register dpui notifier callback\n");
+				goto exit_probe;
+			}
 		}
 	}
 #endif

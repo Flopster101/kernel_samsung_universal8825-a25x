@@ -2157,8 +2157,10 @@ static int dsim_probe(struct platform_device *pdev)
 	}
 
 #if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP)
-	if (!dsim->id)
-		dpu_init_freq_hop(dsim);
+	if (!sec_lcd_device) {
+		if (!dsim->id)
+			dpu_init_freq_hop(dsim);
+	}
 #endif
 
 	dsim_info(dsim, "driver has been probed.\n");

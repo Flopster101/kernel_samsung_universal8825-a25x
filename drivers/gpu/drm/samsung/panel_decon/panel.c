@@ -713,10 +713,12 @@ panel_do_vsync_delay(struct panel_device *panel, struct delayinfo *info)
 			panel->panel_data.props.vrr_fps);
 
 #ifdef CONFIG_SUPPORT_MASK_LAYER
-	if (panel->panel_bl.props.mask_layer_br_hook == MASK_LAYER_HOOK_ON)
-		panel_info("elapsed:%2d.%03d ms (cnt:%d)in %d FPS\n",
-			usec / 1000, usec % 1000, info->nframe,
-			panel->panel_data.props.vrr_fps);
+	if (!sec_lcd_device) {
+		if (panel->panel_bl.props.mask_layer_br_hook == MASK_LAYER_HOOK_ON)
+			panel_info("elapsed:%2d.%03d ms (cnt:%d)in %d FPS\n",
+				usec / 1000, usec % 1000, info->nframe,
+				panel->panel_data.props.vrr_fps);
+	}
 #endif
 	return 0;
 }

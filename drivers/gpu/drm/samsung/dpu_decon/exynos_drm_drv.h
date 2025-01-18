@@ -22,6 +22,7 @@
 #include <linux/kthread.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/sec_detect.h>
 
 #include <samsung_drm.h>
 #include <exynos_drm_connector.h>

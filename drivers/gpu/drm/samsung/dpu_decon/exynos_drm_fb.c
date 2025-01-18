@@ -780,41 +780,63 @@ void exynos_atomic_commit_tail(struct drm_atomic_state *old_state)
 	exynos_atomic_wait_for_vblanks(dev, old_state);
 	DPU_ATRACE_END("wait_for_vblanks");
 
-#if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-	for_each_oldnew_crtc_in_state(old_state, crtc, old_crtc_state,
-			new_crtc_state, i) {
-#else
-	for_each_new_crtc_in_state(old_state, crtc, new_crtc_state, i) {
+	if (!sec_lcd_device) {
+		for_each_oldnew_crtc_in_state(old_state, crtc, old_crtc_state,
+					new_crtc_state, i) {
+			const struct exynos_drm_crtc_ops *ops;
+			struct exynos_drm_crtc_state *exynos_crtc_state =
+				to_exynos_crtc_state(new_crtc_state);
+
+			exynos_crtc = to_exynos_crtc(crtc);
+
+			if (!new_crtc_state->active)
+				continue;
+#if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
+			if (exynos_crtc_state->skip_frameupdate &&
+					crtc_get_encoder(new_crtc_state, DRM_MODE_ENCODER_DSI)) {
+				pr_info("skip_frameupdate\n");
+				continue;
+			}
 #endif
-		const struct exynos_drm_crtc_ops *ops;
-		struct exynos_drm_crtc_state *exynos_crtc_state =
-			to_exynos_crtc_state(new_crtc_state);
+			ops = exynos_crtc->ops;
+			DPU_ATRACE_BEGIN("wait_for_frame_start");
+			if (ops->wait_framestart)
+				ops->wait_framestart(exynos_crtc);
+			DPU_ATRACE_END("wait_for_frame_start");
 
-		exynos_crtc = to_exynos_crtc(crtc);
+			if (ops->set_trigger)
+				ops->set_trigger(exynos_crtc, exynos_crtc_state);
 
-		if (!new_crtc_state->active)
-			continue;
+			if (ops->set_fingerprint_mask)
+				ops->set_fingerprint_mask(exynos_crtc, old_crtc_state, 1);
+		}
+	} else {
+		for_each_new_crtc_in_state(old_state, crtc, new_crtc_state, i) {
+			const struct exynos_drm_crtc_ops *ops;
+			struct exynos_drm_crtc_state *exynos_crtc_state =
+				to_exynos_crtc_state(new_crtc_state);
+
+			exynos_crtc = to_exynos_crtc(crtc);
+
+			if (!new_crtc_state->active)
+				continue;
 
 #if IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-		if (exynos_crtc_state->skip_frameupdate &&
-				crtc_get_encoder(new_crtc_state, DRM_MODE_ENCODER_DSI)) {
-			pr_info("skip_frameupdate\n");
-			continue;
+			if (exynos_crtc_state->skip_frameupdate &&
+					crtc_get_encoder(new_crtc_state, DRM_MODE_ENCODER_DSI)) {
+				pr_info("skip_frameupdate\n");
+				continue;
+			}
+#endif
+			ops = exynos_crtc->ops;
+			DPU_ATRACE_BEGIN("wait_for_frame_start");
+			if (ops->wait_framestart)
+				ops->wait_framestart(exynos_crtc);
+			DPU_ATRACE_END("wait_for_frame_start");
+
+			if (ops->set_trigger)
+				ops->set_trigger(exynos_crtc, exynos_crtc_state);
 		}
-#endif
-		ops = exynos_crtc->ops;
-		DPU_ATRACE_BEGIN("wait_for_frame_start");
-		if (ops->wait_framestart)
-			ops->wait_framestart(exynos_crtc);
-		DPU_ATRACE_END("wait_for_frame_start");
-
-		if (ops->set_trigger)
-			ops->set_trigger(exynos_crtc, exynos_crtc_state);
-
-#if IS_ENABLED(CONFIG_SUPPORT_MASK_LAYER) || IS_ENABLED(CONFIG_USDM_PANEL_MASK_LAYER)
-		if (ops->set_fingerprint_mask)
-			ops->set_fingerprint_mask(exynos_crtc, old_crtc_state, 1);
-#endif
 	}
 	exynos_atomic_framestart_post_processing(old_state);
 

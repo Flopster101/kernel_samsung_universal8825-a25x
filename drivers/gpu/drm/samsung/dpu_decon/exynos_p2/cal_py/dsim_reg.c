@@ -1882,7 +1882,8 @@ static int dsim_reg_set_clocks(u32 id, struct dsim_clks *clks,
 		pll.k = dphy_pms->k;
 
 #if IS_ENABLED(CONFIG_DECON_EXYNOS_FREQ_HOP) && IS_ENABLED(CONFIG_DRM_MCD_COMMON)
-		clear_freq_hop_pll(clks, dphy_pms);
+		if (!sec_lcd_device)
+			clear_freq_hop_pll(clks, dphy_pms);
 #endif
 
 		/* get word clock */
