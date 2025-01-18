@@ -18,6 +18,8 @@
 //int nvt_ts_nt36523_ics_i2c_read(struct nvt_ts_data *ts, u32 address, u8 *data, u16 len);
 //int nvt_ts_nt36523_ics_i2c_write(struct nvt_ts_data *ts, u32 address, u8 *data, u16 len);
 
+#define DISABLE_ATTRS
+
 #if SHOW_NOT_SUPPORT_CMD
 static int nvt_ts_set_touchable_area(struct nvt_ts_data *ts)
 {
@@ -5494,6 +5496,7 @@ static struct sec_cmd sec_cmds[] = {
 };
 
 #if SHOW_NOT_SUPPORT_CMD
+#ifndef DISABLE_ATTRS
 static ssize_t read_multi_count_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -5952,8 +5955,10 @@ static ssize_t get_lp_dump(struct device *dev, struct device_attribute *attr, ch
 	return snprintf(buf, SEC_CMD_BUF_SIZE, "Not support lp dump!");
 #endif
 }
+#endif
 
 #if SHOW_NOT_SUPPORT_CMD
+#ifndef DISABLE_ATTRS
 static DEVICE_ATTR(multi_count, 0664, read_multi_count_show, clear_multi_count_store);
 static DEVICE_ATTR(comm_err_count, 0664, read_comm_err_count_show, clear_comm_err_count_store);
 static DEVICE_ATTR(module_id, 0444, read_module_id_show, NULL);
@@ -5974,8 +5979,10 @@ static DEVICE_ATTR(support_prox_in_aot, 0664, support_prox_in_aot_show, NULL);
 #endif
 //static DEVICE_ATTR(enabled, 0664, enabled_show, enabled_store);
 static DEVICE_ATTR(get_lp_dump, 0444, get_lp_dump, NULL);
+#endif
 
 static struct attribute *cmd_attributes[] = {
+#ifndef DISABLE_ATTRS
 #if SHOW_NOT_SUPPORT_CMD
 	&dev_attr_multi_count.attr,
 	&dev_attr_comm_err_count.attr,
@@ -5997,6 +6004,7 @@ static struct attribute *cmd_attributes[] = {
 #endif
 	//&dev_attr_enabled.attr,
 	&dev_attr_get_lp_dump.attr,
+#endif
 	NULL,
 };
 
