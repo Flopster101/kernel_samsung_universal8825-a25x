@@ -341,6 +341,11 @@ config SND_SOC_SAMSUNG_AUDIO
 	help
 	  Say Y here to enable audio support for the Samsung Audio.
 
+config SND_SOC_SAMSUNG_DEBUG
+	tristate "ABOX debugging support"
+	help
+	  Say Y here to enable debugging support for the Samsung ABOX audio subsystem.
+
 source "sound/soc/samsung/abox/Kconfig"
 source "sound/soc/samsung/vts/Kconfig"
 source "sound/soc/samsung/slif/Kconfig"
