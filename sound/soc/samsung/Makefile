@@ -80,4 +80,5 @@ obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5665) += exynos8825_rt5665.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5665_DBMDX) += exynos8825_rt5665.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5691) += exynos8825_rt5691.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_RAINBOW_PRINCE) += rainbow_prince.o
-obj-$(CONFIG_SND_SOC_SAMSUNG_AUDIO) += sec_audio_sysfs.o sec_audio_debug.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_DEBUG)	+= sec_audio_debug.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_AUDIO) += sec_audio_sysfs.o
