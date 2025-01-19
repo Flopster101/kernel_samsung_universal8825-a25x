@@ -2397,7 +2397,7 @@ static void abox_system_ipc_handler(struct device *dev,
 					type);
 			break;
 		}
-#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_AUDIO)
+#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG)
 		abox_debug_string_update(system_msg->param1, system_msg->param2,
 				system_msg->param3, system_msg->bundle.param_s32[1],
 				data->audio_mode, data->audio_mode_time);
@@ -3663,7 +3663,7 @@ int abox_notify_modem_event(enum abox_modem_event event)
 	if (system_msg->msgtype)
 		abox_request_ipc(dev, msg.ipcid, &msg, sizeof(msg), 1, 0);
 
-#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_AUDIO)
+#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG)
 	set_modem_event(event);
 	if (event == ABOX_MODEM_EVENT_EXIT)
 		abox_debug_string_update(TYPE_ABOX_VSSERROR, 0, 0, 0,

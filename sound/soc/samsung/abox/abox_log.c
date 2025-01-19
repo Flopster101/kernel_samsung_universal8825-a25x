@@ -113,7 +113,7 @@ static void abox_log_flush(struct device *dev,
 
 	mutex_lock(&info->lock);
 
-#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_AUDIO)
+#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG)
 	if (info->id == 0)
 		abox_log_extra_copy(log_buffer->buffer,
 				log_buffer->index_reader, index_writer, log_buffer->size);
