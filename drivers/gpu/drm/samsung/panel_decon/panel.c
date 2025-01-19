@@ -2466,10 +2466,10 @@ int panel_tx_nbytes(struct panel_device *panel,
  * It works also for compatibility if REG_04 feature is NOT set and LCD_TFT_COMMON feature is set.
  * Other cases, read 3 bytes from 04h.
  */
-#if IS_ENABLED(CONFIG_PANEL_ID_READ_REG_DADBDC) || \
-	IS_ENABLED(CONFIG_PANEL_ID_READ_REG_ADAEAF) || \
-	(!IS_ENABLED(CONFIG_PANEL_ID_READ_REG_04) && IS_ENABLED(CONFIG_EXYNOS_DECON_LCD_TFT_COMMON))
-int read_panel_id(struct panel_device *panel, u8 *buf)
+// #if IS_ENABLED(CONFIG_PANEL_ID_READ_REG_DADBDC) || \
+// 	IS_ENABLED(CONFIG_PANEL_ID_READ_REG_ADAEAF) || \
+// 	(!IS_ENABLED(CONFIG_PANEL_ID_READ_REG_04) && IS_ENABLED(CONFIG_EXYNOS_DECON_LCD_TFT_COMMON))
+int read_panel_id_tft(struct panel_device *panel, u8 *buf)
 {
 	int len, ret = 0;
 	int i = 0;
@@ -2482,10 +2482,16 @@ int read_panel_id(struct panel_device *panel, u8 *buf)
 	if (!IS_PANEL_ACTIVE(panel))
 		return -ENODEV;
 
-	panel_info("id read from 0x%02X\n", PANEL_ID_REG);
+	if (sec_lcd_device)
+		panel_info("id read from 0x%02X\n", PANEL_ID_REG_TFT);
+	else
+		panel_info("id read from 0x%02X\n", PANEL_ID_REG_OLED);
 	mutex_lock(&panel->op_lock);
 	for (i = 0; i < PANEL_ID_LEN; i++) {
-		len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf + i, PANEL_ID_REG + i, 0, 1);
+		if (sec_lcd_device)
+			len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf + i, PANEL_ID_REG_TFT + i, 0, 1);
+		else
+			len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf + i, PANEL_ID_REG_OLED + i, 0, 1);
 		if (len < 0) {
 			panel_err("failed to read id\n");
 			ret = -EINVAL;
@@ -2497,8 +2503,8 @@ read_err:
 	mutex_unlock(&panel->op_lock);
 	return ret;
 }
-#else
-int read_panel_id(struct panel_device *panel, u8 *buf)
+// #else
+int read_panel_id_oled(struct panel_device *panel, u8 *buf)
 {
 	int len, ret = 0;
 
@@ -2510,10 +2516,16 @@ int read_panel_id(struct panel_device *panel, u8 *buf)
 	if (!IS_PANEL_ACTIVE(panel))
 		return -ENODEV;
 
-	panel_info("id read from 0x%02X 3bytes\n", PANEL_ID_REG);
+	if (sec_lcd_device)
+		panel_info("id read from 0x%02X 3bytes\n", PANEL_ID_REG_TFT);
+	else
+		panel_info("id read from 0x%02X 3bytes\n", PANEL_ID_REG_OLED);
 	mutex_lock(&panel->op_lock);
 	panel_set_key(panel, 3, true);
-	len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf, PANEL_ID_REG, 0, 3);
+	if (sec_lcd_device)
+		len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf, PANEL_ID_REG_TFT, 0, 3);
+	else
+		len = panel_rx_nbytes(panel, DSI_PKT_TYPE_RD, buf, PANEL_ID_REG_OLED, 0, 3);
 	if (len != 3) {
 		panel_err("failed to read id\n");
 		ret = -EINVAL;
@@ -2525,7 +2537,7 @@ read_err:
 	mutex_unlock(&panel->op_lock);
 	return ret;
 }
-#endif
+// #endif
 
 static struct rdinfo *find_panel_rdinfo(struct panel_info *panel_data, char *name)
 {

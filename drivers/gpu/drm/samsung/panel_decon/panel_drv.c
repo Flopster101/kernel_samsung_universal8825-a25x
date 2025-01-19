@@ -1483,7 +1483,10 @@ static struct common_panel_info *panel_detect(struct panel_device *panel)
 #if IS_ENABLED(CONFIG_PANEL_ID_READ_BY_LPDT)
 	panel_dsi_set_lpdt(panel, true);
 #endif
-	ret = read_panel_id(panel, id);
+	if (sec_lcd_device)
+		ret = read_panel_id_tft(panel, id);
+	else
+		ret = read_panel_id_oled(panel, id);
 	if (unlikely(ret < 0)) {
 		panel_err("failed to read id(ret %d)\n", ret);
 		detect = false;
