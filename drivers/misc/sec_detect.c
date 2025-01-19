@@ -169,6 +169,7 @@ void setup_camera_params(void) {
 		mcd_use_ois_hall_data_for_vdis = true;
 		mcd_camera_uwide_dualized = true;
 		mcd_read_dual_cal_firmware_data = true;
+		mcd_use_leds_flash_charging_voltage_control = true;
 	}
 
 	if (sec_current_device == SEC_M33) {
