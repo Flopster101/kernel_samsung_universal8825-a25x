@@ -20,7 +20,7 @@ static ssize_t abox_oem_resize_reserved_memory_dbg(void)
 {
 	ssize_t size = -ENODEV;
 
-#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_ABOX_CHANGE_RMEM_SIZE)
+#if (IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_ABOX_CHANGE_RMEM_SIZE) && IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG))
 	if (check_upload_mode_disabled())
 		size = get_rmem_size_min(TYPE_ABOX_DBG_SIZE);
 #endif
@@ -32,7 +32,7 @@ static ssize_t abox_oem_resize_reserved_memory_slog(void)
 {
 	ssize_t size = -ENODEV;
 
-#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_ABOX_CHANGE_RMEM_SIZE)
+#if (IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_ABOX_CHANGE_RMEM_SIZE) && IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG))
 	if (check_debug_level_low())
 		size = get_rmem_size_min(TYPE_ABOX_SLOG_SIZE);
 #if IS_ENABLED(CONFIG_SAMSUNG_PRODUCT_SHIP)
