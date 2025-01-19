@@ -88,14 +88,16 @@ enum {
 #define PN_CONCAT(a, b)  _PN_CONCAT(a, b)
 #define _PN_CONCAT(a, b) a ## _ ## b
 
-#if IS_ENABLED(CONFIG_PANEL_ID_READ_REG_ADAEAF)
-#define PANEL_ID_REG		(0xAD)
-#elif IS_ENABLED(CONFIG_PANEL_ID_READ_REG_DADBDC) || \
-	(!IS_ENABLED(CONFIG_PANEL_ID_READ_REG_04) && IS_ENABLED(CONFIG_EXYNOS_DECON_LCD_TFT_COMMON))
-#define PANEL_ID_REG		(0xDA)
-#else
-#define PANEL_ID_REG		(0x04)
-#endif
+// #if IS_ENABLED(CONFIG_PANEL_ID_READ_REG_ADAEAF)
+// #define PANEL_ID_REG		(0xAD)
+// #elif IS_ENABLED(CONFIG_PANEL_ID_READ_REG_DADBDC) || \
+// 	(!IS_ENABLED(CONFIG_PANEL_ID_READ_REG_04) && IS_ENABLED(CONFIG_EXYNOS_DECON_LCD_TFT_COMMON))
+// #define PANEL_ID_REG		(0xDA)
+// #else
+// #define PANEL_ID_REG		(0x04)
+// #endif
+#define PANEL_ID_REG_TFT (0xDA)
+#define PANEL_ID_REG_OLED (0x04)
 #define PANEL_ID_LEN		(3)
 #define PANEL_OCTA_ID_LEN	(20)
 #define PANEL_POC_CHKSUM_LEN	(5)
@@ -1523,7 +1525,8 @@ int panel_set_freq_hop(struct panel_device *panel, struct freq_hop_param *param)
 #endif
 int panel_parse_ap_vendor_node(struct panel_device *panel, struct device_node *node);
 int panel_flush_image(struct panel_device *panel);
-int read_panel_id(struct panel_device *panel, u8 *buf);
+int read_panel_id_tft(struct panel_device *panel, u8 *buf);
+int read_panel_id_oled(struct panel_device *panel, u8 *buf);
 int panel_resource_prepare(struct panel_device *panel);
 void print_panel_resource(struct panel_device *panel);
 int find_sysfs_arg_by_name(struct sysfs_arg *arglist, int nr_arglist, char *s);
