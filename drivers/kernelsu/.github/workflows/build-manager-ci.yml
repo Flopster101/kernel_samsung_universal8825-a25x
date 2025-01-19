@@ -1,19 +1,19 @@
 name: Build Manager
 
 on:
-  # push:
-  #   branches: [ "next" ]
-  #   paths:
-  #     - '.github/workflows/build-manager.yml'
-  #     - 'manager/**'
-  #     - 'kernel/**'
-  #     - 'userspace/ksud_overlayfs**'
-  #     - 'userspace/ksud_magic/**'
-  #     - 'userspace/susfsd/**'
-  # pull_request:
-  #   branches: [ "next" ]
-  #   paths:
-  #     - 'manager/**'
+  push:
+    branches: [ "next" ]
+    paths:
+      - '.github/workflows/build-manager-ci.yml'
+      - 'manager/**'
+      - 'kernel/**'
+      - 'userspace/ksud_overlayfs**'
+      - 'userspace/ksud_magic/**'
+      - 'userspace/susfsd/**'
+  pull_request:
+    branches: [ "next" ]
+    paths:
+      - 'manager/**'
   workflow_call:
   workflow_dispatch:
 
@@ -179,7 +179,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: Release Manager (STABLE BUILD)
+          TITLE: CI Manager (TEST BUILD)
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
