@@ -238,6 +238,7 @@ dev_ril_bridge.ko
 common_muic.ko
 vbus_notifier.ko
 sec_common_fn.ko
+sec_cmd.ko
 dropdump.ko
 mcd-panel-nt36672c_m33x_00.ko
 mcd-panel-nt36672c_m33x_01.ko
