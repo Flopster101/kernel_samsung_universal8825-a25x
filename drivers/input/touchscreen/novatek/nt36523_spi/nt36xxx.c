@@ -24,6 +24,7 @@
 #include <linux/input/mt.h>
 #include <linux/of_gpio.h>
 #include <linux/of_irq.h>
+#include <linux/panel_notify.h>
 
 #include "nt36xxx.h"
 #if NVT_TOUCH_ESD_PROTECT
@@ -3244,16 +3245,10 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	nvt_ts_lpwg_dump_buf_init();
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER)
+#if IS_ENABLED(CONFIG_PANEL_NOTIFY)
 	ts->nb.priority = 1;
 	ts->nb.notifier_call = nvt_notifier_call;
-	ss_panel_notifier_register(&ts->nb);
-#endif
-
-#if (IS_ENABLED(CONFIG_EXYNOS_DPU30) || IS_ENABLED(CONFIG_DRM_SAMSUNG_DPU)) && IS_ENABLED(CONFIG_PANEL_NOTIFY)
-	ts->nb.priority = 1;
-	ts->nb.notifier_call = nvt_notifier_call;
-	panel_notifier_register(&ts->nb);
+	decon_panel_notifier_register(&ts->nb);
 #endif
 
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
