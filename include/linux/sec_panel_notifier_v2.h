@@ -86,21 +86,21 @@ struct panel_notifier_event_data {
 };
 
 #if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2)
-extern int panel_notifier_register(struct notifier_block *nb);
-extern int panel_notifier_unregister(struct notifier_block *nb);
-extern int panel_notifier_call_chain(unsigned long val, void *v);
+extern int usdm_panel_notifier_register(struct notifier_block *nb);
+extern int usdm_panel_notifier_unregister(struct notifier_block *nb);
+extern int usdm_panel_notifier_call_chain(unsigned long val, void *v);
 #else
-static inline int panel_notifier_register(struct notifier_block *nb)
+static inline int usdm_panel_notifier_register(struct notifier_block *nb)
 {
 	return 0;
 };
 
-static inline int panel_notifier_unregister(struct notifier_block *nb)
+static inline int usdm_panel_notifier_unregister(struct notifier_block *nb)
 {
 	return 0;
 };
 
-static inline int panel_notifier_call_chain(unsigned long val, void *v)
+static inline int usdm_panel_notifier_call_chain(unsigned long val, void *v)
 {
 	return 0;
 };

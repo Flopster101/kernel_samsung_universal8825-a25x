@@ -20,28 +20,28 @@ static BLOCKING_NOTIFIER_HEAD(panel_notifier_list);
  *	panel_notifier_register - register a client notifier
  *	@nb: notifier block to callback on events
  */
-int panel_notifier_register(struct notifier_block *nb)
+int usdm_panel_notifier_register(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_register(&panel_notifier_list, nb);
 }
-EXPORT_SYMBOL(panel_notifier_register);
+EXPORT_SYMBOL(usdm_panel_notifier_register);
 
 /**
  *	panel_notifier_unregister - unregister a client notifier
  *	@nb: notifier block to callback on events
  */
-int panel_notifier_unregister(struct notifier_block *nb)
+int usdm_panel_notifier_unregister(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_unregister(&panel_notifier_list, nb);
 }
-EXPORT_SYMBOL(panel_notifier_unregister);
+EXPORT_SYMBOL(usdm_panel_notifier_unregister);
 
 /**
  *	valid_panel_notifier_event - validate panel notifier event
  *	@event: panel notifier event
  *	@ev_data : panel notifier event data
  */
-static bool valid_panel_notifier_event(unsigned long event,
+static bool usdm_valid_panel_notifier_event(unsigned long event,
 		struct panel_notifier_event_data *ev_data)
 {
 	if (event >= MAX_PANEL_EVENT) {
@@ -71,14 +71,14 @@ static bool valid_panel_notifier_event(unsigned long event,
  * panel_notifier_call_chain - notify clients
  *
  */
-int panel_notifier_call_chain(unsigned long val, void *v)
+int usdm_panel_notifier_call_chain(unsigned long val, void *v)
 {
-	if (!valid_panel_notifier_event(val, v))
+	if (!usdm_valid_panel_notifier_event(val, v))
 		return -EINVAL;
 
 	return blocking_notifier_call_chain(&panel_notifier_list, val, v);
 }
-EXPORT_SYMBOL(panel_notifier_call_chain);
+EXPORT_SYMBOL(usdm_panel_notifier_call_chain);
 
 #endif
 
