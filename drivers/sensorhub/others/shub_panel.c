@@ -33,6 +33,8 @@
 #include "../sensor/light.h"
 #include "../sensormanager/shub_sensor_type.h"
 
+#include <linux/sec_detect.h>
+
 #define PANEL_MAX (1)
 
 static struct panel_event_bl_data panel_event_data[PANEL_MAX];
@@ -320,7 +322,10 @@ void init_shub_panel_callback(void)
 		panel_event_data[i].level = -1;
 	}
 
-	ret = panel_notifier_register(&panel_notify);
+	if (sec_needs_decon)
+		ret = decon_panel_notifier_register(&panel_notify);
+	else
+		ret = usdm_panel_notifier_register(&panel_notify);
 	if (ret < 0)
 		shub_infof("panel_notifier_register failed(%d)", ret);
 
@@ -329,7 +334,10 @@ void init_shub_panel_callback(void)
 
 void remove_shub_panel_callback(void)
 {
-	panel_notifier_unregister(&panel_notify);
+	if (sec_needs_decon)
+		decon_panel_notifier_unregister(&panel_notify);
+	else
+		usdm_panel_notifier_unregister(&panel_notify);
 }
 
 void sync_panel_state(void)
