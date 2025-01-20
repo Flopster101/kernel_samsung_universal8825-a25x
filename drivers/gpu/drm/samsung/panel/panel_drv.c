@@ -1184,7 +1184,7 @@ static void panel_notify_panel_state(u32 state)
 	memset(&evt_data, 0, sizeof(evt_data));
 	evt_data.display_index = 0;
 	evt_data.state = evt_state;
-	panel_notifier_call_chain(PANEL_EVENT_PANEL_STATE_CHANGED, &evt_data);
+	usdm_panel_notifier_call_chain(PANEL_EVENT_PANEL_STATE_CHANGED, &evt_data);
 	panel_dbg("notify PANEL_EVENT_PANEL_STATE_CHANGED (state:%d:%s)\n",
 			evt_data.state, evt_name);
 }
@@ -1196,7 +1196,7 @@ static inline void panel_send_ubconn_notify(u32 state)
 		.state = state,
 	};
 
-	panel_notifier_call_chain(PANEL_EVENT_UB_CON_STATE_CHANGED, &evt_data);
+	usdm_panel_notifier_call_chain(PANEL_EVENT_UB_CON_STATE_CHANGED, &evt_data);
 	panel_dbg("notify PANEL_EVENT_UB_CON_STATE_CHANGED (state:%d)\n", evt_data.state);
 }
 
@@ -1209,7 +1209,7 @@ void panel_send_screen_mode_notify(int display_idx, u32 mode)
 
 	evt_data.display_index = display_idx;
 	evt_data.d.screen_mode = mode;
-	panel_notifier_call_chain(PANEL_EVENT_SCREEN_MODE_STATE_CHANGED, &evt_data);
+	usdm_panel_notifier_call_chain(PANEL_EVENT_SCREEN_MODE_STATE_CHANGED, &evt_data);
 	panel_dbg("notify PANEL_EVENT_SCREEN_MODE_STATE_CHANGED (screen_mode:%d)\n",
 			evt_data.d.screen_mode);
 }
@@ -5192,14 +5192,14 @@ int panel_vrr_cb(struct panel_device *panel)
 	/* notify clients that vrr has changed */
 	if (old_dms_data.fps != dms_data.fps) {
 		memcpy(&evt_data.d.dms, &dms_data, sizeof(dms_data));
-		panel_notifier_call_chain(PANEL_EVENT_VRR_STATE_CHANGED, &evt_data);
+		usdm_panel_notifier_call_chain(PANEL_EVENT_VRR_STATE_CHANGED, &evt_data);
 		panel_dbg("PANEL_EVENT_VRR_STATE_CHANGED fps:%d lfd_freq:%d~%dHz\n",
 				dms_data.fps, dms_data.lfd_min_freq, dms_data.lfd_max_freq);
 	}
 
 	/* notify clients that fps or lfd has changed */
 	if (memcmp(&old_dms_data, &dms_data, sizeof(dms_data))) {
-		panel_notifier_call_chain(PANEL_EVENT_LFD_STATE_CHANGED, &evt_data);
+		usdm_panel_notifier_call_chain(PANEL_EVENT_LFD_STATE_CHANGED, &evt_data);
 		panel_dbg("PANEL_EVENT_LFD_STATE_CHANGED fps:%d lfd_freq:%d~%dHz\n",
 				dms_data.fps, dms_data.lfd_min_freq, dms_data.lfd_max_freq);
 	}

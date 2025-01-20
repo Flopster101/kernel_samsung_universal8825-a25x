@@ -1208,7 +1208,7 @@ static int panel_bl_thread(void *data)
 		evt_data.d.bl.finger_mask_hbm_on =
 			(panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON);
 #endif
-		panel_notifier_call_chain(PANEL_EVENT_BL_STATE_CHANGED, &evt_data);
+		usdm_panel_notifier_call_chain(PANEL_EVENT_BL_STATE_CHANGED, &evt_data);
 #endif
 	}
 

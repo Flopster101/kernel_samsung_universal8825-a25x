@@ -466,7 +466,7 @@ static int panel_debug_panel_event_noti(struct panel_device *panel, char *buf)
 	}
 	evt_data.state = state;
 
-	panel_notifier_call_chain(event, &evt_data);
+	usdm_panel_notifier_call_chain(event, &evt_data);
 	panel_info("event:%d state:%d\n", event, evt_data.state);
 
 	return 0;
