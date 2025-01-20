@@ -118,9 +118,11 @@ struct abox_data *abox_get_data(struct device *dev)
 
 static int abox_iommu_fault_handler(struct iommu_fault *fault, void *token)
 {
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 	struct abox_data *data = token;
 
 	abox_dbg_print_gpr(data->dev, data);
+#endif
 
 	return 0;
 }
@@ -150,14 +152,18 @@ static void exynos_abox_panic_handler(void)
 		}
 		has_run = true;
 
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 		abox_dbg_dump_gpr(dev, data, ABOX_DBG_DUMP_KERNEL, "panic");
+#endif
 		abox_set_magic(data, 0x504E4943);
 		abox_cpu_enable(false);
 		abox_cpu_power(false);
 		abox_cpu_power(true);
 		abox_cpu_enable(true);
 		mdelay(100);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 		abox_dbg_dump_mem(dev, data, ABOX_DBG_DUMP_KERNEL, "panic");
+#endif
 	} else {
 		abox_info(dev, "%s: dump is skipped due to no power\n",
 				__func__);
@@ -184,8 +190,10 @@ static void abox_wdt_work_func(struct work_struct *work)
 			wdt_work);
 	struct device *dev_abox = data->dev;
 
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 	abox_dbg_print_gpr(dev_abox, data);
 	abox_dbg_dump_mem(dev_abox, data, ABOX_DBG_DUMP_KERNEL, "watchdog");
+#endif
 	abox_failsafe_report(dev_abox, true);
 }
 
@@ -199,7 +207,9 @@ static irqreturn_t abox_wdt_handler(int irq, void *dev_id)
 	abox_err(dev, "abox watchdog timeout\n");
 
 	if (abox_is_on()) {
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 		abox_dbg_dump_gpr(dev, data, ABOX_DBG_DUMP_KERNEL, "watchdog");
+#endif
 		writel(0x504E4943, data->sram_base + SRAM_FIRMWARE_SIZE -
 				sizeof(u32));
 		abox_cpu_enable(false);
@@ -1148,8 +1158,10 @@ static int abox_check_dram_status(struct device *dev, struct abox_data *data,
 		val &= ABOX_SYSPOWER_STATUS_MASK;
 		if (local_clock() > timeout) {
 			abox_warn(dev, "syspower status timeout: %u\n", val);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 			abox_dbg_dump_simple(dev, data,
 					"syspower status timeout");
+#endif
 			ret = -EPERM;
 			break;
 		}
@@ -2380,21 +2392,25 @@ static void abox_system_ipc_handler(struct device *dev,
 					system_msg->bundle.param_s32[1]);
 			area = abox_addr_to_kernel_addr(data,
 					system_msg->bundle.param_s32[0]);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 			abox_dbg_print_gpr_from_addr(dev, data, area);
 			abox_dbg_dump_gpr_from_addr(dev, data, area,
 					ABOX_DBG_DUMP_FIRMWARE, type);
 			abox_dbg_dump_mem(dev, data, ABOX_DBG_DUMP_FIRMWARE,
 					type);
+#endif
 			break;
 		default:
 			abox_err(dev, "%s(%#x, %#x, %#x) is reported from calliope\n",
 					type, system_msg->param1,
 					system_msg->param2, system_msg->param3);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 			abox_dbg_print_gpr(dev, data);
 			abox_dbg_dump_gpr(dev, data, ABOX_DBG_DUMP_FIRMWARE,
 					type);
 			abox_dbg_dump_mem(dev, data, ABOX_DBG_DUMP_FIRMWARE,
 					type);
+#endif
 			break;
 		}
 #if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_DEBUG)
@@ -3514,8 +3530,10 @@ static int abox_disable(struct device *dev)
 		clk_disable(data->clk_cpu);
 	abox_gic_disable_irq(data->dev_gic);
 	abox_failsafe_report_reset(dev);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 	if (data->debug_mode != DEBUG_MODE_NONE)
 		abox_dbg_dump_simple(dev, data, "suspend");
+#endif
 	abox_power_notifier_call_chain(data, false);
 	abox_cleanup(data);
 	abox_set_minimum_stable_qos(data, false);
@@ -3644,7 +3662,9 @@ int abox_notify_modem_event(enum abox_modem_event event)
 	case ABOX_MODEM_EVENT_EXIT:
 		system_msg->msgtype = ABOX_STOP_VSS;
 		if (abox_is_on()) {
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 			abox_dbg_print_gpr(dev, data);
+#endif
 			abox_failsafe_report(dev, false);
 		}
 		break;
@@ -3688,9 +3708,11 @@ static int abox_itmon_notifier(struct notifier_block *nb,
 
 	if (itmon_data->port && strstr(itmon_data->port, keyword)) {
 		abox_info(dev, "%s(%lu)\n", __func__, action);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 		abox_dbg_print_gpr(dev, data);
 		abox_dbg_dump_gpr(dev, data, ABOX_DBG_DUMP_KERNEL, "itmon");
 		abox_dbg_dump_mem(dev, data, ABOX_DBG_DUMP_KERNEL, "itmon");
+#endif
 		data->enabled = false;
 		return NOTIFY_BAD;
 	}
@@ -3940,7 +3962,9 @@ static void abox_sysevent_register(struct abox_data *data)
 
 /* sub-driver list */
 static struct platform_driver *abox_sub_drivers[] = {
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 	&samsung_abox_debug_driver,
+#endif
 	&samsung_abox_pci_driver,
 	&samsung_abox_core_driver,
 	&samsung_abox_dump_driver,
