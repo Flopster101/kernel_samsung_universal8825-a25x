@@ -9,4 +9,4 @@ ccflags-$(CONFIG_SAMSUNG_TUI)	+= -Idrivers/misc/tui
 
 obj-$(CONFIG_TOUCHSCREEN_NOVATEK_NT36523_SPI) += $(TARGET).o
 
-ccflags-y += -Wformat
+ccflags-y += -Wformat -Wno-unused-label

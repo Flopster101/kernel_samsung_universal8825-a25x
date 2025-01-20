@@ -3285,76 +3285,88 @@ err_init_sec_fn:
 	nvt_ts_sec_fn_remove(ts);
 #if NVT_TOUCH_EXT_PROC
 	nvt_extra_proc_deinit();
-err_extra_proc_init_failed:
 #endif
+err_extra_proc_init_failed:
 #if NVT_TOUCH_PROC
 	nvt_flash_proc_deinit();
-err_flash_proc_init_failed:
 #endif
+err_flash_proc_init_failed:
 #if NVT_TOUCH_ESD_PROTECT
 	if (nvt_esd_check_wq) {
 		cancel_delayed_work_sync(&nvt_esd_check_work);
 		destroy_workqueue(nvt_esd_check_wq);
 		nvt_esd_check_wq = NULL;
 	}
+#endif
 err_create_nvt_esd_check_wq_failed:
-#endif
 err_fw_update_failed:
-	if (ts->platdata->support_ear_detect)
+	if (ts && ts->platdata && ts->platdata->support_ear_detect && ts->input_dev) {
 		device_init_wakeup(&ts->input_dev->dev, 0);
-	free_irq(client->irq, ts);
+	}
 err_int_request_failed:
+	if (client->irq) { // Check if IRQ was requested
+		free_irq(client->irq, ts);
+		client->irq = 0; // Reset client irq
+	}
 #if PROXIMITY_FUNCTION
-	input_unregister_device(ts->input_dev_proximity);
-	ts->input_dev_proximity = NULL;
-err_input_register_proximity_device_failed:
+	if (ts && ts->input_dev_proximity) {
+		input_unregister_device(ts->input_dev_proximity);
+		ts->input_dev_proximity = NULL;
+	}
 #endif
-	input_unregister_device(ts->input_dev);
-	ts->input_dev = NULL;
+err_input_register_proximity_device_failed:
+	if (ts && ts->input_dev) {
+		input_unregister_device(ts->input_dev);
+		ts->input_dev = NULL;
+	}
 err_input_register_device_failed:
 #if PROXIMITY_FUNCTION
-	if (ts->input_dev_proximity != NULL) {
+	if (ts && ts->input_dev_proximity) {
 		input_free_device(ts->input_dev_proximity);
 		ts->input_dev_proximity = NULL;
 	}
-err_input_dev_prox_alloc_failed:
 #endif
-	if (ts->input_dev != NULL) {
+err_input_dev_prox_alloc_failed:
+	if (ts && ts->input_dev) {
 		input_free_device(ts->input_dev);
 		ts->input_dev = NULL;
 	}
 err_input_dev_alloc_failed:
 err_chipvertrim_failed:
-	mutex_destroy(&ts->xbuf_lock);
-	mutex_destroy(&ts->lock);
-	nvt_gpio_deconfig(ts);
+	if (ts) {
+		mutex_destroy(&ts->xbuf_lock);
+		mutex_destroy(&ts->lock);
+		nvt_gpio_deconfig(ts);
+	}
 err_spi_setup:
 err_ckeck_full_duplex:
 	spi_set_drvdata(client, NULL);
 
-	if (ts->platdata->name_lcd_rst)
-		regulator_put(ts->regulator_lcd_rst);
-	if (ts->platdata->name_lcd_vddi)
-		regulator_put(ts->regulator_lcd_vddi);
-	if (ts->platdata->name_lcd_bl_en)
-		regulator_put(ts->regulator_lcd_bl_en);
-	if (ts->platdata->name_lcd_vsp)
-		regulator_put(ts->regulator_lcd_vsp);
-	if (ts->platdata->name_lcd_vsn)
-		regulator_put(ts->regulator_lcd_vsn);
+	if (ts && ts->platdata) {
+		if (ts->platdata->name_lcd_rst && ts->regulator_lcd_rst)
+			regulator_put(ts->regulator_lcd_rst);
+		if (ts->platdata->name_lcd_vddi && ts->regulator_lcd_vddi)
+			regulator_put(ts->regulator_lcd_vddi);
+		if (ts->platdata->name_lcd_bl_en && ts->regulator_lcd_bl_en)
+			regulator_put(ts->regulator_lcd_bl_en);
+		if (ts->platdata->name_lcd_vsp && ts->regulator_lcd_vsp)
+			regulator_put(ts->regulator_lcd_vsp);
+		if (ts->platdata->name_lcd_vsn && ts->regulator_lcd_vsn)
+			regulator_put(ts->regulator_lcd_vsn);
+	}
 err_gpio_config_failed:
 err_parse_dt_failed:
-	if (ts->platdata) {
+	if (ts && ts->platdata) {
 		devm_kfree(&client->dev, ts->platdata);
 		ts->platdata = NULL;
 	}
 err_alloc_platdata_failed:
-	if (ts->rbuf) {
+	if (ts && ts->rbuf) {
 		kfree(ts->rbuf);
 		ts->rbuf = NULL;
 	}
 err_malloc_rbuf:
-	if (ts->xbuf) {
+	if (ts && ts->xbuf) {
 		kfree(ts->xbuf);
 		ts->xbuf = NULL;
 	}
@@ -3379,23 +3391,16 @@ static int32_t nvt_ts_remove(struct spi_device *client)
 {
 	input_info(true, &client->dev, "%s : Removing driver...\n", __func__);
 
+	if (!ts) { // Check if ts is NULL
+		input_err(true, &client->dev, "%s : tsp data null\n", __func__);
+		return 0; // Important: Return 0 on NULL ts
+	}
+
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 	cancel_delayed_work_sync(&ts->work_vbus);
 #endif
 	cancel_delayed_work_sync(&ts->work_print_info);
-
-	nvt_ts_sec_fn_remove(ts);
-
-#if NVT_TOUCH_EXT_PROC
-	nvt_extra_proc_deinit();
-#endif
-#if NVT_TOUCH_PROC
-	nvt_flash_proc_deinit();
-#endif
-
-#if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
-	vbus_notifier_unregister(&ts->vbus_nb);
-#endif
+	cancel_delayed_work_sync(&ts->work_read_info); // Cancel read info work
 
 #if NVT_TOUCH_ESD_PROTECT
 	if (nvt_esd_check_wq) {
@@ -3406,58 +3411,78 @@ static int32_t nvt_ts_remove(struct spi_device *client)
 	}
 #endif
 
-	cancel_delayed_work_sync(&ts->work_read_info);
+	if (ts->input_dev) { // Check before unregistering
+		input_unregister_device(ts->input_dev);
+	}
+	if (ts->input_dev_proximity) { // Check before unregistering
+		input_unregister_device(ts->input_dev_proximity);
+	}
 
-	if (ts->platdata->support_ear_detect)
+	if (ts->platdata && ts->platdata->support_ear_detect && ts->input_dev) { // Check before accessing
 		device_init_wakeup(&ts->input_dev->dev, 0);
+	}
 
 	nvt_irq_enable(false);
-	pinctrl_configure(ts, false);
+	if (client->irq) { // Check if IRQ was requested
+		free_irq(client->irq, ts);
+		client->irq = 0; // Reset client irq
+	}
+	if (ts) { // Check before accessing members
+		pinctrl_configure(ts, false);
+		nvt_ts_sec_fn_remove(ts);
+	}
 
-	free_irq(client->irq, ts);
+#if NVT_TOUCH_EXT_PROC
+	nvt_extra_proc_deinit();
+#endif
+#if NVT_TOUCH_PROC
+	nvt_flash_proc_deinit();
+#endif
 
-	mutex_destroy(&ts->xbuf_lock);
-	mutex_destroy(&ts->lock);
+#if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
+	if(ts)
+		vbus_notifier_unregister(&ts->vbus_nb);
+#endif
 
-	nvt_gpio_deconfig(ts);
+	if (ts) { // Check before destroying mutexes and deconfiguring GPIO
+		mutex_destroy(&ts->xbuf_lock);
+		mutex_destroy(&ts->lock);
+		nvt_gpio_deconfig(ts);
+	}
 
-	if (ts->platdata->name_lcd_rst)
-		regulator_put(ts->regulator_lcd_rst);
-	if (ts->platdata->name_lcd_vddi)
-		regulator_put(ts->regulator_lcd_vddi);
-	if (ts->platdata->name_lcd_bl_en)
-		regulator_put(ts->regulator_lcd_bl_en);
-	if (ts->platdata->name_lcd_vsp)
-		regulator_put(ts->regulator_lcd_vsp);
-	if (ts->platdata->name_lcd_vsn)
-		regulator_put(ts->regulator_lcd_vsn);
+	if (ts && ts->platdata) { // Check before putting regulators
+		if (ts->platdata->name_lcd_rst && ts->regulator_lcd_rst)
+			regulator_put(ts->regulator_lcd_rst);
+		if (ts->platdata->name_lcd_vddi && ts->regulator_lcd_vddi)
+			regulator_put(ts->regulator_lcd_vddi);
+		if (ts->platdata->name_lcd_bl_en && ts->regulator_lcd_bl_en)
+			regulator_put(ts->regulator_lcd_bl_en);
+		if (ts->platdata->name_lcd_vsp && ts->regulator_lcd_vsp)
+			regulator_put(ts->regulator_lcd_vsp);
+		if (ts->platdata->name_lcd_vsn && ts->regulator_lcd_vsn)
+			regulator_put(ts->regulator_lcd_vsn);
+	}
 
-	if (ts->input_dev) {
-		input_unregister_device(ts->input_dev);
+	if (ts->input_dev) { // Check before freeing
+		input_free_device(ts->input_dev);
 		ts->input_dev = NULL;
 	}
-	
-	if (ts->input_dev_proximity) {
-		input_mt_destroy_slots(ts->input_dev_proximity);
-		input_unregister_device(ts->input_dev_proximity);
+	if (ts->input_dev_proximity) { // Check before freeing
+		input_free_device(ts->input_dev_proximity);
 		ts->input_dev_proximity = NULL;
 	}
 
 	spi_set_drvdata(client, NULL);
 
-	if (ts->platdata) {
+	if (ts && ts->platdata) { // Check before freeing
 		devm_kfree(&client->dev, ts->platdata);
 		ts->platdata = NULL;
 	}
-	if (ts->rbuf) {
+	if (ts) { // Check before freeing buffers and ts
 		kfree(ts->rbuf);
 		ts->rbuf = NULL;
-	}
-	if (ts->xbuf) {
 		kfree(ts->xbuf);
 		ts->xbuf = NULL;
-	}
-	if (ts) {
 		kfree(ts);
 		ts = NULL;
 	}
@@ -3469,19 +3494,21 @@ static void nvt_ts_shutdown(struct spi_device *client)
 {
 	input_info(true, &client->dev, "%s : Shutdown driver...\n", __func__);
 
-	if (ts == NULL) {
+	if (!ts) { // Simplified NULL check
 		input_err(true, &client->dev, "%s : tsp data null\n", __func__);
 		return;
 	}
 
 	ts->shutdown_called = true;
 
-	if (ts->platdata->support_ear_detect)
+	if (ts->platdata && ts->input_dev && ts->platdata->support_ear_detect) {
 		device_init_wakeup(&ts->input_dev->dev, 0);
+	}
 
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 	cancel_delayed_work_sync(&ts->work_vbus);
 #endif
+
 	cancel_delayed_work_sync(&ts->work_print_info);
 
 #if NVT_TOUCH_ESD_PROTECT
@@ -3491,16 +3518,18 @@ static void nvt_ts_shutdown(struct spi_device *client)
 		destroy_workqueue(nvt_esd_check_wq);
 		nvt_esd_check_wq = NULL;
 	}
-#endif /* #if NVT_TOUCH_ESD_PROTECT */
+#endif
 
 	cancel_delayed_work_sync(&ts->work_read_info);
 
 	ts->power_status = POWER_OFF_STATUS;
 
-	nvt_irq_enable(false);
-	pinctrl_configure(ts, false);
+	nvt_irq_enable(false); // Disable IRQ
 
-	nvt_ts_sec_fn_remove(ts);
+	if (ts) { //Check if ts is still valid before accessing members.
+	  pinctrl_configure(ts, false);
+	  nvt_ts_sec_fn_remove(ts);
+	}
 
 #if NVT_TOUCH_EXT_PROC
 	nvt_extra_proc_deinit();
@@ -3508,9 +3537,7 @@ static void nvt_ts_shutdown(struct spi_device *client)
 #if NVT_TOUCH_PROC
 	nvt_flash_proc_deinit();
 #endif
-
 }
-
 
 int nvt_ts_lcd_reset_ctrl(bool on)
 {
