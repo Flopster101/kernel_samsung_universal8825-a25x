@@ -147,7 +147,9 @@ static void abox_wdma_disable_barrier(struct device *dev,
 			continue;
 		}
 		dev_warn_ratelimited(dev, "WDMA disable timeout\n");
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 		abox_dbg_dump_simple(dev, abox_data, "WDMA disable timeout");
+#endif
 		/* Disable DMA by force */
 		regmap_update_bits_base(abox_data->regmap,
 				ABOX_WDMA_CTRL(data->id),

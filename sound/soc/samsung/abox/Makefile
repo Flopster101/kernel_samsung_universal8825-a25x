@@ -21,10 +21,14 @@ snd-soc-samsung-abox-gic-$(CONFIG_SND_SOC_SAMSUNG_ABOX) += abox_gic.o abox_util.
 snd-soc-samsung-abox-sync-$(CONFIG_SEC_SND_SYNCHRONIZED_IPC) += abox_synchronized_ipc.o
 
 snd-soc-samsung-abox-$(CONFIG_SND_SOC_SAMSUNG_ABOX) += abox_util.o \
-	abox_dbg.o abox_dump.o abox_log.o abox.o abox_core.o abox_rdma.o\
+	abox_dump.o abox_log.o abox.o abox_core.o abox_rdma.o\
 	abox_wdma.o abox_if.o abox_effect.o abox_vss.o abox_failsafe.o \
 	abox_vdma.o abox_msg.o abox_ipc.o abox_qos.o abox_ion.o abox_tplg.o \
 	abox_dma.o abox_pci.o abox_shm.o abox_atune.o abox_proc.o abox_oem.o
+
+ifeq ($(CONFIG_SND_SOC_SAMSUNG_DEBUG),y)
+snd-soc-samsung-abox-$(CONFIG_SND_SOC_SAMSUNG_ABOX) += abox_dbg.o
+endif
 
 obj-$(CONFIG_SND_SOC_SAMSUNG_ABOX) += snd-soc-samsung-abox-gic.o snd-soc-samsung-abox.o
 
