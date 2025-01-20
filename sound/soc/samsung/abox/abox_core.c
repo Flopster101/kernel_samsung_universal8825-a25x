@@ -196,8 +196,10 @@ int abox_core_standby(void)
 						"standby timeout(%d)",
 						core->id);
 				abox_err(dev, "%s\n", reason);
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 				abox_dbg_dump_gpr_mem(dev, data,
 						ABOX_DBG_DUMP_KERNEL, reason);
+#endif
 				kfree(reason);
 
 				ret = -EBUSY;
@@ -559,7 +561,9 @@ int abox_core_download_firmware(void)
 				if (fw->code_signed && fw->fw_imgloader_desc) {
 					ret |= imgloader_boot(fw->fw_imgloader_desc);
 					if (ret < 0) {
+#ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 						abox_dbg_dump_mem(dev, data, ABOX_DBG_DUMP_KERNEL, "verification fail");
+#endif
 						abox_failsafe_report(dev, true);
 					}
 					continue;
