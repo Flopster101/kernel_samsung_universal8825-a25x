@@ -495,6 +495,13 @@ config SEC_DETECT_SYSFS
 	help
 		Will show the currently running device through the sysfs node: /sys/kernel/sec_detect/device_name.
 
+config SEC_DETECT_CMDLINE_PATCH
+	bool "Patch cmdline module params for certain panel drivers"
+	depends on SEC_DETECT
+	default y
+	help
+		Will add the correct -decon/-usdm prefix to the module params for the panel drivers.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
