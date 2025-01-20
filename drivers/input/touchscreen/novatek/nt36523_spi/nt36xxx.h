@@ -652,12 +652,4 @@ int nvt_sec_mp_parse_dt(struct nvt_ts_data *ts, const char *node_compatible);
 int nvt_ts_lpwg_dump_buf_read(u8 *buf);
 #endif
 
-#if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER)
-extern int ss_panel_notifier_register(struct notifier_block *nb);
-extern int ss_panel_notifier_unregister(struct notifier_block *nb);
-#endif
-#if IS_ENABLED(CONFIG_DRM_SAMSUNG_DPU)
-extern int panel_notifier_register(struct notifier_block *nb);
-extern int panel_notifier_unregister(struct notifier_block *nb);
-#endif
 #endif /* _LINUX_NVT_TOUCH_H */
