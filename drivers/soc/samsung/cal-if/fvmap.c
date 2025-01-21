@@ -409,7 +409,6 @@ static void optimize_rate_volt_table(struct rate_volt_header *head, unsigned int
 #ifdef CONFIG_SOC_S5E8825_UNDERVOLT
 #define S5E8825_DMID_CPUCL0 2 // Set domain_id for CPUCL0 here.
 #define S5E8825_DMID_CPUCL1 3 // Set domain_id for CPUCL1 here.
-#define S5E8825_DMID_G3D 8 // Set domain_id for GPU (G3D)
 #define S5E8825_DMID_INTG3D 15 // Set domain_id for GPU (INTG3D)
 #endif
 
@@ -495,8 +494,8 @@ static void fvmap_copy_from_sram(void __iomem *map_base, void __iomem *sram_base
 #endif
 
 #if CONFIG_SOC_S5E8825_GPU_UV != 0
-        /* Apply undervolt if the domain is G3D or INTG3D */
-        if (fvmap_header[i].domain_id == S5E8825_DMID_G3D || fvmap_header[i].domain_id == S5E8825_DMID_INTG3D) {
+        /* Apply undervolt if the domain is INTG3D */
+        if (fvmap_header[i].domain_id == S5E8825_DMID_INTG3D) {
             for (j = 0; j < fvmap_header[i].num_of_lv; j++) {
                 old->table[j].volt = (old->table[j].volt * (100 - CONFIG_SOC_S5E8825_GPU_UV)) / 100;
             }
