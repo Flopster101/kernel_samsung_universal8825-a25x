@@ -367,6 +367,12 @@ int abox_log_register_buffer(struct device *dev, int id,
 	struct abox_log_buffer_info *info;
 	unsigned long flags;
 
+#if IS_ENABLED(CONFIG_SND_SOC_SAMSUNG_ABOX_LOG_SINGLE)
+	if (id > 0) {
+		abox_info(dev, "%s(%d) not supported\n", __func__, id);
+		return 0;
+	}
+#endif
 	abox_dbg(dev, "%s(%d)\n", __func__, id);
 
 	abox_log_init(dev);
