@@ -280,7 +280,7 @@
 #define I2C_MUTEX_UNLOCK(lock)
 #endif
 
-#define ENABLE_DBG_EVENT_PRINT
+/* #define ENABLE_DBG_EVENT_PRINT */
 /* #define ENABLE_DBG_CLK_PRINT */
 
 #ifdef SECURE_CAMERA_IRIS

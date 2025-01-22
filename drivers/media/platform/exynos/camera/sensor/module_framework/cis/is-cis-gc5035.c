@@ -1065,10 +1065,7 @@ int sensor_gc5035_cis_stream_on(struct v4l2_subdev *subdev)
 	/* Sensor Dual sync on/off */
 	if (single_mode) {
 		/* Delay for single mode */
-		if (core->scenario != IS_SCENARIO_SECURE) {
-			msleep(50);
-		}
-
+		msleep(50);
 		info("%s (single mode)\n", __func__);
 	} else {
 		info("%s (dual slave mode)\n", __func__);
@@ -1100,6 +1097,11 @@ int sensor_gc5035_cis_stream_on(struct v4l2_subdev *subdev)
 		goto p_i2c_err;
 	}
 	I2C_MUTEX_UNLOCK(cis->i2c_lock);
+
+	if (core->scenario == IS_SCENARIO_SECURE) {
+		/* Delay is required to avoid mipi overflow for face recoginition in low light */
+		msleep(50);
+	}
 
 	cis_data->stream_on = true;
 
@@ -1969,10 +1971,6 @@ int sensor_gc5035_cis_wait_streamoff(struct v4l2_subdev *subdev)
 		u8 read_value_3E = 0;
 
 		/* Page Selection */
-		ret = is_sensor_addr8_write8(client, 0xfd, 0x00);
-		if (ret < 0)
-			 goto p_err;
-
 		ret = is_sensor_addr8_write8(client, 0xfe, 0x00);
 		if (ret < 0)
 			 goto p_err;
