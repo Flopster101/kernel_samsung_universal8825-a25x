@@ -119,4 +119,10 @@ config SND_SOC_SAMSUNG_ABOX_CHANGE_RMEM_SIZE
 	default n
 	help
 	  change reserved memory size for abox_dbg or abox_slog
-	  check debug_level or force_upload before alloc reserved memory and change the size.
+	  check debug_level or force_upload before alloc reserved memory and change the size.+
+
+config SND_SOC_SAMSUNG_ABOX_LOG_SINGLE
+	bool "define the number of abox logging files in proc"
+	help
+	  Say Y or M if you don't want to use log-01 to save memory(use only log-00).
+ 	default n

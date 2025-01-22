@@ -825,33 +825,6 @@ void abox_dbg_dump_simple(struct device *dev, struct abox_data *data,
 			sizeof(abox_dump_simple.sfr_gic_gicd));
 }
 
-static struct abox_dbg_dump_simple abox_dump_suspend;
-
-void abox_dbg_dump_suspend(struct device *dev, struct abox_data *data)
-{
-	abox_dbg(dev, "%s\n", __func__);
-
-	abox_dump_suspend.time = sched_clock();
-	strncpy(abox_dump_suspend.reason, "suspend",
-			sizeof(abox_dump_suspend.reason) - 1);
-	abox_core_dump_gpr(abox_dump_suspend.gpr);
-	memcpy_fromio(abox_dump_suspend.sram.dump, data->sram_base,
-			SRAM_FIRMWARE_SIZE);
-	abox_dump_suspend.sram.magic = ABOX_DBG_DUMP_MAGIC_SRAM;
-	memcpy(abox_dump_suspend.log.dump, data->dram_base + ABOX_LOG_OFFSET,
-			ABOX_LOG_SIZE);
-	abox_dump_suspend.log.magic = ABOX_DBG_DUMP_MAGIC_LOG;
-	memcpy_fromio(abox_dump_suspend.sfr.dump, data->sfr_base,
-			sizeof(abox_dump_suspend.sfr.dump));
-	abox_dump_suspend.sfr.magic = ABOX_DBG_DUMP_MAGIC_SFR;
-	memcpy_fromio(abox_dump_suspend.atune.dump,
-			data->sfr_base + ATUNE_OFFSET,
-			sizeof(abox_dump_suspend.atune.dump));
-	abox_dump_suspend.atune.magic = ABOX_DBG_DUMP_MAGIC_ATUNE;
-	abox_gicd_dump(data->dev_gic, (char *)abox_dump_suspend.sfr_gic_gicd, 0,
-			sizeof(abox_dump_suspend.sfr_gic_gicd));
-}
-
 static atomic_t abox_error_count = ATOMIC_INIT(0);
 
 void abox_dbg_report_status(struct device *dev, bool ok)

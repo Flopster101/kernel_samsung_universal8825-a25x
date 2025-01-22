@@ -87,13 +87,6 @@ extern void abox_dbg_dump_simple(struct device *dev, struct abox_data *data,
 		const char *reason);
 
 /**
- * dump gpr and memory except DRAM just before abox suspend
- * @param[in]	dev		pointer to device which invokes this API
- * @param[in]	data		pointer to abox_data structure
- */
-extern void abox_dbg_dump_suspend(struct device *dev, struct abox_data *data);
-
-/**
  * Push status of the abox
  * @param[in]	dev		pointer to abox device
  * @param[in]	ok		true for okay, false on otherwise
