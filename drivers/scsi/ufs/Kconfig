@@ -276,6 +276,13 @@ config SEC_UFS_FEATURE
 	  Enabling this allows kernel to use SEC specific feature
 	  defined and implemented by SEC.
 
+config EXYNOS_UFS_EOM
+	tristate "SEC UFS eom feature"
+	depends on SCSI_UFSHCD
+	help
+	  Enable UFS eom feature.
+	  defined and implemented by SEC.
+
 config SEC_UFS_WB_FEATURE
 	tristate "SEC specific UFS Write Booster Support"
 	depends on SCSI_UFSHCD && SEC_UFS_FEATURE
