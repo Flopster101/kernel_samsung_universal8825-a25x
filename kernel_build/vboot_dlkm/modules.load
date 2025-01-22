@@ -4,9 +4,6 @@ exynos_mct.ko
 clk_exynos.ko
 i2c-exynos5.ko
 ems.ko
-zsmalloc.ko
-lzo.ko
-lzo-rle.ko
 phy-exynos-mipi-dsim.ko
 phy-exynos-mipi.ko
 phy-exynos-usbdrd-super.ko
@@ -78,7 +75,6 @@ mcd-panel-decon-samsung-helper.ko
 mcd-panel-samsung-drv.ko
 mcd-panel-samsung-helper.ko
 mali_kbase.ko
-zram.ko
 scsc_logring.ko
 scsc_platform_mif.ko
 scsc_mx.ko
