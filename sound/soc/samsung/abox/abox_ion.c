@@ -45,9 +45,10 @@ int abox_ion_get_mmap_fd(struct device *dev,
 	mmap_fd->fd = buf->fd;
 
 	temp_buf = dma_buf_get(buf->fd);
-	if (IS_ERR(temp_buf))
-		abox_err(dev, "dma_buf_get(%d) failed: %ld\n", buf->fd,
-				PTR_ERR(temp_buf));
+	if (IS_ERR(temp_buf)) {
+		abox_err(dev, "dma_buf_get(%d) failed: %ld\n", buf->fd, PTR_ERR(temp_buf));
+		return PTR_ERR(temp_buf);
+	}
 
 	return 0;
 }

@@ -3532,7 +3532,7 @@ static int abox_disable(struct device *dev)
 	abox_failsafe_report_reset(dev);
 #ifdef CONFIG_SND_SOC_SAMSUNG_DEBUG
 	if (data->debug_mode != DEBUG_MODE_NONE)
-		abox_dbg_dump_suspend(dev, data);
+		abox_dbg_dump_simple(dev, data, "suspend");
 #endif
 	abox_power_notifier_call_chain(data, false);
 	abox_cleanup(data);
