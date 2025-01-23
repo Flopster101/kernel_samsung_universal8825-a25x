@@ -566,9 +566,11 @@ static int exynos_drm_crtc_late_register(struct drm_crtc *crtc)
 	int ret = 0;
 	struct exynos_drm_crtc *exynos_crtc = to_exynos_crtc(crtc);
 
+#ifdef CONFIG_DEBUG_FS
 	ret = dpu_init_debug(exynos_crtc);
 	if (ret)
 		return ret;
+#endif
 
 	if (exynos_crtc->ops->late_register)
 		ret = exynos_crtc->ops->late_register(exynos_crtc);
