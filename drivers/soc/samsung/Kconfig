@@ -571,6 +571,13 @@ config SOC_S5E8825_GPU_UV
 	  Percentage to undervolt the GPU of the S5E8825 SoC.
 	  Set a value between 0 and 100.
 
+config SOC_S5E8825_GPU_OC
+    bool "Enable overclocked frequencies for the Exynos 1280 Mali GPU."
+    depends on ARCH_EXYNOS && MALI_MIDGARD
+    default n
+    help
+      Choose this option enable preconfigured overclocked frequencies for the Exynos 1280 Mali GPU.
+
 source "drivers/soc/samsung/acpm/Kconfig"
 
 source "drivers/soc/samsung/debug/Kconfig"
