@@ -460,6 +460,7 @@ static const struct file_operations dpu_profile_hiber_fops = {
 	.release = seq_release,
 };
 
+#ifdef CONFIG_DEBUG_FS
 static void dpu_init_memlogger(struct exynos_drm_crtc *exynos_crtc);
 int dpu_init_debug(struct exynos_drm_crtc *exynos_crtc)
 {
@@ -483,6 +484,7 @@ int dpu_init_debug(struct exynos_drm_crtc *exynos_crtc)
 
 	return 0;
 }
+#endif
 
 int dpu_deinit_debug(struct exynos_drm_crtc *exynos_crtc)
 {
@@ -740,6 +742,7 @@ static const struct memlog_ops dpu_memlog_ops = {
 #define DPU_ERRMEMLOG_SIZE	(SZ_32K)
 #define DPU_EVENT_MEMLOG_SIZE	(SZ_32K)
 #define DPU_FEVENT_MEMLOG_SIZE	(SZ_16K)
+#ifdef CONFIG_DEBUG_FS
 static void dpu_init_memlogger(struct exynos_drm_crtc *exynos_crtc)
 {
 	char dev_name[10];
@@ -802,3 +805,4 @@ static void dpu_init_memlogger(struct exynos_drm_crtc *exynos_crtc)
 err:
 	pr_err("%s: failed\n", __func__);
 }
+#endif
