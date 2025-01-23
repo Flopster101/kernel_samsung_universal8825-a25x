@@ -1082,6 +1082,7 @@ static void decon_atomic_print_state(struct drm_printer *p,
 
 static int decon_late_register(struct exynos_drm_crtc *exynos_crtc)
 {
+#ifdef CONFIG_DEBUG_FS
 	struct decon_device *decon = exynos_crtc->ctx;
 	struct drm_crtc *crtc = &exynos_crtc->base;
 	struct dentry *urgent_dent;
@@ -1143,6 +1144,9 @@ err_urgent:
 	debugfs_remove_recursive(urgent_dent);
 err:
 	return -ENOENT;
+#else
+	return 0;
+#endif
 }
 
 #define DEFAULT_TIMEOUT_FPS 60
