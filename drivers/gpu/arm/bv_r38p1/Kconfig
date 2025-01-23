@@ -23,7 +23,6 @@ menuconfig MALI_MIDGARD
 	select GPU_TRACEPOINTS if ANDROID
 	select DMA_SHARED_BUFFER
 	select PM_DEVFREQ
-	select DEVFREQ_THERMAL
 	select FW_LOADER
 	default m if SOC_EXYNOS2100
 	default y if SOC_EXYNOS9830
