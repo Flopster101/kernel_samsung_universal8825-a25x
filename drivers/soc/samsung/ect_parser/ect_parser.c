@@ -13,6 +13,7 @@
 #include <linux/platform_device.h>
 #include <linux/of_platform.h>
 #include <linux/of_reserved_mem.h>
+#include <linux/exynos/s5e8825_clk_gpu.h>
 
 #define ALIGNMENT_SIZE	 4
 
@@ -557,6 +558,11 @@ static int ect_parse_ap_thermal_function(int parser_version, void *address, stru
 		ect_parse_integer(&address, &range->lower_bound_temperature);
 		ect_parse_integer(&address, &range->upper_bound_temperature);
 		ect_parse_integer(&address, &range->max_frequency);
+#ifdef CONFIG_SOC_S5E8825_GPU_OC
+		if (range->max_frequency == GPU_FREQ_STOCK_KHZ_MAX) {
+			range->max_frequency = GPU_FREQ_KHZ_MAX;
+		}
+#endif
 		ect_parse_integer(&address, &range->sw_trip);
 		ect_parse_integer(&address, &range->flag);
 	}
