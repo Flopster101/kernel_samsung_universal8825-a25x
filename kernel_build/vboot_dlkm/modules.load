@@ -208,7 +208,6 @@ hid-twinhan.ko
 hid-zpff.ko
 hid-zydacron.ko
 hid-waltop.ko
-switch_class.ko
 nanohub.ko
 exynos_devfreq.ko
 s2mpu13_adc.ko
