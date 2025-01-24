@@ -17,7 +17,6 @@ config ZRAM
 config ZRAM_WRITEBACK
        bool "Write back incompressible or idle page to backing device"
        depends on ZRAM
-       default y
        help
 	 With incompressible page, there is no memory saving to keep it
 	 in memory. Instead, write it out to backing device.
@@ -38,20 +37,3 @@ config ZRAM_MEMORY_TRACKING
 	  /sys/kernel/debug/zram/zramX/block_state.
 
 	  See Documentation/admin-guide/blockdev/zram.rst for more information.
-
-config ZRAM_LRU_WRITEBACK
-	bool
-	depends on ZRAM_WRITEBACK
-	default n
-	help
-	  This feature supports zram lru-based writeback (SQZR).
-
-config ZRAM_LRU_WRITEBACK_LIMIT
-	int "Limit zram lru writeback"
-	default 5120
-	depends on ZRAM_LRU_WRITEBACK
-
-config ZRAM_SIZE_OVERRIDE
-	int "zram size to set from kernel"
-	range 1 8589934592
-	default 3221225472
