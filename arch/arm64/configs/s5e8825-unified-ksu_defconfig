@@ -7553,7 +7553,7 @@ CONFIG_DEFAULT_SECURITY_SELINUX=y
 # CONFIG_DEFAULT_SECURITY_DAC is not set
 CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
 # CONFIG_DDAR is not set
-CONFIG_SDP=y
+# CONFIG_SDP is not set
 # CONFIG_SDP_KEY_DUMP is not set
 
 #
