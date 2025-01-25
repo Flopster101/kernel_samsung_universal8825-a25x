@@ -158,8 +158,8 @@ if [ $DO_KSU -eq 1 ]; then
 else
     FK_TYPE="Vanilla"
 fi
-ZIP_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
-TAR_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
+ZIP_PATH="$KDIR/kernel_build/FloppyKernelPermissive_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
+TAR_PATH="$KDIR/kernel_build/FloppyKernelPermissive_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
 
 echo -e "\nINFO: Build info:
 - Device: $DEVICE ($CODENAME)
