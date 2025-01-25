@@ -9,8 +9,8 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef IS_CIS_HI1336_SET_B_H
-#define IS_CIS_HI1336_SET_B_H
+#ifndef IS_CIS_HI1336C_SET_B_H
+#define IS_CIS_HI1336C_SET_B_H
 
 #include "is-cis.h"
 #include "is-cis-hi1336.h"
@@ -32,7 +32,7 @@
  *  [ 4 ] Master 4-binning
  */
 
-const u32 sensor_hi1336_setfile_B_Global[] = {
+const u32 sensor_hi1336c_setfile_B_Global[] = {
 	0x0808, 0x0000, 0x02,
 	0x2000, 0x0021, 0x02,
 	0x2002, 0x04a5, 0x02,
@@ -983,7 +983,7 @@ const u32 sensor_hi1336_setfile_B_Global[] = {
 	0x027e, 0x0100, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_full_crop_4000x3000_30fps[] = {
+const u32 sensor_hi1336c_setfile_B_full_crop_4000x3000_30fps[] = {
 	0x3250, 0xa060, 0x02,
 	0x0730, 0x6f0f, 0x02,
 	0x0732, 0xe0b0, 0x02,
@@ -1035,7 +1035,7 @@ const u32 sensor_hi1336_setfile_B_full_crop_4000x3000_30fps[] = {
 	0x0b04, 0x037c, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_full_crop_4000x2252_30fps[] = {
+const u32 sensor_hi1336c_setfile_B_full_crop_4000x2252_30fps[] = {
 	0x3250, 0xa060, 0x02,
 	0x0730, 0x6f0f, 0x02,
 	0x0732, 0xe0b0, 0x02,
@@ -1087,7 +1087,7 @@ const u32 sensor_hi1336_setfile_B_full_crop_4000x2252_30fps[] = {
 	0x0b04, 0x037c, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_4binning_crop_1000x752_120fps[] = {
+const u32 sensor_hi1336c_setfile_B_4binning_crop_1000x752_120fps[] = {
 	0x3250, 0xa870, 0x02,
 	0x0730, 0x6f0f, 0x02,
 	0x0732, 0xe3b0, 0x02,
@@ -1139,7 +1139,7 @@ const u32 sensor_hi1336_setfile_B_4binning_crop_1000x752_120fps[] = {
 	0x0b04, 0x037c, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_full_crop_2800x2100_30fps[] = {
+const u32 sensor_hi1336c_setfile_B_full_crop_2800x2100_30fps[] = {
 	0x3250, 0xa060, 0x02,
 	0x0730, 0x6f0f, 0x02,
 	0x0732, 0xe0b0, 0x02,
@@ -1191,7 +1191,7 @@ const u32 sensor_hi1336_setfile_B_full_crop_2800x2100_30fps[] = {
 	0x0b04, 0x037c, 0x02,
 };
 
-const struct sensor_pll_info_compact sensor_hi1336_pllinfo_B_full_30fps = {
+const struct sensor_pll_info_compact sensor_hi1336c_pllinfo_B_full_30fps = {
 	EXT_CLK_Mhz * 1000 * 1000,  /* ext_clk */
 	1443 * 1000 * 1000,         /* mipi_datarate */
 	149500000,                  /* pclk, VT system clock */
@@ -1200,7 +1200,7 @@ const struct sensor_pll_info_compact sensor_hi1336_pllinfo_B_full_30fps = {
 };
 
 
-const struct sensor_pll_info_compact sensor_hi1336_pllinfo_B_4binning_120fps = {
+const struct sensor_pll_info_compact sensor_hi1336c_pllinfo_B_4binning_120fps = {
 	EXT_CLK_Mhz * 1000 * 1000,  /* ext_clk */
 	360750000,                  /* mipi_datarate */
 	149500000,                  /* pclk, VT system clock */
@@ -1208,37 +1208,37 @@ const struct sensor_pll_info_compact sensor_hi1336_pllinfo_B_4binning_120fps = {
 	1500,                       /* line_length_pck(per lane) */
 };
 
-static const u32 *sensor_hi1336_setfiles_B[] = {
+static const u32 *sensor_hi1336c_setfiles_B[] = {
 
-	sensor_hi1336_setfile_B_full_crop_4000x3000_30fps,
-	sensor_hi1336_setfile_B_full_crop_4000x2252_30fps,
-	sensor_hi1336_setfile_B_full_crop_2800x2100_30fps,
-	sensor_hi1336_setfile_B_4binning_crop_1000x752_120fps
-
-};
-
-static const u32 sensor_hi1336_setfile_B_sizes[] = {
-
-	ARRAY_SIZE(sensor_hi1336_setfile_B_full_crop_4000x3000_30fps),
-	ARRAY_SIZE(sensor_hi1336_setfile_B_full_crop_4000x2252_30fps),
-	ARRAY_SIZE(sensor_hi1336_setfile_B_full_crop_2800x2100_30fps),
-	ARRAY_SIZE(sensor_hi1336_setfile_B_4binning_crop_1000x752_120fps)
+	sensor_hi1336c_setfile_B_full_crop_4000x3000_30fps,
+	sensor_hi1336c_setfile_B_full_crop_4000x2252_30fps,
+	sensor_hi1336c_setfile_B_full_crop_2800x2100_30fps,
+	sensor_hi1336c_setfile_B_4binning_crop_1000x752_120fps
 
 };
 
-static const struct sensor_pll_info_compact *sensor_hi1336_pllinfos_B[] = {
+static const u32 sensor_hi1336c_setfile_B_sizes[] = {
 
-	&sensor_hi1336_pllinfo_B_full_30fps,       /* full_crop_4000x3000_30fps */
-	&sensor_hi1336_pllinfo_B_full_30fps,       /* full_crop_4000x2252_30fps */
-	&sensor_hi1336_pllinfo_B_full_30fps,       /* full_crop_2800x2100_30fps */
-	&sensor_hi1336_pllinfo_B_4binning_120fps,  /* 4binning_crop_1000x752_120fps */
+	ARRAY_SIZE(sensor_hi1336c_setfile_B_full_crop_4000x3000_30fps),
+	ARRAY_SIZE(sensor_hi1336c_setfile_B_full_crop_4000x2252_30fps),
+	ARRAY_SIZE(sensor_hi1336c_setfile_B_full_crop_2800x2100_30fps),
+	ARRAY_SIZE(sensor_hi1336c_setfile_B_4binning_crop_1000x752_120fps)
+
+};
+
+static const struct sensor_pll_info_compact *sensor_hi1336c_pllinfos_B[] = {
+
+	&sensor_hi1336c_pllinfo_B_full_30fps,       /* full_crop_4000x3000_30fps */
+	&sensor_hi1336c_pllinfo_B_full_30fps,       /* full_crop_4000x2252_30fps */
+	&sensor_hi1336c_pllinfo_B_full_30fps,       /* full_crop_2800x2100_30fps */
+	&sensor_hi1336c_pllinfo_B_4binning_120fps,  /* 4binning_crop_1000x752_120fps */
 
 };
 
 /***************************************************************************
  *                           Hi1336 Fsync setting                          *
  ***************************************************************************/
-const u32 sensor_hi1336_setfile_B_fsync_normal[] = {
+const u32 sensor_hi1336c_setfile_B_fsync_normal[] = {
 	0x0250, 0x0000, 0x02,
 	0x0254, 0x0001, 0x02,
 	0x0256, 0x0100, 0x02,
@@ -1247,7 +1247,7 @@ const u32 sensor_hi1336_setfile_B_fsync_normal[] = {
 	0x025c, 0x0002, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_fsync_slave[] = {
+const u32 sensor_hi1336c_setfile_B_fsync_slave[] = {
 	0x0250, 0x0300, 0x02,
 	0x0254, 0x0011, 0x02,
 	0x0256, 0x0100, 0x02,
@@ -1256,7 +1256,7 @@ const u32 sensor_hi1336_setfile_B_fsync_slave[] = {
 	0x025c, 0x0002, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_fsync_master_full[] = {
+const u32 sensor_hi1336c_setfile_B_fsync_master_full[] = {
 	0x0250, 0x0100, 0x02,
 	0x0254, 0x1a00, 0x02,
 	0x0256, 0x0000, 0x02,
@@ -1265,7 +1265,7 @@ const u32 sensor_hi1336_setfile_B_fsync_master_full[] = {
 	0x025c, 0x0c5a, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_fsync_master_2_binning[] = {
+const u32 sensor_hi1336c_setfile_B_fsync_master_2_binning[] = {
 	0x0250, 0x0100, 0x02,
 	0x0254, 0x1a00, 0x02,
 	0x0256, 0x0000, 0x02,
@@ -1274,7 +1274,7 @@ const u32 sensor_hi1336_setfile_B_fsync_master_2_binning[] = {
 	0x025c, 0x063a, 0x02,
 };
 
-const u32 sensor_hi1336_setfile_B_fsync_master_4_binning[] = {
+const u32 sensor_hi1336c_setfile_B_fsync_master_4_binning[] = {
 	0x0250, 0x0100, 0x02,
 	0x0254, 0x1a00, 0x02,
 	0x0256, 0x0000, 0x02,
@@ -1283,12 +1283,12 @@ const u32 sensor_hi1336_setfile_B_fsync_master_4_binning[] = {
 	0x025c, 0x032a, 0x02,
 };
 
-struct setfile_info sensor_hi1336_setfile_B_fsync_info[] = {
-	SET_SETFILE_INFO(sensor_hi1336_setfile_B_fsync_normal),
-	SET_SETFILE_INFO(sensor_hi1336_setfile_B_fsync_slave),
-	SET_SETFILE_INFO(sensor_hi1336_setfile_B_fsync_master_full),
-	SET_SETFILE_INFO(sensor_hi1336_setfile_B_fsync_master_2_binning),
-	SET_SETFILE_INFO(sensor_hi1336_setfile_B_fsync_master_4_binning),
+struct setfile_info sensor_hi1336c_setfile_B_fsync_info[] = {
+	SET_SETFILE_INFO(sensor_hi1336c_setfile_B_fsync_normal),
+	SET_SETFILE_INFO(sensor_hi1336c_setfile_B_fsync_slave),
+	SET_SETFILE_INFO(sensor_hi1336c_setfile_B_fsync_master_full),
+	SET_SETFILE_INFO(sensor_hi1336c_setfile_B_fsync_master_2_binning),
+	SET_SETFILE_INFO(sensor_hi1336c_setfile_B_fsync_master_4_binning),
 };
 
 #endif
