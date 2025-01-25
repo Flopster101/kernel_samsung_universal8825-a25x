@@ -84,6 +84,9 @@ EXPORT_SYMBOL(mcd_use_camera_act_driver_soft_landing);
 bool mcd_use_ois_hall_data_for_vdis = false;
 EXPORT_SYMBOL(mcd_use_ois_hall_data_for_vdis);
 
+bool mcd_use_hi1336c_setfile = false;
+EXPORT_SYMBOL(mcd_use_hi1336c_setfile);
+
 #ifdef CONFIG_SEC_DETECT_SYSFS
 // Sysfs attribute to show the current device name
 static ssize_t device_name_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
@@ -170,6 +173,7 @@ void setup_camera_params(void) {
 		mcd_camera_uwide_dualized = true;
 		mcd_read_dual_cal_firmware_data = true;
 		mcd_use_leds_flash_charging_voltage_control = true;
+		mcd_use_hi1336c_setfile = true;
 	}
 
 	if (sec_current_device == SEC_M33) {
