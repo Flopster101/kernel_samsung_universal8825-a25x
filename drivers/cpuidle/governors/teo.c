@@ -252,17 +252,15 @@ static bool teo_state_ok(int i, struct cpuidle_driver *drv)
  * @dev: Target CPU.
  * @state_idx: Index of the capping idle state.
  * @duration_ns: Idle duration value to match.
- * @no_poll: Don't consider polling states.
  */
 static int teo_find_shallower_state(struct cpuidle_driver *drv,
 				    struct cpuidle_device *dev, int state_idx,
-				    s64 duration_ns, bool no_poll)
+				    s64 duration_ns)
 {
 	int i;
 
 	for (i = state_idx - 1; i >= 0; i--) {
-		if (dev->states_usage[i].disable ||
-				(no_poll && drv->states[i].flags & CPUIDLE_FLAG_POLLING))
+		if (dev->states_usage[i].disable)
 			continue;
 
 		state_idx = i;
