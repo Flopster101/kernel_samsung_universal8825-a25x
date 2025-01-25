@@ -1014,6 +1014,13 @@ config HIGHATOMIC_PAGEBLOCKS
 	  highatomic pageblocks.
 	  This value limits max number of highatomic pageblocks.
 
+config KSWAPD_CPU
+	hex "Set kswapd cpu affinity by default"
+	default 0xFF
+	help
+	  Set kswapd cpu affinity by default. 0x3F means allowing CPU as 0 to 5.
+	  To disable this config, set this to 0.
+
 source "mm/damon/Kconfig"
 
 endmenu
