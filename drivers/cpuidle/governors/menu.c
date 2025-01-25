@@ -19,8 +19,6 @@
 #include <linux/sched/stat.h>
 #include <linux/math64.h>
 
-#include "gov.h"
-
 #define BUCKETS 12
 #define INTERVAL_SHIFT 3
 #define INTERVALS (1UL << INTERVAL_SHIFT)
@@ -168,7 +166,8 @@ static void menu_update(struct cpuidle_driver *drv, struct cpuidle_device *dev);
  * of points is below a threshold. If it is... then use the
  * average of these 8 points as the estimated value.
  */
-static unsigned int get_typical_interval(struct menu_device *data)
+static unsigned int get_typical_interval(struct menu_device *data,
+					 unsigned int predicted_us)
 {
 	int i, divisor;
 	unsigned int min, max, thresh, avg;
@@ -196,7 +195,11 @@ again:
 		}
 	}
 
-	if (!max)
+	/*
+	 * If the result of the computation is going to be discarded anyway,
+	 * avoid the computation altogether.
+	 */
+	if (min >= predicted_us)
 		return UINT_MAX;
 
 	if (divisor == INTERVALS)
@@ -264,10 +267,11 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 {
 	struct menu_device *data = this_cpu_ptr(&menu_devices);
 	s64 latency_req = cpuidle_governor_latency_req(dev->cpu);
+	unsigned int predicted_us;
 	u64 predicted_ns;
 	u64 interactivity_req;
 	unsigned long nr_iowaiters;
-	ktime_t delta, delta_tick;
+	ktime_t delta_next;
 	int i, idx;
 
 	if (data->needs_update) {
@@ -275,41 +279,11 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 		data->needs_update = 0;
 	}
 
+	/* determine the expected residency time, round up */
+	data->next_timer_ns = tick_nohz_get_sleep_length(&delta_next);
+
 	nr_iowaiters = nr_iowait_cpu(dev->cpu);
-
-	/* Find the shortest expected idle interval. */
-	predicted_ns = get_typical_interval(data) * NSEC_PER_USEC;
-	if (predicted_ns > RESIDENCY_THRESHOLD_NS) {
-		unsigned int timer_us;
-
-		/* Determine the time till the closest timer. */
-		delta = tick_nohz_get_sleep_length(&delta_tick);
-		if (unlikely(delta < 0)) {
-			delta = 0;
-			delta_tick = 0;
-		}
-
-		data->next_timer_ns = delta;
-		data->bucket = which_bucket(data->next_timer_ns, nr_iowaiters);
-
-		/* Round up the result for half microseconds. */
-		timer_us = div_u64((RESOLUTION * DECAY * NSEC_PER_USEC) / 2 +
-					data->next_timer_ns *
-						data->correction_factor[data->bucket],
-				   RESOLUTION * DECAY * NSEC_PER_USEC);
-		/* Use the lowest expected idle interval to pick the idle state. */
-		predicted_ns = min((u64)timer_us * NSEC_PER_USEC, predicted_ns);
-	} else {
-		/*
-		 * Because the next timer event is not going to be determined
-		 * in this case, assume that without the tick the closest timer
-		 * will be in distant future and that the closest tick will occur
-		 * after 1/2 of the tick period.
-		 */
-		data->next_timer_ns = KTIME_MAX;
-		delta_tick = TICK_NSEC / 2;
-		data->bucket = which_bucket(KTIME_MAX, nr_iowaiters);
-	}
+	data->bucket = which_bucket(data->next_timer_ns, nr_iowaiters);
 
 	if (unlikely(drv->state_count <= 1 || latency_req == 0) ||
 	    ((data->next_timer_ns < drv->states[1].target_residency_ns ||
@@ -324,6 +298,16 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 		return 0;
 	}
 
+	/* Round up the result for half microseconds. */
+	predicted_us = div_u64(data->next_timer_ns *
+			       data->correction_factor[data->bucket] +
+			       (RESOLUTION * DECAY * NSEC_PER_USEC) / 2,
+			       RESOLUTION * DECAY * NSEC_PER_USEC);
+	/* Use the lowest expected idle interval to pick the idle state. */
+	predicted_ns = (u64)min(predicted_us,
+				get_typical_interval(data, predicted_us)) *
+				NSEC_PER_USEC;
+
 	if (tick_nohz_tick_stopped()) {
 		/*
 		 * If the tick is already stopped, the cost of possible short
@@ -334,7 +318,7 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 		 * state selection.
 		 */
 		if (predicted_ns < TICK_NSEC)
-			predicted_ns = data->next_timer_ns;
+			predicted_ns = delta_next;
 	} else {
 		/*
 		 * Use the performance multiplier and the user-configurable
@@ -393,7 +377,7 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 			 * stuck in the shallow one for too long.
 			 */
 			if (drv->states[idx].target_residency_ns < TICK_NSEC &&
-			    s->target_residency_ns <= delta_tick)
+			    s->target_residency_ns <= delta_next)
 				idx = i;
 
 			return idx;
@@ -415,7 +399,7 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 	     predicted_ns < TICK_NSEC) && !tick_nohz_tick_stopped()) {
 		*stop_tick = false;
 
-		if (idx > 0 && drv->states[idx].target_residency_ns > delta_tick) {
+		if (idx > 0 && drv->states[idx].target_residency_ns > delta_next) {
 			/*
 			 * The tick is not going to be stopped and the target
 			 * residency of the state to be returned is not within
@@ -427,7 +411,7 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 					continue;
 
 				idx = i;
-				if (drv->states[i].target_residency_ns <= delta_tick)
+				if (drv->states[i].target_residency_ns <= delta_next)
 					break;
 			}
 		}
