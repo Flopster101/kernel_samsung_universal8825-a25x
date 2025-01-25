@@ -942,7 +942,7 @@ static int sugov_init(struct cpufreq_policy *policy)
 	}
 
 	tunables->up_rate_limit_us = 500;
-	tunables->down_rate_limit_us = 20000;
+	tunables->down_rate_limit_us = 1000;
 	tunables->efficient_freq = default_efficient_freq;
 	tunables->nefficient_freq = ARRAY_SIZE(default_efficient_freq);
 	tunables->up_delay = default_up_delay;
