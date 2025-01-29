@@ -187,7 +187,6 @@ GPEX_STATIC ssize_t set_max_lock_dvfs(const char *buf, size_t count)
 CREATE_SYSFS_DEVICE_WRITE_FUNCTION(set_max_lock_dvfs)
 CREATE_SYSFS_KOBJECT_WRITE_FUNCTION(set_max_lock_dvfs)
 
-#ifdef CONFIG_SOC_S5E8825_GPU_OC
 GPEX_STATIC ssize_t set_gpu_clklck(const char *buf, size_t count)
 {
 	if (sysfs_streq("0", buf) || sysfs_streq("1", buf)) {
@@ -205,6 +204,8 @@ GPEX_STATIC ssize_t get_gpu_clklck(char *buf)
 	return snprintf(buf, PAGE_SIZE, "%d\n", gpu_clklck);
 }
 CREATE_SYSFS_KOBJECT_READ_FUNCTION(get_gpu_clklck)
+
+#ifdef CONFIG_SOC_S5E8825_GPU_OC
 
 void handle_lock_dvfs(int clock) {
 	int ret;
