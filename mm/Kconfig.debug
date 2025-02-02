@@ -48,7 +48,6 @@ config DEBUG_PAGEALLOC_ENABLE_DEFAULT
 config PAGE_OWNER
 	bool "Track page owner"
 	depends on DEBUG_KERNEL && STACKTRACE_SUPPORT
-	select DEBUG_FS
 	select STACKTRACE
 	select STACKDEPOT
 	select PAGE_EXTENSION
@@ -65,7 +64,6 @@ config PAGE_OWNER
 config PAGE_PINNER
 	bool "Track page pinner"
 	depends on DEBUG_KERNEL && STACKTRACE_SUPPORT
-	select DEBUG_FS
 	select STACKTRACE
 	select STACKDEPOT
 	select PAGE_EXTENSION
