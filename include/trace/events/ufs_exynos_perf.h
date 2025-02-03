@@ -240,6 +240,7 @@ TRACE_EVENT(ufs_perf_lock,
 		__print_symbolic(__entry->i, CTRL_OP))
 );
 
+#ifdef MODULE
 DECLARE_EVENT_CLASS(ufshcd_profiling_template,
 	TP_PROTO(const char *dev_name, const char *profile_info, s64 time_us,
 		 int err),
@@ -269,6 +270,7 @@ DEFINE_EVENT(ufshcd_profiling_template, ufshcd_profile_hibern8,
 	TP_PROTO(const char *dev_name, const char *profile_info, s64 time_us,
 		 int err),
 	TP_ARGS(dev_name, profile_info, time_us, err));
+#endif
 #endif /* _TRACE_UFS_EXYNOS_PERF_H */
 
 /* This part must be outside protection */

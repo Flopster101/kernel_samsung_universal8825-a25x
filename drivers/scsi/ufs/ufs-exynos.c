@@ -42,6 +42,9 @@
 #endif
 
 #include <trace/events/ufs_exynos_perf.h>
+#ifndef MODULE
+#include <trace/events/ufs.h>
+#endif
 #include <soc/samsung/debug-snapshot.h>
 
 #include "../scsi_priv.h"
