@@ -1653,7 +1653,7 @@ static int decon_bind(struct device *dev, struct device *master, void *data)
 #endif
 
 	if (IS_ENABLED(CONFIG_EXYNOS_BTS)) {
-		decon->bts.ops = &dpu_bts_control;
+		decon->bts.ops = &p2_decon_dpu_bts_control;
 		decon->bts.ops->init(decon->crtc);
 
 		if ((decon->config.out_type & DECON_OUT_DSI)

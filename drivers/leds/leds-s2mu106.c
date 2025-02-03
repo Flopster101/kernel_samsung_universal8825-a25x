@@ -24,7 +24,7 @@
 #define CONTROL_I2C	0
 #define CONTROL_GPIO	1
 
-struct s2mu106_fled_data *g_fled_data;
+struct s2mu106_fled_data *s2mu106_g_fled_data;
 extern struct class *camera_class; /*sys/class/camera*/
 
 static char *s2mu106_fled_mode_string[] = {
@@ -382,7 +382,7 @@ int s2mu106_mode_change_cam_to_leds(enum cam_flash_mode cam_mode)
 
 int s2mu106_fled_set_mode_ctrl(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mu106_fled_data *fled = g_fled_data;
+	struct s2mu106_fled_data *fled = s2mu106_g_fled_data;
 	int mode = -1;
 
 	mode = s2mu106_mode_change_cam_to_leds(cam_mode);
@@ -404,7 +404,7 @@ EXPORT_SYMBOL_GPL(s2mu106_fled_set_mode_ctrl);
 
 int s2mu106_fled_set_curr(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mu106_fled_data *fled = g_fled_data;
+	struct s2mu106_fled_data *fled = s2mu106_g_fled_data;
 	int mode = -1;
 
 	mode = s2mu106_mode_change_cam_to_leds(cam_mode);
@@ -438,7 +438,7 @@ EXPORT_SYMBOL_GPL(s2mu106_fled_set_curr);
 
 int s2mu106_fled_get_curr(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mu106_fled_data *fled = g_fled_data;
+	struct s2mu106_fled_data *fled = s2mu106_g_fled_data;
 	int mode = -1;
 	int curr = 0;
 
@@ -642,12 +642,12 @@ ATTRIBUTE_GROUPS(s2mu106_fled);
 void s2mu106_fled_set_operation_mode(int mode)
 {
 	if (mode) {
-		s2mu106_fled_operating_mode(g_fled_data, TA_MODE);
-		g_fled_data->set_on_factory = 1;
+		s2mu106_fled_operating_mode(s2mu106_g_fled_data, TA_MODE);
+		s2mu106_g_fled_data->set_on_factory = 1;
 		pr_info("%s: TA only mode set\n", __func__);
 	} else {
-		g_fled_data->set_on_factory = 0;
-		s2mu106_fled_operating_mode(g_fled_data, AUTO_MODE);
+		s2mu106_g_fled_data->set_on_factory = 0;
+		s2mu106_fled_operating_mode(s2mu106_g_fled_data, AUTO_MODE);
 		pr_info("%s: Auto control mode set\n", __func__);
 	}
 }
@@ -846,10 +846,10 @@ static ssize_t rear_flash_store(struct device *dev,
 		return -EFAULT;
 	}
 	pr_info("%s: %d: rear_flash_store:\n", __func__, value);
-	g_fled_data->sysfs_input_data = value;
+	s2mu106_g_fled_data->sysfs_input_data = value;
 
-	flash_current = g_fled_data->flash_current;
-	torch_current = g_fled_data->torch_current;
+	flash_current = s2mu106_g_fled_data->flash_current;
+	torch_current = s2mu106_g_fled_data->torch_current;
 
 	if (value <= 0) {
 		mode = S2MU106_FLED_MODE_OFF;
@@ -857,60 +857,60 @@ static ssize_t rear_flash_store(struct device *dev,
 		mode = S2MU106_FLED_MODE_TORCH;
 	} else if (value == 100) {
 		/* Factory Torch*/
-		pr_info("%s: factory torch current [%d]\n", __func__, g_fled_data->factory_current);
-		torch_current = g_fled_data->factory_current;
+		pr_info("%s: factory torch current [%d]\n", __func__, s2mu106_g_fled_data->factory_current);
+		torch_current = s2mu106_g_fled_data->factory_current;
 		mode = S2MU106_FLED_MODE_TORCH;
 	} else if (value == 200) {
 		/* Factory Flash */
-		pr_info("%s: factory flash current [%d]\n", __func__, g_fled_data->factory_current);
-		flash_current = g_fled_data->factory_current;
+		pr_info("%s: factory flash current [%d]\n", __func__, s2mu106_g_fled_data->factory_current);
+		flash_current = s2mu106_g_fled_data->factory_current;
 		mode = S2MU106_FLED_MODE_FLASH;
 	} else if (value <= 1010 && value >= 1001) {
 		mode = S2MU106_FLED_MODE_TORCH;
 		/* (value) 1001, 1002, 1004, 1006, 1009 */
 		if (value <= 1001)
-			torch_current = g_fled_data->flashlight_current[0];
+			torch_current = s2mu106_g_fled_data->flashlight_current[0];
 		else if (value <= 1002)
-			torch_current = g_fled_data->flashlight_current[1];
+			torch_current = s2mu106_g_fled_data->flashlight_current[1];
 		else if (value <= 1004)
-			torch_current = g_fled_data->flashlight_current[2];
+			torch_current = s2mu106_g_fled_data->flashlight_current[2];
 		else if (value <= 1006)
-			torch_current = g_fled_data->flashlight_current[3];
+			torch_current = s2mu106_g_fled_data->flashlight_current[3];
 		else if (value <= 1009)
-			torch_current = g_fled_data->flashlight_current[4];
+			torch_current = s2mu106_g_fled_data->flashlight_current[4];
 		else
-			torch_current = g_fled_data->torch_current;
-		g_fled_data->sysfs_input_data = 1;
+			torch_current = s2mu106_g_fled_data->torch_current;
+		s2mu106_g_fled_data->sysfs_input_data = 1;
 	} else if (value == 2) {
 		mode = S2MU106_FLED_MODE_FLASH;
 	}
 
-	mutex_lock(&g_fled_data->lock);
+	mutex_lock(&s2mu106_g_fled_data->lock);
 	if (mode == S2MU106_FLED_MODE_TORCH) {
 		pr_info("%s: %d: S2MU106_FLED_MODE_FACTORY - %dmA\n", __func__, value, torch_current);
 		/* torch current set */
-		s2mu106_fled_set_torch_curr(g_fled_data, 1, torch_current);
-		s2mu106_fled_set_mode(g_fled_data, 1, S2MU106_FLED_MODE_TORCH);
+		s2mu106_fled_set_torch_curr(s2mu106_g_fled_data, 1, torch_current);
+		s2mu106_fled_set_mode(s2mu106_g_fled_data, 1, S2MU106_FLED_MODE_TORCH);
 	} else if (mode == S2MU106_FLED_MODE_FLASH) {
 		pr_info("%s: %d: S2MU106_FLED_MODE_FLASH - %dmA\n", __func__, value, flash_current);
 		/* flash current set */
-		s2mu106_fled_set_flash_curr(g_fled_data, 1, flash_current);
-		s2mu106_fled_set_mode(g_fled_data, 1, S2MU106_FLED_MODE_FLASH);
+		s2mu106_fled_set_flash_curr(s2mu106_g_fled_data, 1, flash_current);
+		s2mu106_fled_set_mode(s2mu106_g_fled_data, 1, S2MU106_FLED_MODE_FLASH);
 	} else {
 		pr_info("%s: %d: S2MU106_FLED_MODE_OFF\n", __func__, value);
 
 		/* flase, torch current set for initial current */
-		flash_current = g_fled_data->flash_current;
-		torch_current = g_fled_data->torch_current;
+		flash_current = s2mu106_g_fled_data->flash_current;
+		torch_current = s2mu106_g_fled_data->torch_current;
 		/* flash current set */
-		s2mu106_fled_set_flash_curr(g_fled_data, 1, flash_current);
+		s2mu106_fled_set_flash_curr(s2mu106_g_fled_data, 1, flash_current);
 		/* torch current set */
-		s2mu106_fled_set_torch_curr(g_fled_data, 1, torch_current);
-		s2mu106_fled_set_mode(g_fled_data, 1, S2MU106_FLED_MODE_OFF);
+		s2mu106_fled_set_torch_curr(s2mu106_g_fled_data, 1, torch_current);
+		s2mu106_fled_set_mode(s2mu106_g_fled_data, 1, S2MU106_FLED_MODE_OFF);
 	}
-	mutex_unlock(&g_fled_data->lock);
+	mutex_unlock(&s2mu106_g_fled_data->lock);
 #if IS_ENABLED(DEBUG_TEST_READ)
-	s2mu106_fled_test_read(g_fled_data);
+	s2mu106_fled_test_read(s2mu106_g_fled_data);
 #endif
 	pr_info("%s: rear_flash_store END\n", __func__);
 	return size;
@@ -919,7 +919,7 @@ static ssize_t rear_flash_store(struct device *dev,
 static ssize_t rear_flash_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
-	return sprintf(buf, "%d\n", g_fled_data->sysfs_input_data);
+	return sprintf(buf, "%d\n", s2mu106_g_fled_data->sysfs_input_data);
 }
 
 
@@ -995,7 +995,7 @@ static int s2mu106_led_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, fled_data);
 
 	/* Store fled_data for EXPORT_SYMBOL */
-	g_fled_data = fled_data;
+	s2mu106_g_fled_data = fled_data;
 	fled_data->cdev.name = "fled-s2mu106";
 	fled_data->cdev.groups = s2mu106_fled_groups;
 
@@ -1005,20 +1005,20 @@ static int s2mu106_led_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	g_fled_data->flash_gpio = fled_data->pdata->flash_gpio;
-	g_fled_data->torch_gpio = fled_data->pdata->torch_gpio;
-	g_fled_data->default_current = fled_data->pdata->default_current;
-	g_fled_data->flash_current = fled_data->pdata->flash_current;
-	g_fled_data->torch_current = fled_data->pdata->torch_current;
-	g_fled_data->preflash_current = fled_data->pdata->preflash_current;
-	g_fled_data->movie_current = fled_data->pdata->movie_current;
-	g_fled_data->factory_current = fled_data->pdata->factory_current;
+	s2mu106_g_fled_data->flash_gpio = fled_data->pdata->flash_gpio;
+	s2mu106_g_fled_data->torch_gpio = fled_data->pdata->torch_gpio;
+	s2mu106_g_fled_data->default_current = fled_data->pdata->default_current;
+	s2mu106_g_fled_data->flash_current = fled_data->pdata->flash_current;
+	s2mu106_g_fled_data->torch_current = fled_data->pdata->torch_current;
+	s2mu106_g_fled_data->preflash_current = fled_data->pdata->preflash_current;
+	s2mu106_g_fled_data->movie_current = fled_data->pdata->movie_current;
+	s2mu106_g_fled_data->factory_current = fled_data->pdata->factory_current;
 
 	for (cnt = 0; cnt < S2MU106_FLASH_LIGHT_MAX; cnt++) {
-		g_fled_data->flashlight_current[cnt] = fled_data->pdata->flashlight_current[cnt];
+		s2mu106_g_fled_data->flashlight_current[cnt] = fled_data->pdata->flashlight_current[cnt];
 	}
 
-	s2mu106_fled_init(g_fled_data);
+	s2mu106_fled_init(s2mu106_g_fled_data);
 	mutex_init(&fled_data->lock);
 
 	//create sysfs for camera.

@@ -162,5 +162,6 @@ struct dpu_bts {
 	struct dpu_bts_win_config wb_config;
 };
 
-extern struct dpu_bts_ops dpu_bts_control;
+extern struct dpu_bts_ops p1_decon_dpu_bts_control;
+extern struct dpu_bts_ops p2_decon_dpu_bts_control;
 #endif /* __EXYNOS_DRM_BTS_H__ */

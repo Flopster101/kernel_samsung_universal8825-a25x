@@ -27,7 +27,7 @@ const char *isg5320a_grip_name[GRIP_MAX_CNT] = {
 	"SUB",
 };
 
-const char *isg5320a_device_name[GRIP_MAX_CNT] = {
+const char *isg5320a_isg5320a_device_name[GRIP_MAX_CNT] = {
 	"ISG5320A",
 	"ISG5320A_SUB",
 };

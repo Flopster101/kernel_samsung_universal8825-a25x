@@ -2045,7 +2045,7 @@ static ssize_t grip_name_show(struct device *dev,
 {
 	struct a96t396_data *data = dev_get_drvdata(dev);
 
-	return snprintf(buf, PAGE_SIZE, "%s\n", device_name[data->ic_num]);
+	return snprintf(buf, PAGE_SIZE, "%s\n", a96t3x6_device_name[data->ic_num]);
 }
 
 static ssize_t bin_fw_ver_show(struct device *dev,
@@ -3994,13 +3994,13 @@ static int a96t396_probe(struct i2c_client *client,
 #endif
 
 #if !defined(CONFIG_SENSORS_FW_VENDOR)
-	pr_info("[GRIP_%s] %s: start (0x%x)\n", grip_name[ic_num], __func__, client->addr);
+	pr_info("[GRIP_%s] %s: start (0x%x)\n", a96t396_grip_name[ic_num], __func__, client->addr);
 #else
 	pr_info("[GRIP_%s] %s: start (0x%x) - probe count %d\n",
-		grip_name[ic_num], __func__, client->addr, probe_count);
+		a96t396_grip_name[ic_num], __func__, client->addr, probe_count);
 #endif
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-		pr_err("[GRIP_%s] i2c_check_functionality fail\n", grip_name[ic_num]);
+		pr_err("[GRIP_%s] i2c_check_functionality fail\n", a96t396_grip_name[ic_num]);
 		return -EIO;
 	}
 
@@ -4109,7 +4109,7 @@ static int a96t396_probe(struct i2c_client *client,
 	GRIP_INFO("Setting up misc dev");
 	data->miscdev.minor = MISC_DYNAMIC_MINOR;
 
-	data->miscdev.name = module_name[data->ic_num];
+	data->miscdev.name = a96t396_module_name[data->ic_num];
 	data->miscdev.fops = &fwload_fops;
 
 	GRIP_INFO("Misc device reg:%s", data->miscdev.name);
@@ -4118,7 +4118,7 @@ static int a96t396_probe(struct i2c_client *client,
 	if (ret != 0)
 		GRIP_INFO("Fail to register misc dev %d", ret);
 #endif
-	input_dev->name = module_name[data->ic_num];
+	input_dev->name = a96t396_module_name[data->ic_num];
 	input_dev->id.bustype = BUS_I2C;
 
 	input_set_capability(input_dev, EV_REL, REL_MISC);
@@ -4210,10 +4210,10 @@ static int a96t396_probe(struct i2c_client *client,
 		memcpy(sensor_attributes + grip_sensor_attr_size - 1, multi_sensor_attrs, sizeof(multi_sensor_attrs));
 	}
 	ret = sensors_register(&data->dev, data, sensor_attributes,
-				(char *)module_name[data->ic_num]);
+				(char *)a96t396_module_name[data->ic_num]);
 #else
 	ret = sensors_register(&data->dev, data, grip_sensor_attributes,
-				(char *)module_name[data->ic_num]);
+				(char *)a96t396_module_name[data->ic_num]);
 #endif
 #else // !CONFIG_SENSORS_CORE_AP
 	ret = sensors_create_symlink(data->input_dev);
@@ -4241,10 +4241,10 @@ static int a96t396_probe(struct i2c_client *client,
 		memcpy(sensor_attributes + grip_sensor_attr_size - 1, multi_sensor_attrs, sizeof(multi_sensor_attrs));
 	}
 	ret = sensors_register(&data->dev, data, sensor_attributes,
-				(char *)module_name[data->ic_num]);
+				(char *)a96t396_module_name[data->ic_num]);
 #else
 	ret = sensors_register(&data->dev, data, grip_sensor_attributes,
-				(char *)module_name[data->ic_num]);
+				(char *)a96t396_module_name[data->ic_num]);
 #endif
 #endif
 	if (ret) {
@@ -4255,7 +4255,7 @@ static int a96t396_probe(struct i2c_client *client,
 	data->enabled = true;
 
 	ret = request_threaded_irq(client->irq, NULL, a96t396_interrupt,
-			IRQF_TRIGGER_FALLING | IRQF_ONESHOT, device_name[data->ic_num], data);
+			IRQF_TRIGGER_FALLING | IRQF_ONESHOT, a96t3x6_device_name[data->ic_num], data);
 
 	disable_irq(client->irq);
 	data->is_irq_active = false;
@@ -4334,7 +4334,7 @@ err_input_alloc:
 #endif
 	kfree(data);
 err_alloc:
-	pr_info("[GRIP %s] Failed\n", grip_name[ic_num]);
+	pr_info("[GRIP %s] Failed\n", a96t396_grip_name[ic_num]);
 	return ret;
 }
 

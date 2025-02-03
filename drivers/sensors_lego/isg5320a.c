@@ -761,9 +761,9 @@ static ssize_t isg5320a_name_show(struct device *dev,
 {
 	struct isg5320a_data *data = dev_get_drvdata(dev);
 
-	GRIP_INFO("%s\n", isg5320a_device_name[data->ic_num]);
+	GRIP_INFO("%s\n", isg5320a_isg5320a_device_name[data->ic_num]);
 
-	return sprintf(buf, "%s\n", isg5320a_device_name[data->ic_num]);
+	return sprintf(buf, "%s\n", isg5320a_isg5320a_device_name[data->ic_num]);
 }
 
 static ssize_t isg5320a_vendor_show(struct device *dev,
@@ -2113,7 +2113,7 @@ static int isg5320a_probe(struct i2c_client *client,
 
 	client->irq = gpio_to_irq(data->gpio_int);
 	ret = request_threaded_irq(client->irq, NULL, isg5320a_irq_thread,
-				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT, isg5320a_device_name[data->ic_num], data);
+				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT, isg5320a_isg5320a_device_name[data->ic_num], data);
 	if (ret < 0) {
 		GRIP_ERR("failed to register interrupt\n");
 		input_free_device(input_dev);

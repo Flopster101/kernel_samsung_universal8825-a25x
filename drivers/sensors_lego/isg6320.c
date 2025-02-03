@@ -1358,9 +1358,9 @@ static ssize_t isg6320_name_show(struct device *dev,
 {
 	struct isg6320_data *data = dev_get_drvdata(dev);
 	pr_info("[GRIP_%d] %s %s\n", data->ic_num, __func__,
-			device_name[data->ic_num]);
+			isg6320_device_name[data->ic_num]);
 
-	return sprintf(buf, "%s\n", device_name[data->ic_num]);
+	return sprintf(buf, "%s\n", isg6320_device_name[data->ic_num]);
 }
 
 static ssize_t isg6320_vendor_show(struct device *dev,
@@ -3234,7 +3234,7 @@ static int isg6320_probe(struct i2c_client *client,
 	else
 		goto err;
 
-	pr_info("[GRIP_%d] %s # probe #\n", ic_num, device_name[ic_num]);	
+	pr_info("[GRIP_%d] %s # probe #\n", ic_num, isg6320_device_name[ic_num]);	
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		pr_info("[GRIP_%d] i2c_check_functionality err\n", ic_num);
@@ -3284,7 +3284,7 @@ static int isg6320_probe(struct i2c_client *client,
 	data->dev = &client->dev;
 	data->input_dev = input_dev;
 
-	input_dev->name = module_name[data->ic_num];
+	input_dev->name = isg6320_module_name[data->ic_num];
 	input_dev->id.bustype = BUS_I2C;
 
 	input_set_capability(input_dev, EV_REL, REL_MISC);
@@ -3346,7 +3346,7 @@ static int isg6320_probe(struct i2c_client *client,
 
 	client->irq = gpio_to_irq(data->gpio_int);
 	ret = request_threaded_irq(client->irq, NULL, isg6320_irq_thread,
-				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT, device_name[data->ic_num], data);
+				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT, isg6320_device_name[data->ic_num], data);
 
 	if (ret < 0) {
 		pr_err("[GRIP_%d] fail to reg client->irq %d err %d\n", client->irq, data->ic_num, ret);
@@ -3397,10 +3397,10 @@ static int isg6320_probe(struct i2c_client *client,
 		memcpy(grip_sensor_attrs + sensor_attrs_size - 1, multi_sensor_attrs, sizeof(multi_sensor_attrs));
 	}
 	ret = sensors_register(&data->dev, data, grip_sensor_attrs,
-				(char *)module_name[data->ic_num]);
+				(char *)isg6320_module_name[data->ic_num]);
 #else
 	ret = sensors_register(&data->dev, data, sensor_attrs,
-				(char *)module_name[data->ic_num]);
+				(char *)isg6320_module_name[data->ic_num]);
 #endif
 
 	if (ret) {
@@ -3434,10 +3434,10 @@ static int isg6320_probe(struct i2c_client *client,
 	}
 
 	ret = sensors_register(&data->dev, data, grip_sensor_attrs,
-				(char *)module_name[data->ic_num]);
+				(char *)isg6320_module_name[data->ic_num]);
 #else
 	ret = sensors_register(&data->dev, data, sensor_attrs,
-				(char *)module_name[data->ic_num]);
+				(char *)isg6320_module_name[data->ic_num]);
 #endif
 	if (ret) {
 		pr_err("[GRIP_%d] fail to reg sensor(%d).\n", data->ic_num, ret);

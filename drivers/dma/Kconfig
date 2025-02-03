@@ -487,7 +487,6 @@ config SAMSUNG_DMADEV
 	tristate
 	select PL330_DMA
 	depends on ARM_AMBA
-	default m
 	help
 	  Use DMA device engine for PL330 DMA controller.
 

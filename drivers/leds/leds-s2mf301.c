@@ -25,8 +25,8 @@
 #define CONTROL_I2C	0
 #define CONTROL_GPIO	1
 
-struct s2mf301_fled_data *g_fled_data;
-struct device *camera_flash_dev;
+struct s2mf301_fled_data *s2mf301_g_fled_data;
+struct device *s2mf301_camera_flash_dev;
 extern void pdo_ctrl_by_flash(bool mode);
 
 static char *fled_supplied_to[] = {
@@ -329,7 +329,7 @@ int s2mf301_mode_change_cam_to_leds(enum cam_flash_mode cam_mode)
 
 int s2mf301_fled_set_mode_ctrl(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mf301_fled_data *fled = g_fled_data;
+	struct s2mf301_fled_data *fled = s2mf301_g_fled_data;
 	int mode = -1;
 
 	mode = s2mf301_mode_change_cam_to_leds(cam_mode);
@@ -351,7 +351,7 @@ EXPORT_SYMBOL_GPL(s2mf301_fled_set_mode_ctrl);
 
 int s2mf301_fled_set_curr(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mf301_fled_data *fled = g_fled_data;
+	struct s2mf301_fled_data *fled = s2mf301_g_fled_data;
 	int mode = -1;
 
 	mode = s2mf301_mode_change_cam_to_leds(cam_mode);
@@ -385,7 +385,7 @@ EXPORT_SYMBOL_GPL(s2mf301_fled_set_curr);
 
 int s2mf301_fled_get_curr(int chan, enum cam_flash_mode cam_mode)
 {
-	struct s2mf301_fled_data *fled = g_fled_data;
+	struct s2mf301_fled_data *fled = s2mf301_g_fled_data;
 	int mode = -1;
 	int curr = 0;
 
@@ -626,8 +626,8 @@ static ssize_t s2mf301_rear_flash_store(struct device *dev,
 	int flash_current = 0;
 	int torch_current = 0;
 
-	if (g_fled_data == NULL) {
-		pr_err("s2mf301-fled: %s: g_fled_data is NULL\n", __func__);
+	if (s2mf301_g_fled_data == NULL) {
+		pr_err("s2mf301-fled: %s: s2mf301_g_fled_data is NULL\n", __func__);
 		return -ENODEV;
 	}
 
@@ -635,13 +635,13 @@ static ssize_t s2mf301_rear_flash_store(struct device *dev,
 		return -ENXIO;
 
 	pr_info("%s: %d: rear_flash_store:\n", __func__, value);
-	g_fled_data->sysfs_input_data = value;
+	s2mf301_g_fled_data->sysfs_input_data = value;
 
-	flash_current = g_fled_data->pdata->default_current;
-	torch_current = g_fled_data->pdata->default_current;
+	flash_current = s2mf301_g_fled_data->pdata->default_current;
+	torch_current = s2mf301_g_fled_data->pdata->default_current;
 
 	if (value == 0) {
-		if (g_fled_data->pdata->en_flash == false && g_fled_data->pdata->en_torch == false) {
+		if (s2mf301_g_fled_data->pdata->en_flash == false && s2mf301_g_fled_data->pdata->en_torch == false) {
 			goto exit;
 		}
 		mode = S2MF301_FLED_MODE_OFF;
@@ -649,38 +649,38 @@ static ssize_t s2mf301_rear_flash_store(struct device *dev,
 		mode = S2MF301_FLED_MODE_TORCH;
 	} else if (value == 100) {
 		/* Factory Torch*/
-		torch_current = g_fled_data->factory_torch_current;
+		torch_current = s2mf301_g_fled_data->factory_torch_current;
 		mode = S2MF301_FLED_MODE_TORCH;
-		g_fled_data->pdata->en_torch = true;
+		s2mf301_g_fled_data->pdata->en_torch = true;
 		pr_info("%s: factory torch current [%d]\n", __func__,
 			torch_current);
 	} else if (value == 200) {
 		/* Factory Flash */
-		if (g_fled_data->pdata->en_flash == true) {
+		if (s2mf301_g_fled_data->pdata->en_flash == true) {
 			/* Turn off flash and torch if already on */
-			s2mf301_fled_set_flash_curr(g_fled_data, 1, 0);
-			s2mf301_fled_set_torch_curr(g_fled_data, 1, 0);
-			s2mf301_fled_set_mode(g_fled_data, 1, S2MF301_FLED_MODE_OFF);
+			s2mf301_fled_set_flash_curr(s2mf301_g_fled_data, 1, 0);
+			s2mf301_fled_set_torch_curr(s2mf301_g_fled_data, 1, 0);
+			s2mf301_fled_set_mode(s2mf301_g_fled_data, 1, S2MF301_FLED_MODE_OFF);
 		}
-		flash_current = g_fled_data->factory_flash_current;
+		flash_current = s2mf301_g_fled_data->factory_flash_current;
 		mode = S2MF301_FLED_MODE_FLASH;
 		pr_info("%s: factory flash current [%d]\n", __func__, flash_current);
 	} else if (value <= 1010 && value >= 1001) {
 		mode = S2MF301_FLED_MODE_TORCH;
 		/* (value) 1001, 1002, 1004, 1006, 1009 */
 		if (value <= 1001)
-			torch_current = g_fled_data->pdata->flashlight_current[0];
+			torch_current = s2mf301_g_fled_data->pdata->flashlight_current[0];
 		else if (value <= 1002)
-			torch_current = g_fled_data->pdata->flashlight_current[1];
+			torch_current = s2mf301_g_fled_data->pdata->flashlight_current[1];
 		else if (value <= 1004)
-			torch_current = g_fled_data->pdata->flashlight_current[2];
+			torch_current = s2mf301_g_fled_data->pdata->flashlight_current[2];
 		else if (value <= 1006)
-			torch_current = g_fled_data->pdata->flashlight_current[3];
+			torch_current = s2mf301_g_fled_data->pdata->flashlight_current[3];
 		else if (value <= 1009)
-			torch_current = g_fled_data->pdata->flashlight_current[4];
+			torch_current = s2mf301_g_fled_data->pdata->flashlight_current[4];
 		else
-			torch_current = g_fled_data->pdata->torch_current;
-		g_fled_data->sysfs_input_data = 1;
+			torch_current = s2mf301_g_fled_data->pdata->torch_current;
+		s2mf301_g_fled_data->sysfs_input_data = 1;
 	} else if (value == 2) {
 		mode = S2MF301_FLED_MODE_FLASH;
 	} else {
@@ -690,26 +690,26 @@ static ssize_t s2mf301_rear_flash_store(struct device *dev,
 	if (mode == S2MF301_FLED_MODE_TORCH) {
 		pr_info("%s: %d: S2MF301_FLED_MODE_TORCH - %dmA\n", __func__, value, torch_current);
 		/* torch current set */
-		s2mf301_fled_set_torch_curr(g_fled_data, 1, torch_current);
-		s2mf301_fled_set_mode(g_fled_data, 1, S2MF301_FLED_MODE_TORCH);
-		g_fled_data->pdata->en_torch = true;
+		s2mf301_fled_set_torch_curr(s2mf301_g_fled_data, 1, torch_current);
+		s2mf301_fled_set_mode(s2mf301_g_fled_data, 1, S2MF301_FLED_MODE_TORCH);
+		s2mf301_g_fled_data->pdata->en_torch = true;
 	} else if (mode == S2MF301_FLED_MODE_FLASH) {
 		pr_info("%s: %d: S2MF301_FLED_MODE_FLASH - %dmA\n", __func__, value, flash_current);
 		/* flash current set */
-		s2mf301_fled_set_flash_curr(g_fled_data, 1, flash_current);
-		s2mf301_fled_set_mode(g_fled_data, 1, S2MF301_FLED_MODE_FLASH);
-		g_fled_data->pdata->en_flash = true;
+		s2mf301_fled_set_flash_curr(s2mf301_g_fled_data, 1, flash_current);
+		s2mf301_fled_set_mode(s2mf301_g_fled_data, 1, S2MF301_FLED_MODE_FLASH);
+		s2mf301_g_fled_data->pdata->en_flash = true;
 	} else {
 		pr_info("%s: %d: S2MF301_FLED_MODE_OFF\n", __func__, value);
 		/* false torch current set for initial current */
 		/* flash current set */
-		s2mf301_fled_set_flash_curr(g_fled_data, 1, flash_current);
+		s2mf301_fled_set_flash_curr(s2mf301_g_fled_data, 1, flash_current);
 		/* torch current set */
-		s2mf301_fled_set_torch_curr(g_fled_data, 1, torch_current);
-		s2mf301_fled_set_mode(g_fled_data, 1, S2MF301_FLED_MODE_OFF);
+		s2mf301_fled_set_torch_curr(s2mf301_g_fled_data, 1, torch_current);
+		s2mf301_fled_set_mode(s2mf301_g_fled_data, 1, S2MF301_FLED_MODE_OFF);
 	}
 #if IS_ENABLED(DEBUG_TEST_READ)
-	s2mf301_fled_test_read(g_fled_data);
+	s2mf301_fled_test_read(s2mf301_g_fled_data);
 #endif
 
 exit:
@@ -720,7 +720,7 @@ exit:
 static ssize_t s2mf301_rear_flash_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
-	return sprintf(buf, "%d\n", g_fled_data->sysfs_input_data);
+	return sprintf(buf, "%d\n", s2mf301_g_fled_data->sysfs_input_data);
 }
 
 static DEVICE_ATTR(rear_flash, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s2mf301_rear_flash_show, s2mf301_rear_flash_store);
@@ -736,12 +736,12 @@ int s2mf301_create_sysfs(struct class *class)
 		}
 	}
 
-	camera_flash_dev = device_create(class, NULL, 3, NULL, "flash");
+	s2mf301_camera_flash_dev = device_create(class, NULL, 3, NULL, "flash");
 
-	if (IS_ERR(camera_flash_dev)) {
+	if (IS_ERR(s2mf301_camera_flash_dev)) {
 		pr_err("<%s> Failed to create device(flash)!\n", __func__);
 	} else {
-		if (device_create_file(camera_flash_dev, &dev_attr_rear_flash) < 0) {
+		if (device_create_file(s2mf301_camera_flash_dev, &dev_attr_rear_flash) < 0) {
 			pr_err("<%s> failed to create device file, %s\n",
 				__func__, dev_attr_rear_flash.attr.name);
 		}
@@ -753,11 +753,11 @@ EXPORT_SYMBOL(s2mf301_create_sysfs);
 
 int s2mf301_destroy_sysfs(struct class *class)
 {
-	if (camera_flash_dev)
-		device_remove_file(camera_flash_dev, &dev_attr_rear_flash);
+	if (s2mf301_camera_flash_dev)
+		device_remove_file(s2mf301_camera_flash_dev, &dev_attr_rear_flash);
 
-	if (class && camera_flash_dev)
-		device_destroy(class, camera_flash_dev->devt);
+	if (class && s2mf301_camera_flash_dev)
+		device_destroy(class, s2mf301_camera_flash_dev->devt);
 
 	return 0;
 }
@@ -827,19 +827,19 @@ static int s2mf301_led_probe(struct platform_device *pdev)
 	s2mf301_fled_init(fled_data);
 
 	/* Store fled_data for EXPORT_SYMBOL */
-	g_fled_data = fled_data;
-	g_fled_data->flash_gpio					= fled_data->pdata->flash_gpio;
-	g_fled_data->torch_gpio					= fled_data->pdata->torch_gpio;
-	g_fled_data->default_current				= fled_data->pdata->default_current;
-	g_fled_data->flash_current				= fled_data->pdata->flash_current;
-	g_fled_data->torch_current				= fled_data->pdata->torch_current;
-	g_fled_data->preflash_current				= fled_data->pdata->preflash_current;
-	g_fled_data->movie_current				= fled_data->pdata->movie_current;
-	g_fled_data->factory_torch_current			= fled_data->pdata->factory_torch_current;
-	g_fled_data->factory_flash_current			= fled_data->pdata->factory_flash_current;
+	s2mf301_g_fled_data = fled_data;
+	s2mf301_g_fled_data->flash_gpio					= fled_data->pdata->flash_gpio;
+	s2mf301_g_fled_data->torch_gpio					= fled_data->pdata->torch_gpio;
+	s2mf301_g_fled_data->default_current				= fled_data->pdata->default_current;
+	s2mf301_g_fled_data->flash_current				= fled_data->pdata->flash_current;
+	s2mf301_g_fled_data->torch_current				= fled_data->pdata->torch_current;
+	s2mf301_g_fled_data->preflash_current				= fled_data->pdata->preflash_current;
+	s2mf301_g_fled_data->movie_current				= fled_data->pdata->movie_current;
+	s2mf301_g_fled_data->factory_torch_current			= fled_data->pdata->factory_torch_current;
+	s2mf301_g_fled_data->factory_flash_current			= fled_data->pdata->factory_flash_current;
 
 	for (cnt = 0; cnt < S2MF301_FLASH_LIGHT_MAX; cnt++) {
-		g_fled_data->flashlight_current[cnt] = fled_data->pdata->flashlight_current[cnt];
+		s2mf301_g_fled_data->flashlight_current[cnt] = fled_data->pdata->flashlight_current[cnt];
 	}
 
 	pr_info("%s: end\n", __func__);

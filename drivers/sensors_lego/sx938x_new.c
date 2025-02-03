@@ -774,7 +774,7 @@ static ssize_t sx938x_name_show(struct device *dev,
 {
 	struct sx938x_p *data = dev_get_drvdata(dev);
 
-	return snprintf(buf, PAGE_SIZE, "%s\n", device_name[data->ic_num]);
+	return snprintf(buf, PAGE_SIZE, "%s\n", sx938x_device_name[data->ic_num]);
 }
 
 static ssize_t sx938x_touch_mode_show(struct device *dev,
@@ -1669,7 +1669,7 @@ static int sx938x_input_init(struct sx938x_p *data)
 	if (!dev)
 		return -ENOMEM;
 
-	dev->name =  module_name[data->ic_num];
+	dev->name =  sx938x_module_name[data->ic_num];
 	dev->id.bustype = BUS_I2C;
 
 	input_set_capability(dev, EV_REL, REL_MISC);
@@ -2155,20 +2155,20 @@ static int sx938x_probe(struct i2c_client *client, const struct i2c_device_id *i
 		pr_err("[GRIP] name %s can't find grip ic num", client->name);
 		return -1;
 	}
-	pr_info("[GRIP_%s] %s start 0x%x\n", grip_name[ic_num], __func__, client->addr);
+	pr_info("[GRIP_%s] %s start 0x%x\n", sx938x_grip_name[ic_num], __func__, client->addr);
 
 	ret = sx938x_check_dependency(&client->dev, ic_num);
 	if (ret < 0)
 		return ret;
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-		pr_info("[GRIP_%s] i2c func err\n", grip_name[ic_num]);
+		pr_info("[GRIP_%s] i2c func err\n", sx938x_grip_name[ic_num]);
 		goto exit;
 	}
 
 	data = kzalloc(sizeof(struct sx938x_p), GFP_KERNEL);
 	if (data == NULL) {
-		pr_info("[GRIP_%s] Fail to mem alloc\n", grip_name[ic_num]);
+		pr_info("[GRIP_%s] Fail to mem alloc\n", sx938x_grip_name[ic_num]);
 		ret = -ENOMEM;
 		goto exit_kzalloc;
 	}
@@ -2246,7 +2246,7 @@ static int sx938x_probe(struct i2c_client *client, const struct i2c_device_id *i
 	/* initailize interrupt reporting */
 	ret = request_threaded_irq(data->irq, NULL, sx938x_interrupt_thread,
 				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-				    device_name[data->ic_num], data);
+				    sx938x_device_name[data->ic_num], data);
 	if (ret < 0) {
 		GRIP_ERR("fail to req thread irq %d ret %d\n", data->irq, ret);
 		goto exit_request_threaded_irq;
@@ -2254,7 +2254,7 @@ static int sx938x_probe(struct i2c_client *client, const struct i2c_device_id *i
 	disable_irq(data->irq);
 	data->is_irq_active = false;
 
-	ret = sensors_register(&data->factory_device, data, sensor_attrs, (char *)module_name[data->ic_num]);
+	ret = sensors_register(&data->factory_device, data, sensor_attrs, (char *)sx938x_module_name[data->ic_num]);
 	if (ret) {
 		GRIP_ERR("could not regi sensor %d\n", ret);
 		goto exit_register_failed;
@@ -2304,7 +2304,7 @@ exit_input_init:
 	kfree(data);
 exit_kzalloc:
 exit:
-	pr_err("[GRIP_%s] Probe fail!\n", grip_name[ic_num]);
+	pr_err("[GRIP_%s] Probe fail!\n", sx938x_grip_name[ic_num]);
 	return ret;
 
 }

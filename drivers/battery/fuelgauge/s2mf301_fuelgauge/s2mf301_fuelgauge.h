@@ -256,7 +256,7 @@ struct s2mf301_fuelgauge_data {
 
 #if IS_ENABLED(BATCAP_LEARN)
 /* cycle, rLOW_EN, rC1_num, rC2_num, rC1_CURR, rWide_lrn_EN, Fast_lrn_EN, Auto_lrn_EN */
-int BAT_L_CON[8] = {2, 0, 10, 10, 500, 0, 0, 1};
+static int S2MF301_BAT_L_CON[8] = {2, 0, 10, 10, 500, 0, 0, 1};
 #endif
 
 #endif /* __S2MF301_FUELGAUGE_H */

@@ -54,7 +54,7 @@ enum ic_num {
 	GRIP_MAX_CNT
 };
 
-const char *grip_name[GRIP_MAX_CNT] = {
+const char *a96t396_grip_name[GRIP_MAX_CNT] = {
 #if IS_ENABLED(CONFIG_SENSORS_A96T396)
 	"MAIN",
 #endif
@@ -69,7 +69,7 @@ const char *grip_name[GRIP_MAX_CNT] = {
 #endif
 };
 
-const char *device_name[GRIP_MAX_CNT] = {
+const char *a96t3x6_device_name[GRIP_MAX_CNT] = {
 #if IS_ENABLED(CONFIG_SENSORS_A96T396)
 	"A96T3X6",
 #endif
@@ -84,7 +84,7 @@ const char *device_name[GRIP_MAX_CNT] = {
 #endif
 };
 
-const char *module_name[GRIP_MAX_CNT] = {
+const char *a96t396_module_name[GRIP_MAX_CNT] = {
 #if IS_ENABLED(CONFIG_SENSORS_A96T396)
 	"grip_sensor",
 #endif
@@ -830,9 +830,9 @@ static struct a96t3xx_reg_data setup_reg[] = {
 };
 #endif
 
-#define GRIP_ERR(fmt, ...) pr_err("[GRIP_%s] %s: "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
-#define GRIP_INFO(fmt, ...) pr_info("[GRIP_%s] %s: "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
-#define GRIP_WARN(fmt, ...) pr_warn("[GRIP_%s] %s: "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_ERR(fmt, ...) pr_err("[GRIP_%s] %s: "fmt, a96t396_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_INFO(fmt, ...) pr_info("[GRIP_%s] %s: "fmt, a96t396_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_WARN(fmt, ...) pr_warn("[GRIP_%s] %s: "fmt, a96t396_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
 
 #ifndef CONFIG_SENSORS_CORE_AP
 extern int sensors_create_symlink(struct input_dev *inputdev);

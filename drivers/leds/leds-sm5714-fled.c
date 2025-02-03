@@ -21,7 +21,7 @@
 #define SM5714_FLED_VERSION "XXX.UA1"
 
 static struct sm5714_fled_data *g_sm5714_fled;
-struct device *camera_flash_dev;
+struct device *sm5714_camera_flash_dev;
 extern void sm5714_request_default_power_src(void);
 extern int muic_request_disable_afc_state(void);
 extern int sm5714_muic_get_vbus_voltage(void);
@@ -645,12 +645,12 @@ int sm5714_create_sysfs(struct class *class)
 		}
 	}
 
-	camera_flash_dev = device_create(class, NULL, 3, NULL, "flash");
+	sm5714_camera_flash_dev = device_create(class, NULL, 3, NULL, "flash");
 
-	if (IS_ERR(camera_flash_dev)) {
+	if (IS_ERR(sm5714_camera_flash_dev)) {
 		pr_err("<%s> Failed to create device(flash)!\n", __func__);
 	} else {
-		if (device_create_file(camera_flash_dev, &dev_attr_rear_flash) < 0) {
+		if (device_create_file(sm5714_camera_flash_dev, &dev_attr_rear_flash) < 0) {
 			pr_err("<%s> failed to create device file, %s\n",
 				__func__, dev_attr_rear_flash.attr.name);
 		}
@@ -662,12 +662,12 @@ EXPORT_SYMBOL(sm5714_create_sysfs);
 
 int sm5714_destroy_sysfs(struct class *class)
 {
-	if (camera_flash_dev) {
-		device_remove_file(camera_flash_dev, &dev_attr_rear_flash);
+	if (sm5714_camera_flash_dev) {
+		device_remove_file(sm5714_camera_flash_dev, &dev_attr_rear_flash);
 	}
 
-	if (class && camera_flash_dev)
-		device_destroy(class, camera_flash_dev->devt);
+	if (class && sm5714_camera_flash_dev)
+		device_destroy(class, sm5714_camera_flash_dev->devt);
 
 	return 0;
 }

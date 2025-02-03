@@ -663,18 +663,18 @@ void s2mf301_batcap_learning(struct s2mf301_fuelgauge_data *fuelgauge)
 {
 	int bat_w = 0;
 	u8 data[2] = {0, }, temp = 0;
-	int range = (BAT_L_CON[5] == 0) ? 900:800;
+	int range = (S2MF301_BAT_L_CON[5] == 0) ? 900:800;
 	int gap_cap = 0;
 
 	gap_cap = (fuelgauge->capcc * 1000) / fuelgauge->batcap_ocv;
 
 	if ((gap_cap > range) && (gap_cap < 1100)) {
-		if (BAT_L_CON[6])
+		if (S2MF301_BAT_L_CON[6])
 			bat_w = ((fuelgauge->batcap_ocv * 75) + (fuelgauge->capcc * 25)) / 100;
 		else
 			bat_w = ((fuelgauge->batcap_ocv * 90) + (fuelgauge->capcc * 10)) / 100;
 
-		if (BAT_L_CON[7]) {
+		if (S2MF301_BAT_L_CON[7]) {
 			fuelgauge->batcap_ocv_fin = bat_w;
 			bat_w = bat_w << 2;
 			data[1] = (u8)((bat_w >> 8) & 0x00ff);
@@ -1076,29 +1076,29 @@ static void s2mf301_determine_batcap_learning(struct s2mf301_fuelgauge_data *fue
 	fuelgauge->capcc = s2mf301_get_cap_cc(fuelgauge);
 	fuelgauge->batcap_ocv = s2mf301_get_batcap_ocv(fuelgauge); // CC mode capacity
 	fuelgauge->cycle = s2mf301_get_cycle(fuelgauge);
-	BATCAP_L_VBAT = (BAT_L_CON[1] == 0) ? 4200:4100;
+	BATCAP_L_VBAT = (S2MF301_BAT_L_CON[1] == 0) ? 4200:4100;
 
 	if (fuelgauge->temperature >= 200) {
 		if (fuelgauge->learn_start == false) {
-			if ((fuelgauge->rsoc < 1000) && (fuelgauge->cycle >= BAT_L_CON[0]))
+			if ((fuelgauge->rsoc < 1000) && (fuelgauge->cycle >= S2MF301_BAT_L_CON[0]))
 				fuelgauge->learn_start = true;
 		} else {
 			if ((fuelgauge->cond1_ok == false) && (fuelgauge->bat_charging == false))
 				goto batcap_learn_init;
 
 			if (fuelgauge->cond1_ok == false) {
-				if (fuelgauge->c1_count >= BAT_L_CON[2]) {
+				if (fuelgauge->c1_count >= S2MF301_BAT_L_CON[2]) {
 					fuelgauge->cond1_ok = true;
 					fuelgauge->c1_count = 0;
 				} else {
 					if ((fuelgauge->vbat >= BATCAP_L_VBAT) &&
-						(fuelgauge->avg_curr < BAT_L_CON[4]) && (fuelgauge->rsoc >= 9700)) {
+						(fuelgauge->avg_curr < S2MF301_BAT_L_CON[4]) && (fuelgauge->rsoc >= 9700)) {
 						fuelgauge->c1_count++;
 					} else
 						fuelgauge->c1_count = 0;
 				}
 			} else {
-				if (fuelgauge->c2_count >= BAT_L_CON[3]) {
+				if (fuelgauge->c2_count >= S2MF301_BAT_L_CON[3]) {
 					s2mf301_batcap_learning(fuelgauge);
 					goto batcap_learn_init;
 				} else {
@@ -1235,8 +1235,8 @@ static int s2mf301_get_rawsoc(struct s2mf301_fuelgauge_data *fuelgauge)
 	fuelgauge->rmc = s2mf301_get_remaining_cap(fuelgauge);
 
 	pr_info("%s: Learning_start = %d, C1_count = %d/%d, C2_count = %d/%d, BATCAP_OCV_new = %d ", __func__,
-		fuelgauge->learn_start, fuelgauge->c1_count, BAT_L_CON[2],
-		fuelgauge->c2_count, BAT_L_CON[3], fuelgauge->batcap_ocv_fin);
+		fuelgauge->learn_start, fuelgauge->c1_count, S2MF301_BAT_L_CON[2],
+		fuelgauge->c2_count, S2MF301_BAT_L_CON[3], fuelgauge->batcap_ocv_fin);
 	pr_info("%s: SOH = %d, CAP_CC = %d, FCC = %d, RM = %d\n", __func__,
 		fuelgauge->soh, fuelgauge->capcc, fuelgauge->fcc, fuelgauge->rmc);
 #endif
@@ -1278,8 +1278,8 @@ get_rawsoc_err:
 	fuelgauge->rmc = s2mf301_get_remaining_cap(fuelgauge);
 
 	pr_info("%s: Learning_start = %d, C1_count = %d/%d, C2_count = %d/%d, BATCAP_OCV_new = %d ", __func__,
-		fuelgauge->learn_start, fuelgauge->c1_count, BAT_L_CON[2],
-		fuelgauge->c2_count, BAT_L_CON[3], fuelgauge->batcap_ocv_fin);
+		fuelgauge->learn_start, fuelgauge->c1_count, S2MF301_BAT_L_CON[2],
+		fuelgauge->c2_count, S2MF301_BAT_L_CON[3], fuelgauge->batcap_ocv_fin);
 	pr_info("%s: SOH = %d, CAP_CC = %d, FCC = %d, RM = %d\n", __func__,
 		fuelgauge->soh, fuelgauge->capcc, fuelgauge->fcc, fuelgauge->rmc);
 #endif

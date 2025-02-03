@@ -2923,7 +2923,7 @@ static void sm5714_usbpd_check_rid(struct sm5714_phydrv_data *pdic_data)
 }
 
 #if IS_ENABLED(CONFIG_IF_CB_MANAGER)
-struct usbpd_ops ops_usbpd = {
+struct usbpd_ops sm5714_ops_usbpd = {
 	.usbpd_sbu_test_read = sm5714_usbpd_sbu_test_read,
 	.usbpd_set_host_on = sm5714_usbpd_set_host_on,
 	.usbpd_wait_entermode = sm5714_usbpd_wait_entermode,
@@ -4000,7 +4000,7 @@ static int sm5714_usbpd_probe(struct i2c_client *i2c,
 		goto err_kfree1;
 	}
 
-	usbpd_d->ops = &ops_usbpd;
+	usbpd_d->ops = &sm5714_ops_usbpd;
 	usbpd_d->data = (void *)pdic_data;
 	pdic_data->man = register_usbpd(usbpd_d);
 #endif

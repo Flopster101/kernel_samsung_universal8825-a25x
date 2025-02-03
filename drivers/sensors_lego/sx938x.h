@@ -18,21 +18,21 @@ enum ic_num {
 	GRIP_MAX_CNT
 };
 
-const char *grip_name[GRIP_MAX_CNT] = {
+const char *sx938x_grip_name[GRIP_MAX_CNT] = {
 	"MAIN",
 	"SUB",
 	"SUB2",
 	"WIFI"
 };
 
-const char *device_name[GRIP_MAX_CNT] = {
+const char *sx938x_device_name[GRIP_MAX_CNT] = {
 	"SX9380",
 	"SX9380_SUB",
 	"SX9380_SUB2",
 	"SX9380_WIFI"
 };
 
-const char *module_name[GRIP_MAX_CNT] = {
+const char *sx938x_module_name[GRIP_MAX_CNT] = {
 	"grip_sensor",
 	"grip_sensor_sub",
 	"grip_sensor_sub2",
@@ -485,9 +485,9 @@ enum {
 	ON = 1
 };
 
-#define GRIP_ERR(fmt, ...) pr_err("[GRIP_%s] %s "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
-#define GRIP_INFO(fmt, ...) pr_info("[GRIP_%s] %s "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
-#define GRIP_WARN(fmt, ...) pr_warn("[GRIP_%s] %s "fmt, grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_ERR(fmt, ...) pr_err("[GRIP_%s] %s "fmt, sx938x_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_INFO(fmt, ...) pr_info("[GRIP_%s] %s "fmt, sx938x_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
+#define GRIP_WARN(fmt, ...) pr_warn("[GRIP_%s] %s "fmt, sx938x_grip_name[data->ic_num], __func__, ##__VA_ARGS__)
 
 #if IS_ENABLED(CONFIG_SENSORS_GRIP_FAILURE_DEBUG)
 extern void update_grip_error(u8 idx, u32 error_state);

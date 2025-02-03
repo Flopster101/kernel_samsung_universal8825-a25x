@@ -34,14 +34,14 @@ enum ic_num {
 	GRIP_MAX_CNT
 };
 
-const char *device_name[GRIP_MAX_CNT] = {
+const char *isg6320_device_name[GRIP_MAX_CNT] = {
 	"ISG6320",
 	"ISG6320_SUB",
 	"ISG6320_SUB2",
 	"ISG6320_WIFI"
 };
 
-const char *module_name[GRIP_MAX_CNT] = {
+const char *isg6320_module_name[GRIP_MAX_CNT] = {
 	"grip_sensor",
 	"grip_sensor_sub",
 	"grip_sensor_sub2",

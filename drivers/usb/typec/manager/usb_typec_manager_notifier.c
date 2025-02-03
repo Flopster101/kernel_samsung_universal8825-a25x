@@ -27,11 +27,7 @@
 #include <linux/usb/typec/common/pdic_param.h>
 #include <linux/muic/common/muic_notifier.h>
 #include <linux/power_supply.h>
-#if IS_MODULE(CONFIG_BATTERY_SAMSUNG) || IS_MODULE(CONFIG_BATTERY_SAMSUNG_MODULE)
 #include <linux/battery/sec_battery_common.h>
-#elif defined(CONFIG_BATTERY_SAMSUNG)
-#include "../../../battery/common/sec_charging_common.h"
-#endif
 #if IS_ENABLED(CONFIG_CABLE_TYPE_NOTIFIER)
 #include <linux/cable_type_notifier.h>
 #endif

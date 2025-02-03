@@ -575,7 +575,7 @@ static u64 dpu_bts_calc_disp_with_full_size(struct decon_device *decon)
 	return (resol_clock/ppc);
 }
 
-void dpu_bts_set_bus_qos(const struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_set_bus_qos(const struct exynos_drm_crtc *exynos_crtc)
 {
 	/* If you need to hold a minlock in a specific scenario, do it here. */
 	return;
@@ -640,7 +640,7 @@ static void dpu_bts_find_max_disp_freq(struct decon_device *decon)
 	disp_min_freq = dpu_bts_calc_disp_with_full_size(decon);
 	if (disp_op_freq < disp_min_freq) {
 		disp_op_freq = disp_min_freq;
-		dpu_bts_set_bus_qos(decon->crtc);
+		p2_dpu_bts_set_bus_qos(decon->crtc);
 	}
 
 	DPU_DEBUG_BTS(decon, "\tDISP bus freq(%d), operating freq(%d)\n",
@@ -831,7 +831,7 @@ static void dpu_bts_set_max_bus_qos(struct decon_device *decon)
 		exynos_pm_qos_update_request(&decon->bts.mif_qos, 0);
 }
 
-void dpu_bts_calc_bw(struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_calc_bw(struct exynos_drm_crtc *exynos_crtc)
 {
 	struct decon_device *decon = exynos_crtc->ctx;
 	struct dpu_bts_win_config *config = decon->bts.win_config;
@@ -921,7 +921,7 @@ void dpu_bts_calc_bw(struct exynos_drm_crtc *exynos_crtc)
 }
 
 
-void dpu_bts_update_bw(struct exynos_drm_crtc *exynos_crtc, bool shadow_updated)
+void p2_dpu_bts_update_bw(struct exynos_drm_crtc *exynos_crtc, bool shadow_updated)
 {
 	struct decon_device *decon = exynos_crtc->ctx;
 	struct bts_bw bw = { 0, };
@@ -980,7 +980,7 @@ void dpu_bts_update_bw(struct exynos_drm_crtc *exynos_crtc, bool shadow_updated)
 	DPU_DEBUG_BTS(decon, "-\n");
 }
 
-void dpu_bts_release_bw(struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_release_bw(struct exynos_drm_crtc *exynos_crtc)
 {
 	struct decon_device *decon = exynos_crtc->ctx;
 	struct bts_bw bw = { 0, };
@@ -1046,7 +1046,7 @@ void dpu_bts_release_bw(struct exynos_drm_crtc *exynos_crtc)
 }
 
 #define MAX_IDX_NAME_SIZE	16
-void dpu_bts_init(struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_init(struct exynos_drm_crtc *exynos_crtc)
 {
 	int i;
 	char bts_idx_name[MAX_IDX_NAME_SIZE];
@@ -1105,7 +1105,7 @@ void dpu_bts_init(struct exynos_drm_crtc *exynos_crtc)
 	DPU_INFO_BTS(decon, "bts feature is enabled\n");
 }
 
-void dpu_bts_deinit(struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_deinit(struct exynos_drm_crtc *exynos_crtc)
 {
 	struct decon_device *decon = exynos_crtc->ctx;
 
@@ -1119,7 +1119,7 @@ void dpu_bts_deinit(struct exynos_drm_crtc *exynos_crtc)
 	DPU_DEBUG_BTS(decon, "-\n");
 }
 
-void dpu_bts_print_info(const struct exynos_drm_crtc *exynos_crtc)
+void p2_dpu_bts_print_info(const struct exynos_drm_crtc *exynos_crtc)
 {
 	int i;
 	struct decon_device *decon = exynos_crtc->ctx;
@@ -1169,11 +1169,11 @@ void dpu_bts_print_info(const struct exynos_drm_crtc *exynos_crtc)
 	}
 }
 
-struct dpu_bts_ops dpu_bts_control = {
-	.init		= dpu_bts_init,
-	.calc_bw	= dpu_bts_calc_bw,
-	.update_bw	= dpu_bts_update_bw,
-	.release_bw	= dpu_bts_release_bw,
-	.deinit		= dpu_bts_deinit,
-	.print_info	= dpu_bts_print_info,
+struct dpu_bts_ops p2_decon_dpu_bts_control = {
+	.init		= p2_dpu_bts_init,
+	.calc_bw	= p2_dpu_bts_calc_bw,
+	.update_bw	= p2_dpu_bts_update_bw,
+	.release_bw	= p2_dpu_bts_release_bw,
+	.deinit		= p2_dpu_bts_deinit,
+	.print_info	= p2_dpu_bts_print_info,
 };
