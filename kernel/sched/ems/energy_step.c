@@ -185,7 +185,7 @@ static int esg_mode_update_callback(struct notifier_block *nb,
 	int cpu;
 
 	for_each_possible_cpu(cpu) {
-		if (cpu != cpumask_first(cpu_coregroup_mask(cpu)))
+		if (cpu != cpumask_first(ems_cpu_coregroup_mask(cpu)))
 			continue;
 
 		param = *per_cpu_ptr(esgov_param, cpu);

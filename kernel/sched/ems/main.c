@@ -438,7 +438,7 @@ int cpuctl_task_group_idx(struct task_struct *p)
 	return idx;
 }
 
-const struct cpumask *cpu_coregroup_mask(int cpu)
+const struct cpumask *ems_cpu_coregroup_mask(int cpu)
 {
 	return &cpu_topology[cpu].core_sibling;
 }
@@ -942,7 +942,7 @@ static int ems_probe(struct platform_device *pdev)
 	lb_init();
 	mhdvfs_init(ems_kobj);
 
-	ret = hook_init();
+	ret = ems_hook_init();
 	if (ret) {
 		WARN_ON("EMS failed to register vendor hook\n");
 		return ret;

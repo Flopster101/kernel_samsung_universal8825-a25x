@@ -14,7 +14,7 @@
 
 #define MODPROB_TIMEOUT 20000
 
-#if IS_MODULE(CONFIG_BATTERY_SAMSUNG)
+//#if IS_MODULE(CONFIG_BATTERY_SAMSUNG)
 static struct dev_init_info gdev_init;
 
 void sec_chg_init_gdev(void)
@@ -67,9 +67,9 @@ void sec_chg_check_dev_modprobe(unsigned int dev)
 		pr_info("%s: takes time to wait(0x%x)\n", __func__, dev);
 }
 EXPORT_SYMBOL(sec_chg_check_dev_modprobe);
-#else
-void sec_chg_init_gdev(void) { }
-int sec_chg_set_dev_init(unsigned int dev) { return 0; }
-void sec_chg_check_modprobe(void) { }
-void sec_chg_check_dev_modprobe(unsigned int dev) { }
-#endif
+// #else
+// void sec_chg_init_gdev(void) { }
+// int sec_chg_set_dev_init(unsigned int dev) { return 0; }
+// void sec_chg_check_modprobe(void) { }
+// void sec_chg_check_dev_modprobe(unsigned int dev) { }
+// #endif

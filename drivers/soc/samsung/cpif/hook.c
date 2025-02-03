@@ -34,7 +34,7 @@ static void cpif_hook_set_wake_flags(void *data,
 #endif
 }
 
-int hook_init(void)
+int cpif_hook_init(void)
 {
 	int ret;
 
@@ -48,7 +48,7 @@ int hook_init(void)
 
 	return 0;
 }
-EXPORT_SYMBOL(hook_init);
+EXPORT_SYMBOL(cpif_hook_init);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Samsung CPIF vendor hook driver");

@@ -144,11 +144,11 @@ static void move_from_spared_cpus(struct cpumask *spared_cpus)
 		int cpu, min_util = INT_MAX;
 
 		/* To loop each domain */
-		if (fcpu != cpumask_first(cpu_coregroup_mask(fcpu)))
+		if (fcpu != cpumask_first(ems_cpu_coregroup_mask(fcpu)))
 			continue;
 
 		/* To find idlest cpu in this domain */
-		for_each_cpu_and(cpu, get_governor_cpus(), cpu_coregroup_mask(fcpu)) {
+		for_each_cpu_and(cpu, get_governor_cpus(), ems_cpu_coregroup_mask(fcpu)) {
 			struct rq *rq = cpu_rq(cpu);
 			int cpu_util;
 
@@ -161,7 +161,7 @@ static void move_from_spared_cpus(struct cpumask *spared_cpus)
 		}
 
 		/* Move task to idlest cpu */
-		for_each_cpu_and(cpu, spared_cpus, cpu_coregroup_mask(fcpu)) {
+		for_each_cpu_and(cpu, spared_cpus, ems_cpu_coregroup_mask(fcpu)) {
 			if (available_idle_cpu(cpu))
 				continue;
 			__move_from_spared_cpus(cpu, idlest_cpu);

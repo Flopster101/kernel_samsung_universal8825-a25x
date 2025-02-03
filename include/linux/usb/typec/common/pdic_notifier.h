@@ -275,7 +275,5 @@ const char *pdic_event_id_string(pdic_notifier_id_t id);
 const char *pdic_rid_string(pdic_notifier_rid_t rid);
 const char *pdic_usbstatus_string(USB_STATUS usbstatus);
 
-#ifndef MODULE
 extern int pdic_notifier_init(void);
-#endif
 #endif /* __PDIC_NOTIFIER_H__ */

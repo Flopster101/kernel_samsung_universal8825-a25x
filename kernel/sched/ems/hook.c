@@ -279,7 +279,7 @@ static void ems_hook_syscall_prctl_finished(void *data, int option, struct task_
 	ems_render(p) = 1;
 }
 
-int hook_init(void)
+int ems_hook_init(void)
 {
 	int ret;
 

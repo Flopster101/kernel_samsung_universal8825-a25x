@@ -228,7 +228,7 @@ extern void ems_check_preempt_wakeup(struct rq *rq, struct task_struct *p,
 extern void ems_do_sched_yield(struct rq *rq);
 
 extern int core_init(struct device_node *ems_dn);
-extern int hook_init(void);
+extern int ems_hook_init(void);
 
 int find_cpus_allowed(struct tp_env *env);
 
@@ -1011,7 +1011,7 @@ static inline bool is_busy_cpu(int cpu)
 
 extern int get_sched_class(struct task_struct *p);
 extern int cpuctl_task_group_idx(struct task_struct *p);
-extern const struct cpumask *cpu_coregroup_mask(int cpu);
+extern const struct cpumask *ems_cpu_coregroup_mask(int cpu);
 extern const struct cpumask *cpu_slowest_mask(void);
 extern const struct cpumask *cpu_fastest_mask(void);
 extern int send_uevent(char *msg);

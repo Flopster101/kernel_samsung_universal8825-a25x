@@ -481,6 +481,7 @@ int pdic_notifier_init(void)
 out:
 	return ret;
 }
+EXPORT_SYMBOL(pdic_notifier_init);
 
 static void __exit pdic_notifier_exit(void)
 {

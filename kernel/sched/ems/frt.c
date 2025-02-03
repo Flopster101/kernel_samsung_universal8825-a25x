@@ -92,7 +92,7 @@ int frt_init(struct kobject *ems_kobj)
 	for_each_possible_cpu(cpu) {
 		*per_cpu_ptr(frt_local_cpu_mask, cpu) = NULL;
 
-		if (cpu != cpumask_first(cpu_coregroup_mask(cpu)))
+		if (cpu != cpumask_first(ems_cpu_coregroup_mask(cpu)))
 			continue;
 
 		cur = kzalloc(sizeof(struct frt_dom), GFP_KERNEL);
@@ -101,7 +101,7 @@ int frt_init(struct kobject *ems_kobj)
 			goto put_node;
 		}
 
-		cpumask_copy(&cur->cpus, cpu_coregroup_mask(cpu));
+		cpumask_copy(&cur->cpus, ems_cpu_coregroup_mask(cpu));
 
 		/* make linke between rt domains */
 		if (head == NULL)

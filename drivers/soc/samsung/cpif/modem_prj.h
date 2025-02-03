@@ -980,7 +980,7 @@ int register_pdn_event_notifier(struct notifier_block *nb);
 #endif
 
 #if IS_ENABLED(CONFIG_CPIF_VENDOR_HOOK)
-int hook_init(void);
+int cpif_hook_init(void);
 #endif
 
 #if IS_ENABLED(CONFIG_CPIF_MBIM)

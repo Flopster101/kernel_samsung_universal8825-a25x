@@ -23,8 +23,8 @@
 #include <linux/mfd/samsung/s2mf301.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-#include <linux/muic/muic.h>
-#include <linux/muic/muic_notifier.h>
+#include <linux/muic/common/muic.h>
+#include <linux/muic/common/muic_notifier.h>
 #endif /* CONFIG_MUIC_NOTIFIER */
 
 #include <linux/power/s2m_chg_manager.h>

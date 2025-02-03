@@ -235,10 +235,10 @@ parse_coregroup_field(struct device_node *dn, const char *name,
 skip_parse_value:
 	count = 0;
 	for_each_possible_cpu(cpu) {
-		if (cpu != cpumask_first(cpu_coregroup_mask(cpu)))
+		if (cpu != cpumask_first(ems_cpu_coregroup_mask(cpu)))
 			continue;
 
-		for_each_cpu(cursor, cpu_coregroup_mask(cpu))
+		for_each_cpu(cursor, ems_cpu_coregroup_mask(cpu))
 			field[cursor] = val[count];
 
 		count++;
@@ -1063,7 +1063,7 @@ set_value_coregroup(int (field)[VENDOR_NR_CPUS], int cpu, char *v,
 	if (sanity_check_convert_value(v, type, limit, &value))
 		return;
 
-	for_each_cpu(i, cpu_coregroup_mask(cpu))
+	for_each_cpu(i, ems_cpu_coregroup_mask(cpu))
 		field[i] = value;
 }
 
@@ -1103,12 +1103,12 @@ set_value_cgroup_coregroup(int (field)[CGROUP_COUNT][VENDOR_NR_CPUS],
 
 	if (group >= CGROUP_COUNT) {
 		for (group = 0; group < CGROUP_COUNT; group++)
-			for_each_cpu(i, cpu_coregroup_mask(cpu))
+			for_each_cpu(i, ems_cpu_coregroup_mask(cpu))
 				field[group][i] = value;
 		return;
 	}
 
-	for_each_cpu(i, cpu_coregroup_mask(cpu))
+	for_each_cpu(i, ems_cpu_coregroup_mask(cpu))
 		field[group][i] = value;
 }
 
@@ -1473,7 +1473,7 @@ static ssize_t cur_set_read(struct file *file, struct kobject *kobj,
 	count += sprintf(msg + count, "[cpuidle gov]\n");
 	count += sprintf(msg + count, "expired ratio\n");
 	for_each_possible_cpu(cpu) {
-		if (cpu != cpumask_first(cpu_coregroup_mask(cpu)))
+		if (cpu != cpumask_first(ems_cpu_coregroup_mask(cpu)))
 			continue;
 		count += sprintf(msg + count, "cpu%d: %4d\n", cpu,
 				cur_set->cpuidle_gov.expired_ratio[cpu]);

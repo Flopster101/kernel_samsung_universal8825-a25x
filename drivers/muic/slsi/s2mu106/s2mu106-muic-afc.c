@@ -49,7 +49,7 @@
 #include "../../../battery/charger/s2mu106_charger/s2mu106_pmeter.h"
 #endif
 
-static struct s2mu106_muic_data *static_data;
+static struct s2mu106_muic_data *s2mu106_static_data;
 
 /*
  * Functions Prototype
@@ -1064,7 +1064,7 @@ static void s2mu106_hv_muic_hv_charger_init_work(struct work_struct *work)
 
 static int s2mu106_hv_muic_hv_charger_init(void)
 {
-	struct s2mu106_muic_data *muic_data = static_data;
+	struct s2mu106_muic_data *muic_data = s2mu106_static_data;
 
 	if (muic_data->is_charger_ready) {
 		pr_info("%s: charger is already ready(%d0, return\n",
@@ -1123,7 +1123,7 @@ int s2mu106_hv_muic_init(struct s2mu106_muic_data *muic_data)
 
 	sdata = muic_data->sdata;
 	muic_pdata = sdata->pdata;
-	static_data = muic_data;
+	s2mu106_static_data = muic_data;
 	ic_data = sdata->ic_data;
 	mutex_init(&muic_data->afc_mutex);
 

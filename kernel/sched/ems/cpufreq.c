@@ -344,7 +344,7 @@ static int fclamp_init(void)
 		struct fclamp *fc;
 		int i;
 
-		if (cpu != cpumask_first(cpu_coregroup_mask(cpu)))
+		if (cpu != cpumask_first(ems_cpu_coregroup_mask(cpu)))
 			continue;
 
 		fc = kzalloc(sizeof(struct fclamp), GFP_KERNEL);
@@ -354,7 +354,7 @@ static int fclamp_init(void)
 		fc->fclamp_min.type = FCLAMP_MIN;
 		fc->fclamp_max.type = FCLAMP_MAX;
 
-		for_each_cpu(i, cpu_coregroup_mask(cpu))
+		for_each_cpu(i, ems_cpu_coregroup_mask(cpu))
 			per_cpu_fc(i) = fc;
 	}
 

@@ -887,7 +887,7 @@ static int cpif_probe(struct platform_device *pdev)
 #endif
 
 #if IS_ENABLED(CONFIG_CPIF_VENDOR_HOOK)
-	err = hook_init();
+	err = cpif_hook_init();
 	if (err)
 		mif_err("failed to register vendor hook\n");
 #endif

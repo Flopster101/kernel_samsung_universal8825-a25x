@@ -64,7 +64,7 @@
 
 #include <linux/usb/typec/common/pdic_param.h>
 
-struct s2mu106_muic_data *static_data;
+static struct s2mu106_muic_data *s2mu106_static_data;
 /* Prototypes of the Static symbols of s2mu106-muic */
 
 int s2mu106_muic_bcd_rescan(struct s2mu106_muic_data *muic_data);
@@ -2037,7 +2037,7 @@ static void s2mu106_muic_init_drvdata(struct s2mu106_muic_data *muic_data,
 
 void s2mu106_muic_charger_init(void)
 {
-	struct s2mu106_muic_data *muic_data = static_data;
+	struct s2mu106_muic_data *muic_data = s2mu106_static_data;
 	
 	pr_info("%s\n", __func__);
 
@@ -2131,7 +2131,7 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 	}
 
 	muic_if = sdata->muic_if;
-	static_data = muic_data;
+	s2mu106_static_data = muic_data;
 
 	s2mu106_muic_init_drvdata(muic_data, s2mu106, pdev, mfd_pdata);
 

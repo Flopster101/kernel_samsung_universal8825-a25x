@@ -68,7 +68,7 @@
 #endif
 
 
-static struct sm5714_muic_data *static_data;
+static struct sm5714_muic_data *sm5714_static_data;
 
 static int com_to_open(struct sm5714_muic_data *muic_data);
 static void sm5714_muic_handle_attach(struct sm5714_muic_data *muic_data,
@@ -1066,11 +1066,11 @@ static int attach_jig_uart_path(struct sm5714_muic_data *muic_data, int new_dev)
 
 void sm5714_muic_set_bc12_control(int state)
 {
-	struct i2c_client *i2c = static_data->i2c;
+	struct i2c_client *i2c = sm5714_static_data->i2c;
 	int reg_value1 = 0, reg_value2 = 0;
 
 	pr_info("[%s:%s] state=%d\n", MUIC_DEV_NAME, __func__, state);
-	if (static_data == NULL)
+	if (sm5714_static_data == NULL)
 		return;
 
 	reg_value1 = sm5714_i2c_read_byte(i2c, 0x32);
@@ -1142,11 +1142,11 @@ static void sm5714_muic_BCD_rescan(struct sm5714_muic_data *muic_data)
 
 int sm5714_muic_get_jig_status(void)
 {
-	struct i2c_client *i2c = static_data->i2c;
+	struct i2c_client *i2c = sm5714_static_data->i2c;
 	int dev2 = 0;
 
 	pr_info("[%s:%s]\n", MUIC_DEV_NAME, __func__);
-	if (static_data == NULL)
+	if (sm5714_static_data == NULL)
 		return 0;
 
 	dev2 = sm5714_i2c_read_byte(i2c, SM5714_MUIC_REG_DEVICETYPE2);
@@ -1921,7 +1921,7 @@ static void sm5714_muic_handle_event(struct work_struct *work)
 
 static void sm5714_muic_U200_delayed_noti(struct work_struct *work)
 {
-	struct sm5714_muic_data *muic_data = static_data;
+	struct sm5714_muic_data *muic_data = sm5714_static_data;
 
 	pr_info("[%s:%s]\n", MUIC_DEV_NAME, __func__);
 
@@ -1934,7 +1934,7 @@ static void sm5714_muic_U200_delayed_noti(struct work_struct *work)
 
 static void sm5714_muic_delayed_523Kto619K_work(struct work_struct *work)
 {
-	struct sm5714_muic_data *muic_data = static_data;
+	struct sm5714_muic_data *muic_data = sm5714_static_data;
 
 	pr_info("[%s:%s]\n", MUIC_DEV_NAME, __func__);
 
@@ -1979,9 +1979,9 @@ static int sm5714_muic_handle_vbus_notification(struct notifier_block *nb,
 #if defined(CONFIG_HICCUP_CHARGER)
 static int sm5714_muic_pdic_set_hiccup_mode(int val)
 {
-	struct sm5714_muic_data *muic_data = static_data;
+	struct sm5714_muic_data *muic_data = sm5714_static_data;
 
-	if (static_data == NULL)
+	if (sm5714_static_data == NULL)
 		return -ENODEV;
 
 	if (is_lpcharge_pdic_param())
@@ -2008,7 +2008,7 @@ static int sm5714_muic_pdic_set_hiccup_mode(int val)
 static int sm5714_muic_hv_charger_init(void)
 {
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
-	struct sm5714_muic_data *muic_data = static_data;
+	struct sm5714_muic_data *muic_data = sm5714_static_data;
 
 	/* enable hiccup mode after charger init*/
 	if (muic_data->is_water_detect &&
@@ -2283,7 +2283,7 @@ static int sm5714_muic_probe(struct platform_device *pdev)
 	}
 
 	/* save platfom data for gpio control functions */
-	static_data = muic_data;
+	sm5714_static_data = muic_data;
 	muic_data->pdata = &muic_pdata;
 	muic_data->muic_data = muic_data;
 

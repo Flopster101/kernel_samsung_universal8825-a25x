@@ -69,7 +69,7 @@ static struct ontime_env __percpu *ontime_env;
 
 static inline int check_migrate_slower(int src, int dst)
 {
-	if (cpumask_test_cpu(src, cpu_coregroup_mask(dst)))
+	if (cpumask_test_cpu(src, ems_cpu_coregroup_mask(dst)))
 		return false;
 
 	if (capacity_cpu(src) > capacity_cpu(dst))
