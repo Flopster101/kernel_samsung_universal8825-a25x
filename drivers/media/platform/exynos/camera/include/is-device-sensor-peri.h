@@ -14,8 +14,8 @@
 
 #ifdef CONFIG_MUIC_NOTIFIER
 #include <linux/device.h>
-#include <linux/muic/muic.h>
-#include <linux/muic/muic_notifier.h>
+#include <linux/muic/common/muic.h>
+#include <linux/muic/common/muic_notifier.h>
 #endif
 
 #include <linux/interrupt.h>

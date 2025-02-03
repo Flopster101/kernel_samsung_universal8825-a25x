@@ -24,7 +24,7 @@
 #include "is-core.h"
 
 #include <linux/leds-s2mu106.h>
-#include <linux/muic/muic.h>
+#include <linux/muic/common/muic.h>
 
 extern int muic_afc_get_voltage(void);
 
