@@ -38,7 +38,13 @@ config ZRAM_MEMORY_TRACKING
 
 	  See Documentation/admin-guide/blockdev/zram.rst for more information.
 
+config ZRAM_AUTO_SIZE
+	bool "Auto size zram depending on ram size"
+	default n
+	depends on ZRAM
+
 config ZRAM_SIZE_OVERRIDE
 	int "zram size to set from kernel"
 	range 1 8589934592
 	default 3221225472
+	depends on ZRAM && !ZRAM_AUTO_SIZE
