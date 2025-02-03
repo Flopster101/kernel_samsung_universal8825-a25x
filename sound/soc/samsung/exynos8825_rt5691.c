@@ -1476,7 +1476,7 @@ static int read_codec(struct device_node *np, struct device *dev,
 	return ret;
 }
 
-static void exynos_register_card_work_func(struct work_struct *work)
+static void exynos_register_rt5691_work_func(struct work_struct *work)
 {
 	struct snd_soc_card *card = &exynos_card;
 	int ret;
@@ -1485,7 +1485,7 @@ static void exynos_register_card_work_func(struct work_struct *work)
 	if (ret)
 		dev_err(card->dev, "sound card register failed: %d\n", ret);
 }
-DECLARE_WORK(exynos_register_card_work, exynos_register_card_work_func);
+DECLARE_WORK(exynos_register_rt5691_work, exynos_register_rt5691_work_func);
 
 static int exynos_sound_probe(struct platform_device *pdev)
 {
@@ -1598,7 +1598,7 @@ static int exynos_sound_probe(struct platform_device *pdev)
 	}
 	card->num_aux_devs = i;
 
-	schedule_work(&exynos_register_card_work);
+	schedule_work(&exynos_register_rt5691_work);
 
 	return ret;
 }

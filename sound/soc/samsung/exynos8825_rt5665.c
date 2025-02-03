@@ -1495,7 +1495,7 @@ static void exynos8825_mic_always_on(struct snd_soc_card *card)
 	dev_info(card->dev, "%s: mic-always-on is enabled\n", __func__);
 }
 
-static void exynos_register_card_work_func(struct work_struct *work)
+static void exynos_register_rt5665_work_func(struct work_struct *work)
 {
 	struct snd_soc_card *card = &exynos_card;
 	int ret;
@@ -1506,7 +1506,7 @@ static void exynos_register_card_work_func(struct work_struct *work)
 	else
 		exynos8825_mic_always_on(card);
 }
-DECLARE_WORK(exynos_register_card_work, exynos_register_card_work_func);
+DECLARE_WORK(exynos_register_rt5665_work, exynos_register_rt5665_work_func);
 
 static int exynos_sound_probe(struct platform_device *pdev)
 {
@@ -1619,7 +1619,7 @@ static int exynos_sound_probe(struct platform_device *pdev)
 	}
 	card->num_aux_devs = i;
 
-	schedule_work(&exynos_register_card_work);
+	schedule_work(&exynos_register_rt5665_work);
 
 	return ret;
 }
