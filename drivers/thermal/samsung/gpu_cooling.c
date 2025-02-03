@@ -27,8 +27,10 @@
 #include <soc/samsung/gpu_cooling.h>
 #include <soc/samsung/tmu.h>
 
+#ifdef MODULE
 #define CREATE_TRACE_POINTS
-#include <trace/events/thermal_exynos_gpu.h>
+#endif
+#include <trace/events/thermal_exynos.h>
 
 #include <soc/samsung/ect_parser.h>
 #include "exynos_tmu.h"
