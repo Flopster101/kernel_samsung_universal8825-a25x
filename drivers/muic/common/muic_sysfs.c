@@ -506,11 +506,11 @@ static ssize_t muic_sysfs_set_afc_disable(struct device *dev,
 	param_val = pdata->afc_disable ? '1' : '0';
 
 #if IS_BUILTIN(CONFIG_MUIC_NOTIFIER)
-#if defined(CONFIG_USB_DWC3_MSM)
-	ret = sec_set_param(param_index_afc_disable, &param_val);
-#else
-	ret = sec_set_param(CM_OFFSET + 1, (char)param_val);
-#endif
+// #if defined(CONFIG_USB_DWC3_MSM)
+// 	ret = sec_set_param(param_index_afc_disable, &param_val);
+// #else
+// 	ret = sec_set_param(CM_OFFSET + 1, (char)param_val);
+// #endif
 	if ((!IS_ENABLED(CONFIG_USB_DWC3_MSM) && ret < 0) ||
 			(IS_ENABLED(CONFIG_USB_DWC3_MSM) && ret == false)) {
 		pr_err("%s:set_param failed - %02x:%02x(%d)\n", __func__,
