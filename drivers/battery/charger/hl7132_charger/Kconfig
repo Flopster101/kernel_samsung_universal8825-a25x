@@ -1,0 +1,19 @@
+config CHARGER_HL7132
+	tristate "HL7132 charger driver"
+	default n
+	depends on DIRECT_CHARGING
+	help
+	  Say Y or M here,
+	  to enable support for the HL7132 charger.
+	  This is 2:1 switched capacitor direct charger.
+	  To compile the driver as a module, choose M here.
+
+config SEND_PDMSG_IN_PPS_REQUEST_WORK
+	bool "HL7132 send pdmsg in request work"
+	default n
+	help
+	  Say Y here to enable
+	  support for send pdmsg in direct charger.
+	  This options for pdic not support periodic send pdmsg.
+	  If this is Y in direct charger, direct charger send pdmsg periodic.
+

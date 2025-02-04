@@ -1,0 +1,31 @@
+&hsi2c_5 {
+	status = "okay";
+
+	hl7132_charger: hl7132@5E {
+		compatible = "halo,hl7132";
+		reg = <0x5E>;
+
+		/* All properties can be changed by customer ! */
+		/* VBAT Regualtion Voltage ::  4.34  */
+		hl7132,vbat-reg = <4340000>;
+		/* Input Current Limit : 2A */
+		hl7132,input-current-limit = <2000000>;
+		/* Topoff Current :: 500mA */
+		hl7132,topoff-current = <500000>;
+		/* ts protection Enabled */
+		//hl7132,ts-prot-en;
+		/* All auto recovery Disabled */
+		//hl7132,all-auto-recovery;
+		/* Enable Manual mode, Set 8-samples, Enable ADC-Read */
+		hl7132,adc-ctrl0 = <0x85>;
+		/* Set ts0 to SSMC requirement*/
+		hl7132,ts0-th = <0x0048>;
+		/* Set ts1 to SSMC requirement*/
+		hl7132,ts1-th = <0x03AC>;
+		/* watchdog timer setting : 16S */
+		hl7132,wd-tmr = <0x3>;
+		/* WDT enabled */
+		//hl7132,wd-dis;
+		hl7132,fsw-set = <0x06>; //1100khz default setting
+	};
+};
