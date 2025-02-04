@@ -1,0 +1,221 @@
+/*
+ * sm5714_fake_mfd_fg.h - header file of SM5714 Charger device driver
+ *
+ * Copyright (C) 2023 Samsung Electronics Co.Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ */
+
+#ifndef __sm5714_FAKE_MFD_FG_H
+#define __sm5714_FAKE_MFD_FG_H __FILE__
+
+/* Secondary addr	= 0xE2 : FUEL GAUGE */
+enum sm5714_fuelgauge_reg {
+	SM5714_FG_REG_DEVICE_ID			= 0x00,
+	SM5714_FG_REG_CTRL				= 0x01,
+	SM5714_FG_REG_INTFG				= 0x02,
+	SM5714_FG_REG_STATUS			= 0x03,
+	SM5714_FG_REG_INTFG_MASK		= 0x04,
+
+	SM5714_FG_REG_SYSTEM_STATUS		= 0x10,
+	SM5714_FG_REG_TABLE_UNLOCK		= 0x13,
+
+	SM5714_FG_REG_AUX_CTRL1			= 0x20,
+	SM5714_FG_REG_AUX_CTRL2			= 0x21,
+	SM5714_FG_REG_AUX_STAT			= 0x22,
+
+	SM5714_FG_REG_SRAM_PROT			= 0x8B,
+	SM5714_FG_REG_SRAM_RADDR		= 0x8C,
+	SM5714_FG_REG_SRAM_RDATA		= 0x8D,
+	SM5714_FG_REG_SRAM_WADDR		= 0x8E,
+	SM5714_FG_REG_SRAM_WDATA		= 0x8F,
+
+	SM5714_FG_REG_RESET				= 0x91,
+
+	//SRAM ADDR
+	SM5714_FG_ADDR_SRAM_SOC			= 0x00,
+	SM5714_FG_ADDR_SRAM_OCV			= 0x01,
+	SM5714_FG_ADDR_SRAM_VBAT		= 0x03,
+	SM5714_FG_ADDR_SRAM_VSYS		= 0x04,
+	SM5714_FG_ADDR_SRAM_CURRENT		= 0x05,
+	SM5714_FG_ADDR_SRAM_TEMPERATURE	= 0x07,
+	SM5714_FG_ADDR_SRAM_VBAT_AVG	= 0x08,
+	SM5714_FG_ADDR_SRAM_CURRENT_AVG	= 0x09,
+	SM5714_FG_ADDR_SRAM_STATE		= 0x15,
+
+	SM5714_FG_ADDR_SRAM_START_LB_V	= 0x20,
+	SM5714_FG_ADDR_SRAM_START_CB_V	= 0x28,
+	SM5714_FG_ADDR_SRAM_START_LB_I	= 0x30,
+	SM5714_FG_ADDR_SRAM_START_CB_I	= 0x38,
+
+
+
+	SM5714_FG_ADDR_SRAM_AGING_RATE_FILT	= 0x46,
+
+
+	SM5714_FG_ADDR_SRAM_VOFFSET		= 0x61,
+	SM5714_FG_ADDR_SRAM_VSLOPE		= 0x62,
+
+	SM5714_FG_ADDR_SRAM_DP_IOFFSET	= 0x63,
+	SM5714_FG_ADDR_SRAM_DP_IPSLOPE	= 0x64,
+	SM5714_FG_ADDR_SRAM_DP_INSLOPE	= 0x65,
+	SM5714_FG_ADDR_SRAM_ALG_IOFFSET	= 0x66,
+	SM5714_FG_ADDR_SRAM_ALG_IPSLOPE	= 0x67,
+	SM5714_FG_ADDR_SRAM_ALG_INSLOPE	= 0x68,
+
+	SM5714_FG_ADDR_SRAM_VVT			= 0x6C,
+	SM5714_FG_ADDR_SRAM_IVT			= 0x6D,
+	SM5714_FG_ADDR_SRAM_IVV			= 0x6E,
+
+	SM5714_FG_ADDR_SRAM_RS_MIN		= 0x73,
+	SM5714_FG_ADDR_SRAM_RS_MAX		= 0x74,
+	SM5714_FG_ADDR_SRAM_RS_FACTOR	= 0x75,
+	SM5714_FG_ADDR_SRAM_RS_CHG_FACTOR	= 0x76,
+	SM5714_FG_ADDR_SRAM_RS_DISCHG_FACTOR	= 0x77,
+	SM5714_FG_ADDR_SRAM_RS_AUTO_MAN_VALUE	= 0x78,
+	SM5714_FG_ADDR_SRAM_Q_MAX		= 0x79,
+
+	SM5714_FG_ADDR_SRAM_INIT_OCV	= 0x7A,
+
+	SM5714_FG_ADDR_SRAM_INTR_VL		= 0x80,
+	SM5714_FG_ADDR_SRAM_INTR_VL_HYS	= 0x81,
+
+	SM5714_FG_ADDR_SRAM_SOC_CYCLE	= 0x87,
+
+	SM5714_FG_ADDR_SRAM_USER_RESERV_1	= 0x8A,
+	SM5714_FG_ADDR_SRAM_USER_RESERV_2	= 0x8B,
+
+	SM5714_FG_ADDR_TABLE0_0			= 0x90,
+	SM5714_FG_ADDR_TABLE0_1			= 0x91,
+	SM5714_FG_ADDR_TABLE0_2			= 0x92,
+	SM5714_FG_ADDR_TABLE0_3			= 0x93,
+	SM5714_FG_ADDR_TABLE0_4			= 0x94,
+	SM5714_FG_ADDR_TABLE0_5			= 0x95,
+	SM5714_FG_ADDR_TABLE0_6			= 0x96,
+	SM5714_FG_ADDR_TABLE0_7			= 0x97,
+	SM5714_FG_ADDR_TABLE0_8			= 0x98,
+	SM5714_FG_ADDR_TABLE0_9			= 0x99,
+	SM5714_FG_ADDR_TABLE0_A			= 0x9A,
+	SM5714_FG_ADDR_TABLE0_B			= 0x9B,
+	SM5714_FG_ADDR_TABLE0_C			= 0x9C,
+	SM5714_FG_ADDR_TABLE0_D			= 0x9D,
+	SM5714_FG_ADDR_TABLE0_E			= 0x9E,
+	SM5714_FG_ADDR_TABLE0_F			= 0x9F,
+	SM5714_FG_ADDR_TABLE0_10		= 0xA0,
+	SM5714_FG_ADDR_TABLE0_11		= 0xA1,
+	SM5714_FG_ADDR_TABLE0_12		= 0xA2,
+	SM5714_FG_ADDR_TABLE0_13		= 0xA3,
+	SM5714_FG_ADDR_TABLE0_14		= 0xA4,
+	SM5714_FG_ADDR_TABLE0_15		= 0xA5,
+	SM5714_FG_ADDR_TABLE0_16		= 0xA6,
+	SM5714_FG_ADDR_TABLE0_17		= 0xA7,
+	SM5714_FG_ADDR_TABLE1_0			= 0xA8,
+	SM5714_FG_ADDR_TABLE1_1			= 0xA9,
+	SM5714_FG_ADDR_TABLE1_2			= 0xAA,
+	SM5714_FG_ADDR_TABLE1_3			= 0xAB,
+	SM5714_FG_ADDR_TABLE1_4			= 0xAC,
+	SM5714_FG_ADDR_TABLE1_5			= 0xAD,
+	SM5714_FG_ADDR_TABLE1_6			= 0xAE,
+	SM5714_FG_ADDR_TABLE1_7			= 0xAF,
+	SM5714_FG_ADDR_TABLE1_8			= 0xB0,
+	SM5714_FG_ADDR_TABLE1_9			= 0xB1,
+	SM5714_FG_ADDR_TABLE1_A			= 0xB2,
+	SM5714_FG_ADDR_TABLE1_B			= 0xB3,
+	SM5714_FG_ADDR_TABLE1_C			= 0xB4,
+	SM5714_FG_ADDR_TABLE1_D			= 0xB5,
+	SM5714_FG_ADDR_TABLE1_E			= 0xB6,
+	SM5714_FG_ADDR_TABLE1_F			= 0xB7,
+	SM5714_FG_ADDR_TABLE1_10		= 0xB8,
+	SM5714_FG_ADDR_TABLE1_11		= 0xB9,
+	SM5714_FG_ADDR_TABLE1_12		= 0xBA,
+	SM5714_FG_ADDR_TABLE1_13		= 0xBB,
+	SM5714_FG_ADDR_TABLE1_14		= 0xBC,
+	SM5714_FG_ADDR_TABLE1_15		= 0xBD,
+	SM5714_FG_ADDR_TABLE1_16		= 0xBE,
+	SM5714_FG_ADDR_TABLE1_17		= 0xBF,
+	SM5714_FG_ADDR_TABLE2_0			= 0xC0,
+	SM5714_FG_ADDR_TABLE2_1			= 0xC1,
+	SM5714_FG_ADDR_TABLE2_2			= 0xC2,
+	SM5714_FG_ADDR_TABLE2_3			= 0xC3,
+	SM5714_FG_ADDR_TABLE2_4			= 0xC4,
+	SM5714_FG_ADDR_TABLE2_5			= 0xC5,
+	SM5714_FG_ADDR_TABLE2_6			= 0xC6,
+	SM5714_FG_ADDR_TABLE2_7			= 0xC7,
+	SM5714_FG_ADDR_TABLE2_8			= 0xC8,
+	SM5714_FG_ADDR_TABLE2_9			= 0xC9,
+	SM5714_FG_ADDR_TABLE2_A			= 0xCA,
+	SM5714_FG_ADDR_TABLE2_B			= 0xCB,
+	SM5714_FG_ADDR_TABLE2_C			= 0xCC,
+	SM5714_FG_ADDR_TABLE2_D			= 0xCD,
+	SM5714_FG_ADDR_TABLE2_E			= 0xCE,
+	SM5714_FG_ADDR_TABLE2_F			= 0xCF,
+
+	SM5714_FG_REG_END,
+};
+
+enum sm5714_irq {
+	/* FG INT */
+	SM5714_FG_IRQ_INT_LOW_VOLTAGE	= 0,
+};
+
+enum sm5714_irq_source {
+	CHG_INT1 = 0,
+	CHG_INT2,
+	CHG_INT3,
+	CHG_INT4,
+	CHG_INT5,
+	FG_INT,
+	SM5714_IRQ_GROUP_NR,
+};
+
+struct sm5714_platform_data {
+	/* IRQ */
+	int irq_base;
+	int irq_gpio;
+	bool wakeup;
+
+	struct mfd_cell *sub_devices;
+	int num_subdevs;
+};
+
+struct sm5714_dev {
+	struct device *dev;
+	struct i2c_client *charger; /* 0x92; Charger */
+	struct i2c_client *fuelgauge;	/* 0xE2; Fuelgauge */
+	struct mutex i2c_lock;
+
+	int type;
+
+	int irq;
+	int irq_base;
+	int irq_gpio;
+	bool wakeup;
+	bool suspended;
+	wait_queue_head_t suspend_wait;
+	struct wakeup_source	*irq_ws;
+	struct mutex irqlock;
+	int irq_masks_cur[SM5714_IRQ_GROUP_NR];
+	int irq_masks_cache[SM5714_IRQ_GROUP_NR];
+
+	/* For IC-Reset protection */
+	void (*check_chg_reset)(struct i2c_client *, void *);
+	void (*check_fg_reset)(struct i2c_client *, void *);
+	void *chg_data;
+	void *fg_data;
+
+	u8 pmic_rev;
+	u8 vender_id;
+
+	struct sm5714_platform_data *pdata;
+};
+
+/* Remove dependency from SM5714 MFD*/
+static inline int sm5714_read_word(struct i2c_client *i2c, u8 reg)
+{ return 0; }
+static inline int sm5714_write_word(struct i2c_client *i2c, u8 reg, u16 value)
+{ return 0; }
+
+#endif /* __sm5714_FAKE_MFD_FG_H */

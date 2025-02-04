@@ -1,0 +1,17 @@
+config CHARGER_SM5714
+	tristate "SM5714 battery charger support"
+	default n
+	help
+	  Say Y here to enable support for the SM5714 charger
+	  SM5714 is charger systems for lithium-ion (Li+) batteries
+	  in handheld and portable equipment.
+
+config SHIPMODE_BY_VBAT
+	bool "enable for check shipmode by vbat"
+	default n
+	depends on CHARGER_SM5714
+	help
+	  Say Y here to enable
+	  support for SHIPMODE_BY_VBAT.
+	  CHARGER_SM5714 only supports this checking options.
+	  this is for shipmode by vbat.
