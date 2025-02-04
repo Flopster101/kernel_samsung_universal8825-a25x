@@ -2092,11 +2092,7 @@ static int sm5451_charger_probe(struct i2c_client *i2c,
 	if (ret)
 		dev_err(sm5451->dev, "%s : Failed to create_attrs\n", __func__);
 
-	ret = sm5451_create_debugfs_entries(sm5451);
-	if (ret < 0) {
-		dev_err(sm5451->dev, "%s: fail to create debugfs(ret=%d)\n", __func__, ret);
-		goto err_psy_chg;
-	}
+	sm5451_create_debugfs_entries(sm5451);
 
 	dev_info(sm5451->dev, "%s: done. (rev_id=0x%x)[%s]\n", __func__,
 		sm5451->pdata->rev_id, SM5451_DC_VERSION);
