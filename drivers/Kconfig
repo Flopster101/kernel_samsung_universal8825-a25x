@@ -269,6 +269,7 @@ source "drivers/battery/core/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBM
 source "drivers/kq/mesh/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/kperfmon/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/fingerprint/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/usb/typec/slsi/common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/usb/typec/common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/gpu/drm/samsung/panel/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/gpu/drm/samsung/panel_decon/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
