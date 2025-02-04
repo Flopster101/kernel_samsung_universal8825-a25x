@@ -499,11 +499,6 @@ CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 LDFLAGS_vmlinux =
 
-# Use VARIANTINCLUDE when you must reference the include directories in variant.
-VARIANTINCLUDE := \
-		$(if $(building_out_of_srctree),-I$(srctree)/include/variant1) \
-		-I$(objtree)/include/variant1
-
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE    := \
 		-I$(srctree)/arch/$(SRCARCH)/include/uapi \
@@ -519,7 +514,6 @@ LINUXINCLUDE    := \
 		-I$(objtree)/arch/$(SRCARCH)/include/generated \
 		$(if $(building_out_of_srctree),-I$(srctree)/include) \
 		-I$(objtree)/include \
-		$(VARIANTINCLUDE) \
 		$(USERINCLUDE)
 
 KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
