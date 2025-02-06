@@ -27,6 +27,7 @@
 
 #include <linux/muic/slsi/platform/muic_platform_layer.h>
 #include <linux/muic/slsi/platform/muic_platform_manager.h>
+#include <linux/muic/slsi/platform/muic_platform_log.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 #include <linux/muic/common/muic_notifier.h>
@@ -87,10 +88,10 @@ static int muic_platform_get_vbus_state(struct muic_share_data *sdata)
 	int ret = 0;
 
 	MUIC_PDATA_FUNC(ic_data->m_ops.get_vbus_state, ic_data->drv_data, &ret);
-	pr_info("%s vbus state=%d\n", __func__, ret);
+	mpl_info("%s vbus state=%d\n", __func__, ret);
 
 	if (ret < 0)
-		pr_info("%s callback function error! ret=%d\n", __func__, ret);
+		mpl_info("%s callback function error! ret=%d\n", __func__, ret);
 
 	return ret;
 }
@@ -100,7 +101,7 @@ static int muic_platform_set_switch_path(struct muic_share_data *sdata, int path
 	struct muic_ic_data *ic_data = (struct muic_ic_data *)sdata->ic_data;
 	int ret = 0;
 
-	pr_info("%s path=%d\n", __func__, path);
+	mpl_info("%s path=%d\n", __func__, path);
 
 	switch (path) {
 	case MUIC_PATH_OPEN:
@@ -117,11 +118,11 @@ static int muic_platform_set_switch_path(struct muic_share_data *sdata, int path
 			ic_data->drv_data, path, &ret);
 		break;
 	default:
-		pr_info("%s A wrong com path!!\n", __func__);
+		mpl_info("%s A wrong com path!!\n", __func__);
 	}
 
 	if (ret < 0)
-		pr_info("%s callback function error! ret=%d\n", __func__, ret);
+		mpl_info("%s callback function error! ret=%d\n", __func__, ret);
 
 	return ret;
 }
@@ -130,7 +131,7 @@ static void muic_platform_switch_uart_path(struct muic_share_data *sdata)
 {
 	struct muic_platform_data *pdata = sdata->pdata;
 
-	pr_info("%s uart_path=(%d)\n", __func__, pdata->uart_path);
+	mpl_info("%s uart_path=(%d)\n", __func__, pdata->uart_path);
 
 	switch (pdata->uart_path) {
 	case MUIC_PATH_UART_AP:
@@ -138,7 +139,7 @@ static void muic_platform_switch_uart_path(struct muic_share_data *sdata)
 		muic_platform_set_switch_path(sdata, pdata->uart_path);
 		break;
 	default:
-		pr_info("%s invalid uart_path\n", __func__);
+		mpl_info("%s invalid uart_path\n", __func__);
 		break;
 	}
 }
@@ -147,7 +148,7 @@ static void muic_platform_switch_usb_path(struct muic_share_data *sdata)
 {
 	struct muic_platform_data *pdata = sdata->pdata;
 
-	pr_info("%s usb_path=(%d)\n", __func__, pdata->usb_path);
+	mpl_info("%s usb_path=(%d)\n", __func__, pdata->usb_path);
 
 	switch (pdata->usb_path) {
 	case MUIC_PATH_USB_AP:
@@ -155,7 +156,7 @@ static void muic_platform_switch_usb_path(struct muic_share_data *sdata)
 		muic_platform_set_switch_path(sdata, pdata->usb_path);
 		break;
 	default:
-		pr_info("%s invalid usb_path\n", __func__);
+		mpl_info("%s invalid usb_path\n", __func__);
 		break;
 	}
 }
@@ -167,16 +168,16 @@ static int muic_platform_handle_pdic_rprd(struct muic_interface_t *muic_if)
 	int ret = 0;
 
 	if (sdata->attached_dev == new_dev) {
-		pr_err("%s skip to handle duplicated event\n", __func__);
+		mpl_err("%s skip to handle duplicated event\n", __func__);
 		ret = EPERM;
 		goto err;
 	}
 
-	pr_info("%s +\n", __func__);
+	mpl_info("%s +\n", __func__);
 
 	muic_platform_handle_attach(sdata, new_dev);
 	muic_platform_switch_usb_path(sdata);
-	pr_info("%s -\n", __func__);
+	mpl_info("%s -\n", __func__);
 err:
 	return ret;
 }
@@ -197,7 +198,7 @@ static int muic_platform_handle_pdic_detach(struct muic_interface_t *muic_if)
 	int ret = 0;
 	int vbus = 0;
 
-	pr_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
+	mpl_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
 
 	vbus = muic_platform_get_vbus_state(sdata);
 	MUIC_PDATA_VOID_FUNC_MULTI_PARAM(ic_data->m_ops.set_chg_det, ic_data->drv_data, true);
@@ -251,15 +252,15 @@ static int muic_platform_handle_pdic_water(struct muic_interface_t *muic_if)
 	int ret = 0;
 
 	if (!sdata) {
-		pr_err("%s sdata is null\n", __func__);
+		mpl_err("%s sdata is null\n", __func__);
 		goto err;
 	}
-	pr_info("%s is_water=(%d)\n", __func__, muic_if->is_water);
+	mpl_info("%s is_water=(%d)\n", __func__, muic_if->is_water);
 
 	if (muic_if->is_water) {
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
 		if (sdata->is_hiccup_mode == false) {
-			pr_info("%s set hiccup path\n", __func__);
+			mpl_info("%s set hiccup path\n", __func__);
 			muic_platform_set_hiccup(sdata, true);
 		}
 #endif
@@ -292,7 +293,7 @@ static int muic_platform_handle_pdic_otg(struct muic_interface_t *muic_if)
 #if defined(CONFIG_USB_HW_PARAM)
 	struct otg_notify *o_notify = get_otg_notify();
 #endif
-	pr_info("%s +\n", __func__);
+	mpl_info("%s +\n", __func__);
 	sdata->is_pdic_attached = true;
 	MUIC_PDATA_FUNC(ic_data->m_ops.check_usb_killer, ic_data->drv_data, &ret);
 	if (ret == MUIC_NORMAL_OTG) {
@@ -300,9 +301,9 @@ static int muic_platform_handle_pdic_otg(struct muic_interface_t *muic_if)
 		MUIC_PDATA_VOID_FUNC_MULTI_PARAM(ic_data->m_ops.set_chg_det, ic_data->drv_data, false);
 		MUIC_SEND_NOTI_TO_PDIC_ATTACH(ATTACHED_DEV_OTG_MUIC);
 		muic_platform_switch_usb_path(sdata);
-		pr_info("%s -\n", __func__);
+		mpl_info("%s -\n", __func__);
 	} else {
-		pr_info("[MUIC] %s USB Killer Detected!!!\n", __func__);
+		mpl_info("[MUIC] %s USB Killer Detected!!!\n", __func__);
 #ifdef CONFIG_USB_NOTIFY_PROC_LOG
 		event = NOTIFY_EXTRA_USBKILLER;
 		store_usblog_notify(NOTIFY_EXTRA, (void *)&event, NULL);
@@ -321,7 +322,7 @@ static int muic_platform_handle_pdic_role_swap(struct muic_interface_t *muic_if)
 	struct muic_ic_data *ic_data = (struct muic_ic_data *)sdata->ic_data;
 	int ret = 0;
 
-	pr_info("%s +\n", __func__);
+	mpl_info("%s +\n", __func__);
 
 	MUIC_PDATA_VOID_FUNC_MULTI_PARAM(ic_data->m_ops.set_chg_det, ic_data->drv_data, false);
 	return ret;
@@ -333,7 +334,7 @@ int muic_platform_send_pdic_event(void *data, int event)
 	int ret = 0;
 
 	if (!data) {
-		pr_err("%s data is NULL\n", __func__);
+		mpl_err("%s data is NULL\n", __func__);
 		ret = -ENOENT;
 		goto err;
 	}
@@ -341,12 +342,12 @@ int muic_platform_send_pdic_event(void *data, int event)
 	muic_if = (struct muic_interface_t *)data;
 
 	if (event >= EVENT_PDIC_MAX) {
-		pr_err("%s pdic event is invalid. (%d)\n", __func__, event);
+		mpl_err("%s pdic event is invalid. (%d)\n", __func__, event);
 		ret = -EPERM;
 		goto err;
 	}
 
-	pr_info("%s event=(%s)\n", __func__, pdic_event[event]);
+	mpl_info("%s event=(%s)\n", __func__, pdic_event[event]);
 
 	switch (event) {
 	case EVENT_PDIC_RPRD:
@@ -387,7 +388,7 @@ void muic_platform_handle_vbus(struct muic_share_data *sdata,
 	struct muic_interface_t *muic_if;
 
 	if (!sdata) {
-		pr_err("%s sdata is null\n", __func__);
+		mpl_err("%s sdata is null\n", __func__);
 		goto err;
 	}
 
@@ -396,7 +397,7 @@ void muic_platform_handle_vbus(struct muic_share_data *sdata,
 	if (vbus_on) {
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
 		if (muic_if->is_water) {
-			pr_info("%s set hiccup path\n", __func__);
+			mpl_info("%s set hiccup path\n", __func__);
 			muic_platform_set_hiccup(sdata, true);
 		}
 #endif
@@ -416,7 +417,7 @@ void muic_platform_handle_rid(struct muic_share_data *sdata,
 
 	pdata = sdata->pdata;
 
-	pr_info("%s new_dev=%d\n", __func__, new_dev);
+	mpl_info("%s new_dev=%d\n", __func__, new_dev);
 
 #if IS_ENABLED(CONFIG_SEC_FACTORY)
 	muic_send_lcd_on_uevent(pdata);
@@ -436,7 +437,7 @@ static int muic_platform_handle_detach_logically(struct muic_share_data *sdata,
 	case ATTACHED_DEV_CDP_MUIC:
 	case ATTACHED_DEV_TIMEOUT_OPEN_MUIC:
 		if (new_dev == ATTACHED_DEV_OTG_MUIC) {
-			pr_info("%s: data role changed, not detach\n", __func__);
+			mpl_info("%s: data role changed, not detach\n", __func__);
 			force_path_open = false;
 			goto out;
 		}
@@ -466,7 +467,7 @@ static int muic_platform_handle_detach_logically(struct muic_share_data *sdata,
 		goto out;
 	}
 
-	pr_info("%s attached(%d)!=new(%d), assume detach\n",
+	mpl_info("%s attached(%d)!=new(%d), assume detach\n",
 			__func__, sdata->attached_dev, new_dev);
 
 	if (noti) {
@@ -492,7 +493,7 @@ int muic_platform_handle_attach(struct muic_share_data *sdata,
 	struct muic_ic_data *ic_data;
 
 	if (!sdata) {
-		pr_info("%s sdata is NULL\n", __func__);
+		mpl_info("%s sdata is NULL\n", __func__);
 		goto out1;
 	}
 	mutex_lock(&sdata->attach_mutex);
@@ -500,14 +501,14 @@ int muic_platform_handle_attach(struct muic_share_data *sdata,
 	muic_if = (struct muic_interface_t *)sdata->muic_if;
 	ic_data = (struct muic_ic_data *)sdata->ic_data;
 	if (muic_if->is_water) {
-		pr_info("%s water state. skip.\n", __func__);
+		mpl_info("%s water state. skip.\n", __func__);
 		goto out;
 	}
 
-	pr_info("%s new_dev=(%d)\n", __func__, new_dev);
+	mpl_info("%s new_dev=(%d)\n", __func__, new_dev);
 
 	if (new_dev == sdata->attached_dev) {
-		pr_info("%s Duplicated(%d), just ignore\n",
+		mpl_info("%s Duplicated(%d), just ignore\n",
 				__func__, sdata->attached_dev);
 		goto out;
 	}
@@ -589,7 +590,7 @@ int muic_platform_handle_detach(struct muic_share_data *sdata)
 
 	ic_data = (struct muic_ic_data *)sdata->ic_data;
 
-	pr_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
+	mpl_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
 
 	sdata->is_dcp_charger = false;
 	cancel_delayed_work(&sdata->hv_work);
@@ -597,7 +598,7 @@ int muic_platform_handle_detach(struct muic_share_data *sdata)
 	sdata->is_jig_on = false;
 
 	if (sdata->attached_dev == ATTACHED_DEV_NONE_MUIC) {
-		pr_info("%s Duplicated(%d), just ignore\n",
+		mpl_info("%s Duplicated(%d), just ignore\n",
 				__func__, sdata->attached_dev);
 		goto out_without_noti;
 	}
@@ -666,7 +667,7 @@ void muic_platform_handle_hv_attached_dev(struct muic_share_data *sdata,
 {
 	int afc_disable = muic_platform_get_afc_disable(sdata);
 
-	pr_info("%s sdata->attached_dev: %d, new_dev: %d, afc_disable: %d\n",
+	mpl_info("%s sdata->attached_dev: %d, new_dev: %d, afc_disable: %d\n",
 				__func__, sdata->attached_dev, new_dev, afc_disable);
 
 	if (sdata->attached_dev == ATTACHED_DEV_HICCUP_MUIC)
@@ -692,7 +693,7 @@ void muic_platform_handle_hv_attached_dev(struct muic_share_data *sdata,
 
 	if (new_dev == ATTACHED_DEV_AFC_CHARGER_5V_MUIC &&
 		afc_disable) {
-		pr_info("%s afc_disable is true => afc disabled type.\n", __func__);
+		mpl_info("%s afc_disable is true => afc disabled type.\n", __func__);
 		new_dev = ATTACHED_DEV_AFC_CHARGER_DISABLED_MUIC;
 	}
 
@@ -700,7 +701,7 @@ void muic_platform_handle_hv_attached_dev(struct muic_share_data *sdata,
 	MUIC_SEND_NOTI_ATTACH(sdata->attached_dev);
 
 skip_noti:
-	pr_info("%s -\n", __func__);
+	mpl_info("%s -\n", __func__);
 }
 EXPORT_SYMBOL_GPL(muic_platform_handle_hv_attached_dev);
 
@@ -710,7 +711,7 @@ static void muic_platform_hv_work(struct work_struct *work)
 	struct muic_ic_data *ic_data = (struct muic_ic_data *)sdata->ic_data;
 	int ret = 0;
 
-	pr_info("%s sdata->pdata->afc_disable = %d\n", __func__, sdata->pdata->afc_disable);
+	mpl_info("%s sdata->pdata->afc_disable = %d\n", __func__, sdata->pdata->afc_disable);
 	mutex_lock(&sdata->hv_mutex);
 	if (sdata->hv_voltage == HV_9V) /* send prepare type before 9v charging */
 		muic_platform_handle_hv_attached_dev(sdata, ATTACHED_DEV_AFC_CHARGER_PREPARE_MUIC);
@@ -724,9 +725,9 @@ static bool muic_platform_check_hv_ready(struct muic_share_data *sdata)
 	bool ret = false;
 
 	if (sdata->is_dcp_charger == false)
-		pr_info("%s Not DCP charger, skip HV\n", __func__);
+		mpl_info("%s Not DCP charger, skip HV\n", __func__);
 	else if (sdata->is_afc_pdic_ready == false)
-		pr_info("%s Not PDIC ready, skip HV\n", __func__);
+		mpl_info("%s Not PDIC ready, skip HV\n", __func__);
 	else
 		ret = true;
 
@@ -745,7 +746,7 @@ void muic_platform_send_hv_ready(struct muic_share_data *sdata)
 
 	sdata->hv_voltage = pdata->afc_disable ? HV_5V : HV_9V;
 
-	pr_info("%s hv work start, hv_voltage=(%d)\n", __func__, sdata->hv_voltage);
+	mpl_info("%s hv work start, hv_voltage=(%d)\n", __func__, sdata->hv_voltage);
 	cancel_delayed_work(&sdata->hv_work);
 	schedule_delayed_work(&sdata->hv_work, msecs_to_jiffies(sdata->hv_work_delay));
 err:
@@ -786,7 +787,7 @@ bool muic_platform_hv_is_hv_dev(struct muic_share_data *sdata)
 		ret = false;
 	}
 
-	pr_info("%s attached_dev(%d)[%c]\n",
+	mpl_info("%s attached_dev(%d)[%c]\n",
 			__func__, sdata->attached_dev, (ret ? 'T' : 'F'));
 
 	return ret;
@@ -834,7 +835,7 @@ void muic_platform_hv_handle_state(struct muic_share_data *sdata,
 		MUIC_PDATA_VOID_FUNC(ic_data->m_ops.hv_qc_failed, ic_data->drv_data);
 		break;
 	default:
-		pr_err("%s not IS_ENABLED state : %d\n",
+		mpl_err("%s not IS_ENABLED state : %d\n",
 				__func__, next_state);
 		break;
 	}
@@ -844,7 +845,7 @@ bool muic_platform_get_pdic_cable_state(struct muic_share_data *sdata)
 {
 	bool ret = false;
 
-	pr_info("%s call, attached_dev : %d\n", __func__, sdata->attached_dev);
+	mpl_info("%s call, attached_dev : %d\n", __func__, sdata->attached_dev);
 
 	switch (sdata->attached_dev) {
 	case ATTACHED_DEV_JIG_USB_OFF_MUIC:
@@ -977,6 +978,7 @@ int muic_platform_hv_state_manager(struct muic_share_data *sdata,
 			break;
 		case HV_TRANS_NO_RESPONSE:
 			next_state = HV_STATE_QC_FAILED;
+			break;
 		default:
 			skip_trans = true;
 			break;
@@ -1022,9 +1024,9 @@ int muic_platform_hv_state_manager(struct muic_share_data *sdata,
 	}
 
 	if (skip_trans) {
-		pr_info("%s skip to transaction - state(%d), trans(%d)\n", __func__, cur_state, trans);
+		mpl_info("%s skip to transaction - state(%d), trans(%d)\n", __func__, cur_state, trans);
 	} else {
-		pr_info("%s state(%d->%d), trans(%d)\n", __func__, cur_state, next_state, trans);
+		mpl_info("%s state(%d->%d), trans(%d)\n", __func__, cur_state, next_state, trans);
 		muic_platform_hv_handle_state(sdata, next_state);
 	}
 
@@ -1088,19 +1090,19 @@ static int muic_platform_afc_set_vol(void *data, int vol)
 
 	pdata = sdata->pdata;
 
-	pr_info("%s sdata->attached_dev=(%d), voltage=(%dV)\n", __func__,
+	mpl_info("%s sdata->attached_dev=(%d), voltage=(%dV)\n", __func__,
 			sdata->attached_dev, vol);
 
 	switch (sdata->attached_dev) {
 	case ATTACHED_DEV_AFC_CHARGER_5V_MUIC:
 	case ATTACHED_DEV_QC_CHARGER_5V_MUIC:
 		if (vol != 9) {
-			pr_info("%s same voltage. skip\n", __func__);
+			mpl_info("%s same voltage. skip\n", __func__);
 			ret = 0;
 			goto err;
 		} else {
 			if (pdata->afc_disable == true) {
-				pr_info("%s afc disable. skip\n", __func__);
+				mpl_info("%s afc disable. skip\n", __func__);
 				ret = 0;
 				goto err;
 			}
@@ -1109,7 +1111,7 @@ static int muic_platform_afc_set_vol(void *data, int vol)
 	case ATTACHED_DEV_AFC_CHARGER_9V_MUIC:
 	case ATTACHED_DEV_QC_CHARGER_9V_MUIC:
 		if (vol != 5) {
-			pr_info("%s same voltage. skip\n", __func__);
+			mpl_info("%s same voltage. skip\n", __func__);
 			ret = 0;
 			goto err;
 		}
@@ -1269,7 +1271,7 @@ static void muic_platform_set_afc_disable(void *data)
 	if (sdata == NULL)
 		goto err;
 
-	pr_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
+	mpl_info("%s sdata->attached_dev=(%d)\n", __func__, sdata->attached_dev);
 
 	switch (sdata->attached_dev) {
 	case ATTACHED_DEV_AFC_CHARGER_DISABLED_MUIC:
@@ -1388,11 +1390,11 @@ int muic_platform_init_gpio_cb(struct muic_share_data *sdata)
 #endif
 
 	if (ret) {
-		pr_err("%s failed to init gpio(%d)\n", __func__, ret);
+		mpl_err("%s failed to init gpio(%d)\n", __func__, ret);
 		goto err;
 	}
 
-	pr_info("%s: usb_path(%d), uart_path(%d)\n", __func__,
+	mpl_info("%s: usb_path(%d), uart_path(%d)\n", __func__,
 		pdata->usb_path, pdata->uart_path);
 err:
 	return ret;
@@ -1407,7 +1409,7 @@ int muic_platform_init_switch_dev(struct muic_share_data *sdata)
 #if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
 	ret = muic_sysfs_init(pdata);
 	if (ret) {
-		pr_err("failed to create sysfs\n");
+		mpl_err("failed to create sysfs\n");
 		goto err;
 	}
 #endif
@@ -1459,7 +1461,7 @@ int mpl_init(void)
 
 	mpl_data = kzalloc(sizeof(struct m_p_l_data), GFP_KERNEL);
 	if (unlikely(!mpl_data)) {
-		pr_err("%s mpl data alloc fail\n", __func__);
+		mpl_err("%s mpl data alloc fail\n", __func__);
 		ret = -ENOMEM;
 	}
 
@@ -1488,6 +1490,10 @@ static int muic_manager_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_LSI_PROP_MIN ... POWER_SUPPLY_LSI_PROP_MAX:
 		switch (lsi_prop) {
+		case POWER_SUPPLY_LSI_PROP_VGPADC:
+			MUIC_PDATA_FUNC(ic_data->m_ops.get_sbu_ovp_state, ic_data->drv_data, &ret);
+			val->intval = ret;
+			break;
 		case POWER_SUPPLY_LSI_PROP_PM_VCHGIN:
 			MUIC_PDATA_FUNC(ic_data->m_ops.get_vbus_state, ic_data->drv_data, &ret);
 			val->intval = ret;
@@ -1552,7 +1558,7 @@ int muic_platform_psy_init(struct muic_share_data *sdata, struct device *parent)
 	int ret = 0;
 
 	if (sdata == NULL || parent == NULL) {
-		pr_err("%s NULL data\n", __func__);
+		mpl_err("%s NULL data\n", __func__);
 		return -1;
 	}
 
@@ -1570,7 +1576,7 @@ int muic_platform_psy_init(struct muic_share_data *sdata, struct device *parent)
 	sdata->psy_muic = power_supply_register(parent, &sdata->psy_muic_desc, &psy_cfg);
 	if (IS_ERR(sdata->psy_muic)) {
 		ret = (int)PTR_ERR(sdata->psy_muic);
-		pr_err("%s: Failed to Register psy_muic, ret : %d\n", __func__, ret);
+		mpl_err("%s: Failed to Register psy_muic, ret : %d\n", __func__, ret);
 	}
 	return ret;
 }
@@ -1586,7 +1592,7 @@ int register_muic_platform_layer(struct muic_share_data *sdata)
 #endif
 	int ret = 0;
 
-	pr_info("%s +\n", __func__);
+	mpl_info("%s +\n", __func__);
 	if (!mpl_data) {
 		ret = mpl_init();
 		if (ret < 0)
@@ -1638,7 +1644,7 @@ int register_muic_platform_layer(struct muic_share_data *sdata)
 
 	muic_if = register_muic_platform_manager(sdata);
 	if (!muic_if) {
-		pr_err("%s failed to init muic manager\n", __func__);
+		mpl_err("%s failed to init muic manager\n", __func__);
 		ret = -ENOMEM;
 		goto err_kfree1;
 	}
@@ -1646,7 +1652,7 @@ int register_muic_platform_layer(struct muic_share_data *sdata)
 #ifdef CONFIG_MUIC_COMMON_SYSFS
 	fill_muic_sysfs_cb(pdata);
 #endif
-	pr_info("%s -\n", __func__);
+	mpl_info("%s -\n", __func__);
 	return ret;
 
 err_kfree1:
@@ -1654,7 +1660,7 @@ err_kfree1:
 	kfree(muic_d);
 #endif
 err:
-	pr_info("%s -\n", __func__);
+	mpl_info("%s -\n", __func__);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(register_muic_platform_layer);

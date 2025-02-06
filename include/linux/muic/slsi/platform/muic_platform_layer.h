@@ -47,6 +47,7 @@ enum pdic_events {
 };
 
 struct muic_ic_ops {
+	int (*get_sbu_ovp_state)(void *mdata);
 	int (*get_vbus_state)(void *mdata);
 	int (*set_gpio_uart_sel)(void *mdata, int uart_path);
 	int (*set_gpio_usb_sel)(void *mdata, int usb_path);
