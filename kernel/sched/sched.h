@@ -2084,6 +2084,14 @@ unsigned long arch_scale_freq_capacity(int cpu)
 }
 #endif
 
+#ifndef arch_scale_min_freq_capacity
+static __always_inline
+unsigned long arch_scale_min_freq_capacity(int cpu)
+{
+	return 0;
+}
+#endif
+
 #ifdef CONFIG_SMP
 #ifdef CONFIG_PREEMPTION
 
