@@ -31,16 +31,19 @@
 #include <linux/muic/common/muic_notifier.h>
 #include <linux/muic/common/muic.h>
 #include <linux/muic/common/muic_sysfs.h>
+#if IS_ENABLED(CONFIG_DRV_SAMSUNG)
 #include <linux/sec_class.h>
+#endif
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
 #include <linux/battery/sec_battery_common.h>
 #endif
 #if IS_BUILTIN(CONFIG_MUIC_NOTIFIER)
 #if defined(CONFIG_ARCH_QCOM)
 #include <linux/sec_param.h>
-#else
-#include <linux/sec_ext.h>
 #endif
+#endif
+#if IS_ENABLED(CONFIG_IF_CB_MANAGER)
+#include <linux/usb/typec/manager/if_cb_manager.h>
 #endif
 
 static ssize_t muic_sysfs_uart_en_show(struct device *dev,
@@ -584,6 +587,9 @@ static ssize_t hiccup_store(struct device *dev,
 
 	pr_info("%s+\n", __func__);
 	if (!strncasecmp(buf, "DISABLE", 7)) {
+#if IS_ENABLED(CONFIG_IF_CB_MANAGER) && IS_ENABLED(CONFIG_HICCUP_CC_DISABLE)
+		usbpd_cc_control_command(pdata->man, 0);
+#endif
 		MUIC_PDATA_FUNC_MULTI_PARAM(pdata->sysfs_cb.set_hiccup,
 					pdata->drv_data, MUIC_DISABLE, &ret);
 	} else {
@@ -672,6 +678,7 @@ int muic_sysfs_init(struct muic_platform_data *pdata)
 
 	mutex_init(&pdata->sysfs_mutex);
 
+#if IS_ENABLED(CONFIG_DRV_SAMSUNG)
 	if (pdata->switch_device == NULL)
 		pdata->switch_device = switch_device;
 
@@ -681,6 +688,7 @@ int muic_sysfs_init(struct muic_platform_data *pdata)
 		return ret;
 	}
 	dev_set_drvdata(pdata->switch_device, pdata);
+#endif
 
 	return ret;
 }

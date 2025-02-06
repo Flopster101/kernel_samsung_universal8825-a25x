@@ -1,38 +1,62 @@
 /* drivers/muic/muic-core.c
  *
- * Copyright (c) 2011 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2011-2023 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#include <linux/platform_device.h>
-#include <linux/i2c.h>
-#include <linux/gpio.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
 
 #if IS_ENABLED(CONFIG_DRV_SAMSUNG)
 #include <linux/sec_class.h>
 #endif
-/* switch device header */
-//#ifdef CONFIG_SWITCH
+
 #if IS_ENABLED(CONFIG_ANDROID_SWITCH) || IS_ENABLED(CONFIG_SWITCH)
 #include <linux/switch.h>
 #endif
-//#endif /* CONFIG_SWITCH */
+
 #if defined(CONFIG_USB_HW_PARAM)
 #include <linux/usb_notify.h>
 #endif
-#include <linux/muic/common/muic.h>
-#if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-#include <linux/muic/common/muic_notifier.h>
-#endif /* CONFIG_MUIC_NOTIFIER */
 
-extern struct muic_platform_data muic_pdata;
+#include <linux/muic/common/muic.h>
+#include <linux/muic/common/muic_kunit.h>
+#include <linux/muic/common/muic_notifier.h>
+
+static void muic_init_switch_dev_cb(void);
+static void muic_cleanup_switch_dev_cb(void);
+#if IS_MODULE(CONFIG_MUIC_NOTIFIER)
+static int muic_init_gpio_cb(int switch_sel);
+#else
+static int muic_init_gpio_cb(void);
+#endif
+
+struct muic_platform_data muic_pdata = {
+	.init_switch_dev_cb	= muic_init_switch_dev_cb,
+	.cleanup_switch_dev_cb	= muic_cleanup_switch_dev_cb,
+	.init_gpio_cb		= muic_init_gpio_cb,
+};
+EXPORT_SYMBOL(muic_pdata);
 
 #if IS_ENABLED(CONFIG_USE_SECOND_MUIC)
 struct muic_platform_data muic_pdata2;
 #endif
+
+#if IS_ENABLED(CONFIG_ANDROID_SWITCH) || IS_ENABLED(CONFIG_SWITCH)
+static struct switch_dev switch_dock = {
+	.name = "dock",
+};
+
+struct switch_dev switch_uart3 = {
+	.name = "uart3", /* sys/class/switch/uart3/state */
+};
+#endif
+
+static struct notifier_block dock_notifier_block;
+static struct notifier_block cable_data_notifier_block;
 
 static int muic_device_uevent(struct muic_platform_data *muic_pdata,
 	char *envp_ext[])
@@ -71,20 +95,6 @@ err:
 }
 EXPORT_SYMBOL(muic_send_lcd_on_uevent);
 
-#if IS_ENABLED(CONFIG_ANDROID_SWITCH) || IS_ENABLED(CONFIG_SWITCH)
-static struct switch_dev switch_dock = {
-	.name = "dock",
-};
-
-struct switch_dev switch_uart3 = {
-	.name = "uart3", /* sys/class/switch/uart3/state */
-};
-#endif /* CONFIG_ANDROID_SWITCH || CONFIG_SWITCH */
-
-#if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-static struct notifier_block dock_notifier_block;
-static struct notifier_block cable_data_notifier_block;
-
 void muic_send_dock_intent(int type)
 {
 	pr_info("%s: MUIC dock type(%d)\n", __func__, type);
@@ -110,8 +120,7 @@ static int muic_dock_detach_notify(void)
 	return NOTIFY_OK;
 }
 
-static int muic_handle_dock_notification(struct notifier_block *nb,
-			unsigned long action, void *data)
+static muic_attached_dev_t muic_get_attached_dev(void *data)
 {
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER) && IS_ENABLED(CONFIG_MUIC_SUPPORT_PDIC)
 	PD_NOTI_ATTACH_TYPEDEF *pnoti = (PD_NOTI_ATTACH_TYPEDEF *)data;
@@ -119,8 +128,23 @@ static int muic_handle_dock_notification(struct notifier_block *nb,
 #else
 	muic_attached_dev_t attached_dev = *(muic_attached_dev_t *)data;
 #endif
+
+	return attached_dev;
+}
+
+static int muic_handle_dock_notification(struct notifier_block *nb,
+			unsigned long action, void *data)
+{
+	muic_attached_dev_t attached_dev = ATTACHED_DEV_NONE_MUIC;
 	int type = MUIC_DOCK_DETACHED;
 	const char *name;
+
+	if (!data) {
+		pr_err("%s. data is null\n", __func__);
+		goto ignore;
+	}
+
+	attached_dev = muic_get_attached_dev(data);
 
 	switch (attached_dev) {
 	case ATTACHED_DEV_DESKDOCK_MUIC:
@@ -192,7 +216,7 @@ static int muic_handle_dock_notification(struct notifier_block *nb,
 	default:
 		break;
 	}
-
+ignore:
 	pr_info("%s: ignore(%d)\n", __func__, attached_dev);
 	return NOTIFY_DONE;
 }
@@ -200,16 +224,18 @@ static int muic_handle_dock_notification(struct notifier_block *nb,
 static int muic_handle_cable_data_notification(struct notifier_block *nb,
 			unsigned long action, void *data)
 {
-#if IS_ENABLED(CONFIG_PDIC_NOTIFIER) && IS_ENABLED(CONFIG_MUIC_SUPPORT_PDIC)
-	PD_NOTI_ATTACH_TYPEDEF *pnoti = (PD_NOTI_ATTACH_TYPEDEF *)data;
-	muic_attached_dev_t attached_dev = pnoti->cable_type;
-#else
-	muic_attached_dev_t attached_dev = *(muic_attached_dev_t *)data;
-#endif
-	int jig_state = 0;
 #if defined(CONFIG_USB_HW_PARAM)
 	struct otg_notify *o_notify = get_otg_notify();
 #endif
+	muic_attached_dev_t attached_dev;
+	int jig_state = 0;
+
+	if (!data) {
+		pr_err("%s. data is null\n", __func__);
+		goto ignore;
+	}
+
+	attached_dev = muic_get_attached_dev(data);
 
 	switch (attached_dev) {
 	case ATTACHED_DEV_JIG_UART_OFF_MUIC:
@@ -223,12 +249,12 @@ static int muic_handle_cable_data_notification(struct notifier_block *nb,
 		if (action == MUIC_NOTIFY_CMD_ATTACH)
 			jig_state = 1;
 		break;
-#if defined(CONFIG_USB_HW_PARAM)
 	case ATTACHED_DEV_TIMEOUT_OPEN_MUIC:
+#if defined(CONFIG_USB_HW_PARAM)
 		if (action == MUIC_NOTIFY_CMD_ATTACH && o_notify)
 			inc_hw_param(o_notify, USB_MUIC_DCD_TIMEOUT_COUNT);
-		break;
 #endif
+		break;
 	default:
 		jig_state = 0;
 		break;
@@ -238,9 +264,10 @@ static int muic_handle_cable_data_notification(struct notifier_block *nb,
 #if IS_ENABLED(CONFIG_ANDROID_SWITCH) || IS_ENABLED(CONFIG_SWITCH)
 	switch_set_state(&switch_uart3, jig_state);
 #endif
+	return NOTIFY_OK;
+ignore:
 	return NOTIFY_DONE;
 }
-#endif /* CONFIG_MUIC_NOTIFIER */
 
 static void muic_init_switch_dev_cb(void)
 {
@@ -273,12 +300,10 @@ static void muic_init_switch_dev_cb(void)
 		pr_err("%s: Failed to create device(muic)!\n", __func__);
 #endif
 
-#if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 	muic_notifier_register(&dock_notifier_block,
 			muic_handle_dock_notification, MUIC_NOTIFY_DEV_DOCK);
 	muic_notifier_register(&cable_data_notifier_block,
 			muic_handle_cable_data_notification, MUIC_NOTIFY_DEV_CABLE_DATA);
-#endif /* CONFIG_MUIC_NOTIFIER */
 
 	pr_info("%s: done\n", __func__);
 }
@@ -289,10 +314,8 @@ static void muic_cleanup_switch_dev_cb(void)
 	struct muic_platform_data *pdata = &muic_pdata;
 #endif
 
-#if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
-	muic_notifier_unregister(&dock_notifier_block);
 	muic_notifier_unregister(&cable_data_notifier_block);
-#endif /* CONFIG_MUIC_NOTIFIER */
+	muic_notifier_unregister(&dock_notifier_block);
 
 #if IS_ENABLED(CONFIG_DRV_SAMSUNG)
 	if (pdata->muic_device)
@@ -331,34 +354,88 @@ bool is_muic_usb_path_cp_usb(void)
 	return false;
 }
 
+__visible_for_testing void muic_set_afc_disable(struct muic_platform_data *pdata)
+{
+#if !IS_ENABLED(CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE)
+	if (get_afc_mode() == CH_MODE_AFC_DISABLE_VAL) {
+		pr_info("AFC mode disabled\n");
+		pdata->afc_disable = true;
+	} else {
+		pr_info("AFC mode enabled\n");
+		pdata->afc_disable = false;
+	}
+#else
+	pr_info("AFC mode disable enforce\n");
+	pdata->afc_disable = true;
+#endif /* !CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE */
+}
+EXPORT_SYMBOL_KUNIT(muic_set_afc_disable);
+
+static const char *muic_path_name(int path)
+{
+	switch (path) {
+	case MUIC_PATH_USB_AP:
+		return "USB_AP";
+	case MUIC_PATH_USB_CP:
+		return "USB_CP";
+	case MUIC_PATH_UART_AP:
+		return "UART_AP";
+	case MUIC_PATH_UART_CP:
+		return "UART_CP";
+	case MUIC_PATH_OPEN:
+		return "OPEN";
+	case MUIC_PATH_AUDIO:
+		return "AUDIO";
+	default:
+		return "UNDEFINED";
+	}
+}
+
+__visible_for_testing int muic_set_path(struct muic_platform_data *pdata)
+{
+	int ret = 0;
+
+	if (pdata->set_gpio_usb_sel) {
+		ret = pdata->set_gpio_usb_sel(pdata->drv_data, pdata->usb_path);
+		if (ret) {
+			pr_err("%s set_gpio_usb_sel error\n", __func__);
+			goto err;
+		}
+	}
+
+	if (pdata->set_gpio_uart_sel) {
+		ret = pdata->set_gpio_uart_sel(pdata->drv_data, pdata->uart_path);
+		if (ret) {
+			pr_err("%s set_gpio_uart_sel error\n", __func__);
+			goto err;
+		}
+	}
+
+	pr_info("%s: usb_path(%s), uart_path(%s)\n", __func__,
+			muic_path_name(pdata->usb_path), muic_path_name(pdata->uart_path));
+
+err:
+	return ret;
+}
+EXPORT_SYMBOL_KUNIT(muic_set_path);
+
 #if IS_MODULE(CONFIG_MUIC_NOTIFIER)
 static int muic_init_gpio_cb(int switch_sel)
 {
 	struct muic_platform_data *pdata = &muic_pdata;
-	const char *usb_mode;
-	const char *uart_mode;
 	int ret = 0;
 
 	pr_info("%s (%d)\n", __func__, switch_sel);
 
-	if (switch_sel & SWITCH_SEL_USB_MASK) {
+	if (switch_sel & SWITCH_SEL_USB_MASK)
 		pdata->usb_path = MUIC_PATH_USB_AP;
-		usb_mode = "PDA";
-	} else {
+	else
 		pdata->usb_path = MUIC_PATH_USB_CP;
-		usb_mode = "MODEM";
-	}
 
-	if (pdata->set_gpio_usb_sel)
-		ret = pdata->set_gpio_usb_sel(pdata->drv_data, pdata->usb_path);
-
-	if (switch_sel & SWITCH_SEL_UART_MASK) {
+	if (switch_sel & SWITCH_SEL_UART_MASK)
 		pdata->uart_path = MUIC_PATH_UART_AP;
-		uart_mode = "AP";
-	} else {
+	else
 		pdata->uart_path = MUIC_PATH_UART_CP;
-		uart_mode = "CP";
-	}
 
 	/* These flags MUST be updated again from probe function */
 	pdata->rustproof_on = false;
@@ -368,24 +445,9 @@ static int muic_init_gpio_cb(int switch_sel)
 		pdata->rustproof_on = true;
 #endif
 
-#if !IS_ENABLED(CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE)
-	if (get_afc_mode() == CH_MODE_AFC_DISABLE_VAL) {
-		pr_info("AFC mode disabled\n");
-		pdata->afc_disable = true;
-	} else {
-		pr_info("AFC mode enabled\n");
-		pdata->afc_disable = false;
-	}
-#else
-	pr_info("AFC mode disable enforce\n");
-	pdata->afc_disable = true;
-#endif /* !CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE */
+	muic_set_afc_disable(pdata);
 
-	if (pdata->set_gpio_uart_sel)
-		ret = pdata->set_gpio_uart_sel(pdata->drv_data, pdata->uart_path);
-
-	pr_info("%s: usb_path(%s), uart_path(%s)\n", __func__,
-			usb_mode, uart_mode);
+	muic_set_path(pdata);
 
 	return ret;
 }
@@ -395,72 +457,42 @@ static int muic_init_gpio_cb(void)
 	struct muic_platform_data *pdata = &muic_pdata;
 	int switch_sel = get_switch_sel();
 	int uart_sel = get_uart_sel();
-	const char *usb_mode;
-	const char *uart_mode;
 	int ret = 0;
 
 	pr_info("%s: switch_sel(%d) uart_sel(%d)\n", __func__, switch_sel, uart_sel);
 
 	pdata->usb_path = MUIC_PATH_USB_AP;
-	usb_mode = "PDA";
 
 	pdata->uart_path = MUIC_PATH_UART_AP;
-	uart_mode = "AP";
 
 	if (switch_sel != -1) {
-		if (switch_sel & SWITCH_SEL_USB_MASK) {
+		if (switch_sel & SWITCH_SEL_USB_MASK)
 			pdata->usb_path = MUIC_PATH_USB_AP;
-			usb_mode = "PDA";
-		} else {
+		else
 			pdata->usb_path = MUIC_PATH_USB_CP;
-			usb_mode = "MODEM";
-		}
-		if (switch_sel & SWITCH_SEL_UART_MASK) {
+
+		if (switch_sel & SWITCH_SEL_UART_MASK)
 			pdata->uart_path = MUIC_PATH_UART_AP;
-			uart_mode = "AP";
-		} else {
+		else
 			pdata->uart_path = MUIC_PATH_UART_CP;
-			uart_mode = "CP";
-		}
+
 #if IS_ENABLED(CONFIG_MUIC_UART_SWITCH)
-		if (switch_sel & SWITCH_SEL_UART_MASK2) {
+		if (switch_sel & SWITCH_SEL_UART_MASK2)
 			pdata->uart_path = MUIC_PATH_UART_CP2;
-			uart_mode = "CP2";
-		}
 #endif
 	}
 
 #if defined(CONFIG_MUIC_SUPPORT_UART_SEL)
-	if (get_uart_sel() == MUIC_PATH_UART_CP) {
+	if (uart_sel == MUIC_PATH_UART_CP)
 		pdata->uart_path = MUIC_PATH_UART_CP;
-		uart_mode = "CP";
-	}
 #endif
 
 	/* These flags MUST be updated again from probe function */
 	pdata->rustproof_on = false;
 
-#if !IS_ENABLED(CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE)
-	if (get_afc_mode() == CH_MODE_AFC_DISABLE_VAL) {
-		pr_info("AFC mode disabled\n");
-		pdata->afc_disable = true;
-	} else {
-		pr_info("AFC mode enabled\n");
-		pdata->afc_disable = false;
-	}
-#else
-	pr_info("AFC mode disable enforce\n");
-	pdata->afc_disable = true;
-#endif /* !CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE */
+	muic_set_afc_disable(pdata);
 
-	if (pdata->set_gpio_usb_sel)
-		ret = pdata->set_gpio_usb_sel(pdata->drv_data, pdata->usb_path);
-
-	if (pdata->set_gpio_uart_sel)
-		ret = pdata->set_gpio_uart_sel(pdata->drv_data, pdata->uart_path);
-
-	pr_info("%s: usb_path(%s), uart_path(%s)\n", __func__,
-			usb_mode, uart_mode);
+	muic_set_path(pdata);
 
 	return ret;
 }
@@ -486,7 +518,7 @@ int muic_afc_request_cause_clear(void)
 
 	if (pdata == NULL)
 		return -ENOENT;
-	pdata->afc_request_cause = 0;
+	pdata->afc_request_cause &= ~(AFC_REQUEST_DETACH_CLEAR_BIT);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(muic_afc_request_cause_clear);
@@ -494,7 +526,7 @@ EXPORT_SYMBOL_GPL(muic_afc_request_cause_clear);
 int muic_afc_get_request_cause(void)
 {
 	struct muic_platform_data *pdata = &muic_pdata;
-	int ret = -ENOENT;
+	int ret = 0;
 
 	if (pdata == NULL) {
 		return ret;
@@ -568,19 +600,27 @@ int muic_afc_set_voltage(int voltage)
 #if defined(CONFIG_USE_SECOND_MUIC)
 	struct muic_platform_data *pdata2 = &muic_pdata2;
 #endif
+	int ret = -ENODEV;
 
 	pr_info("%s : %dV\n", __func__, voltage);
 
 #if defined(CONFIG_USE_SECOND_MUIC)
-	if (pdata2->muic_afc_set_voltage_cb)
-		pdata2->muic_afc_set_voltage_cb(voltage);
+	if (pdata2->muic_afc_set_voltage_cb) {
+		ret = pdata2->muic_afc_set_voltage_cb(voltage);
+		if (ret)
+			pr_err("%s second muic_afc_set_voltage_cb ret=%d\n", __func__, ret);
+	}
 #endif
 
-	if (pdata && pdata->muic_afc_set_voltage_cb)
-		return pdata->muic_afc_set_voltage_cb(voltage);
+	if (pdata && pdata->muic_afc_set_voltage_cb) {
+		ret = pdata->muic_afc_set_voltage_cb(voltage);
+		if (ret)
+			pr_err("%s muic_afc_set_voltage_cb ret=%d\n", __func__, ret);
+		return ret;
+	}
 
 	pr_err("%s: cannot supported\n", __func__);
-	return -ENODEV;
+	return ret;
 }
 EXPORT_SYMBOL(muic_afc_set_voltage);
 
@@ -595,12 +635,18 @@ int muic_hv_charger_disable(bool en)
 	pr_info("%s %sable\n", __func__, en ? "en" : "dis");
 
 #if defined(CONFIG_USE_SECOND_MUIC)
-	if (pdata2->muic_hv_charger_disable_cb)
+	if (pdata2->muic_hv_charger_disable_cb) {
 		ret = pdata2->muic_hv_charger_disable_cb(en);
+		if (ret)
+			pr_err("%s second muic_hv_charger_disable_cb ret=%d\n", __func__, ret);
+	}
 #endif
 
-	if (pdata && pdata->muic_hv_charger_disable_cb)
+	if (pdata && pdata->muic_hv_charger_disable_cb) {
 		ret = pdata->muic_hv_charger_disable_cb(en);
+		if (ret)
+			pr_err("%s muic_hv_charger_disable_cb ret=%d\n", __func__, ret);
+	}
 
 	return ret;
 }
@@ -635,7 +681,7 @@ int muic_set_hiccup_mode(int on_off)
 }
 EXPORT_SYMBOL_GPL(muic_set_hiccup_mode);
 
-#if IS_ENABLED(CONFIG_MUIC_SM5504_POGO)
+#if IS_ENABLED(CONFIG_MUIC_POGO)
 int muic_set_pogo_adc(int adc)
 {
 	struct muic_platform_data *pdata = &muic_pdata;
@@ -648,11 +694,3 @@ int muic_set_pogo_adc(int adc)
 }
 EXPORT_SYMBOL_GPL(muic_set_pogo_adc);
 #endif
-
-struct muic_platform_data muic_pdata = {
-	.init_switch_dev_cb	= muic_init_switch_dev_cb,
-	.cleanup_switch_dev_cb	= muic_cleanup_switch_dev_cb,
-	.init_gpio_cb		= muic_init_gpio_cb,
-};
-EXPORT_SYMBOL(muic_pdata);
-

@@ -63,9 +63,9 @@ struct muic_notifier_struct {
 	muic_notifier_cmd_t cmd;
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 	PD_NOTI_ATTACH_TYPEDEF cxt;
-#if IS_ENABLED(CONFIG_MUIC_SM5504_POGO)
+#if IS_ENABLED(CONFIG_MUIC_POGO)
 	PD_NOTI_ATTACH_TYPEDEF pogo_cxt;
-#endif /* CONFIG_MUIC_SM5504_POGO */
+#endif /* CONFIG_MUIC_POGO */
 #endif
 	struct blocking_notifier_head notifier_call_chain;
 };
@@ -85,8 +85,10 @@ extern void muic_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void muic_pdic_notifier_detach_attached_dev(muic_attached_dev_t new_dev);
 extern void muic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void muic_notifier_logically_detach_attached_dev(muic_attached_dev_t cur_dev);
+#if IS_ENABLED(CONFIG_VIRTUAL_MUIC)
 extern void vt_muic_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void vt_muic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
+#endif
 
 #if IS_ENABLED(CONFIG_PDIC_SLSI_NON_MCU)
 extern int muic_pdic_notifier_register(struct notifier_block *nb,
@@ -102,9 +104,9 @@ extern int muic_notifier_unregister(struct notifier_block *nb);
 /* Choose a proper noti. interface for a test */
 extern void muic_notifier_set_new_noti(bool flag);
 
-#if IS_ENABLED(CONFIG_MUIC_SM5504_POGO)
+#if IS_ENABLED(CONFIG_MUIC_POGO)
 extern void muic_pogo_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void muic_pogo_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
-#endif /* CONFIG_MUIC_SM5504_POGO */
+#endif /* CONFIG_MUIC_POGO */
 
 #endif /* __MUIC_NOTIFIER_H__ */
