@@ -58,9 +58,10 @@ typedef enum {
 	PDIC_NOTIFY_ID_DEVICE_INFO		= 18,
 	PDIC_NOTIFY_ID_SVID_INFO		= 19,
 	PDIC_NOTIFY_ID_CLEAR_INFO		= 20,
-#if IS_ENABLED(CONFIG_MUIC_SM5504_POGO)
+#if IS_ENABLED(CONFIG_MUIC_POGO)
 	PDIC_NOTIFY_ID_POGO				= 21,
 #endif
+	PDIC_NOTIFY_ID_RPLEVEL		= 22,
 } pdic_notifier_id_t;
 
 typedef enum {
@@ -72,6 +73,7 @@ typedef enum {
 	RID_523K		= 5,
 	RID_619K		= 6,
 	RID_OPEN		= 7,
+	RID_056K		= 8,
 } pdic_notifier_rid_t;
 
 typedef enum {
@@ -245,6 +247,8 @@ typedef struct {
 struct pdic_notifier_data {
 	PD_NOTI_TYPEDEF pdic_template;
 	struct blocking_notifier_head notifier_call_chain;
+
+	struct mutex notify_mutex;
 };
 
 #define PDIC_NOTIFIER_BLOCK(name)	\

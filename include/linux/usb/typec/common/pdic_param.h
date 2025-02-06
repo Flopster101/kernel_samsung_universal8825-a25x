@@ -34,14 +34,17 @@ extern int check_factory_mode_boot(void);
 extern int get_usb_factory_mode(void);
 extern int is_lpcharge_pdic_param(void);
 extern int is_factory_mode_pdic_param(void);
+extern int is_recovery_mode_pdic_param(void);
 #else
 static inline int check_factory_mode_boot(void)
-	{return 0;}
+	{return 0; }
 static inline int get_usb_factory_mode(void)
 	{return PDIC_PARAM_MODE_NO;}
 static inline int is_lpcharge_pdic_param(void)
-	{return 0;}
+	{return 0; }
 static inline int is_factory_mode_pdic_param(void)
-	{return 0;}
+	{return 0; }
+static inline int is_recovery_mode_pdic_param(void)
+	{return 0; }
 #endif
 #endif /* __LINUX_PDIC_PARAM_H__ */

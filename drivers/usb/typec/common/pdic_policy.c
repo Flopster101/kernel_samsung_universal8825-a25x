@@ -31,7 +31,11 @@
 #if IS_ENABLED(CONFIG_IF_CB_MANAGER)
 #include <linux/usb/typec/manager/if_cb_manager.h>
 #endif
+#if IS_ENABLED(CONFIG_BATTERY_NOTIFIER)
+#include <linux/battery/battery_notifier.h>
+#else
 #include <linux/battery/sec_pd.h>
+#endif
 #include <linux/usb_notify.h>
 #include <linux/power_supply.h>
 
@@ -215,6 +219,7 @@ static const char * const pp_msg[] = {
 	[MSG_U255K] = "U255K",
 	[MSG_U523K] = "U523K",
 	[MSG_U619K] = "U619K",
+	[MSG_FAC_ERR] = "FAC ERROR",
 	[MSG_EX_CNT]	= "EXPLICIT CONTRACT",
 	[MSG_KILLER]	= "USB_KILLER",
 	[MSG_DCOVER]	= "DISCOVER ALT DEVICE",
@@ -222,9 +227,16 @@ static const char * const pp_msg[] = {
 	[MSG_DP_DISCONN]	= "DP DISCONNECT",
 	[MSG_DP_LINK_CONF]	= "DP LINK CONFIGURATION",
 	[MSG_DP_HPD]	= "DP HPD",
+	[MSG_DEVICE_INFO] = "DEVICE INFO",
+	[MSG_SVID_INFO] = "SVID_INFO",
 	[MSG_SELECT_PDO]	= "SELECT_PDO",
 	[MSG_CURRENT_PDO]	= "CURRENT_PDO",
 	[MSG_PD_POWER_STATUS]	= "PD_POWER_STATUS",
+	[MSG_FAC_MODE_NOTI_TO_MUIC] = "FAC_MODE_NOTI_TO_MUIC",
+	[MSG_GET_ROLESWAP_CHECK] = "GET_ROLESWAP_CHECK",
+	[MSG_GET_ACC] = "GET_ACC",
+	[MSG_MUIC_SET_BC12] = "MUIC_SET_BC12",
+	[MSG_SHUTDOWN] = "SHUTDOWN",
 	[MSG_CCOFF]	= "CC OFF",
 	[MSG_MAX]	= "MSG MAX",
 };
@@ -534,6 +546,16 @@ inline void process_typec_power_role(struct pdic_policy *pp_data, int msg) {}
 
 static void pdic_policy_alt_dev_detach(struct pdic_policy *pp_data)
 {
+	struct pp_ic_data *ic_data;
+
+	pr_info("%s\n", __func__);
+
+	ic_data = pp_data->ic_data;
+	if (!ic_data) {
+		pr_err("%s ic_data in null\n", __func__);
+		goto err;
+	}
+
 	if (pp_data->acc_type != PDIC_DOCK_DETACHED) {
 		if (pp_data->acc_type != PDIC_DOCK_NEW)
 			pdic_send_dock_intent(PDIC_DOCK_DETACHED);
@@ -541,7 +563,14 @@ static void pdic_policy_alt_dev_detach(struct pdic_policy *pp_data)
 				pp_data->alt_info.product_id,
 				PDIC_DOCK_DETACHED);
 		memset(&pp_data->alt_info, 0, sizeof(struct pdic_alt_info));
+		pp_data->acc_type = PDIC_DOCK_DETACHED;
+		if (ic_data->p_ops && ic_data->p_ops->alt_info_clear)
+			ic_data->p_ops->alt_info_clear(ic_data->drv_data);
+		PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_ALL,
+			PDIC_NOTIFY_ID_CLEAR_INFO, PDIC_NOTIFY_ID_DEVICE_INFO, 0, 0);
 	}
+err:
+	return;
 }
 
 static void pdic_policy_dp_detach(struct pdic_policy *pp_data)
@@ -577,9 +606,11 @@ static void pdic_policy_pd_initial(struct pdic_notifier_struct *pd_noti)
 	pd_noti->sink_status.available_pdo_num = 0;
 	pd_noti->sink_status.selected_pdo_num = 0;
 	pd_noti->sink_status.current_pdo_num = 0;
+#if !IS_ENABLED(CONFIG_BATTERY_NOTIFIER)
 	pd_noti->sink_status.vid = 0;
 	pd_noti->sink_status.pid = 0;
 	pd_noti->sink_status.xid = 0;
+#endif
 	pd_noti->sink_status.pps_voltage = 0;
 	pd_noti->sink_status.pps_current = 0;
 	pd_noti->sink_status.rp_currentlvl = RP_CURRENT_LEVEL_NONE;
@@ -647,6 +678,17 @@ static void process_policy_cc_attach(struct pdic_policy *pp_data, int msg)
 		process_typec_power_role(pp_data, PP_SOURCE);
 #endif
 	} else if (msg == MSG_SNK) {
+		if (pp_data->power_role == PP_SOURCE &&
+				pp_data->cc_state == PP_CCRD) {
+			if (pp_pd_noti.pd_noti) {
+				pd_noti = pp_pd_noti.pd_noti;
+				pdic_policy_pd_initial(pd_noti);
+				pd_noti->event = PDIC_NOTIFY_EVENT_PD_PRSWAP_SRCTOSNK;
+				PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_BATT,
+					PDIC_NOTIFY_ID_POWER_STATUS,
+					0, 0, 0);
+			}
+		}
 		pp_data->cc_state = PP_CCRP;
 		pp_data->power_role = PP_SINK;
 		send_otg_notify(o_notify, NOTIFY_EVENT_POWER_SOURCE, 0);
@@ -755,6 +797,9 @@ static void process_policy_vbus(struct pdic_policy *pp_data, int msg)
 static void process_policy_rpcurrent(struct pdic_policy *pp_data, int msg)
 {
 	struct pdic_notifier_struct *pd_noti = NULL; 
+#if IS_ENABLED(CONFIG_TYPEC)
+		enum typec_pwr_opmode mode = TYPEC_PWR_MODE_USB;
+#endif
 
 	pr_info("%s %s (%s)\n", __func__, pp_msg[msg],
 			pd_p_contract[pp_data->explicit_contract]);
@@ -767,14 +812,23 @@ static void process_policy_rpcurrent(struct pdic_policy *pp_data, int msg)
 		} else if (msg == MSG_RP22K) {
 			pd_noti->sink_status.rp_currentlvl = RP_CURRENT_LEVEL2;
 			pp_data->cc_rp_current = PP_22K;
+#if IS_ENABLED(CONFIG_TYPEC)
+			mode = TYPEC_PWR_MODE_1_5A;
+#endif
 		} else if (msg == MSG_RP10K) {
 			pd_noti->sink_status.rp_currentlvl = RP_CURRENT_LEVEL3;
 			pp_data->cc_rp_current = PP_10K;
+#if IS_ENABLED(CONFIG_TYPEC)
+			mode = TYPEC_PWR_MODE_3_0A;
+#endif
 		} else
 			;
 		pd_noti->event = PDIC_NOTIFY_EVENT_PDIC_ATTACH;
 
 		if (pp_data->explicit_contract == PP_NO_EXCNT) {
+#if IS_ENABLED(CONFIG_TYPEC)
+			typec_set_pwr_opmode(pp_data->port, mode);
+#endif
 			if (msg == MSG_RP56K && !is_short(pp_data)) {
 				PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_MUIC,
 					PDIC_NOTIFY_ID_TA,
@@ -783,6 +837,11 @@ static void process_policy_rpcurrent(struct pdic_policy *pp_data, int msg)
 			PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_BATT,
 				PDIC_NOTIFY_ID_POWER_STATUS,
 				0/* no power nego*/, 0, 0);
+			PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_MUIC,
+				PDIC_NOTIFY_ID_RPLEVEL,
+				PDIC_NOTIFY_ATTACH,
+				USB_STATUS_NOTIFY_DETACH,
+				pd_noti->sink_status.rp_currentlvl);
 		}
 	}
 }
@@ -903,7 +962,6 @@ static void process_policy_rid(struct pdic_policy *pp_data, int msg)
 		break;
 	case MSG_R255K:
 		rid = RID_255K;
-		no_usb = 1;
 		pp_data->rid = PP_R255K;
 		break;
 	case MSG_R523K:
@@ -913,6 +971,7 @@ static void process_policy_rid(struct pdic_policy *pp_data, int msg)
 		break;
 	case MSG_R619K:
 		rid = RID_619K;
+		no_usb = 1;
 		pp_data->rid = PP_R619K;
 		break;
 	default:
@@ -929,7 +988,7 @@ static void process_policy_rid(struct pdic_policy *pp_data, int msg)
 }
 
 static void process_policy_explicit_contract
-		(struct pdic_policy *pp_data, int msg)
+		(struct pdic_policy *pp_data, int msg, int skip_event)
 {
 	struct pdic_notifier_struct *pd_noti = NULL;
 	int mode = TYPEC_PWR_MODE_USB;
@@ -946,8 +1005,10 @@ static void process_policy_explicit_contract
 		}
 		if (pp_data->power_role == PP_SINK) {
 			if (pp_pd_noti.pd_noti) {
-				pd_noti = pp_pd_noti.pd_noti;
-				pd_noti->event = PDIC_NOTIFY_EVENT_PD_SINK;
+				if (!skip_event) {
+					pd_noti = pp_pd_noti.pd_noti;
+					pd_noti->event = PDIC_NOTIFY_EVENT_PD_SINK;
+				}
 
 				PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_BATT,
 					PDIC_NOTIFY_ID_POWER_STATUS,
@@ -960,11 +1021,103 @@ static void process_policy_explicit_contract
 static void process_policy_usb_killer(struct pdic_policy *pp_data)
 {
 	int event = 0;
-	
+	struct otg_notify *o_notify = get_otg_notify();
+
 	pp_data->usb_killer = PP_KILLER;
 
 	event = NOTIFY_EXTRA_USBKILLER;
-	store_usblog_notify(NOTIFY_EXTRA, (void *)&event, NULL);	
+	store_usblog_notify(NOTIFY_EXTRA, (void *)&event, NULL);
+#if defined(CONFIG_USB_HW_PARAM)
+	if (o_notify)
+		inc_hw_param(o_notify, USB_CCIC_USB_KILLER_COUNT);
+#endif
+}
+
+static void process_policy_fac_err(struct pdic_policy *pp_data, int err)
+{
+	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_PDIC,
+			PDIC_NOTIFY_ID_FAC, err, 0, 0);
+}
+
+static void process_policy_fac_mode_noti_to_muic(struct pdic_policy *pp_data, int attach)
+{
+	PDIC_POLICY_SEND_NOTI(pp_data,
+		PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
+		attach/*attach*/,
+		USB_STATUS_NOTIFY_DETACH/*rprd*/, 0);
+}
+
+static void process_policy_sbu_short(struct pdic_policy *pp_data, int need_pd_detach)
+{
+	pp_data->sbu_short = PP_SBU_SHORT;
+
+	if (need_pd_detach)
+		PDIC_POLICY_SEND_NOTI(pp_data,
+			PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
+			PDIC_NOTIFY_DETACH/*attach*/,
+			USB_STATUS_NOTIFY_DETACH/*rprd*/, 0);
+}
+
+static int process_policy_get_ppdata(struct pdic_policy *pp_data, int msg)
+{
+	int ret = -EINVAL;
+
+	switch (msg) {
+	case MSG_GET_ROLESWAP_CHECK:
+		if (pp_data->pp_r_s.try_power_role || pp_data->pp_r_s.try_data_role ||
+			pp_data->pp_r_s.try_port_type)
+			ret = 1;
+		else
+			ret = 0;
+		break;
+	case MSG_GET_ACC:
+		ret = pp_data->acc_type;
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+static void process_policy_cc_short(struct pdic_policy *pp_data, int need_pd_noti)
+{
+	struct pdic_notifier_struct *pd_noti = NULL;
+
+	pp_data->cc_short = PP_CC_SHORT;
+
+	if (need_pd_noti && pp_pd_noti.pd_noti) {
+		pd_noti = pp_pd_noti.pd_noti;
+		if (pd_noti->sink_status.rp_currentlvl != RP_CURRENT_ABNORMAL) {
+			pd_noti->sink_status.rp_currentlvl = RP_CURRENT_ABNORMAL;
+			pd_noti->event = PDIC_NOTIFY_EVENT_PDIC_ATTACH;
+			pr_info("%s : rp_currentlvl(%d)\n", __func__,
+					pd_noti->sink_status.rp_currentlvl);
+			PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_BATT,
+				PDIC_NOTIFY_ID_POWER_STATUS,
+				0/* no power nego*/, 0, 0);
+			PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_MUIC,
+				PDIC_NOTIFY_ID_RPLEVEL,
+				PDIC_NOTIFY_ATTACH,
+				USB_STATUS_NOTIFY_DETACH,
+				pd_noti->sink_status.rp_currentlvl);
+		}
+	}
+}
+
+static void process_policy_shutdown(struct pdic_policy *pp_data)
+{
+	int val1 = 0, val2 = 0;
+
+	if (gpio_is_valid(pp_data->ic_data->vbus_dischar_gpio)) {
+		if (delayed_work_pending(&pp_data->dischar_work)) {
+			val1 = gpio_get_value(pp_data->ic_data->vbus_dischar_gpio);
+			gpio_set_value(pp_data->ic_data->vbus_dischar_gpio, 0);
+			val2 = gpio_get_value(pp_data->ic_data->vbus_dischar_gpio);
+			cancel_delayed_work_sync(&pp_data->dischar_work);
+			pr_info("%s vbus_discharging %d->%d\n", __func__, val1, val2);
+		}
+	}
 }
 
 static int pdic_policy_get_alt_info(struct pdic_policy *pp_data)
@@ -1130,6 +1283,7 @@ static void process_policy_dp(struct pdic_policy *pp_data, int msg)
 			1/*dp_is_connect*/, 1/*dp_hs_connect*/, 0);
 		break;
 	case MSG_DP_DISCONN:
+		pp_data->usb_host.detach_done_wait = 1;
 		PDIC_POLICY_SEND_NOTI(pp_data,
 			PDIC_NOTIFY_DEV_USB_DP, PDIC_NOTIFY_ID_USB_DP,
 			0/*dp_is_connect*/, 0/*dp_hs_connect*/, 0);
@@ -1137,6 +1291,13 @@ static void process_policy_dp(struct pdic_policy *pp_data, int msg)
 			PDIC_NOTIFY_ID_DP_CONNECT, 0/*attach*/, 0/*drp*/, 0);
 		break;
 	case MSG_DP_LINK_CONF:
+		if (alt_info->dp_selected_pin == PDIC_NOTIFY_DP_PIN_C ||
+				alt_info->dp_selected_pin == PDIC_NOTIFY_DP_PIN_E ||
+				alt_info->dp_selected_pin == PDIC_NOTIFY_DP_PIN_A)
+			usb_restart_host_mode(pp_data->man, 4);
+		else
+			usb_restart_host_mode(pp_data->man, 2);
+
 		PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_DP,
 			PDIC_NOTIFY_ID_DP_LINK_CONF,
 			alt_info->dp_selected_pin, 0, 0);
@@ -1153,6 +1314,34 @@ static void process_policy_dp(struct pdic_policy *pp_data, int msg)
 err:
 	pr_info("%s msg=%s -\n", __func__, pp_msg[msg]);
 	return;
+}
+
+static void process_policy_device_info(struct pdic_policy *pp_data)
+{
+	struct pdic_alt_info *alt_info;
+	uint16_t vid = 0, pid = 0, bcd_device = 0;
+	int ret = 0;
+
+	ret = pdic_policy_get_alt_info(pp_data);
+	if (ret < 0)
+		goto err;
+
+	alt_info = &pp_data->alt_info;
+
+	vid = alt_info->vendor_id;
+	pid = alt_info->product_id;
+	bcd_device = alt_info->bcd_device;
+	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_ALL,
+			PDIC_NOTIFY_ID_DEVICE_INFO, vid,
+			pid, bcd_device);
+err:
+	return;
+}
+
+static void process_policy_svid_info(struct pdic_policy *pp_data, int svid)
+{
+	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_ALL,
+		PDIC_NOTIFY_ID_SVID_INFO, svid, 0, 0);
 }
 
 static void pdic_policy_update_pdo_num(void *data, int msg, int pdo_num)
@@ -1209,6 +1398,7 @@ static void process_policy_cc_detach(struct pdic_policy *pp_data)
 		pr_info("%s vbus_discharging %d->%d\n", __func__, val1, val2);
 	}
 
+	pp_data->usb_host.detach_done_wait = 1;
 	pp_data->cc_on = PP_CCOFF;
 	pp_data->cc_state = PP_TOGGLE;
 	pp_data->cc_direction = PP_CC1;
@@ -1228,7 +1418,9 @@ static void process_policy_cc_detach(struct pdic_policy *pp_data)
 	pdic_policy_pd_detach(pp_data);
 
 	pdic_policy_alt_dev_detach(pp_data);
-	
+
+	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_ALL,
+		PDIC_NOTIFY_ID_CLEAR_INFO, PDIC_NOTIFY_ID_SVID_INFO, 0, 0);
 	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
 		0/*attach*/, 0/*rprd*/, 0);
 	PDIC_POLICY_SEND_NOTI(pp_data, PDIC_NOTIFY_DEV_USB, PDIC_NOTIFY_ID_USB,
@@ -1357,6 +1549,12 @@ int pdic_policy_send_msg(void *data, int msg, int param1, int param2)
 	case MSG_RP10K:
 		process_policy_rpcurrent(pp_data, msg);
 		break;
+	case MSG_CC_SHORT:
+		process_policy_cc_short(pp_data, param1);
+		break;
+	case MSG_SBU_SHORT:
+		process_policy_sbu_short(pp_data, param1);
+		break;
 	case MSG_UFP:
 	case MSG_DFP:
 		process_policy_data_role(pp_data, msg);
@@ -1376,8 +1574,11 @@ int pdic_policy_send_msg(void *data, int msg, int param1, int param2)
 	case MSG_R619K:
 		process_policy_rid(pp_data, msg);
 		break;
+	case MSG_FAC_ERR:
+		process_policy_fac_err(pp_data, param1);
+		break;
 	case MSG_EX_CNT:
-		process_policy_explicit_contract(pp_data, msg);
+		process_policy_explicit_contract(pp_data, msg, param1);
 		break;
 	case MSG_KILLER:
 		process_policy_usb_killer(pp_data);
@@ -1391,12 +1592,29 @@ int pdic_policy_send_msg(void *data, int msg, int param1, int param2)
 	case MSG_DP_HPD:
 		process_policy_dp(pp_data, msg);
 		break;
+	case MSG_DEVICE_INFO:
+		process_policy_device_info(pp_data);
+	case MSG_SVID_INFO:
+		process_policy_svid_info(pp_data, param1);
 	case MSG_SELECT_PDO:
 	case MSG_CURRENT_PDO:
 		pdic_policy_update_pdo_num(pp_data, msg, param1);
 		break;
 	case MSG_PD_POWER_STATUS:
 		pdic_policy_pd_power_status(pp_data, param1, param2);
+		break;
+	case MSG_FAC_MODE_NOTI_TO_MUIC:
+		process_policy_fac_mode_noti_to_muic(pp_data, param1);
+		break;
+	case MSG_GET_ROLESWAP_CHECK:
+	case MSG_GET_ACC:
+		ret = process_policy_get_ppdata(pp_data, msg);
+		break;
+	case MSG_MUIC_SET_BC12:
+		muic_set_bc12(pp_data->man, param1);
+		break;
+	case MSG_SHUTDOWN:
+		process_policy_shutdown(pp_data);
 		break;
 	case MSG_CCOFF:
 		process_policy_cc_detach(pp_data);
@@ -1749,8 +1967,40 @@ err:
 	return;
 }
 
+static int pdic_policy_usbpd_sbu_test_read(void *data)
+{
+	struct pdic_policy *pp_data = data;
+	struct pp_ic_data *ic_data = pp_data->ic_data;
+	int ret = 0;
+
+	if (!ic_data) {
+		ret = -ENOENT;
+		goto err;
+	}
+
+	ret = ic_data->p_ops->usbpd_sbu_test_read(ic_data->drv_data);
+
+err:
+	return ret;
+}
+
+static void pdic_policy_cc_control_command(void *data, int is_off)
+{
+	struct pdic_policy *pp_data = data;
+	struct pp_ic_data *ic_data = pp_data->ic_data;
+
+	if (!ic_data)
+		goto err;
+
+	ic_data->p_ops->cc_control_command(ic_data->drv_data, is_off);
+err:
+	return;
+}
+
 struct usbpd_ops ops_usbpd = {
 	.usbpd_set_host_on = pdic_policy_usbpd_set_host_on,
+	.usbpd_sbu_test_read = pdic_policy_usbpd_sbu_test_read,
+	.usbpd_cc_control_command = pdic_policy_cc_control_command,
 };
 
 static int pdic_policy_handle_usb_ext_noti(struct notifier_block *nb,
@@ -1858,15 +2108,17 @@ void *pdic_policy_init(struct pp_ic_data *ic_data)
 
 	pp_data->ic_data = ic_data;
 	ic_data->pp_data = pp_data;
-
+	pp_data->acc_type = PDIC_DOCK_DETACHED;
 	if (ic_data->pd_noti) {
 		pp_pd_noti.pd_noti = ic_data->pd_noti;
 		pr_info("%s ic_data pd_noti registered\n", __func__);
 	} else {
+#if !IS_ENABLED(CONFIG_BATTERY_NOTIFIER)
 		pp_data->pd_noti.sink_status.fp_sec_pd_select_pdo
 			= pdic_policy_select_pdo;
 		pp_pd_noti.pd_noti = &pp_data->pd_noti;
 		pr_info("%s ic_data pd_noti is none.\n", __func__);
+#endif
 	}
 	pp_pd_noti.pp_data = pp_data;
 

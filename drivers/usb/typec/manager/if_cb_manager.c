@@ -95,6 +95,20 @@ void usb_set_vbus_current(struct if_cb_manager *man_core, int state)
 }
 EXPORT_SYMBOL(usb_set_vbus_current);
 
+int usb_restart_host_mode(struct if_cb_manager *man_core, int lanes)
+{
+	if (man_core == NULL || man_core->usb_d == NULL ||
+			man_core->usb_d->ops == NULL ||
+			man_core->usb_d->ops->usb_restart_host_mode == NULL) {
+		pr_err("%s : Member of if_cb_manager is NULL\n", __func__);
+		return -ENXIO;
+	}
+
+	return man_core->usb_d->ops->usb_restart_host_mode(
+			man_core->usb_d->data, lanes);
+}
+EXPORT_SYMBOL(usb_restart_host_mode);
+
 int muic_check_usb_killer(struct if_cb_manager *man_core)
 {
 	if (man_core == NULL || man_core->muic_d == NULL ||
@@ -177,6 +191,21 @@ void usbpd_wait_entermode(struct if_cb_manager *man_core, int on)
 	man_core->usbpd_d->ops->usbpd_wait_entermode(man_core->usbpd_d->data, on);
 }
 EXPORT_SYMBOL(usbpd_wait_entermode);
+
+void usbpd_sbu_switch_control(int on)
+{
+	struct if_cb_manager *man_core = get_if_cb_manager();
+
+	if (!IS_ENABLED(CONFIG_SBU_SWITCH_CONTROL) || man_core == NULL ||
+			man_core->usbpd_d == NULL || man_core->usbpd_d->ops == NULL ||
+			man_core->usbpd_d->ops->usbpd_sbu_switch_control == NULL) {
+		pr_err("%s : This function isn't supported\n", __func__);
+		return;
+	}
+
+	man_core->usbpd_d->ops->usbpd_sbu_switch_control(man_core->usbpd_d->data, on);
+}
+EXPORT_SYMBOL(usbpd_sbu_switch_control);
 
 static int __init if_cb_manager_init(void)
 {

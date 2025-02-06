@@ -26,3 +26,12 @@ config USB_TYPEC_MANAGER_NOTIFIER_TEST
         help
           TODO: Describe config fully.
 
+config SBU_SWITCH_CONTROL
+    bool "Support controlling SBU switch open/close"
+    depends on IF_CB_MANAGER
+    default n
+    help
+        If you say yes here you will use if_cb_manager function
+        to control SBU switch (controlled by displayport TG)
+        This config indicates that switch will be controlled
+        manually by drivers, not automatically by FW or HW.

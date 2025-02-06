@@ -12,8 +12,16 @@
 #ifndef __IF_CB_MANAGER_H__
 #define __IF_CB_MANAGER_H__
 
+enum sbu_switch_status {
+	UNDEFINED = -1,
+	OPEN_SBU = 0,
+	CLOSE_SBU_CC1_ACTIVE = 1,
+	CLOSE_SBU_CC2_ACTIVE = 2,
+};
+
 struct usb_ops {
 	void (*usb_set_vbus_current)(void *data, int state);
+	int (*usb_restart_host_mode)(void *data, int lanes);
 };
 
 struct muic_ops {
@@ -27,6 +35,7 @@ struct usbpd_ops {
 	void (*usbpd_set_host_on)(void *data, int mode);
 	void (*usbpd_cc_control_command)(void *data, int is_off);
 	void (*usbpd_wait_entermode)(void *data, int on);
+	void (*usbpd_sbu_switch_control)(void *data, int on);
 };
 
 struct lvs_ops {
@@ -65,6 +74,7 @@ extern struct if_cb_manager *register_muic(struct muic_dev *muic);
 extern struct if_cb_manager *register_usbpd(struct usbpd_dev *usbpd);
 extern struct if_cb_manager *register_lvs(struct lvs_dev *lvs);
 extern void usb_set_vbus_current(struct if_cb_manager *man_core, int state);
+extern int usb_restart_host_mode(struct if_cb_manager *man_core, int lanes);
 extern int muic_check_usb_killer(struct if_cb_manager *man_core);
 extern void muic_set_bypass(struct if_cb_manager *man_core, int enable);
 extern void muic_set_bc12(struct if_cb_manager *man_core, int enable);
@@ -72,5 +82,6 @@ extern int usbpd_sbu_test_read(struct if_cb_manager *man_core);
 extern void usbpd_set_host_on(struct if_cb_manager *man_core, int mode);
 extern void usbpd_cc_control_command(struct if_cb_manager *man_core, int is_off);
 extern void usbpd_wait_entermode(struct if_cb_manager *man_core, int on);
+extern void usbpd_sbu_switch_control(int on);
 
 #endif /* __IF_CB_MANAGER_H__ */
