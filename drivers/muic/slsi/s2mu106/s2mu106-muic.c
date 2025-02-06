@@ -2069,7 +2069,9 @@ static void register_muic_ops(struct muic_ic_data *ic_data)
 	ic_data->m_ops.set_switch_to_open = s2mu106_ops_com_to_open;
 	ic_data->m_ops.set_switch_to_uart = s2mu106_ops_com_to_uart;
 	ic_data->m_ops.set_switch_to_usb = s2mu106_ops_com_to_usb;
+#if IS_ENABLED(CONFIG_MUIC_SUPPORT_PRSWAP)
 	ic_data->m_ops.set_chg_det = s2mu106_ops_set_chg_det;
+#endif
 	ic_data->m_ops.set_bypass = s2mu106_ops_set_bypass;
 	ic_data->m_ops.set_water_state = s2mu106_ops_set_water_state;
 	ic_data->m_ops.check_usb_killer = s2mu106_ops_check_usb_killer;
