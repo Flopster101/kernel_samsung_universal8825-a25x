@@ -244,14 +244,16 @@ int is_ois_get_reg(struct i2c_client *client, int cmd, u8 *data)
 {
 	int ret;
 	u16 addr = ois_mcu_regs[cmd].offset;
-#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
+//#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
 	u8 rxbuf[1];
 
-	ret = cam_ois_reg_read_notifier_call_chain(0, addr, &rxbuf[0], 1);
-	*data = rxbuf[0];
-#else
-	ret = is_ois_i2c_read(client, addr, data);
-#endif
+	if (mcd_camera_use_aois) {
+		ret = cam_ois_reg_read_notifier_call_chain(0, addr, &rxbuf[0], 1);
+		*data = rxbuf[0];
+//#else
+	} else
+		ret = is_ois_i2c_read(client, addr, data);
+//#endif
 
 	dbg_ois("[GET_REG] reg:[%s][0x%04X], reg_value(R):[0x%02X]\n",
 		ois_mcu_regs[cmd].reg_name, ois_mcu_regs[cmd].offset, *data);
@@ -274,14 +276,16 @@ int is_ois_get_reg_multi(struct i2c_client *client, int cmd, u8 *data, size_t si
 	int ret;
 	u16 addr = ois_mcu_regs[cmd].offset;
 	int i;
-#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
+//#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
 	u8 rxbuf[256];
 
-	ret = cam_ois_reg_read_notifier_call_chain(0, addr, rxbuf, size);
-	memcpy(data, rxbuf, size);
-#else
-	ret = is_ois_i2c_read_multi(client, addr, data, size);
-#endif
+	if (mcd_camera_use_aois) {
+		ret = cam_ois_reg_read_notifier_call_chain(0, addr, rxbuf, size);
+		memcpy(data, rxbuf, size);
+//#else
+	} else
+		ret = is_ois_i2c_read_multi(client, addr, data, size);
+//#endif
 
 	for (i = 0; i < size; i++) {
 		dbg_ois("[GET_REG] reg:[%s][0x%04X], reg_value(R):[0x%02X]\n",
@@ -301,11 +305,13 @@ int is_ois_set_reg(struct i2c_client *client, int cmd, u8 data)
 	int ret;
 	u16 addr = ois_mcu_regs[cmd].offset;
 
-#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-	ret = cam_ois_cmd_notifier_call_chain(0, addr, &data, 1);
-#else
-	ret = is_ois_i2c_write(client, addr, data);
-#endif
+//#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
+	if (mcd_camera_use_aois)
+		ret = cam_ois_cmd_notifier_call_chain(0, addr, &data, 1);
+//#else
+	else
+		ret = is_ois_i2c_write(client, addr, data);
+//#endif
 
 	dbg_ois("[SET_REG] reg:[%s][0x%04X], reg_value(W):[0x%02X]\n",
 		ois_mcu_regs[cmd].reg_name, ois_mcu_regs[cmd].offset, data);
@@ -329,11 +335,13 @@ int is_ois_set_reg_multi(struct i2c_client *client, int cmd, u8 *data, size_t si
 	u16 addr = ois_mcu_regs[cmd].offset;
 	int i;
 
-#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-	ret = cam_ois_cmd_notifier_call_chain(0, addr, data, size);
-#else
-	ret = is_ois_i2c_write_multi(client, addr, data, size);
-#endif
+//#if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
+	if (mcd_camera_use_aois)
+		ret = cam_ois_cmd_notifier_call_chain(0, addr, data, size);
+//#else
+	else
+		ret = is_ois_i2c_write_multi(client, addr, data, size);
+//#endif
 
 	for (i = 0 ; i < size; i++) {
 		dbg_ois("[SET_REG] reg:[%s][0x%04X], reg_value(W):[0x%02X]\n",
