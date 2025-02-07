@@ -244,6 +244,8 @@ struct s2mu106_fuelgauge_data {
 	int val_0x5C;
 	int low_voltage_limit_cnt;
 	char d_buf[FG_BATT_DUMP_SIZE];
+	int bd_vfocv;
+	int bd_raw_soc;
 };
 
 #if (BATCAP_LEARN)
