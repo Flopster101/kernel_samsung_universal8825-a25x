@@ -397,6 +397,9 @@
 				S2MU106_REG_INT_STATUS4_MSG_ERROR)
 #define ENABLED_INT_4_WATER    (S2MU106_REG_INT_STATUS4_MSG_PASS |\
 				S2MU106_REG_INT_STATUS4_MSG_ERROR)
+#define ENABLED_INT_4_CCOPEN    (S2MU106_REG_INT_STATUS4_USB_DETACH |\
+				S2MU106_REG_INT_STATUS4_MSG_PASS |\
+				S2MU106_REG_INT_STATUS4_MSG_ERROR)
 #define ENABLED_INT_5    (S2MU106_REG_INT_STATUS5_HARD_RESET)
 
 /* S2MU106 I2C registers */
@@ -607,6 +610,12 @@ typedef enum {
 	S2MU106_PHY_IFG_35US = 2,
 } PDIC_PHY_IFG_SEL;
 
+typedef enum {
+	CC_STATE_OPEN,
+	CC_STATE_RD,
+	CC_STATE_DRP,
+	CC_STATE_DEFAULT,
+}PDIC_CC_STATE;
 
 typedef enum {
 	DET_HARD_RESET = 0,
@@ -701,10 +710,11 @@ struct s2mu106_usbpd_data {
 	int cc2_val;
 	int cc_instead_of_vbus;
 	bool checking_pm_water;
+	int cc_state;
+	int is_manual_cc_open;
 #if IS_ENABLED(CONFIG_S2MU106_TYPEC_WATER)
 	struct delayed_work check_facwater;
 	int water_status;
-	int water_cc;
 	int power_off_water_detected;
 
 	int water_th;

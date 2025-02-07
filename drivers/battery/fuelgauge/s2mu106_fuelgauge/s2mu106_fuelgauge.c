@@ -1279,6 +1279,7 @@ batcap_learn_init:
 	s2mu106_fg_test_read(fuelgauge->i2c);
 
 	soc_val->intval = min(fuelgauge->info.soc, 10000);
+	fuelgauge->bd_raw_soc = soc_val->intval;
 	return 0;
 
 err:
@@ -1358,6 +1359,7 @@ ocv_soc_mapping:
 	s2mu106_fg_periodic_read_power(fuelgauge);
 
 	dev_info(&fuelgauge->i2c->dev, "%s: soc (%d), ocv (%d)\n", __func__, soc, ocv);
+	fuelgauge->bd_vfocv = ocv;
 	return ocv;
 }
 
@@ -1572,7 +1574,7 @@ static void s2mu106_fg_adjust_capacity_max(
 
 		if ((diff >= 1) && (fuelgauge->capacity_max < fuelgauge->g_capacity_max)) {
 			fuelgauge->capacity_max++;
-		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 1000)) {
+		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 100)) {
 			fuelgauge->g_capacity_max = 0;
 			fuelgauge->capacity_max_conv = false;
 		}
@@ -1668,11 +1670,11 @@ static void s2mu106_fg_calculate_dynamic_scale(
 	if (capacity < 100)
 		fuelgauge->capacity_max_conv = false;  //Force full sequence , need to decrease capacity_max
 
-	if (raw_soc_val.intval < min_cap) {
-		pr_info("%s: raw soc(%d) is very low, skip routine\n",
-			__func__, raw_soc_val.intval);
+	if ((raw_soc_val.intval < min_cap) || (fuelgauge->capacity_max_conv)) {
+		pr_info("%s: skip routine - raw_soc(%d), min_cap(%d), cap_max_conv(%d)\n",
+				__func__, raw_soc_val.intval, min_cap, fuelgauge->capacity_max_conv);
 		return;
-	}
+}
 
 	if (capacity == 100)
 		scaling_factor = 2;
@@ -1771,17 +1773,12 @@ static void s2mu106_reset_bat_id(struct s2mu106_fuelgauge_data *fuelgauge)
 
 static void s2mu106_fg_bd_log(struct s2mu106_fuelgauge_data *fuelgauge)
 {
-	union power_supply_propval raw_soc_val;
-
 	memset(fuelgauge->d_buf, 0x0, sizeof(fuelgauge->d_buf));
-
-	if (s2mu106_get_rawsoc(fuelgauge, &raw_soc_val) < 0)
-		pr_err("%s: failed to read raw soc\n", __func__);
 
 	snprintf(fuelgauge->d_buf + strlen(fuelgauge->d_buf), sizeof(fuelgauge->d_buf),
 		"%d,%d,%d",
-		s2mu106_get_ocv(fuelgauge),
-		raw_soc_val.intval,
+		fuelgauge->bd_vfocv,
+		fuelgauge->bd_raw_soc,
 		fuelgauge->capacity_max);
 }
 
@@ -2368,6 +2365,7 @@ static int s2mu106_fuelgauge_parse_dt(struct s2mu106_fuelgauge_data *fuelgauge)
 		np = of_find_node_by_name(NULL, "battery_params");
 		if (!np) {
 			pr_err("%s battery_params node NULL\n", __func__);
+			return -EINVAL;
 		} else {
 			char prop_name[PROPERTY_NAME_SIZE];
 
