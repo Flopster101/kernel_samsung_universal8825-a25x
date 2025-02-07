@@ -3954,6 +3954,9 @@ static int32_t __init nvt_driver_init(void)
 {
 	int32_t ret = 0;
 
+	if (!sec_legacy_sinput)
+		return ret;
+
 	pr_info("[sec_input] %s : start\n", __func__);
 
 	//---add spi driver---

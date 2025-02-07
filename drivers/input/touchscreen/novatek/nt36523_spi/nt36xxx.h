@@ -37,6 +37,8 @@
 #define SECURE_TOUCH_DISABLE	0
 #endif
 
+#include <linux/sec_detect.h>
+
 #if IS_ENABLED(CONFIG_MTK_SPI)
 /* Please copy mt_spi.h file under mtk spi driver folder */
 #include "mt_spi.h"
