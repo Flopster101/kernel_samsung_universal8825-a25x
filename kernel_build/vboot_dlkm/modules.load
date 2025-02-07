@@ -273,6 +273,8 @@ sec_debug_hardlockup_info.ko
 sec_debug_sched_report.ko
 vbus_notifier.ko
 sec_common_fn.ko
+legacy_sec_common_fn.ko
+legacy_sec_cmd.ko
 dropdump.ko
 mcd-panel-nt36672c_m33x_00.ko
 mcd-panel-nt36672c_m33x_01.ko
