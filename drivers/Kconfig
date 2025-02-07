@@ -260,6 +260,7 @@ source "drivers/muic/common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMI
 source "drivers/samsung/debug/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/usb/common/vbus_notifier/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/input/sec_input/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/input/sec_input_legacy/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/net/dropdump/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/gpu/drm/samsung/panel/s6e3fc3/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/gpu/drm/samsung/panel_decon/s6e8fc3/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT

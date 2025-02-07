@@ -217,6 +217,7 @@ obj-y += muic/common/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += samsung/debug/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += usb/common/vbus_notifier/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += input/sec_input/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += input/sec_input_legacy/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += net/dropdump/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += gpu/drm/samsung/panel/s6e3fc3/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += gpu/drm/samsung/panel_decon/s6e8fc3/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
