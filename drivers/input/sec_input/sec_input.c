@@ -2077,6 +2077,9 @@ static int __init sec_input_init(void)
 {
 	int ret = 0;
 
+	if (sec_legacy_sinput)
+		return ret;
+
 	pr_info("%s %s ++\n", SECLOG, __func__);
 
 #if IS_ENABLED(CONFIG_SEC_DEBUG_TSP_LOG)

@@ -405,6 +405,9 @@ static int __init __init_sec_virtual_tsp(void)
 {
 	int ret;
 
+	if (!sec_legacy_sinput)
+		return 0;
+
 	dual_sec = kzalloc(sizeof(struct sec_cmd_data), GFP_KERNEL);
 	if (!dual_sec) {
 		input_err(true, NULL, "%s: failed to alloc sec_cmd_data for dual tsp\n", __func__);
