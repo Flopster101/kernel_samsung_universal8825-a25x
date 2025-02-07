@@ -33,7 +33,7 @@
 #include <linux/mfd/slsi/s2mu106/s2mu106.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic.h>
 
-#if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
+#if IS_ENABLED(CONFIG_MUIC_SYSFS)
 #include <linux/muic/common/muic_sysfs.h>
 #endif
 #if IS_ENABLED(CONFIG_HV_MUIC_S2MU106_AFC)
@@ -2179,21 +2179,6 @@ static int s2mu106_muic_probe(struct platform_device *pdev)
 		pr_err("%s rustproof is enabled\n", __func__);
 		ret = _s2mu106_muic_sel_path(muic_data, S2MU106_PATH_OPEN);
 	}
-
-#if IS_ENABLED(CONFIG_HV_MUIC_S2MU106_AFC)
-#if !IS_ENABLED(CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE)
-	if (get_afc_mode() == CH_MODE_AFC_DISABLE_VAL) {
-		pr_info("AFC mode disabled\n");
-		sdata->pdata->afc_disable = true;
-	} else {
-		pr_info("AFC mode enabled\n");
-		sdata->pdata->afc_disable = false;
-	}
-#else
-	pr_info("AFC mode disable enforce\n");
-	sdata->afc_disable = true;
-#endif /* !CONFIG_HV_MUIC_AFC_DISABLE_ENFORCE */
-#endif /* CONFIG_HV_MUIC_S2MU106_AFC */
 
 	INIT_DELAYED_WORK(&muic_data->dcd_recheck, s2mu106_muic_dcd_recheck);
 	INIT_DELAYED_WORK(&muic_data->rescan_validity_checker,
