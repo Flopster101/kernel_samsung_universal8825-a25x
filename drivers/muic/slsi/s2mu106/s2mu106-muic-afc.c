@@ -49,6 +49,10 @@
 #include "../../../battery/charger/s2mu106_charger/s2mu106_pmeter.h"
 #endif
 
+#if !IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
+#include <linux/battery/sec_battery_common.h>
+#endif
+
 static struct s2mu106_muic_data *static_data;
 
 /*
@@ -335,6 +339,7 @@ static void _s2mu106_hv_muic_reset(struct s2mu106_muic_data *muic_data)
 static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_data)
 {
 	char *str = NULL;
+	int afc_request_cause = 0;
 	int afc_disable = 0;
 	struct muic_share_data *sdata = muic_data->sdata;
 
@@ -345,7 +350,7 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 		str = "User Disable";
 		s2mu106_hv_muic_set_chgtype_usrcmd(muic_data);
 		muic_afc_request_cause_clear();
-#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#if IS_ENABLED(CONFIG_MUIC_MANAGER)
 	} else if (sdata->is_afc_pdic_ready == 0) {
 		str = "VBUS-CC Short";
 		pr_info("%s short detected or 56k not detected, revert dev to TA\n", __func__);
@@ -355,6 +360,10 @@ static bool _s2mu106_hv_muic_check_afc_enabled(struct s2mu106_muic_data *muic_da
 	} else if (muic_data->is_requested_step_down == true) {
 		str = "requested step down";
 #endif
+	} else if (muic_is_enable_afc_request() == false) {
+		str = "HV REQUEST DISABLED";
+		afc_request_cause = muic_afc_get_request_cause();
+		pr_info("%s high voltage is not enabled! cause(%d)\n", __func__, afc_request_cause);
 	}
 
 	if (str) {
@@ -426,7 +435,9 @@ static void s2mu106_hv_muic_set_chgtype_usrcmd(struct s2mu106_muic_data *muic_da
 	int afc_disable = 0;
 
 	afc_disable = muic_platform_get_afc_disable(sdata);
+#if IS_ENABLED(CONFIG_MUIC_SUPPORT_POWERMETER)
 	vbus = s2mu106_hv_muic_get_vchgin(muic_data);
+#endif
 	device_typ1 = s2mu106_i2c_read_byte(muic_data->i2c, S2MU106_REG_DEVICE_TYP1);
 	pr_info("%s vbus = %d, afc_disable = %d, DEVICE_TYPE1 = %#x\n",
 			__func__, vbus, afc_disable, device_typ1);
@@ -901,7 +912,9 @@ static void s2mu106_hv_muic_qc_retry_work(struct work_struct *work)
 	pr_info("%s\n", __func__);
 
 	msleep(50);
+#if IS_ENABLED(CONFIG_MUIC_SUPPORT_POWERMETER)
 	vchgin = s2mu106_hv_muic_get_vchgin(muic_data);
+#endif
 	if (vchgin >= 5500 && vchgin < 8000) {
 		pr_info("%s vchgin(%d) wait_cnt(%d)\n", __func__, vchgin,
 				muic_data->qc_retry_wait_cnt);
