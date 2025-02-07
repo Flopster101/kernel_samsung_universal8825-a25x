@@ -1954,11 +1954,13 @@ static bool read_ois_version(void)
 		ois_power_control(1);
 #endif
 #if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-		cam_ois_set_aois_fac_mode_on();
+		if (mcd_camera_use_aois)
+			cam_ois_set_aois_fac_mode_on();
 #endif
 		ret = is_ois_check_fw(sysfs_core);
 #if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-		cam_ois_set_aois_fac_mode_off();
+		if (mcd_camera_use_aois)
+			cam_ois_set_aois_fac_mode_off();
 #endif
 #ifndef CONFIG_CAMERA_USE_INTERNAL_MCU
 		ois_power_control(0);
@@ -2015,11 +2017,13 @@ static ssize_t camera_ois_set_mode_store(struct device *dev,
 
 	if (check_ois_power) {
 #if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-		cam_ois_set_aois_fac_mode_on();
+		if (mcd_camera_use_aois)
+			cam_ois_set_aois_fac_mode_on();
 #endif
 		is_ois_set_mode(sysfs_core, value);
 #if IS_ENABLED(CONFIG_CAMERA_USE_AOIS)
-		cam_ois_set_aois_fac_mode_off();
+		if (mcd_camera_use_aois)
+			cam_ois_set_aois_fac_mode_off();
 #endif
 	} else
 		err("OIS power is not enabled.");
