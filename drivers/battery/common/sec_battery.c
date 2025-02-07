@@ -46,8 +46,9 @@
 #include <linux/vbus_notifier.h>
 #endif
 
-static unsigned int __read_mostly lpcharge;
+unsigned int __read_mostly lpcharge;
 module_param(lpcharge, uint, 0444);
+EXPORT_SYMBOL(lpcharge);
 static int __read_mostly fg_reset;
 module_param(fg_reset, int, 0444);
 static int factory_mode;
