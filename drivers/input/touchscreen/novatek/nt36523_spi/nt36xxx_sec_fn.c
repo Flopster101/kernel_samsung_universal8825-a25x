@@ -1735,7 +1735,7 @@ static void fw_update(void *device_data)
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 	int ret;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	switch (sec->cmd_param[0]) {
 	case BUILT_IN:
@@ -1769,7 +1769,7 @@ static void fw_update(void *device_data)
 	nvt_ts_mode_restore(ts);
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
@@ -1779,7 +1779,7 @@ static void fw_update(void *device_data)
 out:
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 }
 
 static void get_fw_ver_bin(void *device_data)
@@ -1788,15 +1788,15 @@ static void get_fw_ver_bin(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "NO%02X%02X%02X%02X",
 		ts->fw_ver_bin[0], ts->fw_ver_bin[1], ts->fw_ver_bin[2], ts->fw_ver_bin[3]);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_BIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_BIN");
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1810,7 +1810,7 @@ static void get_fw_ver_ic(void *device_data)
 	char model[16] = { 0 };
 	int ret;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -1829,14 +1829,14 @@ static void get_fw_ver_ic(void *device_data)
 	data[3] = ts->fw_ver_ic[3];
 
 	snprintf(buff, sizeof(buff), "NO%02X%02X%02X%02X", data[0], data[1], data[2], data[3]);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	snprintf(model, sizeof(model), "NO%02X%02X", data[0], data[1]);
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING) {
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_IC");
-		sec_cmd_set_cmd_result_all(sec, model, strnlen(model, sizeof(model)), "FW_MODEL");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_IC");
+		legacy_sec_cmd_set_cmd_result_all(sec, model, strnlen(model, sizeof(model)), "FW_MODEL");
 	}
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
@@ -1848,7 +1848,7 @@ out:
 out_power_off:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1859,9 +1859,9 @@ static void get_x_num(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[16] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 	snprintf(buff, sizeof(buff), "%d", ts->platdata->x_num);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true,  &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1872,9 +1872,9 @@ static void get_y_num(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[16] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 	snprintf(buff, sizeof(buff), "%d", ts->platdata->y_num);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true,  &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1885,14 +1885,14 @@ static void get_chip_vendor(void *device_data)
 //	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "NOVATEK");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_VENDOR");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_VENDOR");
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1903,7 +1903,7 @@ static void get_chip_name(void *device_data)
 //	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->fw_ver_ic[0] == 0x02) {
 		snprintf(buff, sizeof(buff), "%s", "NT36672C");
@@ -1918,11 +1918,11 @@ static void get_chip_name(void *device_data)
 		input_err(true, &ts->client->dev, "%s: cheack fw version!!(0x%X)\n", __func__, ts->fw_ver_ic[0]);
 	}
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_NAME");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_NAME");
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1934,7 +1934,7 @@ static void get_checksum_data(void *device_data)
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 	u8 csum_result[BLOCK_64KB_NUM * 4 + 1] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -1951,7 +1951,7 @@ static void get_checksum_data(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", csum_result);
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -1962,7 +1962,7 @@ err:
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1973,11 +1973,11 @@ static void get_threshold(void *device_data)
 //	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "%s", "60");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1989,7 +1989,7 @@ static void check_connection(void *device_data)
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 	int ret;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2015,7 +2015,7 @@ static void check_connection(void *device_data)
 	snprintf(buff, sizeof(buff), "%s", ret ? "NG" : "OK");
 
 	sec->cmd_state =  ret ? SEC_CMD_STATUS_FAIL : SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2024,7 +2024,7 @@ static void check_connection(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2042,7 +2042,7 @@ static void nvt_ts_high_sensitivity_mode(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2078,8 +2078,8 @@ static void nvt_ts_high_sensitivity_mode(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2087,8 +2087,8 @@ static void nvt_ts_high_sensitivity_mode(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2106,7 +2106,7 @@ static void nvt_ts_glove_mode(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2142,8 +2142,8 @@ static void nvt_ts_glove_mode(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2151,8 +2151,8 @@ static void nvt_ts_glove_mode(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2207,7 +2207,7 @@ static void ear_detect_enable(void *device_data)
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 	int ret;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (!ts->platdata->support_ear_detect) {
 		input_err(true, &ts->client->dev, "%s: Not support EarDetection!\n", __func__);
@@ -2244,8 +2244,8 @@ static void ear_detect_enable(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s,%d: %s\n", __func__, sec->cmd_param[0], buff);
 
@@ -2253,8 +2253,8 @@ static void ear_detect_enable(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s,%d: %s\n", __func__, sec->cmd_param[0], buff);
 }
@@ -2270,7 +2270,7 @@ static void prox_lp_scan_mode(void *device_data)
 	u8 buf[3] = {0};
 	int retry = 10;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (!ts->platdata->prox_lp_scan_enabled) {
 		input_err(true, &ts->client->dev, "%s: Not support LPSCAN!\n", __func__);
@@ -2325,8 +2325,8 @@ static void prox_lp_scan_mode(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s : switch to %s mode OK\n",
 					__func__, (mode == PROX_SLEEP_IN) ? "SLEEP_IN" : "SLEEP_OUT");
@@ -2335,8 +2335,8 @@ static void prox_lp_scan_mode(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s : failed to switch %d mode\n", __func__, mode);
 }
@@ -2357,7 +2357,7 @@ static void set_sip_mode(void *device_data)
 	u8 mode;
 	u8 buf[4];
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2395,8 +2395,8 @@ static void set_sip_mode(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2404,8 +2404,8 @@ static void set_sip_mode(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2422,7 +2422,7 @@ static void set_game_mode(void *device_data)
 	u8 mode = 0;
 	u8 buf[4] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : OFF!\n", __func__);
 		goto out;
@@ -2457,16 +2457,16 @@ static void set_game_mode(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 	return;
 
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -2478,7 +2478,7 @@ static void aot_enable(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (!ts->platdata->enable_settings_aot) {
 		input_err(true, &ts->client->dev, "%s: Not support AOT(%d)!\n", __func__, sec->cmd_param[0]);
@@ -2520,8 +2520,8 @@ static void aot_enable(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2529,8 +2529,8 @@ static void aot_enable(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2543,7 +2543,7 @@ static void dead_zone_enable(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2579,8 +2579,8 @@ static void dead_zone_enable(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2588,8 +2588,8 @@ static void dead_zone_enable(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2608,7 +2608,7 @@ static void set_lpwg_dump(void *device_data)
 	int reti;
 	u8 buf[4] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : OFF!\n", __func__);
@@ -2645,8 +2645,8 @@ static void set_lpwg_dump(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2654,8 +2654,8 @@ static void set_lpwg_dump(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2668,7 +2668,7 @@ static void spay_enable(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
 		input_err(true, &ts->client->dev, "%s: invalid parameter %d\n",
@@ -2702,8 +2702,8 @@ static void spay_enable(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2711,8 +2711,8 @@ static void spay_enable(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2726,7 +2726,7 @@ static void set_touchable_area(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2769,8 +2769,8 @@ static void set_touchable_area(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2782,8 +2782,8 @@ out:
 
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2796,7 +2796,7 @@ static void set_untouchable_area_rect(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -2847,8 +2847,8 @@ static void set_untouchable_area_rect(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2860,8 +2860,8 @@ out:
 out_for_touchable:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -3020,7 +3020,7 @@ static void set_grip_data(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -3060,8 +3060,8 @@ static void set_grip_data(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -3071,8 +3071,8 @@ err:
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -3085,7 +3085,7 @@ static void lcd_orientation(void *device_data)
 	int ret;
 	u8 mode;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -3139,8 +3139,8 @@ static void lcd_orientation(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -3149,8 +3149,8 @@ static void lcd_orientation(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -3164,7 +3164,7 @@ static void run_self_lpwg_rawdata_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3200,11 +3200,11 @@ static void run_self_lpwg_rawdata_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_RAW_DATA");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -3221,11 +3221,11 @@ err_alloc_mem:
 
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_RAW_DATA");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -3241,7 +3241,7 @@ static void run_self_lpwg_rawdata_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3286,7 +3286,7 @@ static void run_self_lpwg_rawdata_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -3308,7 +3308,7 @@ err_alloc_mem:
 
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -3322,7 +3322,7 @@ static void run_self_lpwg_noise_max_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3364,11 +3364,11 @@ static void run_self_lpwg_noise_max_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MAX");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -3385,11 +3385,11 @@ err_alloc_mem:
 
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MAX");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -3405,7 +3405,7 @@ static void run_self_lpwg_noise_max_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3457,7 +3457,7 @@ static void run_self_lpwg_noise_max_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -3480,7 +3480,7 @@ err_alloc_mem:
 
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -3494,7 +3494,7 @@ static void run_self_lpwg_noise_min_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3536,11 +3536,11 @@ static void run_self_lpwg_noise_min_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MIN");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -3556,11 +3556,11 @@ err_alloc_mem:
 
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "LP_NOISE_MIN");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -3576,7 +3576,7 @@ static void run_self_lpwg_noise_min_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3628,7 +3628,7 @@ static void run_self_lpwg_noise_min_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -3651,7 +3651,7 @@ err_alloc_mem:
 
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -3665,7 +3665,7 @@ static void run_self_fdm_rawdata_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3701,11 +3701,11 @@ static void run_self_fdm_rawdata_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_RAW_DATA");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -3722,11 +3722,11 @@ err_alloc_mem:
 
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_RAW_DATA");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -3742,7 +3742,7 @@ static void run_self_fdm_rawdata_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3787,7 +3787,7 @@ static void run_self_fdm_rawdata_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->fdm_x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -3808,7 +3808,7 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -3822,7 +3822,7 @@ static void run_self_fdm_noise_max_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3864,11 +3864,11 @@ static void run_self_fdm_noise_max_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MAX");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -3884,11 +3884,11 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MAX");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -3904,7 +3904,7 @@ static void run_self_fdm_noise_max_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -3956,7 +3956,7 @@ static void run_self_fdm_noise_max_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->fdm_x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -3978,7 +3978,7 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -3992,7 +3992,7 @@ static void run_self_fdm_noise_min_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -4034,11 +4034,11 @@ static void run_self_fdm_noise_min_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MIN");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 
@@ -4053,11 +4053,11 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FDM_NOISE_MIN");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4073,7 +4073,7 @@ static void run_self_fdm_noise_min_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status != LP_MODE_STATUS) {
 		input_err(true, &ts->client->dev, "%s: invalid POWER_STATUS : not LPM!\n", __func__);
@@ -4125,7 +4125,7 @@ static void run_self_fdm_noise_min_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->fdm_x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -4147,7 +4147,7 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -4163,7 +4163,7 @@ static void run_self_open_raw_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4208,7 +4208,7 @@ static void run_self_open_raw_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff,
 			strnlen(buff, ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -4230,7 +4230,7 @@ err:
 
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -4244,7 +4244,7 @@ static void run_self_open_raw_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4284,11 +4284,11 @@ static void run_self_open_raw_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_RAW");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_RAW");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4303,11 +4303,11 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_RAW");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_RAW");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4322,7 +4322,7 @@ static void run_self_open_uni_read_all(void *device_data)
 	int x, y;
 	int offset, data;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4376,7 +4376,7 @@ static void run_self_open_uni_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff,
 			strnlen(buff, ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -4396,7 +4396,7 @@ err:
 	kfree(raw_buff);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -4412,7 +4412,7 @@ static void run_self_open_uni_read(void *device_data)
 	int min, max;
 	int offset, data;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4477,11 +4477,11 @@ static void run_self_open_uni_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_UNIFORMITY");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_UNIFORMITY");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4496,11 +4496,11 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_UNIFORMITY");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "OPEN_UNIFORMITY");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4513,7 +4513,7 @@ static void run_self_short_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4553,11 +4553,11 @@ static void run_self_short_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SHORT_TEST");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SHORT_TEST");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4571,11 +4571,11 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SHORT_TEST");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SHORT_TEST");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4591,7 +4591,7 @@ static void run_self_rawdata_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4634,7 +4634,7 @@ static void run_self_rawdata_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff,
 				ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -4657,7 +4657,7 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -4671,7 +4671,7 @@ static void run_self_rawdata_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4714,11 +4714,11 @@ static void run_self_rawdata_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_RAW_DATA");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4733,11 +4733,11 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_RAW_DATA");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_RAW_DATA");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4752,7 +4752,7 @@ static void run_self_ccdata_read_all(void *device_data)
 	int x, y;
 	int offset;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4797,7 +4797,7 @@ static void run_self_ccdata_read_all(void *device_data)
 
 	mutex_unlock(&ts->lock);
 
-	sec_cmd_set_cmd_result(sec, buff,
+	legacy_sec_cmd_set_cmd_result(sec, buff,
 			strnlen(buff, ts->platdata->x_num * ts->platdata->y_num * CMD_RESULT_WORD_LEN));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
@@ -4818,7 +4818,7 @@ err:
 	kfree(raw_buff);
 out:
 	snprintf(tmp, sizeof(tmp), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
+	legacy_sec_cmd_set_cmd_result(sec, tmp, strnlen(tmp, sizeof(tmp)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, tmp);
@@ -4832,7 +4832,7 @@ static void run_self_ccdata_read(void *device_data)
 	int *raw_buff;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4872,11 +4872,11 @@ static void run_self_ccdata_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_CC");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_CC");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4891,11 +4891,11 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_CC");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_CC");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4908,7 +4908,7 @@ static void run_self_noise_max_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -4955,11 +4955,11 @@ static void run_self_noise_max_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MAX");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -4975,11 +4975,11 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MAX");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MAX");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -4992,7 +4992,7 @@ static void run_self_noise_min_read(void *device_data)
 	int *raw_min, *raw_max;
 	int min, max;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -5039,11 +5039,11 @@ static void run_self_noise_min_read(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MIN");
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -5058,11 +5058,11 @@ err_alloc_mem:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MIN");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "NOISE_MIN");
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -5075,7 +5075,7 @@ static void run_sram_test(void *device_data)
 	char test[32];
 	char result[32];
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (ts->power_status == POWER_OFF_STATUS) {
 		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF!\n", __func__);
@@ -5103,14 +5103,14 @@ static void run_sram_test(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%d", TEST_RESULT_PASS);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SRAM");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SRAM");
 
 	snprintf(result, sizeof(result), "RESULT=PASS");
-	sec_cmd_send_event_to_user(&ts->sec, test, result);
+	legacy_sec_cmd_send_event_to_user(&ts->sec, test, result);
 
 	input_raw_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 	return;
@@ -5122,14 +5122,14 @@ err:
 	mutex_unlock(&ts->lock);
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SRAM");
+		legacy_sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "SRAM");
 
 	snprintf(result, sizeof(result), "RESULT=FAIL");
-	sec_cmd_send_event_to_user(&ts->sec, test, result);
+	legacy_sec_cmd_send_event_to_user(&ts->sec, test, result);
 
 	input_raw_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -5224,7 +5224,7 @@ static void incell_power_control(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
 		input_err(true, &ts->client->dev, "%s: invalid parameter %d\n",
@@ -5236,8 +5236,8 @@ static void incell_power_control(void *device_data)
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
 	sec->cmd_state =  SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 
@@ -5245,8 +5245,8 @@ static void incell_power_control(void *device_data)
 out:
 	snprintf(buff, sizeof(buff), "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -5283,7 +5283,7 @@ static void run_trx_short_test(void *device_data)
 	char result[32];
 	int ret = 0;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[1])
 		snprintf(test, sizeof(test), "TEST=%d,%d", sec->cmd_param[0], sec->cmd_param[1]);
@@ -5330,11 +5330,11 @@ static void run_trx_short_test(void *device_data)
 	mutex_unlock(&ts->lock);
 
 	snprintf(buff, sizeof(buff), "%s", "OK");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 	snprintf(result, sizeof(result), "RESULT=PASS");
-	sec_cmd_send_event_to_user(&ts->sec, test, result);
+	legacy_sec_cmd_send_event_to_user(&ts->sec, test, result);
 
 	return;
 out:
@@ -5343,11 +5343,11 @@ out:
 
 	mutex_unlock(&ts->lock);
 	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 	snprintf(result, sizeof(result), "RESULT=FAIL");
-	sec_cmd_send_event_to_user(&ts->sec, test, result);
+	legacy_sec_cmd_send_event_to_user(&ts->sec, test, result);
 
 	input_info(true, &ts->client->dev, "%s: %s", __func__, buff);
 }
@@ -5359,13 +5359,13 @@ static void get_func_mode(void *device_data)
 	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "0x%X", nvt_ts_mode_read(ts));
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -5379,7 +5379,7 @@ static void run_prox_intensity_read_all(void *device_data)
 	u8 buf[3] = {0};
 	short int sum, thd;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	//---set xdata index to EVENT BUF ADDR---
 	nvt_set_page(ts->mmap->EVENT_BUF_ADDR | EVENT_MAP_PROXIMITY_SUM);
@@ -5404,9 +5404,9 @@ static void run_prox_intensity_read_all(void *device_data)
 
 	snprintf(buff, sizeof(buff), "SUM_X:%d THD_X:%d", sum, thd);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: buff : %s sum : %d thd : %d\n", __func__, buff, sum, thd);
 }
@@ -5417,13 +5417,13 @@ static void not_support_cmd(void *device_data)
 //	struct nvt_ts_data *ts = container_of(sec, struct nvt_ts_data, sec);
 	char buff[SEC_CMD_STR_LEN] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "%s", "NA");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 	sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &ts->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -6040,7 +6040,7 @@ int nvt_ts_sec_fn_init(struct nvt_ts_data *ts)
 {
 	int ret;
 
-	ret = sec_cmd_init(&ts->sec, sec_cmds, ARRAY_SIZE(sec_cmds), SEC_CLASS_DEVT_TSP);
+	ret = legacy_sec_cmd_init(&ts->sec, sec_cmds, ARRAY_SIZE(sec_cmds), SEC_CLASS_DEVT_TSP);
 	if (ret < 0) {
 		input_err(true, &ts->client->dev, "%s: failed to sec cmd init\n",
 			__func__);
@@ -6067,7 +6067,7 @@ int nvt_ts_sec_fn_init(struct nvt_ts_data *ts)
 	return 0;
 
 out:
-	sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
+	legacy_sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
 
 	return ret;
 }
@@ -6078,5 +6078,5 @@ void nvt_ts_sec_fn_remove(struct nvt_ts_data *ts)
 
 	sysfs_remove_group(&ts->sec.fac_dev->kobj, &cmd_attr_group);
 
-	sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
+	legacy_sec_cmd_exit(&ts->sec, SEC_CLASS_DEVT_TSP);
 }

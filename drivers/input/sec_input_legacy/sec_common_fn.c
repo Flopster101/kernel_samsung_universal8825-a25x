@@ -23,11 +23,11 @@ static char *lcd_id1;
 module_param(lcd_id1, charp, S_IRUGO);
 #endif
 
-struct device *ptsp;
-EXPORT_SYMBOL(ptsp);
+struct device *legacy_ptsp;
+EXPORT_SYMBOL(legacy_ptsp);
 
-struct sec_ts_secure_data *psecuretsp = NULL;
-EXPORT_SYMBOL(psecuretsp);
+struct sec_ts_secure_data *legacy_psecuretsp = NULL;
+EXPORT_SYMBOL(legacy_psecuretsp);
 
 static int sec_input_lcd_parse_panel_id(char *panel_id)
 {
@@ -54,7 +54,7 @@ static int sec_input_lcd_parse_panel_id(char *panel_id)
 	return lcd_id_p;
 }
 
-int sec_input_get_lcd_id(struct device *dev)
+int legacy_sec_input_get_lcd_id(struct device *dev)
 {
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
 	struct sec_ts_plat_data *pdata = dev->platform_data;
@@ -121,7 +121,7 @@ int sec_input_get_lcd_id(struct device *dev)
 	input_info(true, dev, "%s: lcdtype 0x%08X\n", __func__, lcdtype);
 	return lcdtype;
 }
-EXPORT_SYMBOL(sec_input_get_lcd_id);
+EXPORT_SYMBOL(legacy_sec_input_get_lcd_id);
 
 static void sec_input_handler_wait_resume_work(struct work_struct *work)
 {
@@ -155,7 +155,7 @@ out:
 	}
 }
 
-int sec_input_handler_start(struct device *dev)
+int legacy_sec_input_handler_start(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	unsigned int irq = gpio_to_irq(pdata->irq_gpio);
@@ -183,7 +183,7 @@ int sec_input_handler_start(struct device *dev)
 
 	return SEC_SUCCESS;
 }
-EXPORT_SYMBOL(sec_input_handler_start);
+EXPORT_SYMBOL(legacy_sec_input_handler_start);
 
 /************************************************************
  *  720  * 1480 : <48 96 60>
@@ -211,16 +211,16 @@ static void location_detect(struct sec_ts_plat_data *pdata, int t_id)
 		strlcat(pdata->location, "N", SEC_TS_LOCATION_DETECT_SIZE);
 }
 
-void sec_delay(unsigned int ms)
+void legacy_sec_delay(unsigned int ms)
 {
 	if (ms < 20)
 		usleep_range(ms * 1000, ms * 1000);
 	else
 		msleep(ms);
 }
-EXPORT_SYMBOL(sec_delay);
+EXPORT_SYMBOL(legacy_sec_delay);
 
-int sec_input_set_temperature(struct device *dev, int state)
+int legacy_sec_input_set_temperature(struct device *dev, int state)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int ret = 0;
@@ -283,9 +283,9 @@ int sec_input_set_temperature(struct device *dev, int state)
 
 	return SEC_SUCCESS;
 }
-EXPORT_SYMBOL(sec_input_set_temperature);
+EXPORT_SYMBOL(legacy_sec_input_set_temperature);
 
-void sec_input_set_grip_type(struct device *dev, u8 set_type)
+void legacy_sec_input_set_grip_type(struct device *dev, u8 set_type)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	u8 mode = G_NONE;
@@ -317,9 +317,9 @@ void sec_input_set_grip_type(struct device *dev, u8 set_type)
 	if (mode)
 		pdata->set_grip_data(dev, mode);
 }
-EXPORT_SYMBOL(sec_input_set_grip_type);
+EXPORT_SYMBOL(legacy_sec_input_set_grip_type);
 
-int sec_input_check_cover_type(struct device *dev)
+int legacy_sec_input_check_cover_type(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int cover_cmd = 0;
@@ -347,9 +347,9 @@ int sec_input_check_cover_type(struct device *dev)
 
 	return cover_cmd;
 }
-EXPORT_SYMBOL(sec_input_check_cover_type);
+EXPORT_SYMBOL(legacy_sec_input_check_cover_type);
 
-void sec_input_set_fod_info(struct device *dev, int vi_x, int vi_y, int vi_size, int vi_event)
+void legacy_sec_input_set_fod_info(struct device *dev, int vi_x, int vi_y, int vi_size, int vi_event)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int byte_size = vi_x * vi_y / 8;
@@ -370,9 +370,9 @@ void sec_input_set_fod_info(struct device *dev, int vi_x, int vi_y, int vi_size,
 			__func__, pdata->fod_data.vi_event, pdata->fod_data.vi_x, pdata->fod_data.vi_y,
 			pdata->fod_data.vi_size);
 }
-EXPORT_SYMBOL(sec_input_set_fod_info);
+EXPORT_SYMBOL(legacy_sec_input_set_fod_info);
 
-ssize_t sec_input_get_fod_info(struct device *dev, char *buf)
+ssize_t legacy_sec_input_get_fod_info(struct device *dev, char *buf)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -394,9 +394,9 @@ ssize_t sec_input_get_fod_info(struct device *dev, char *buf)
 			pdata->fod_data.vi_x, pdata->fod_data.vi_y,
 			pdata->fod_data.vi_size, pdata->x_node_num, pdata->y_node_num);
 }
-EXPORT_SYMBOL(sec_input_get_fod_info);
+EXPORT_SYMBOL(legacy_sec_input_get_fod_info);
 
-bool sec_input_set_fod_rect(struct device *dev, int *rect_data)
+bool legacy_sec_input_set_fod_rect(struct device *dev, int *rect_data)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int i;
@@ -417,9 +417,9 @@ bool sec_input_set_fod_rect(struct device *dev, int *rect_data)
 
 	return pdata->fod_data.set_val;
 }
-EXPORT_SYMBOL(sec_input_set_fod_rect);
+EXPORT_SYMBOL(legacy_sec_input_set_fod_rect);
 
-int sec_input_check_wirelesscharger_mode(struct device *dev, int mode, int force)
+int legacy_sec_input_check_wirelesscharger_mode(struct device *dev, int mode, int force)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -452,9 +452,9 @@ int sec_input_check_wirelesscharger_mode(struct device *dev, int mode, int force
 
 	return SEC_SUCCESS;
 }
-EXPORT_SYMBOL(sec_input_check_wirelesscharger_mode);
+EXPORT_SYMBOL(legacy_sec_input_check_wirelesscharger_mode);
 
-ssize_t sec_input_get_common_hw_param(struct sec_ts_plat_data *pdata, char *buf)
+ssize_t legacy_sec_input_get_common_hw_param(struct sec_ts_plat_data *pdata, char *buf)
 {
 	char buff[SEC_INPUT_HW_PARAM_SIZE];
 	char tbuff[SEC_CMD_STR_LEN];
@@ -503,9 +503,9 @@ ssize_t sec_input_get_common_hw_param(struct sec_ts_plat_data *pdata, char *buf)
 
 	return snprintf(buf, SEC_INPUT_HW_PARAM_SIZE, "%s", buff);
 }
-EXPORT_SYMBOL(sec_input_get_common_hw_param);
+EXPORT_SYMBOL(legacy_sec_input_get_common_hw_param);
 
-void sec_input_clear_common_hw_param(struct sec_ts_plat_data *pdata)
+void legacy_sec_input_clear_common_hw_param(struct sec_ts_plat_data *pdata)
 {
 	pdata->hw_param.multi_count = 0;
 	pdata->hw_param.wet_count = 0;
@@ -518,9 +518,9 @@ void sec_input_clear_common_hw_param(struct sec_ts_plat_data *pdata)
 	pdata->hw_param.mode_change_failed_count = 0;
 	pdata->hw_param.ic_reset_count = 0;
 }
-EXPORT_SYMBOL(sec_input_clear_common_hw_param);
+EXPORT_SYMBOL(legacy_sec_input_clear_common_hw_param);
 
-void sec_input_print_info(struct device *dev, struct sec_tclm_data *tdata)
+void legacy_sec_input_print_info(struct device *dev, struct sec_tclm_data *tdata)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	unsigned int irq = gpio_to_irq(pdata->irq_gpio);
@@ -563,9 +563,9 @@ void sec_input_print_info(struct device *dev, struct sec_tclm_data *tdata)
 			pdata->tsp_temperature_data,
 			pdata->print_info_cnt_open, pdata->print_info_cnt_release);
 }
-EXPORT_SYMBOL(sec_input_print_info);
+EXPORT_SYMBOL(legacy_sec_input_print_info);
 
-void sec_input_proximity_report(struct device *dev, int data)
+void legacy_sec_input_proximity_report(struct device *dev, int data)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -579,9 +579,9 @@ void sec_input_proximity_report(struct device *dev, int data)
 	input_report_abs(pdata->input_dev_proximity, ABS_MT_CUSTOM, data);
 	input_sync(pdata->input_dev_proximity);
 }
-EXPORT_SYMBOL(sec_input_proximity_report);
+EXPORT_SYMBOL(legacy_sec_input_proximity_report);
 
-void sec_input_gesture_report(struct device *dev, int id, int x, int y)
+void legacy_sec_input_gesture_report(struct device *dev, int id, int x, int y)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	char buff[SEC_TS_GESTURE_REPORT_BUFF_SIZE] = { 0 };
@@ -626,7 +626,7 @@ void sec_input_gesture_report(struct device *dev, int id, int x, int y)
 			__func__, buff, pdata->gesture_id, pdata->gesture_x, pdata->gesture_y);
 #endif
 }
-EXPORT_SYMBOL(sec_input_gesture_report);
+EXPORT_SYMBOL(legacy_sec_input_gesture_report);
 
 static void sec_input_coord_report(struct device *dev, u8 t_id)
 {
@@ -770,7 +770,7 @@ static void sec_input_coord_log(struct device *dev, u8 t_id, int action)
 	}
 }
 
-void sec_input_coord_event_fill_slot(struct device *dev, int t_id)
+void legacy_sec_input_coord_event_fill_slot(struct device *dev, int t_id)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -829,9 +829,9 @@ void sec_input_coord_event_fill_slot(struct device *dev, int t_id)
 	pdata->fill_slot = true;
 
 }
-EXPORT_SYMBOL(sec_input_coord_event_fill_slot);
+EXPORT_SYMBOL(legacy_sec_input_coord_event_fill_slot);
 
-void sec_input_coord_event_sync_slot(struct device *dev)
+void legacy_sec_input_coord_event_sync_slot(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -839,9 +839,9 @@ void sec_input_coord_event_sync_slot(struct device *dev)
 		input_sync(pdata->input_dev);
 	pdata->fill_slot = false;
 }
-EXPORT_SYMBOL(sec_input_coord_event_sync_slot);
+EXPORT_SYMBOL(legacy_sec_input_coord_event_sync_slot);
 
-void sec_input_release_all_finger(struct device *dev)
+void legacy_sec_input_release_all_finger(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int i;
@@ -890,7 +890,7 @@ void sec_input_release_all_finger(struct device *dev)
 
 	input_sync(pdata->input_dev);
 }
-EXPORT_SYMBOL(sec_input_release_all_finger);
+EXPORT_SYMBOL(legacy_sec_input_release_all_finger);
 
 static void sec_input_set_prop(struct device *dev, struct input_dev *input_dev, u8 propbit, void *data)
 {
@@ -1032,7 +1032,7 @@ static void sec_input_set_prop_proximity(struct device *dev, struct input_dev *i
 	input_set_drvdata(input_dev, data);
 }
 
-int sec_input_device_register(struct device *dev, void *data)
+int legacy_sec_input_device_register(struct device *dev, void *data)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int ret = 0;
@@ -1106,9 +1106,9 @@ int sec_input_device_register(struct device *dev, void *data)
 
 	return 0;
 }
-EXPORT_SYMBOL(sec_input_device_register);
+EXPORT_SYMBOL(legacy_sec_input_device_register);
 
-int sec_input_pinctrl_configure(struct device *dev, bool on)
+int legacy_sec_input_pinctrl_configure(struct device *dev, bool on)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	struct pinctrl_state *state;
@@ -1130,9 +1130,9 @@ int sec_input_pinctrl_configure(struct device *dev, bool on)
 
 	return 0;
 }
-EXPORT_SYMBOL(sec_input_pinctrl_configure);
+EXPORT_SYMBOL(legacy_sec_input_pinctrl_configure);
 
-int sec_input_power(struct device *dev, bool on)
+int legacy_sec_input_power(struct device *dev, bool on)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	int ret = 0;
@@ -1150,7 +1150,7 @@ int sec_input_power(struct device *dev, bool on)
 				goto out;
 			}
 
-			sec_delay(1);
+			legacy_sec_delay(1);
 		}
 		ret = regulator_enable(pdata->avdd);
 		if (ret) {
@@ -1160,7 +1160,7 @@ int sec_input_power(struct device *dev, bool on)
 	} else {
 		regulator_disable(pdata->avdd);
 		if (!pdata->not_support_io_ldo) {
-			sec_delay(4);
+			legacy_sec_delay(4);
 			regulator_disable(pdata->dvdd);
 		}
 	}
@@ -1179,7 +1179,7 @@ out:
 
 	return ret;
 }
-EXPORT_SYMBOL(sec_input_power);
+EXPORT_SYMBOL(legacy_sec_input_power);
 
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
@@ -1276,7 +1276,7 @@ static void sec_input_vbus_notification_work(struct work_struct *work)
 }
 #endif
 
-void sec_input_register_vbus_notifier(struct device *dev)
+void legacy_sec_input_register_vbus_notifier(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -1301,9 +1301,9 @@ void sec_input_register_vbus_notifier(struct device *dev)
 #endif
 
 }
-EXPORT_SYMBOL(sec_input_register_vbus_notifier);
+EXPORT_SYMBOL(legacy_sec_input_register_vbus_notifier);
 
-void sec_input_unregister_vbus_notifier(struct device *dev)
+void legacy_sec_input_unregister_vbus_notifier(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 
@@ -1322,9 +1322,9 @@ void sec_input_unregister_vbus_notifier(struct device *dev)
 	destroy_workqueue(pdata->vbus_notifier_workqueue);
 #endif
 }
-EXPORT_SYMBOL(sec_input_unregister_vbus_notifier);
+EXPORT_SYMBOL(legacy_sec_input_unregister_vbus_notifier);
 
-int sec_input_parse_dt(struct device *dev)
+int legacy_sec_input_parse_dt(struct device *dev)
 {
 	struct sec_ts_plat_data *pdata = dev->platform_data;
 	struct device_node *np = dev->of_node;
@@ -1343,7 +1343,7 @@ int sec_input_parse_dt(struct device *dev)
 
 	pdata->chip_on_board = of_property_read_bool(np, "chip_on_board");
 
-	lcd_type = sec_input_get_lcd_id(dev);
+	lcd_type = legacy_sec_input_get_lcd_id(dev);
 #if !defined(DUAL_FOLDABLE_GKI)
 	if (lcd_type < 0) {
 		input_err(true, dev, "%s: lcd is not attached\n", __func__);
@@ -1586,9 +1586,9 @@ int sec_input_parse_dt(struct device *dev)
 
 	return ret;
 }
-EXPORT_SYMBOL(sec_input_parse_dt);
+EXPORT_SYMBOL(legacy_sec_input_parse_dt);
 
-void sec_tclm_parse_dt(struct device *dev, struct sec_tclm_data *tdata)
+void legacy_sec_tclm_parse_dt(struct device *dev, struct sec_tclm_data *tdata)
 {
 	struct device_node *np = dev->of_node;
 
@@ -1606,9 +1606,9 @@ void sec_tclm_parse_dt(struct device *dev, struct sec_tclm_data *tdata)
 
 	input_err(true, dev, "%s: tclm_level %d, sec_afe_base %04X\n", __func__, tdata->tclm_level, tdata->afe_base);
 }
-EXPORT_SYMBOL(sec_tclm_parse_dt);
+EXPORT_SYMBOL(legacy_sec_tclm_parse_dt);
 
-void sec_tclm_parse_dt_dev(struct device *dev, struct sec_tclm_data *tdata)
+void legacy_sec_tclm_parse_dt_dev(struct device *dev, struct sec_tclm_data *tdata)
 {
 	struct device_node *np = dev->of_node;
 
@@ -1626,89 +1626,89 @@ void sec_tclm_parse_dt_dev(struct device *dev, struct sec_tclm_data *tdata)
 
 	input_err(true, dev, "%s: tclm_level %d, sec_afe_base %04X\n", __func__, tdata->tclm_level, tdata->afe_base);
 }
-EXPORT_SYMBOL(sec_tclm_parse_dt_dev);
+EXPORT_SYMBOL(legacy_sec_tclm_parse_dt_dev);
 
-void stui_tsp_init(int (*stui_tsp_enter)(void), int (*stui_tsp_exit)(void), int (*stui_tsp_type)(void))
+void legacy_stui_tsp_init(int (*legacy_stui_tsp_enter)(void), int (*legacy_stui_tsp_exit)(void), int (*legacy_stui_tsp_type)(void))
 {
 	pr_info("%s %s: called\n", SECLOG, __func__);
 
-	psecuretsp = kzalloc(sizeof(struct sec_ts_secure_data), GFP_KERNEL);
+	legacy_psecuretsp = kzalloc(sizeof(struct sec_ts_secure_data), GFP_KERNEL);
 
-	psecuretsp->stui_tsp_enter = stui_tsp_enter;
-	psecuretsp->stui_tsp_exit = stui_tsp_exit;
-	psecuretsp->stui_tsp_type = stui_tsp_type;
+	legacy_psecuretsp->legacy_stui_tsp_enter = legacy_stui_tsp_enter;
+	legacy_psecuretsp->legacy_stui_tsp_exit = legacy_stui_tsp_exit;
+	legacy_psecuretsp->legacy_stui_tsp_type = legacy_stui_tsp_type;
 }
-EXPORT_SYMBOL(stui_tsp_init);
+EXPORT_SYMBOL(legacy_stui_tsp_init);
 
 
-int stui_tsp_enter(void)
+int legacy_stui_tsp_enter(void)
 {
 	struct sec_ts_plat_data *pdata = NULL;
 
-	if (psecuretsp != NULL) {
-		pr_info("%s %s: psecuretsp->stui_tsp_enter called!\n", SECLOG, __func__);
-		return psecuretsp->stui_tsp_enter();
+	if (legacy_psecuretsp != NULL) {
+		pr_info("%s %s: legacy_psecuretsp->legacy_stui_tsp_enter called!\n", SECLOG, __func__);
+		return legacy_psecuretsp->legacy_stui_tsp_enter();
 	}
 
-	if (ptsp == NULL) {
-		pr_info("%s: ptsp is null\n", __func__);
+	if (legacy_ptsp == NULL) {
+		pr_info("%s: legacy_ptsp is null\n", __func__);
 		return -EINVAL;
 	}
 
-	pdata = ptsp->platform_data;
+	pdata = legacy_ptsp->platform_data;
 	if (pdata == NULL) {
 		pr_info("%s: pdata is null\n", __func__);
 		return  -EINVAL;
 	}
 
-	pr_info("%s %s: pdata->stui_tsp_enter called!\n", SECLOG, __func__);
-	return pdata->stui_tsp_enter();
+	pr_info("%s %s: pdata->legacy_stui_tsp_enter called!\n", SECLOG, __func__);
+	return pdata->legacy_stui_tsp_enter();
 }
-EXPORT_SYMBOL(stui_tsp_enter);
+EXPORT_SYMBOL(legacy_stui_tsp_enter);
 
-int stui_tsp_exit(void)
+int legacy_stui_tsp_exit(void)
 {
 	struct sec_ts_plat_data *pdata = NULL;
 
-	if (psecuretsp != NULL) {
-		pr_info("%s %s: psecuretsp->stui_tsp_exit called!\n", SECLOG, __func__);
-		return psecuretsp->stui_tsp_exit();
+	if (legacy_psecuretsp != NULL) {
+		pr_info("%s %s: legacy_psecuretsp->legacy_stui_tsp_exit called!\n", SECLOG, __func__);
+		return legacy_psecuretsp->legacy_stui_tsp_exit();
 	}
 
-	if (ptsp == NULL)
+	if (legacy_ptsp == NULL)
 		return -EINVAL;
 
-	pdata = ptsp->platform_data;
+	pdata = legacy_ptsp->platform_data;
 	if (pdata == NULL)
 		return  -EINVAL;
 
-	pr_info("%s %s: pdata->stui_tsp_exit called!\n", SECLOG, __func__);
-	return pdata->stui_tsp_exit();
+	pr_info("%s %s: pdata->legacy_stui_tsp_exit called!\n", SECLOG, __func__);
+	return pdata->legacy_stui_tsp_exit();
 }
-EXPORT_SYMBOL(stui_tsp_exit);
+EXPORT_SYMBOL(legacy_stui_tsp_exit);
 
-int stui_tsp_type(void)
+int legacy_stui_tsp_type(void)
 {
 	struct sec_ts_plat_data *pdata = NULL;
 
-	if (psecuretsp != NULL) {
-		pr_info("%s %s: psecuretsp->stui_tsp_type called!\n", SECLOG, __func__);
-		return psecuretsp->stui_tsp_type();
+	if (legacy_psecuretsp != NULL) {
+		pr_info("%s %s: legacy_psecuretsp->legacy_stui_tsp_type called!\n", SECLOG, __func__);
+		return legacy_psecuretsp->legacy_stui_tsp_type();
 	}
 
-	if (ptsp == NULL)
+	if (legacy_ptsp == NULL)
 		return -EINVAL;
 
-	pdata = ptsp->platform_data;
+	pdata = legacy_ptsp->platform_data;
 	if (pdata == NULL)
 		return  -EINVAL;
 
-	pr_info("%s %s: pdata->stui_tsp_type called!\n", SECLOG, __func__);
-	return pdata->stui_tsp_type();
+	pr_info("%s %s: pdata->legacy_stui_tsp_type called!\n", SECLOG, __func__);
+	return pdata->legacy_stui_tsp_type();
 }
-EXPORT_SYMBOL(stui_tsp_type);
+EXPORT_SYMBOL(legacy_stui_tsp_type);
 
-int sec_input_enable_device(struct input_dev *dev)
+int legacy_sec_input_enable_device(struct input_dev *dev)
 {
 	int retval;
 
@@ -1723,9 +1723,9 @@ int sec_input_enable_device(struct input_dev *dev)
 
 	return retval;
 }
-EXPORT_SYMBOL(sec_input_enable_device);
+EXPORT_SYMBOL(legacy_sec_input_enable_device);
 
-int sec_input_disable_device(struct input_dev *dev)
+int legacy_sec_input_disable_device(struct input_dev *dev)
 {
 	int retval;
 
@@ -1739,7 +1739,7 @@ int sec_input_disable_device(struct input_dev *dev)
 	mutex_unlock(&dev->mutex);
 	return 0;
 }
-EXPORT_SYMBOL(sec_input_disable_device);
+EXPORT_SYMBOL(legacy_sec_input_disable_device);
 
 __visible_for_testing ssize_t sec_input_enabled_show(struct device *dev,
 					 struct device_attribute *attr,
@@ -1774,9 +1774,9 @@ __visible_for_testing ssize_t sec_input_enabled_store(struct device *dev,
 	}
 
 	if (enable)
-		ret = sec_input_enable_device(input_dev);
+		ret = legacy_sec_input_enable_device(input_dev);
 	else
-		ret = sec_input_disable_device(input_dev);
+		ret = legacy_sec_input_disable_device(input_dev);
 
 	if (ret)
 		return ret;
@@ -1799,7 +1799,7 @@ static const struct attribute_group sec_input_attr_group = {
 	.attrs	= sec_input_attrs,
 };
 
-int sec_input_sysfs_create(struct kobject *kobj)
+int legacy_sec_input_sysfs_create(struct kobject *kobj)
 {
 	struct kernfs_node *enabled_sd = NULL;
 	int retval = 0;
@@ -1817,13 +1817,13 @@ int sec_input_sysfs_create(struct kobject *kobj)
 
 	return retval;
 }
-EXPORT_SYMBOL(sec_input_sysfs_create);
+EXPORT_SYMBOL(legacy_sec_input_sysfs_create);
 
-void sec_input_sysfs_remove(struct kobject *kobj)
+void legacy_sec_input_sysfs_remove(struct kobject *kobj)
 {
 	sysfs_remove_group(kobj, &sec_input_attr_group);
 }
-EXPORT_SYMBOL(sec_input_sysfs_remove);
+EXPORT_SYMBOL(legacy_sec_input_sysfs_remove);
 
 MODULE_DESCRIPTION("Samsung common functions");
 MODULE_LICENSE("GPL");

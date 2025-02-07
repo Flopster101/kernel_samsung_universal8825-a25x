@@ -20,9 +20,9 @@ static struct sec_cmd_data *dual_sec;
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUMP_MODE)
 #include "sec_tsp_dumpkey.h"
-extern struct tsp_dump_callbacks dump_callbacks;
-struct tsp_dump_callbacks *tsp_callbacks;
-EXPORT_SYMBOL(tsp_callbacks);
+extern struct tsp_dump_callbacks legacy_dump_callbacks;
+struct tsp_dump_callbacks *legacy_tsp_callbacks;
+EXPORT_SYMBOL(legacy_tsp_callbacks);
 static struct tsp_dump_callbacks callbacks[DEV_COUNT];
 
 static void sec_virtual_tsp_dump(struct device *dev)
@@ -44,7 +44,7 @@ static void sec_virtual_tsp_dual_cmd(void *device_data)
 {
 	struct sec_cmd_data *sec = (struct sec_cmd_data *)device_data;
 
-	sec_cmd_virtual_tsp_write_cmd(sec, true, true);
+	legacy_sec_cmd_virtual_tsp_write_cmd(sec, true, true);
 }
 
 #if !IS_ENABLED(CONFIG_TOUCHSCREEN_STM_SUB)
@@ -63,7 +63,7 @@ static void sec_virtual_tsp_main_cmd(void *device_data)
 	}
 	mutex_unlock(&switching_mutex);
 
-	sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
+	legacy_sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
 }
 #endif
 
@@ -83,7 +83,7 @@ static void sec_virtual_tsp_sub_cmd(void *device_data)
 	}
 	mutex_unlock(&switching_mutex);
 
-	sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
+	legacy_sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
 }
 #endif
 
@@ -92,12 +92,12 @@ static void sec_virtual_not_support_cmd(void *device_data)
 	struct sec_cmd_data *sec = (struct sec_cmd_data *)device_data;
 	char buff[16] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	snprintf(buff, sizeof(buff), "%s", "NA");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_exit(sec);
 }
 
 static void sec_virtual_tsp_switch_cmd(void *device_data)
@@ -122,7 +122,7 @@ static void sec_virtual_tsp_switch_cmd(void *device_data)
 	input_dbg(true, sec->fac_dev, "%s: %d,%d\n", __func__, fac_flip_status, flip_status);
 	mutex_unlock(&switching_mutex);
 
-	sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
+	legacy_sec_cmd_virtual_tsp_write_cmd(sec, main, sub);
 }
 
 static void sec_virtual_tsp_factory_cmd_result_all(void *device_data)
@@ -147,7 +147,7 @@ static void sec_virtual_tsp_factory_cmd_result_all(void *device_data)
 	input_dbg(true, sec->fac_dev, "%s: %d,%d\n", __func__, fac_flip_status, flip_status);
 	mutex_unlock(&switching_mutex);
 
-	sec_cmd_virtual_tsp_write_cmd_factory_all(sec, main, sub);
+	legacy_sec_cmd_virtual_tsp_write_cmd_factory_all(sec, main, sub);
 }
 
 static void set_factory_panel(void *device_data)
@@ -155,7 +155,7 @@ static void set_factory_panel(void *device_data)
 	struct sec_cmd_data *sec = (struct sec_cmd_data *)device_data;
 	char buff[16] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < FLIP_STATUS_DEFAULT || sec->cmd_param[0] > FLIP_STATUS_SUB) {
 		snprintf(buff, sizeof(buff), "%s", "NG");
@@ -172,7 +172,7 @@ static void set_factory_panel(void *device_data)
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 err:
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 }
 
 static void dev_count(void *device_data)
@@ -180,12 +180,12 @@ static void dev_count(void *device_data)
 	struct sec_cmd_data *sec = (struct sec_cmd_data *)device_data;
 	char buff[16] = { 0 };
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	snprintf(buff, sizeof(buff), "%s,%d", "OK", DEV_COUNT);
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
 }
 
 #if IS_ENABLED(CONFIG_HALL_NOTIFIER)
@@ -311,7 +311,7 @@ static ssize_t sec_virtual_tsp_support_feature_show(struct device *dev,
 
 	memset(buffer, 0x00, sizeof(buffer));
 
-	ret = sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_SUPPORT_FEATURE, buffer, sizeof(buffer));
+	ret = legacy_sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_SUPPORT_FEATURE, buffer, sizeof(buffer));
 	if (ret < 0)
 		return snprintf(buf, SEC_CMD_BUF_SIZE, "NG\n");
 
@@ -327,9 +327,9 @@ static ssize_t sec_virtual_tsp_prox_power_off_show(struct device *dev,
 	memset(buffer, 0x00, sizeof(buffer));
 
 	if (flip_status)
-		ret = sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_PROX_POWER_OFF, buffer, sizeof(buffer));
+		ret = legacy_sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_PROX_POWER_OFF, buffer, sizeof(buffer));
 	else
-		ret = sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_PROX_POWER_OFF, buffer, sizeof(buffer));
+		ret = legacy_sec_cmd_virtual_tsp_read_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_PROX_POWER_OFF, buffer, sizeof(buffer));
 
 	input_info(false, dual_sec->fac_dev, "%s: %s, ret:%d\n", __func__,
 			 flip_status ? "close" : "open", ret);
@@ -346,9 +346,9 @@ static ssize_t sec_virtual_tsp_prox_power_off_store(struct device *dev,
 	int ret;
 
 	if (flip_status)
-		ret = sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_PROX_POWER_OFF, buf);
+		ret = legacy_sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_PROX_POWER_OFF, buf);
 	else
-		ret = sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_PROX_POWER_OFF, buf);
+		ret = legacy_sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_PROX_POWER_OFF, buf);
 
 	input_info(false, dual_sec->fac_dev, "%s: %s, ret:%d\n", __func__,
 			 flip_status ? "close" : "open", ret);
@@ -376,8 +376,8 @@ static ssize_t dualscreen_policy_store(struct device *dev,
 	mutex_unlock(&switching_mutex);
 
 	if (value == FLIP_STATUS_MAIN) {
-		sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_DUALSCREEN_POLICY, buf);
-		sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_DUALSCREEN_POLICY, buf);
+		legacy_sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_MAIN_SEC_SYSFS_DUALSCREEN_POLICY, buf);
+		legacy_sec_cmd_virtual_tsp_write_sysfs(dual_sec, PATH_SUB_SEC_SYSFS_DUALSCREEN_POLICY, buf);
 	}
 
 	input_info(true, dual_sec->fac_dev, "%s: value=%d %s\n", __func__, value,
@@ -411,7 +411,7 @@ static int __init __init_sec_virtual_tsp(void)
 		return -ENOMEM;
 	}
 
-	sec_cmd_init(dual_sec, tsp_commands,
+	legacy_sec_cmd_init(dual_sec, tsp_commands,
 		ARRAY_SIZE(tsp_commands), SEC_CLASS_DEVT_TSP);
 
 	input_info(true, dual_sec->fac_dev, "%s\n", __func__);
@@ -436,8 +436,8 @@ static int __init __init_sec_virtual_tsp(void)
 	input_info(true, dual_sec->fac_dev, "%s: hall ic(ssh) register\n", __func__);
 #endif
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUMP_MODE)
-	tsp_callbacks = callbacks;
-	dump_callbacks.inform_dump = sec_virtual_tsp_dump;
+	legacy_tsp_callbacks = callbacks;
+	legacy_dump_callbacks.inform_dump = sec_virtual_tsp_dump;
 #endif
 
 	ret = sysfs_create_group(&dual_sec->fac_dev->kobj, &sec_virtual_tsp_attrs_group);

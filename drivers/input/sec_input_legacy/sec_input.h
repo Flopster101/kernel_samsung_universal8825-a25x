@@ -123,7 +123,7 @@ const struct file_operations ops_name = {				\
 					dev_driver_string(dev), dev_name(dev));	\
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL");	\
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
 	}									\
 })
 #define input_info(mode, dev, fmt, ...)						\
@@ -136,7 +136,7 @@ const struct file_operations ops_name = {				\
 					dev_driver_string(dev), dev_name(dev));	\
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL");	\
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
 	}									\
 })
 #define input_err(mode, dev, fmt, ...)						\
@@ -149,7 +149,7 @@ const struct file_operations ops_name = {				\
 					dev_driver_string(dev), dev_name(dev));	\
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL");	\
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
 	}									\
 })
 
@@ -164,19 +164,19 @@ const struct file_operations ops_name = {				\
 					dev_driver_string(dev), dev_name(dev)); \
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL"); \
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
-		sec_debug_tsp_raw_data_msg(mode, input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_raw_data_msg(mode, input_log_buf, fmt, ## __VA_ARGS__);	\
 	} else {						\
 		if (dev)							\
 			snprintf(input_log_buf, sizeof(input_log_buf), "%s %s", \
 					dev_driver_string(dev), dev_name(dev)); \
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL"); \
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
-		sec_debug_tsp_raw_data_msg(mode, input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_raw_data_msg(mode, input_log_buf, fmt, ## __VA_ARGS__);	\
 	}									\
 })
-#define input_raw_data_clear(mode) sec_tsp_raw_data_clear(mode)
+#define input_raw_data_clear(mode) legacy_sec_tsp_raw_data_clear(mode)
 #else
 #define input_raw_info(mode, dev, fmt, ...)					\
 ({										\
@@ -188,13 +188,13 @@ const struct file_operations ops_name = {				\
 					dev_driver_string(dev), dev_name(dev)); \
 		else								\
 			snprintf(input_log_buf, sizeof(input_log_buf), "NULL"); \
-		sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
-		sec_debug_tsp_raw_data_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_log_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
+		legacy_sec_debug_tsp_raw_data_msg(input_log_buf, fmt, ## __VA_ARGS__);	\
 	}									\
 })
-#define input_raw_data_clear() sec_tsp_raw_data_clear()
+#define input_raw_data_clear() legacy_sec_tsp_raw_data_clear()
 #endif
-#define input_log_fix()	sec_tsp_log_fix()
+#define input_log_fix()	legacy_sec_tsp_log_fix()
 #else
 #define input_dbg(mode, dev, fmt, ...)						\
 ({										\
@@ -694,9 +694,9 @@ struct sec_ts_plat_data {
 	int (*stop_device)(void *data);
 	int (*lpmode)(void *data, u8 mode);
 	void (*init)(void *data);
-	int (*stui_tsp_enter)(void);
-	int (*stui_tsp_exit)(void);
-	int (*stui_tsp_type)(void);
+	int (*legacy_stui_tsp_enter)(void);
+	int (*legacy_stui_tsp_exit)(void);
+	int (*legacy_stui_tsp_type)(void);
 
 	union power_supply_propval psy_value;
 	struct power_supply *psy;
@@ -791,9 +791,9 @@ struct sec_ts_plat_data {
 };
 
 struct sec_ts_secure_data {
-	int (*stui_tsp_enter)(void);
-	int (*stui_tsp_exit)(void);
-	int (*stui_tsp_type)(void);
+	int (*legacy_stui_tsp_enter)(void);
+	int (*legacy_stui_tsp_exit)(void);
+	int (*legacy_stui_tsp_type)(void);
 };
 
 #ifdef TCLM_CONCEPT
@@ -814,45 +814,45 @@ extern int get_lcd_info(char *arg);
 extern unsigned int lcdtype;
 #endif
 
-int sec_input_get_lcd_id(struct device *dev);
-int sec_input_handler_start(struct device *dev);
-void sec_delay(unsigned int ms);
-int sec_input_set_temperature(struct device *dev, int state);
-void sec_input_set_grip_type(struct device *dev, u8 set_type);
-int sec_input_check_cover_type(struct device *dev);
-void sec_input_set_fod_info(struct device *dev, int vi_x, int vi_y, int vi_size, int vi_event);
-ssize_t sec_input_get_fod_info(struct device *dev, char *buf);
-bool sec_input_set_fod_rect(struct device *dev, int *rect_data);
-int sec_input_check_wirelesscharger_mode(struct device *dev, int mode, int force);
+int legacy_sec_input_get_lcd_id(struct device *dev);
+int legacy_sec_input_handler_start(struct device *dev);
+void legacy_sec_delay(unsigned int ms);
+int legacy_sec_input_set_temperature(struct device *dev, int state);
+void legacy_sec_input_set_grip_type(struct device *dev, u8 set_type);
+int legacy_sec_input_check_cover_type(struct device *dev);
+void legacy_sec_input_set_fod_info(struct device *dev, int vi_x, int vi_y, int vi_size, int vi_event);
+ssize_t legacy_sec_input_get_fod_info(struct device *dev, char *buf);
+bool legacy_sec_input_set_fod_rect(struct device *dev, int *rect_data);
+int legacy_sec_input_check_wirelesscharger_mode(struct device *dev, int mode, int force);
 
-ssize_t sec_input_get_common_hw_param(struct sec_ts_plat_data *pdata, char *buf);
-void sec_input_clear_common_hw_param(struct sec_ts_plat_data *pdata);
+ssize_t legacy_sec_input_get_common_hw_param(struct sec_ts_plat_data *pdata, char *buf);
+void legacy_sec_input_clear_common_hw_param(struct sec_ts_plat_data *pdata);
 
-void sec_input_print_info(struct device *dev, struct sec_tclm_data *tdata);
+void legacy_sec_input_print_info(struct device *dev, struct sec_tclm_data *tdata);
 
-void sec_input_proximity_report(struct device *dev, int data);
-void sec_input_gesture_report(struct device *dev, int id, int x, int y);
-void sec_input_coord_event_fill_slot(struct device *dev, int t_id);
-void sec_input_coord_event_sync_slot(struct device *dev);
-void sec_input_release_all_finger(struct device *dev);
-int sec_input_device_register(struct device *dev, void *data);
-void sec_tclm_parse_dt(struct device *dev, struct sec_tclm_data *tdata);
-int sec_input_parse_dt(struct device *dev);
-void sec_tclm_parse_dt_dev(struct device *dev, struct sec_tclm_data *tdata);
-int sec_input_pinctrl_configure(struct device *dev, bool on);
-int sec_input_power(struct device *dev, bool on);
-int sec_input_sysfs_create(struct kobject *kobj);
-void sec_input_sysfs_remove(struct kobject *kobj);
-void sec_input_register_vbus_notifier(struct device *dev);
-void sec_input_unregister_vbus_notifier(struct device *dev);
+void legacy_sec_input_proximity_report(struct device *dev, int data);
+void legacy_sec_input_gesture_report(struct device *dev, int id, int x, int y);
+void legacy_sec_input_coord_event_fill_slot(struct device *dev, int t_id);
+void legacy_sec_input_coord_event_sync_slot(struct device *dev);
+void legacy_sec_input_release_all_finger(struct device *dev);
+int legacy_sec_input_device_register(struct device *dev, void *data);
+void legacy_sec_tclm_parse_dt(struct device *dev, struct sec_tclm_data *tdata);
+int legacy_sec_input_parse_dt(struct device *dev);
+void legacy_sec_tclm_parse_dt_dev(struct device *dev, struct sec_tclm_data *tdata);
+int legacy_sec_input_pinctrl_configure(struct device *dev, bool on);
+int legacy_sec_input_power(struct device *dev, bool on);
+int legacy_sec_input_sysfs_create(struct kobject *kobj);
+void legacy_sec_input_sysfs_remove(struct kobject *kobj);
+void legacy_sec_input_register_vbus_notifier(struct device *dev);
+void legacy_sec_input_unregister_vbus_notifier(struct device *dev);
 
-void sec_input_register_notify(struct notifier_block *nb, notifier_fn_t notifier_call, int priority);
-void sec_input_unregister_notify(struct notifier_block *nb);
-int sec_input_notify(struct notifier_block *nb, unsigned long noti, void *v);
-int sec_input_self_request_notify(struct notifier_block *nb);
-int sec_input_enable_device(struct input_dev *dev);
-int sec_input_disable_device(struct input_dev *dev);
-void stui_tsp_init(int (*stui_tsp_enter)(void), int (*stui_tsp_exit)(void), int (*stui_tsp_type)(void));
-int stui_tsp_enter(void);
-int stui_tsp_exit(void);
-int stui_tsp_type(void);
+void legacy_sec_input_register_notify(struct notifier_block *nb, notifier_fn_t notifier_call, int priority);
+void legacy_sec_input_unregister_notify(struct notifier_block *nb);
+int legacy_sec_input_notify(struct notifier_block *nb, unsigned long noti, void *v);
+int legacy_sec_input_self_request_notify(struct notifier_block *nb);
+int legacy_sec_input_enable_device(struct input_dev *dev);
+int legacy_sec_input_disable_device(struct input_dev *dev);
+void legacy_stui_tsp_init(int (*legacy_stui_tsp_enter)(void), int (*legacy_stui_tsp_exit)(void), int (*legacy_stui_tsp_type)(void));
+int legacy_stui_tsp_enter(void);
+int legacy_stui_tsp_exit(void);
+int legacy_stui_tsp_type(void);
