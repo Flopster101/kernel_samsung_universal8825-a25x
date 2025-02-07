@@ -335,7 +335,7 @@ static struct input_handler sec_tsp_dumpkey_handler = {
 	.event		= sec_tsp_dumpkey_event,
 	.connect	= sec_tsp_dumpkey_connect,
 	.disconnect	= sec_tsp_dumpkey_disconnect,
-	.name		= "sec_tsp_dumpkey",
+	.name		= "legacy_sec_tsp_dumpkey",
 	.id_table	= sec_tsp_dumpkey_ids,
 };
 
@@ -343,6 +343,9 @@ static int __init sec_tsp_dumpkey_init(void)
 {
 	int err;
 	size_t i;
+
+	if (!sec_legacy_sinput)
+		return 0;
 
 	pr_info("%s %s\n", SECLOG, __func__);
 
