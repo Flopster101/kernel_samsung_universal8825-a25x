@@ -95,40 +95,11 @@ static int s2mf301_read_reg_byte(struct i2c_client *client, int reg, void *data)
 	return ret;
 }
 
-static void s2mf301_fg_i2c_enable(struct i2c_client *client, bool enable)
-{
-	u8 temp;
-
-	if (enable) {
-		/* I2C enable */
-		s2mf301_read_reg_byte(client, S2MF301_REG_FG_IMTM, &temp);
-		temp |= 0x30;
-		i2c_smbus_write_byte_data(client, S2MF301_REG_FG_IMTM, temp);
-	} else {
-		/* I2C disable */
-		s2mf301_read_reg_byte(client, S2MF301_REG_FG_IMTM, &temp);
-		temp &= ~0x30;
-		i2c_smbus_write_byte_data(client, S2MF301_REG_FG_IMTM, temp);
-	}
-}
-
-#if defined(CONFIG_SEC_FACTORY)
-static void s2mf301_fg_update_reg(struct i2c_client *client, u8 reg, u8 val, u8 mask)
-{
-	s2mf301_fg_i2c_enable(client, true);
-	s2mf301_update_reg(client, reg, val, mask);
-	s2mf301_fg_i2c_enable(client, false);
-}
-#endif
-
 static int s2mf301_write_and_verify_reg_byte(struct i2c_client *client, int reg, u8 data)
 {
 	int ret, i = 0;
 	int i2c_corrupted_cnt = 0;
 	u8 temp = 0;
-
-	/* I2C enable */
-	s2mf301_fg_i2c_enable(client, true);
 
 	ret = i2c_smbus_write_byte_data(client, reg, data);
 	if (ret < 0) {
@@ -145,9 +116,6 @@ static int s2mf301_write_and_verify_reg_byte(struct i2c_client *client, int reg,
 	/* Skip non-writable registers */
 	if ((reg == 0xee) || (reg == 0xef) || (reg == 0xf2) || (reg == 0xf3) || (reg == 0x8E) ||
 		(reg == 0x0C) || (reg == 0x1e) || (reg == 0x1f) || (reg == 0x27)) {
-		/* I2C disable */
-		s2mf301_fg_i2c_enable(client, false);
-
 		return ret;
 	}
 
@@ -169,9 +137,6 @@ static int s2mf301_write_and_verify_reg_byte(struct i2c_client *client, int reg,
 			"%s: I2C write failed REG: 0x%x Expected: 0x%x\n",
 			__func__, reg, data);
 
-	/* I2C disable */
-	s2mf301_fg_i2c_enable(client, false);
-
 	return ret;
 }
 
@@ -185,9 +150,6 @@ static int s2mf301_fg_write_reg(struct i2c_client *client, int reg, u8 *buf)
 #else
 	int ret, i = 0;
 
-	/* I2C enable */
-	s2mf301_fg_i2c_enable(client, true);
-
 	ret = i2c_smbus_write_i2c_block_data(client, reg, 2, buf);
 	if (ret < 0) {
 		for (i = 0; i < 3; i++) {
@@ -199,10 +161,6 @@ static int s2mf301_fg_write_reg(struct i2c_client *client, int reg, u8 *buf)
 		if (i >= 3)
 			dev_err(&client->dev, "%s: Error(%d)\n", __func__, ret);
 	}
-
-	/* I2C disable */
-	s2mf301_fg_i2c_enable(client, false);
-
 #endif
 	return ret;
 }
@@ -557,6 +515,7 @@ static int s2mf301_temperature_compensation(struct s2mf301_fuelgauge_data *fuelg
 				s2mf301_read_reg_byte(fuelgauge->i2c, S2MF301_REG_VM, &temp);
 				temp = temp & ~TEMP_COMPEN_INC_OK_EN;
 				s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, S2MF301_REG_VM, temp);
+
 			}
 		}
 	}
@@ -831,6 +790,7 @@ static void s2mf301_set_trim_5mohm(struct s2mf301_fuelgauge_data *fuelgauge)
 static int s2mf301_runtime_reset_wa(struct s2mf301_fuelgauge_data *fuelgauge)
 {
 	int ret = 0;
+	u8 temp;
 	u8 por_state = 0;
 	u8 reg_1E = 0;
 	u8 reg_OTP_52 = 0, reg_OTP_53 = 0;
@@ -894,6 +854,10 @@ static int s2mf301_runtime_reset_wa(struct s2mf301_fuelgauge_data *fuelgauge)
 			s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, 0x1F, 0x01);
 			usleep_range(10000, 11000);
 
+			s2mf301_read_reg_byte(fuelgauge->i2c, 0x03, &temp);
+			temp |= 0x30;
+			s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, 0x03, temp);
+
 			s2mf301_read_reg_byte(fuelgauge->i2c, 0x53, &reg_OTP_53);
 			s2mf301_read_reg_byte(fuelgauge->i2c, 0x52, &reg_OTP_52);
 
@@ -917,6 +881,10 @@ static int s2mf301_runtime_reset_wa(struct s2mf301_fuelgauge_data *fuelgauge)
 				msleep(50);
 				s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, 0x1F, 0x01);
 				usleep_range(10000, 11000);
+
+				s2mf301_read_reg_byte(fuelgauge->i2c, 0x03, &temp);
+				temp |= 0x30;
+				s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, 0x03, temp);
 
 				dev_err(&fuelgauge->i2c->dev, "%s: 2nd reset\n", __func__);
 			}
@@ -1303,7 +1271,7 @@ static int s2mf301_get_current(struct s2mf301_fuelgauge_data *fuelgauge)
 	if (compliment & (0x1 << 15)) { /* Charging */
 		curr = ((~compliment) & 0xFFFF) + 1;
 		curr = (curr * 1000) >> 11;
-	} else { /* discharging */
+	} else { /* dischaging */
 		curr = compliment & 0x7FFF;
 		curr = (curr * (-1000)) >> 11;
 	}
@@ -1381,7 +1349,7 @@ static int s2mf301_get_avgcurrent(struct s2mf301_fuelgauge_data *fuelgauge)
 	if (compliment & (0x1 << 15)) { /* Charging */
 		curr = ((~compliment) & 0xFFFF) + 1;
 		curr = (curr * 1000) >> 11;
-	} else { /* discharging */
+	} else { /* dischaging */
 		curr = compliment & 0x7FFF;
 		curr = (curr * (-1000)) >> 11;
 	}
@@ -1553,7 +1521,7 @@ static void s2mf301_fg_adjust_capacity_max(
 
 		if ((diff >= 1) && (fuelgauge->capacity_max < fuelgauge->g_capacity_max)) {
 			fuelgauge->capacity_max++;
-		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 1000)) {
+		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 100)) {
 			fuelgauge->g_capacity_max = 0;
 			fuelgauge->capacity_max_conv = false;
 		}
@@ -2084,16 +2052,22 @@ static int s2mf301_fg_set_property(struct power_supply *psy,
 			pr_info("%s, POWER_SUPPLY_EXT_PROP_AFC_TEST_FG_MODE(%d)\n", __func__, val->intval);
 			if (val->intval) {
 				s2mf301_fg_reset_capacity_by_jig_connection(fuelgauge);
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL, 0x00, FG_ON_MASK);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL,
+									0x00, FG_ON_MASK);
 				msleep(260);
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_FS, FS_MANUAL_EN, FS_MANUAL_EN);
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL, FG_ON_MASK, FG_ON_MASK);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_FS,
+									FS_MANUAL_EN, FS_MANUAL_EN);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL,
+									FG_ON_MASK, FG_ON_MASK);
 				msleep(200);
 			} else {
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL, 0x00, FG_ON_MASK);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL,
+									0x00, FG_ON_MASK);
 				msleep(70);
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_FS, 0x00, FS_MANUAL_EN);
-				s2mf301_fg_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL, FG_ON_MASK, FG_ON_MASK);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_FS,
+									0x00, FS_MANUAL_EN);
+				s2mf301_update_reg(fuelgauge->i2c, S2MF301_REG_VBAT_TIME_SEL,
+									FG_ON_MASK, FG_ON_MASK);
 			}
 			break;
 #endif
@@ -2386,6 +2360,11 @@ static int s2mf301_fuelgauge_probe(struct platform_device *pdev)
 
 	if (fuelgauge->pdata->fuelgauge_name == NULL)
 		fuelgauge->pdata->fuelgauge_name = "s2mf301-fuelgauge";
+
+	/* I2C enable */
+	s2mf301_read_reg_byte(fuelgauge->i2c, 0x03, &temp);
+	temp |= 0x30;
+	s2mf301_write_and_verify_reg_byte(fuelgauge->i2c, 0x03, temp);
 
 	fuelgauge->revision = 0;
 	s2mf301_read_reg_byte(fuelgauge->i2c, 0x48, &temp);

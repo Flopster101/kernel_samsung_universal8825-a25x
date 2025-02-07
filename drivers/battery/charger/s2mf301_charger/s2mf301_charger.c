@@ -473,8 +473,8 @@ static bool s2mf301_chg_init(struct s2mf301_charger_data *charger, struct s2mf30
 	u8 sts;
 	union power_supply_propval value;
 
-	/* Set battery BAT OCP disable */
-	s2mf301_update_reg(charger->i2c, S2MF301_CHG_TRIM_D2A_LC_OTP_02, 1 << BAT_OCP_ENB_SHIFT, BAT_OCP_ENB_MASK);
+	/* Set battery OCP Disable */
+	s2mf301_update_reg(charger->i2c, S2MF301_CHG_CTRL13, 0x00, BAT_OCP_EN_MASK);
 
 	/* Set topoff timer 90m */
 	s2mf301_update_reg(charger->i2c, S2MF301_CHG_CTRL20,
@@ -2057,19 +2057,19 @@ static void s2mf301_charger_shutdown(struct platform_device *dev)
 	{
 		u8 auto_shipmode_level;
 
-		/* case with stray voltage due to TA connection */
-		if (!is_nocharge_type(charger->cable_type) || lpcharge) {
+		if ((charger->cable_type != POWER_SUPPLY_TYPE_BATTERY &&
+				charger->cable_type != POWER_SUPPLY_TYPE_UNKNOWN) || lpcharge)
 			if (s2mf301_check_current_level())
 				auto_shipmode_level = s2mf301_check_auto_shipmode_level(charger, 2);
 			else
 				auto_shipmode_level = s2mf301_check_auto_shipmode_level(charger, 1);
-		} else
+		else
 			auto_shipmode_level = s2mf301_check_auto_shipmode_level(charger, 0);
 
 		s2mf301_set_auto_shipmode_level(charger, auto_shipmode_level);
 	}
 #endif
-	s2mf301_set_time_bat2ship_db(charger, 0);
+	s2mf301_set_time_bat2ship_db(charger, 192);
 	s2mf301_set_auto_shipmode(charger, true);
 
 	pr_info("%s: S2MF301 Charger driver shutdown\n", __func__);
