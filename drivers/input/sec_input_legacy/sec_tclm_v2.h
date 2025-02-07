@@ -100,16 +100,16 @@ struct sec_tclm_data {
 	bool support_tclm_test;
 };
 
-void sec_tclm_case(struct sec_tclm_data *data, int tclm_case);
+void legacy_sec_tclm_case(struct sec_tclm_data *data, int tclm_case);
 int sec_tclm_get_nvm_all(struct sec_tclm_data *data);
 void sec_tclm_position_history(struct sec_tclm_data *data);
-void sec_tclm_root_of_cal(struct sec_tclm_data *data, int pos);
-void sec_tclm_debug_info(struct sec_tclm_data *data);
+void legacy_sec_tclm_root_of_cal(struct sec_tclm_data *data, int pos);
+void legacy_sec_tclm_debug_info(struct sec_tclm_data *data);
 void sec_tclm_reposition_history(struct sec_tclm_data *data);
-int sec_execute_tclm_package(struct sec_tclm_data *data, int factory_mode);
-int sec_tclm_check_cal_case(struct sec_tclm_data *data);
-void sec_tclm_initialize(struct sec_tclm_data *data);
-int tclm_test_command(struct sec_tclm_data *data, int test_case, int cmd_param1, int cmd_param2, char *buff);
-int sec_tclm_test_on_probe(struct sec_tclm_data *data);
+int legacy_sec_execute_tclm_package(struct sec_tclm_data *data, int factory_mode);
+int legacy_sec_tclm_check_cal_case(struct sec_tclm_data *data);
+void legacy_sec_tclm_initialize(struct sec_tclm_data *data);
+int legacy_tclm_test_command(struct sec_tclm_data *data, int test_case, int cmd_param1, int cmd_param2, char *buff);
+int legacy_sec_tclm_test_on_probe(struct sec_tclm_data *data);
 
 #endif

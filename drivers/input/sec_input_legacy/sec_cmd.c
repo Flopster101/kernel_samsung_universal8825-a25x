@@ -16,8 +16,8 @@
 struct class *tsp_sec_class;
 
 #if IS_ENABLED(CONFIG_SEC_KUNIT)
-__visible_for_testing struct sec_cmd_data *kunit_sec;
-EXPORT_SYMBOL(kunit_sec);
+__visible_for_testing struct sec_cmd_data *legacy_kunit_sec;
+EXPORT_SYMBOL(legacy_kunit_sec);
 #else
 #define __visible_for_testing static
 #endif
@@ -47,7 +47,7 @@ void sec_cmd_execution(struct sec_cmd_data *data, bool lock)
 }
 #endif
 
-void sec_cmd_set_cmd_exit(struct sec_cmd_data *data)
+void legacy_sec_cmd_set_cmd_exit(struct sec_cmd_data *data)
 {
 #ifdef USE_SEC_CMD_QUEUE
 	mutex_lock(&data->fifo_lock);
@@ -76,7 +76,7 @@ void sec_cmd_set_cmd_exit(struct sec_cmd_data *data)
 	mutex_unlock(&data->cmd_lock);
 #endif
 }
-EXPORT_SYMBOL(sec_cmd_set_cmd_exit);
+EXPORT_SYMBOL(legacy_sec_cmd_set_cmd_exit);
 
 #ifdef USE_SEC_CMD_QUEUE
 static void cmd_exit_work(struct work_struct *work)
@@ -87,16 +87,16 @@ static void cmd_exit_work(struct work_struct *work)
 }
 #endif
 
-void sec_cmd_set_default_result(struct sec_cmd_data *data)
+void legacy_sec_cmd_set_default_result(struct sec_cmd_data *data)
 {
 	char *delim = ":";
 	memset(data->cmd_result, 0x00, SEC_CMD_RESULT_STR_LEN_EXPAND);
 	memcpy(data->cmd_result, data->cmd, SEC_CMD_STR_LEN);
 	strlcat(data->cmd_result, delim, SEC_CMD_RESULT_STR_LEN_EXPAND);
 }
-EXPORT_SYMBOL(sec_cmd_set_default_result);
+EXPORT_SYMBOL(legacy_sec_cmd_set_default_result);
 
-void sec_cmd_set_cmd_result_all(struct sec_cmd_data *data, char *buff, int len, char *item)
+void legacy_sec_cmd_set_cmd_result_all(struct sec_cmd_data *data, char *buff, int len, char *item)
 {
 	char *delim1 = " ";
 	char *delim2 = ":";
@@ -115,9 +115,9 @@ void sec_cmd_set_cmd_result_all(struct sec_cmd_data *data, char *buff, int len, 
 	strlcat(data->cmd_result_all, delim2, sizeof(data->cmd_result_all));
 	strlcat(data->cmd_result_all, buff, sizeof(data->cmd_result_all));
 }
-EXPORT_SYMBOL(sec_cmd_set_cmd_result_all);
+EXPORT_SYMBOL(legacy_sec_cmd_set_cmd_result_all);
 
-void sec_cmd_set_cmd_result(struct sec_cmd_data *data, char *buff, int len)
+void legacy_sec_cmd_set_cmd_result(struct sec_cmd_data *data, char *buff, int len)
 {
 	if (strlen(buff) >= (unsigned int)SEC_CMD_RESULT_STR_LEN_EXPAND) {
 		pr_err("%s %s: cmd length is over (%d)!!", SECLOG, __func__, (int)strlen(buff));
@@ -130,7 +130,7 @@ void sec_cmd_set_cmd_result(struct sec_cmd_data *data, char *buff, int len)
 
 	strlcat(data->cmd_result, buff, SEC_CMD_RESULT_STR_LEN_EXPAND);
 }
-EXPORT_SYMBOL(sec_cmd_set_cmd_result);
+EXPORT_SYMBOL(legacy_sec_cmd_set_cmd_result);
 
 #ifndef USE_SEC_CMD_QUEUE
 __visible_for_testing ssize_t sec_cmd_store(struct device *dev,
@@ -382,7 +382,7 @@ check_not_support_cmd:
 				(unsigned long)t,
 				nanosec_rem / 1000);
 #if IS_ENABLED(CONFIG_SEC_DEBUG_TSP_LOG)
-		sec_debug_tsp_command_history(tbuf);
+		legacy_sec_debug_tsp_command_history(tbuf);
 #endif
 	}
 }
@@ -451,9 +451,9 @@ __visible_for_testing ssize_t sec_cmd_store(struct device *dev, struct device_at
 
 				snprintf(task_info, 40, "\n[%d:%s:%s]", current->pid, current->comm, dev_name(data->fac_dev));
 #if IS_ENABLED(CONFIG_SEC_DEBUG_TSP_LOG)
-				sec_debug_tsp_command_history(task_info);
-				sec_debug_tsp_command_history(cmd.cmd);
-				sec_debug_tsp_command_history(tbuf);
+				legacy_sec_debug_tsp_command_history(task_info);
+				legacy_sec_debug_tsp_command_history(cmd.cmd);
+				legacy_sec_debug_tsp_command_history(tbuf);
 #endif
 			}
 			break;
@@ -593,7 +593,7 @@ __visible_for_testing ssize_t sec_cmd_show_result(struct device *dev,
 
 	pr_info("%s: %s %s: %s\n", dev_name(data->fac_dev), SECLOG, __func__, buf);
 
-	sec_cmd_set_cmd_exit(data);
+	legacy_sec_cmd_set_cmd_exit(data);
 
 	return size;
 }
@@ -616,7 +616,7 @@ static ssize_t sec_cmd_show_result_all(struct device *dev,
 	pr_info("%s: %s %s: %d, %s\n", dev_name(data->fac_dev), SECLOG, __func__, data->item_count, data->cmd_result_all);
 	size = snprintf(buf, SEC_CMD_RESULT_STR_LEN, "%d%s\n", data->item_count, data->cmd_result_all);
 
-	sec_cmd_set_cmd_exit(data);
+	legacy_sec_cmd_set_cmd_exit(data);
 
 	data->item_count = 0;
 	memset(data->cmd_result_all, 0x00, SEC_CMD_RESULT_STR_LEN);
@@ -674,7 +674,7 @@ static struct attribute_group sec_fac_attr_group = {
 };
 
 
-int sec_cmd_init(struct sec_cmd_data *data, struct sec_cmd *cmds,
+int legacy_sec_cmd_init(struct sec_cmd_data *data, struct sec_cmd *cmds,
 			int len, int devt)
 {
 	const char *dev_name;
@@ -797,9 +797,9 @@ err_alloc_cmd_result:
 	list_del(&data->cmd_list_head);
 	return -ENODEV;
 }
-EXPORT_SYMBOL(sec_cmd_init);
+EXPORT_SYMBOL(legacy_sec_cmd_init);
 
-void sec_cmd_exit(struct sec_cmd_data *data, int devt)
+void legacy_sec_cmd_exit(struct sec_cmd_data *data, int devt)
 {
 #ifdef USE_SEC_CMD_QUEUE
 	struct command cmd = {{0}};
@@ -843,9 +843,9 @@ void sec_cmd_exit(struct sec_cmd_data *data, int devt)
 		sub_sec = NULL;
 #endif
 }
-EXPORT_SYMBOL(sec_cmd_exit);
+EXPORT_SYMBOL(legacy_sec_cmd_exit);
 
-void sec_cmd_send_event_to_user(struct sec_cmd_data *data, char *test, char *result)
+void legacy_sec_cmd_send_event_to_user(struct sec_cmd_data *data, char *test, char *result)
 {
 	char *event[5];
 	char timestamp[32];
@@ -894,7 +894,7 @@ void sec_cmd_send_event_to_user(struct sec_cmd_data *data, char *test, char *res
 
 	kobject_uevent_env(&data->fac_dev->kobj, KOBJ_CHANGE, event);
 }
-EXPORT_SYMBOL(sec_cmd_send_event_to_user);
+EXPORT_SYMBOL(legacy_sec_cmd_send_event_to_user);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
 void sec_cmd_virtual_tsp_register(struct sec_cmd_data *sec)
@@ -921,7 +921,7 @@ void sec_cmd_virtual_tsp_register(struct sec_cmd_data *sec)
 }
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(5, 10, 0))
-int sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len)
+int legacy_sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len)
 {
 	int ret = 0;
 
@@ -966,7 +966,7 @@ int sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, c
 	return ret;
 }
 #else
-int sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len)
+int legacy_sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len)
 {
 	int ret = 0;
 	mm_segment_t old_fs;
@@ -995,10 +995,10 @@ int sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, c
 	return ret;
 }
 #endif
-EXPORT_SYMBOL(sec_cmd_virtual_tsp_read_sysfs);
+EXPORT_SYMBOL(legacy_sec_cmd_virtual_tsp_read_sysfs);
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(5, 10, 0))
-int sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd)
+int legacy_sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd)
 {
 	int ret = 0;
 	int len;
@@ -1040,7 +1040,7 @@ int sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, 
 	return ret;
 }
 #else
-int sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd)
+int legacy_sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd)
 {
 	int ret = 0;
 	mm_segment_t old_fs;
@@ -1074,7 +1074,7 @@ int sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, 
 	return ret;
 }
 #endif
-EXPORT_SYMBOL(sec_cmd_virtual_tsp_write_sysfs);
+EXPORT_SYMBOL(legacy_sec_cmd_virtual_tsp_write_sysfs);
 
 static int sec_cmd_virtual_tsp_get_cmd_status(struct sec_cmd_data *sec, char *path)
 {
@@ -1083,7 +1083,7 @@ static int sec_cmd_virtual_tsp_get_cmd_status(struct sec_cmd_data *sec, char *pa
 
 	memset(buff, 0x00, sizeof(buff));
 
-	ret = sec_cmd_virtual_tsp_read_sysfs(sec, path, buff, sizeof(buff));
+	ret = legacy_sec_cmd_virtual_tsp_read_sysfs(sec, path, buff, sizeof(buff));
 	if (ret < 0)
 		return SEC_CMD_STATUS_FAIL;
 
@@ -1101,14 +1101,14 @@ static int sec_cmd_virtual_tsp_get_cmd_status(struct sec_cmd_data *sec, char *pa
 		return SEC_CMD_STATUS_NOT_APPLICABLE;
 }
 
-int sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub)
+int legacy_sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub)
 {
 	u8 buff[16];
 	int ret_sub = 0;
 	int ret_main = 0;
 	bool exit = false;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (!main && !sub) {
 		snprintf(buff, sizeof(buff), "%s", "NA");
@@ -1118,7 +1118,7 @@ int sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub)
 
 	if (sub && sub_sec) {
 		input_dbg(true, sec->fac_dev, "%s: send to sub\n", sec->cmd);
-		ret_sub = sec_cmd_virtual_tsp_write_sysfs(sec, PATH_SUB_SEC_CMD, sec->cmd);
+		ret_sub = legacy_sec_cmd_virtual_tsp_write_sysfs(sec, PATH_SUB_SEC_CMD, sec->cmd);
 		if (ret_sub < 0) {
 			snprintf(buff, sizeof(buff), "%s", "NG");
 			sec->cmd_state = SEC_CMD_STATUS_FAIL;
@@ -1128,14 +1128,14 @@ int sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub)
 		input_dbg(true, sec->fac_dev, "%s: sub_sec OK\n", sec->cmd);
 		if (!sub_sec->cmd_is_running)
 			exit = true;
-		sec_cmd_virtual_tsp_read_sysfs(sec, PATH_SUB_SEC_CMD_RESULT, sec->cmd_result, SEC_CMD_RESULT_STR_LEN);
+		legacy_sec_cmd_virtual_tsp_read_sysfs(sec, PATH_SUB_SEC_CMD_RESULT, sec->cmd_result, SEC_CMD_RESULT_STR_LEN);
 		memset(sec->cmd_result, 0x00, SEC_CMD_RESULT_STR_LEN_EXPAND);
-		sec_cmd_set_cmd_result(sec, sub_sec->cmd_result, strlen(sub_sec->cmd_result));
+		legacy_sec_cmd_set_cmd_result(sec, sub_sec->cmd_result, strlen(sub_sec->cmd_result));
 	}
 main:
 	if (main && main_sec) {
 		input_dbg(true, sec->fac_dev, "%s: send to main\n", sec->cmd);
-		ret_main = sec_cmd_virtual_tsp_write_sysfs(sec, PATH_MAIN_SEC_CMD, sec->cmd);
+		ret_main = legacy_sec_cmd_virtual_tsp_write_sysfs(sec, PATH_MAIN_SEC_CMD, sec->cmd);
 		if (ret_main < 0) {
 			snprintf(buff, sizeof(buff), "%s", "NG");
 			sec->cmd_state = SEC_CMD_STATUS_FAIL;
@@ -1145,34 +1145,34 @@ main:
 		input_dbg(true, sec->fac_dev, "%s: main_sec OK\n", sec->cmd);
 		if (!main_sec->cmd_is_running)
 			exit = true;
-		sec_cmd_virtual_tsp_read_sysfs(sec, PATH_MAIN_SEC_CMD_RESULT, sec->cmd_result, SEC_CMD_RESULT_STR_LEN);
+		legacy_sec_cmd_virtual_tsp_read_sysfs(sec, PATH_MAIN_SEC_CMD_RESULT, sec->cmd_result, SEC_CMD_RESULT_STR_LEN);
 		memset(sec->cmd_result, 0x00, SEC_CMD_RESULT_STR_LEN_EXPAND);
-		sec_cmd_set_cmd_result(sec, main_sec->cmd_result, strlen(main_sec->cmd_result));
+		legacy_sec_cmd_set_cmd_result(sec, main_sec->cmd_result, strlen(main_sec->cmd_result));
 	}
 	if (exit) {
 		input_dbg(true, sec->fac_dev, "%s: set_cmd_exit\n", sec->cmd);
-		sec_cmd_set_cmd_exit(sec);
+		legacy_sec_cmd_set_cmd_exit(sec);
 	} else if ((main && !main_sec) || (sub && !sub_sec)) {
 		input_err(true, sec->fac_dev, "%s: some device is not registered in virtual tsp.\n", sec->cmd);
-		sec_cmd_set_cmd_exit(sec);
+		legacy_sec_cmd_set_cmd_exit(sec);
 	}
 
 	return (ret_sub < 0 || ret_main < 0) ? -1 : 0;
 
 err:
-	sec_cmd_set_cmd_result(sec, buff, SEC_CMD_RESULT_STR_LEN);
-	sec_cmd_set_cmd_exit(sec);
+	legacy_sec_cmd_set_cmd_result(sec, buff, SEC_CMD_RESULT_STR_LEN);
+	legacy_sec_cmd_set_cmd_exit(sec);
 
 	return -1;
 }
-EXPORT_SYMBOL(sec_cmd_virtual_tsp_write_cmd);
+EXPORT_SYMBOL(legacy_sec_cmd_virtual_tsp_write_cmd);
 
-void sec_cmd_virtual_tsp_write_cmd_factory_all(struct sec_cmd_data *sec, bool main, bool sub)
+void legacy_sec_cmd_virtual_tsp_write_cmd_factory_all(struct sec_cmd_data *sec, bool main, bool sub)
 {
 	u8 buff[16];
 	int ret = 0;
 
-	sec_cmd_set_default_result(sec);
+	legacy_sec_cmd_set_default_result(sec);
 
 	if (!main && !sub) {
 		snprintf(buff, sizeof(buff), "%s", "NA");
@@ -1182,34 +1182,34 @@ void sec_cmd_virtual_tsp_write_cmd_factory_all(struct sec_cmd_data *sec, bool ma
 
 	if (sub && sub_sec) {
 		input_dbg(true, sec->fac_dev, "%s: sub\n", sec->cmd);
-		ret = sec_cmd_virtual_tsp_write_sysfs(sec, PATH_SUB_SEC_CMD, sec->cmd);
+		ret = legacy_sec_cmd_virtual_tsp_write_sysfs(sec, PATH_SUB_SEC_CMD, sec->cmd);
 		if (ret < 0) {
 			snprintf(buff, sizeof(buff), "%s", "NG");
 			sec->cmd_all_factory_state = SEC_CMD_STATUS_FAIL;
 			goto main;
 		}
 		sec->cmd_all_factory_state = sec_cmd_virtual_tsp_get_cmd_status(sec, PATH_SUB_SEC_CMD_STATUS_ALL);
-		sec_cmd_virtual_tsp_read_sysfs(sec, PATH_SUB_SEC_CMD_RESULT_ALL, sec->cmd_result_all, SEC_CMD_RESULT_STR_LEN);
+		legacy_sec_cmd_virtual_tsp_read_sysfs(sec, PATH_SUB_SEC_CMD_RESULT_ALL, sec->cmd_result_all, SEC_CMD_RESULT_STR_LEN);
 	}
 main:
 	if (main && main_sec) {
 		input_dbg(true, sec->fac_dev, "%s: main\n", sec->cmd);
-		ret = sec_cmd_virtual_tsp_write_sysfs(sec, PATH_MAIN_SEC_CMD, sec->cmd);
+		ret = legacy_sec_cmd_virtual_tsp_write_sysfs(sec, PATH_MAIN_SEC_CMD, sec->cmd);
 		if (ret < 0) {
 			snprintf(buff, sizeof(buff), "%s", "NG");
 			sec->cmd_all_factory_state = SEC_CMD_STATUS_FAIL;
 			goto err;
 		}
 		sec->cmd_all_factory_state = sec_cmd_virtual_tsp_get_cmd_status(sec, PATH_MAIN_SEC_CMD_STATUS_ALL);
-		sec_cmd_virtual_tsp_read_sysfs(sec, PATH_MAIN_SEC_CMD_RESULT_ALL, sec->cmd_result_all, SEC_CMD_RESULT_STR_LEN);
+		legacy_sec_cmd_virtual_tsp_read_sysfs(sec, PATH_MAIN_SEC_CMD_RESULT_ALL, sec->cmd_result_all, SEC_CMD_RESULT_STR_LEN);
 	}
 
 	return;
 
 err:
-	sec_cmd_set_cmd_result_all(sec, buff, SEC_CMD_RESULT_STR_LEN, "NONE");
+	legacy_sec_cmd_set_cmd_result_all(sec, buff, SEC_CMD_RESULT_STR_LEN, "NONE");
 }
-EXPORT_SYMBOL(sec_cmd_virtual_tsp_write_cmd_factory_all);
+EXPORT_SYMBOL(legacy_sec_cmd_virtual_tsp_write_cmd_factory_all);
 #endif
 
 #if IS_ENABLED(CONFIG_SEC_KUNIT) && !IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)

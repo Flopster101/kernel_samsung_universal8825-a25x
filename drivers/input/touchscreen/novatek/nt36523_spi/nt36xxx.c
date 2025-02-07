@@ -202,7 +202,7 @@ ssize_t secure_touch_enable_store(struct device *dev,
 			return -EBUSY;
 		}
 
-		sec_delay(200);
+		legacy_sec_delay(200);
 		
 		/* syncronize_irq -> disable_irq + enable_irq
 		 * concern about timing issue.
@@ -235,14 +235,14 @@ ssize_t secure_touch_enable_store(struct device *dev,
 			return count;
 		}
 
-		sec_delay(200);
+		legacy_sec_delay(200);
 
 		pm_runtime_put_sync(ts->client->controller->dev.parent);
 		atomic_set(&ts->secure_enabled, 0);
 
 		sysfs_notify(&ts->input_dev->dev.kobj, NULL, "secure_touch");
 
-		sec_delay(10);
+		legacy_sec_delay(10);
 
 		nvt_ts_work_func(ts->client->irq, ts);
 		complete(&ts->secure_interrupt);
@@ -1397,7 +1397,7 @@ static int nvt_parse_dt(struct device *dev)
 	if (!np)
 		return -ENODEV;
 
-	lcdtype = sec_input_get_lcd_id(dev);
+	lcdtype = legacy_sec_input_get_lcd_id(dev);
 	if (lcdtype < 0) {
 		input_err(true, dev, "lcd is not attached\n");
 		return -ENODEV;
@@ -3257,7 +3257,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #endif
 
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
-	stui_tsp_init(nvt_stui_tsp_enter, nvt_stui_tsp_exit, nvt_stui_tsp_type);
+	legacy_stui_tsp_init(nvt_stui_tsp_enter, nvt_stui_tsp_exit, nvt_stui_tsp_type);
 	input_info(true, &client->dev,"secure touch support\n");
 #endif
 
@@ -3268,7 +3268,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	else
 		secure_touch_init(ts);
 
-	sec_secure_touch_register(ts, 1, &ts->input_dev->dev.kobj);
+	legacy_sec_secure_touch_register(ts, 1, &ts->input_dev->dev.kobj);
 #endif
 
 #if IS_ENABLED(CONFIG_VBUS_NOTIFIER)

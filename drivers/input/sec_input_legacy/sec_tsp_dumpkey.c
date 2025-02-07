@@ -33,10 +33,10 @@ static atomic_t sec_tsp_dumpkey_acceptable_event[KEY_MAX] __read_mostly;
 #define KEY_STATE_DOWN 1
 #define KEY_STATE_UP 0
 
-struct tsp_dump_callbacks dump_callbacks;
-EXPORT_SYMBOL(dump_callbacks);
+struct tsp_dump_callbacks legacy_dump_callbacks;
+EXPORT_SYMBOL(legacy_dump_callbacks);
 
-extern struct device *ptsp;
+extern struct device *legacy_ptsp;
 
 static unsigned int __tsp_dump_keys[] = {
 	KEY_POWER,
@@ -182,8 +182,8 @@ static void increase_step(void)
 {
 	if (check_step < ARRAY_SIZE(tsp_dump_key_combination))
 		check_step++;
-	else if (dump_callbacks.inform_dump)
-		dump_callbacks.inform_dump(ptsp);
+	else if (legacy_dump_callbacks.inform_dump)
+		legacy_dump_callbacks.inform_dump(legacy_ptsp);
 }
 
 static void reset_step(void)
@@ -195,8 +195,8 @@ static void increase_count(void)
 {
 	if (check_count < get_count_for_dump())
 		check_count++;
-	else if (dump_callbacks.inform_dump)
-		dump_callbacks.inform_dump(ptsp);
+	else if (legacy_dump_callbacks.inform_dump)
+		legacy_dump_callbacks.inform_dump(legacy_ptsp);
 }
 
 static void reset_count(void)

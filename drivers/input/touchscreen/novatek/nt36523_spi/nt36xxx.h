@@ -62,7 +62,7 @@
 #include <linux/vbus_notifier.h>
 #endif
 
-extern void stui_tsp_init(int (*stui_tsp_enter)(void), int (*stui_tsp_exit)(void), int (*stui_tsp_type)(void));
+extern void legacy_stui_tsp_init(int (*legacy_stui_tsp_enter)(void), int (*legacy_stui_tsp_exit)(void), int (*legacy_stui_tsp_type)(void));
 
 #define NVT_DEBUG 1
 

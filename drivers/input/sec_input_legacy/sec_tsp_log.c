@@ -54,7 +54,7 @@ static unsigned int sec_tsp_sponge_log_size;
 
 static struct mutex tsp_log_mutex;
 
-void sec_tsp_sponge_log(char *buf)
+void legacy_sec_tsp_sponge_log(char *buf)
 {
 	int len = 0;
 	unsigned int idx;
@@ -81,7 +81,7 @@ void sec_tsp_sponge_log(char *buf)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_tsp_sponge_log);
+EXPORT_SYMBOL(legacy_sec_tsp_sponge_log);
 
 static ssize_t sec_tsp_sponge_log_read(struct file *file, char __user *buf,
 					size_t len, loff_t *offset)
@@ -118,7 +118,7 @@ static size_t sec_tsp_log_timestamp(unsigned long idx, char *tbuf)
 }
 
 #define TSP_BUF_SIZE 512
-void sec_debug_tsp_log(char *fmt, ...)
+void legacy_sec_debug_tsp_log(char *fmt, ...)
 {
 	va_list args;
 	char buf[TSP_BUF_SIZE];
@@ -158,15 +158,15 @@ void sec_debug_tsp_log(char *fmt, ...)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_log);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_log);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
-void sec_debug_tsp_raw_data(char *fmt, ...)
+void legacy_sec_debug_tsp_raw_data(char *fmt, ...)
 {
 }
-EXPORT_SYMBOL(sec_debug_tsp_raw_data);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_raw_data);
 #else
-void sec_debug_tsp_raw_data(char *fmt, ...)
+void legacy_sec_debug_tsp_raw_data(char *fmt, ...)
 {
 	va_list args;
 	char buf[TSP_BUF_SIZE];
@@ -202,10 +202,10 @@ void sec_debug_tsp_raw_data(char *fmt, ...)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_raw_data);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_raw_data);
 #endif
 
-void sec_debug_tsp_log_msg(char *msg, char *fmt, ...)
+void legacy_sec_debug_tsp_log_msg(char *msg, char *fmt, ...)
 {
 	va_list args;
 	char buf[TSP_BUF_SIZE];
@@ -245,10 +245,10 @@ void sec_debug_tsp_log_msg(char *msg, char *fmt, ...)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_log_msg);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_log_msg);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
-void sec_debug_tsp_raw_data_msg(char mode, char *msg, char *fmt, ...)
+void legacy_sec_debug_tsp_raw_data_msg(char mode, char *msg, char *fmt, ...)
 {
 	va_list args;
 	char buf[TSP_BUF_SIZE];
@@ -302,9 +302,9 @@ void sec_debug_tsp_raw_data_msg(char mode, char *msg, char *fmt, ...)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_raw_data_msg);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_raw_data_msg);
 #else
-void sec_debug_tsp_raw_data_msg(char *msg, char *fmt, ...)
+void legacy_sec_debug_tsp_raw_data_msg(char *msg, char *fmt, ...)
 {
 	va_list args;
 	char buf[TSP_BUF_SIZE];
@@ -340,10 +340,10 @@ void sec_debug_tsp_raw_data_msg(char *msg, char *fmt, ...)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_raw_data_msg);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_raw_data_msg);
 #endif
 
-void sec_debug_tsp_command_history(char *buf)
+void legacy_sec_debug_tsp_command_history(char *buf)
 {
 	int len = 0;
 	unsigned int idx;
@@ -371,10 +371,10 @@ void sec_debug_tsp_command_history(char *buf)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_debug_tsp_command_history);
+EXPORT_SYMBOL(legacy_sec_debug_tsp_command_history);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
-void sec_tsp_raw_data_clear(char mode)
+void legacy_sec_tsp_raw_data_clear(char mode)
 {
 	if (!sec_tsp_raw_data_size || !sec_tsp_raw_data_buf)
 		return;
@@ -389,9 +389,9 @@ void sec_tsp_raw_data_clear(char mode)
 	}
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_tsp_raw_data_clear);
+EXPORT_SYMBOL(legacy_sec_tsp_raw_data_clear);
 #else
-void sec_tsp_raw_data_clear(void)
+void legacy_sec_tsp_raw_data_clear(void)
 {
 	if (!sec_tsp_raw_data_size || !sec_tsp_raw_data_buf)
 		return;
@@ -402,10 +402,10 @@ void sec_tsp_raw_data_clear(void)
 	memset(sec_tsp_raw_data_buf, 0x00, sec_tsp_raw_data_size);
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_tsp_raw_data_clear);
+EXPORT_SYMBOL(legacy_sec_tsp_raw_data_clear);
 #endif
 
-void sec_tsp_log_fix(void)
+void legacy_sec_tsp_log_fix(void)
 {
 	char *buf = "FIX LOG!\n";
 	char tbuf[SEC_TSP_LOG_TIMESTAMP_SIZE];
@@ -439,7 +439,7 @@ void sec_tsp_log_fix(void)
 	sec_tsp_log_index_full = max(sec_tsp_log_index_full, sec_tsp_log_index);
 	mutex_unlock(&tsp_log_mutex);
 }
-EXPORT_SYMBOL(sec_tsp_log_fix);
+EXPORT_SYMBOL(legacy_sec_tsp_log_fix);
 
 static ssize_t sec_tsp_log_write(struct file *file,
 				const char __user *buf,
@@ -469,7 +469,7 @@ static ssize_t sec_tsp_log_write(struct file *file,
 	if (sscanf(page, "%u", &new_value) != 1) {
 		pr_info("%s %s\n", SECLOG, page);
 		/* print tsp_log to sec_tsp_log_buf */
-		sec_debug_tsp_log("%s", page);
+		legacy_sec_debug_tsp_log("%s", page);
 	}
 	ret = count;
 out:
@@ -504,7 +504,7 @@ static ssize_t sec_tsp_raw_data_write(struct file *file,
 	ret = -EINVAL;
 	if (sscanf(page, "%u", &new_value) != 1) {
 		pr_info("%s %s\n", SECLOG, page);
-		sec_debug_tsp_raw_data("%s", page);
+		legacy_sec_debug_tsp_raw_data("%s", page);
 	}
 	ret = count;
 out:
