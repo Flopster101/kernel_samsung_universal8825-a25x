@@ -29,11 +29,13 @@ bool sec_needs_decon;
 bool sec_needs_blic = false;
 bool sec_doze = false; // Uses Samsung DRM Doze?
 bool sec_lcd_device = false;
+bool sec_legacy_sinput = false; // Uses old sec_input driver?
 EXPORT_SYMBOL(sec_needs_decon);
 EXPORT_SYMBOL(sec_current_device);
 EXPORT_SYMBOL(sec_needs_blic);
 EXPORT_SYMBOL(sec_doze);
 EXPORT_SYMBOL(sec_lcd_device);
+EXPORT_SYMBOL(sec_legacy_sinput);
 
 // Camera params
 bool mcd_disable_dual_sync = false;
@@ -248,6 +250,7 @@ int sec_detect_init(void) {
 		sec_needs_decon = true;
 		sec_needs_blic = true;
 		sec_lcd_device = true;
+		sec_legacy_sinput = true;
 	} else if (strstr(machine_name, "M34") != NULL) {
 		sec_current_device = SEC_M34;
 		strncpy(sec_current_device_name, "m34x", sizeof(sec_current_device_name));
