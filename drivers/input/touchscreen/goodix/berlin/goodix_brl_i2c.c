@@ -395,7 +395,8 @@ static int goodix_i2c_dev_remove(struct i2c_client *client)
 	// Unregister the platform device
 	platform_device_unregister(goodix_pdev);
 
-	// Set the pointer to NULL to avoid using it after freeing
+	// Free the allocated platform device memory
+	kfree(goodix_pdev);
 	goodix_pdev = NULL;
 
 	return 0;
