@@ -45,7 +45,7 @@ int sec_secure_touch_set_device(struct sec_secure_touch *data, int dev_num)
 	return ret;
 }
 
-struct sec_touch_driver *sec_secure_touch_register(void *drv_data, int dev_num, struct kobject *kobj)
+struct sec_touch_driver *legacy_sec_secure_touch_register(void *drv_data, int dev_num, struct kobject *kobj)
 {
 	struct sec_secure_touch *data = g_ss_touch;
 	int number = dev_num - 1;
@@ -79,7 +79,7 @@ struct sec_touch_driver *sec_secure_touch_register(void *drv_data, int dev_num, 
 
 	return &data->touch_driver[number];
 }
-EXPORT_SYMBOL(sec_secure_touch_register);
+EXPORT_SYMBOL(legacy_sec_secure_touch_register);
 
 
 void sec_secure_touch_unregister(int dev_num)
