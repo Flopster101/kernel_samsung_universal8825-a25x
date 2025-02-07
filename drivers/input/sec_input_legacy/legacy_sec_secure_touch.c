@@ -369,7 +369,7 @@ struct platform_driver sec_secure_touch_driver = {
 	.probe = sec_secure_touch_probe,
 	.remove = sec_secure_touch_remove,
 	.driver = {
-		.name = "sec_secure_touch",
+		.name = "legacy_sec_secure_touch",
 		.owner = THIS_MODULE,
 #if CONFIG_OF
 		.of_match_table = of_match_ptr(sec_secure_touch_dt_match),
@@ -380,6 +380,9 @@ struct platform_driver sec_secure_touch_driver = {
 static int __init sec_secure_touch_init(void)
 {
 	pr_info("%s: %s\n", SECLOG, __func__);
+
+	if (!sec_legacy_sinput)
+		return 0;
 
 	platform_driver_register(&sec_secure_touch_driver);
 	return 0;
