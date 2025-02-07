@@ -95,11 +95,11 @@ enum SEC_CMD_STATUS {
 		else if (cmd_state_parm == SEC_CMD_STATUS_NOT_APPLICABLE)	\
 			snprintf(buff, sizeof(buff), "NA");			\
 	}									\
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));		\
+	legacy_sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));		\
 	sec->cmd_state = cmd_state_parm;					\
 	if (need_exit == INPUT_CMD_RESULT_NEED_EXIT)				\
-		sec_cmd_set_cmd_exit(sec);					\
-	input_info(true, ptsp, "%s: %s\n", __func__, buff);			\
+		legacy_sec_cmd_set_cmd_exit(sec);					\
+	input_info(true, legacy_ptsp, "%s: %s\n", __func__, buff);			\
 })
 
 #ifdef USE_SEC_CMD_QUEUE
@@ -149,19 +149,19 @@ struct sec_cmd_data {
 #endif
 };
 
-extern void sec_cmd_set_cmd_exit(struct sec_cmd_data *data);
-extern void sec_cmd_set_default_result(struct sec_cmd_data *data);
-extern void sec_cmd_set_cmd_result(struct sec_cmd_data *data, char *buff, int len);
-extern void sec_cmd_set_cmd_result_all(struct sec_cmd_data *data, char *buff, int len, char *item);
-extern int sec_cmd_init(struct sec_cmd_data *data, struct sec_cmd *cmds, int len, int devt);
-extern void sec_cmd_exit(struct sec_cmd_data *data, int devt);
-extern void sec_cmd_send_event_to_user(struct sec_cmd_data *data, char *test, char *result);
+extern void legacy_sec_cmd_set_cmd_exit(struct sec_cmd_data *data);
+extern void legacy_sec_cmd_set_default_result(struct sec_cmd_data *data);
+extern void legacy_sec_cmd_set_cmd_result(struct sec_cmd_data *data, char *buff, int len);
+extern void legacy_sec_cmd_set_cmd_result_all(struct sec_cmd_data *data, char *buff, int len, char *item);
+extern int legacy_sec_cmd_init(struct sec_cmd_data *data, struct sec_cmd *cmds, int len, int devt);
+extern void legacy_sec_cmd_exit(struct sec_cmd_data *data, int devt);
+extern void legacy_sec_cmd_send_event_to_user(struct sec_cmd_data *data, char *test, char *result);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
 void sec_cmd_virtual_tsp_register(struct sec_cmd_data *sec);
-int sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len);
-int sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd);
-int sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub);
-void sec_cmd_virtual_tsp_write_cmd_factory_all(struct sec_cmd_data *sec, bool main, bool sub);
+int legacy_sec_cmd_virtual_tsp_read_sysfs(struct sec_cmd_data *sec, const char *path, char *buf, int len);
+int legacy_sec_cmd_virtual_tsp_write_sysfs(struct sec_cmd_data *sec, const char *path, const char *cmd);
+int legacy_sec_cmd_virtual_tsp_write_cmd(struct sec_cmd_data *sec, bool main, bool sub);
+void legacy_sec_cmd_virtual_tsp_write_cmd_factory_all(struct sec_cmd_data *sec, bool main, bool sub);
 #endif
 #endif /* _SEC_CMD_H_ */

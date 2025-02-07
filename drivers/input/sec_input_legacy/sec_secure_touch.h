@@ -82,7 +82,7 @@ struct sec_secure_touch {
 };
 
 void sec_secure_touch_sysfs_notify(struct sec_secure_touch *data);
-struct sec_touch_driver *sec_secure_touch_register(void *drv_data, int dev_num, struct kobject *kobj);
+struct sec_touch_driver *legacy_sec_secure_touch_register(void *drv_data, int dev_num, struct kobject *kobj);
 void sec_secure_touch_unregister(int dev_num);
 
 
