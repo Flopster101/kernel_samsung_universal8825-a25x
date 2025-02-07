@@ -1747,7 +1747,7 @@ static int pn547_probe(struct i2c_client *client, const struct i2c_device_id *id
 	if (pn547_dev->clkctrl_addr != 0) {
 		unsigned int val = 0;
 
-		pn547_dev->clkctrl = ioremap_nocache(pn547_dev->clkctrl_addr, 0x4);
+		pn547_dev->clkctrl = ioremap(pn547_dev->clkctrl_addr, 0x4);
 		if (!pn547_dev->clkctrl) {
 			NFC_LOG_ERR("cannot remap register\n");
 			ret = -ENXIO;
