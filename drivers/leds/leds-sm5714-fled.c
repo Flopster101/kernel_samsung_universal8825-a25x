@@ -13,7 +13,7 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <linux/sm5714.h>
-#include <linux/mfd/sm5714-private.h>
+#include <linux/mfd/sm/sm5714/sm5714-private.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/platform_device.h>
