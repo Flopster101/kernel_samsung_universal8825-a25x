@@ -57,6 +57,7 @@ extern bool mcd_config_check_hw_version_for_mcu_fw_upload;
 extern bool mcd_use_camera_act_driver_soft_landing;
 extern bool mcd_use_ois_hall_data_for_vdis;
 extern bool mcd_use_hi1336c_setfile;
+extern bool mcd_camera_use_aois;
 
 #ifdef CONFIG_SEC_DETECT_SYSFS
 extern char sec_current_device_name[32];
