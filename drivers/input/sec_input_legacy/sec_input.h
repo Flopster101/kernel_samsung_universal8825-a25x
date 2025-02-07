@@ -52,6 +52,7 @@
 #include <linux/usb/typec/manager/usb_typec_manager_notifier.h>
 #endif
 #endif
+#include <linux/sec_detect.h>
 
 #include "sec_cmd.h"
 #include "sec_tclm_v2.h"
