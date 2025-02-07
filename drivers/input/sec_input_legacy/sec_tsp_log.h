@@ -25,25 +25,25 @@
 #define SEC_TSP_LOG_EXTRA_SIZE		10
 
 /**
- * sec_debug_tsp_log : Leave tsp log in tsp_msg file.
+ * legacy_sec_debug_tsp_log : Leave tsp log in tsp_msg file.
  * ( Timestamp + Tsp logs )
- * sec_debug_tsp_log_msg : Leave tsp log in tsp_msg file and
+ * legacy_sec_debug_tsp_log_msg : Leave tsp log in tsp_msg file and
  * add additional message between timestamp and tsp log.
  * ( Timestamp + additional Message + Tsp logs )
  */
-void sec_tsp_sponge_log(char *buf);
-void sec_debug_tsp_log(char *fmt, ...);
-void sec_debug_tsp_log_msg(char *msg, char *fmt, ...);
-void sec_tsp_log_fix(void);
-void sec_debug_tsp_raw_data(char *fmt, ...);
+void legacy_sec_tsp_sponge_log(char *buf);
+void legacy_sec_debug_tsp_log(char *fmt, ...);
+void legacy_sec_debug_tsp_log_msg(char *msg, char *fmt, ...);
+void legacy_sec_tsp_log_fix(void);
+void legacy_sec_debug_tsp_raw_data(char *fmt, ...);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DUAL_FOLDABLE)
-void sec_debug_tsp_raw_data_msg(char mode, char *msg, char *fmt, ...);
-void sec_tsp_raw_data_clear(char mode);
+void legacy_sec_debug_tsp_raw_data_msg(char mode, char *msg, char *fmt, ...);
+void legacy_sec_tsp_raw_data_clear(char mode);
 #else
-void sec_debug_tsp_raw_data_msg(char *msg, char *fmt, ...);
-void sec_tsp_raw_data_clear(void);
+void legacy_sec_debug_tsp_raw_data_msg(char *msg, char *fmt, ...);
+void legacy_sec_tsp_raw_data_clear(void);
 #endif
 
-void sec_debug_tsp_command_history(char *buf);
+void legacy_sec_debug_tsp_command_history(char *buf);
 #endif /* _SEC_TSP_LOG_H_ */
