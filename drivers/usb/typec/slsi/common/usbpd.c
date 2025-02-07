@@ -304,9 +304,6 @@ protocol_state usbpd_protocol_tx_construct_message(struct protocol_data *tx)
 	tx->msg_header.msg_id = pd_data->counter.message_id_counter;
 	tx->status = DEFAULT_PROTOCOL_NONE;
 
-	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR);
-	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC);
-
 	if (PDIC_OPS_PARAM2_FUNC(tx_msg, pd_data, &tx->msg_header, tx->data_obj)) {
 		dev_err(pd_data->dev, "%s error\n", __func__);
 		return PRL_Tx_Construct_Message;
@@ -341,38 +338,7 @@ protocol_state usbpd_protocol_tx_wait_for_phy_response(struct protocol_data *tx)
 
 	return PRL_Tx_Check_RetryCounter;
 #endif
-	struct usbpd_data *pd_data = protocol_tx_to_usbpd(tx);
-	protocol_state state = PRL_Tx_Transmission_Error;
-
-#if IS_ENABLED(CONFIG_S2M_PDIC_MANUAL_RETRY)
-	if (pd_data->is_manual_retry) {
-		usbpd_info("%s, Manual retry Mode\n", __func__);
-		return PRL_Tx_Message_Sent;
-	}
-#endif
-
-	usbpd_crc_timer_start(pd_data);
-	while (1) {
-		if (pd_data->phy_ops.get_status(pd_data, MSG_GOODCRC)) {
-			usbpd_info("%s, Receive GoodCRC\n", __func__);
-			state = PRL_Tx_Message_Sent;
-			break;
-		}
-
-		if (pd_data->phy_ops.get_status(pd_data, MSG_ERROR)) {
-			usbpd_info("%s, not Receive GoodCRC\n", __func__);
-			state = PRL_Tx_Transmission_Error;
-			break;
-		}
-
-		if (usbpd_check_crc_timer(pd_data) > tReceive) {
-			usbpd_info("%s, GoodCRC not Received, but maybe good(no Error)\n", __func__);
-			state = PRL_Tx_Message_Sent;
-			break;
-		}
-	}
-
-	return state;
+	return PRL_Tx_Message_Sent;
 }
 
 protocol_state usbpd_protocol_tx_match_messageid(struct protocol_data *tx)
@@ -435,7 +401,6 @@ protocol_state usbpd_protocol_tx_transmission_error(struct protocol_data *tx)
 
 	increase_message_id_counter(pd_data);
 	tx->status = TRANSMISSION_ERROR;
-	tx->msg_header.word = 0;
 
 	return PRL_Tx_Wait_for_Message_Request;
 }
@@ -595,7 +560,6 @@ protocol_state usbpd_protocol_rx_store_messageid(struct protocol_data *rx)
 
 	rx->stored_message_id = rx->msg_header.msg_id;
 	usbpd_read_msg(pd_data);
-	rx->status = MSG_RECEIVED;
 /*
 	return PRL_Rx_Wait_for_PHY_Message;
 */
@@ -604,19 +568,16 @@ protocol_state usbpd_protocol_rx_store_messageid(struct protocol_data *rx)
 
 protocol_state usbpd_protocol_rx_check_messageid(struct protocol_data *rx)
 {
+#if 0
 	protocol_state state;
-	state = PRL_Rx_Store_MessageID;
 
-	if (rx->msg_header.msg_type == USBPD_Soft_Reset) {
-		usbpd_info("%s, msg_type is USBPD_Soft_Reset\n", __func__);
-		state = PRL_Rx_Layer_Reset_for_Receive;
-    } else if (rx->stored_message_id == rx->msg_header.msg_id) {
-		usbpd_info("%s, msgid(%d) is same, discarded\n", __func__, rx->stored_message_id);
-		state = PRL_Rx_Check_MessageID;
-		rx->status = MSG_DISCARDED;
-	}
-
+	if (rx->stored_message_id == rx->msg_header.msg_id)
+		state = PRL_Rx_Wait_for_PHY_Message;
+	else
+		state = PRL_Rx_Store_MessageID;
 	return state;
+#endif
+	return PRL_Rx_Store_MessageID;
 }
 
 void usbpd_protocol_tx(struct usbpd_data *pd_data)
@@ -800,13 +761,8 @@ EXPORT_SYMBOL(usbpd_rx_hard_reset);
 
 void usbpd_rx_soft_reset(struct usbpd_data *pd_data)
 {
-	int revision = pd_data->specification_revision;
-
-	mutex_lock(&pd_data->softreset_mutex);
 	usbpd_reinit(pd_data->dev);
 	usbpd_policy_reset(pd_data, SOFTRESET_RECEIVED);
-	PDIC_OPS_PARAM_FUNC(set_revision, pd_data, revision);
-	mutex_unlock(&pd_data->softreset_mutex);
 }
 EXPORT_SYMBOL(usbpd_rx_soft_reset);
 
