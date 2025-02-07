@@ -431,6 +431,13 @@ static void manager_usb_enum_state_check_work(struct work_struct *work)
 	typec_manager.usb_enum_check.pending = false;
 	dwc3_link_check= dwc3_gadget_get_cmply_link_state_wrapper();
 
+#if IS_ENABLED(CONFIG_USB_NOTIFY_LAYER) && !IS_ENABLED(CONFIG_DISABLE_LOCKSCREEN_USB_RESTRICTION)
+	if (is_blocked(get_otg_notify(), NOTIFY_BLOCK_TYPE_CLIENT)) {
+		utmanager_info("%s usb device is blocked. skip.\n", __func__);
+		return;
+	}
+#endif
+
 	if ((typec_manager.usb.dr != USB_STATUS_NOTIFY_ATTACH_UFP)
 			|| (dwc3_link_check == 1)) {
 		utmanager_info("%s: skip case : dwc3_link = %d\n", __func__, dwc3_link_check);
@@ -463,6 +470,14 @@ static void manager_usb_enum_state_check_work(struct work_struct *work)
 
 __visible_for_testing void manager_usb_enum_state_check(uint time_ms)
 {
+#if IS_ENABLED(CONFIG_USB_NOTIFY_LAYER) && !IS_ENABLED(CONFIG_DISABLE_LOCKSCREEN_USB_RESTRICTION)
+	struct otg_notify *o_notify = get_otg_notify();
+	int enum_check_skip = 0;
+
+	if ((o_notify && o_notify->booting_delay_sec) || is_blocked(o_notify, NOTIFY_BLOCK_TYPE_CLIENT))
+		enum_check_skip = 1;
+#endif
+
 	if (typec_manager.usb_factory) {
 		utmanager_info("%s skip. usb_factory mode.\n", __func__);
 		return;
@@ -473,6 +488,12 @@ __visible_for_testing void manager_usb_enum_state_check(uint time_ms)
 			cancel_delayed_work(&typec_manager.usb_enum_check.dwork);
 
 		if (time_ms && typec_manager.usb.dr == USB_STATUS_NOTIFY_ATTACH_UFP) {
+#if IS_ENABLED(CONFIG_USB_NOTIFY_LAYER) && !IS_ENABLED(CONFIG_DISABLE_LOCKSCREEN_USB_RESTRICTION)
+			if (enum_check_skip) {
+				utmanager_info("%s skip. booting_delay(%d)\n", __func__, o_notify->booting_delay_sec);
+				return;
+			}
+#endif
 			typec_manager.usb_enum_check.pending = true;
 			schedule_delayed_work(&typec_manager.usb_enum_check.dwork, msecs_to_jiffies(time_ms));
 		} else
