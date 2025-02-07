@@ -110,6 +110,9 @@
 #define SM5714_REG_CNTL_CABLE_RESET_MESSAGE		(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 1)
 #define SM5714_REG_CNTL_HARD_RESET_MESSAGE		(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 2)
 #define SM5714_REG_CNTL_PROTOCOL_RESET_MESSAGE	(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 3)
+#define SM5714_REG_CNTL_START_AMS_PROTOCOL		(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 4)
+#define SM5714_REG_CNTL_END_AMS_PROTOCOL		(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 5)
+#define SM5714_REG_CNTL_RP_AUTO_CONTRL_ENABLE	(SM5714_REG_CNTL_NOTIFY_RESET_DONE << 7)
 
 #define SM5714_SBU_CORR_CHECK				(1<<6)
 #define SM5714_DEAD_RD_ENABLE				(1<<7)
@@ -182,7 +185,7 @@ enum sm5714_usbpd_reg {
 	SM5714_REG_ADC_CNTL2		= 0x1A,
 	SM5714_REG_SYS_CNTL			= 0x1B,
 	SM5714_REG_COMP_CNTL		= 0x1C,
-	SM5714_REG_CLK_CNTL			= 0x1D,	
+	SM5714_REG_CLK_CNTL			= 0x1D,
 	SM5714_REG_USBK_CNTL 		= 0x1E,
 	SM5714_REG_CORR_CNTL1		= 0x20,
 	SM5714_REG_CORR_CNTL4		= 0x23,
@@ -229,6 +232,12 @@ enum sm5714_usbpd_reg {
 	SM5714_REG_PD_STATE4		= 0xD9,
 	SM5714_REG_PD_STATE5		= 0xDA
 };
+
+typedef enum {
+	AUTO_RP_CNTL = 0,
+	END_AMS_PRL = 1,
+	STR_AMS_PRL = 2,
+} PDIC_AMS_MODE;
 
 typedef enum {
 	NON_PWR_CABLE = 0,
@@ -283,6 +292,7 @@ struct sm5714_phydrv_data {
 	int irq_gpio;
 	int irq;
 	int vbus_dischg_gpio;
+	int otg_det_gpio;
 	int power_role;
 	int data_role;
 	int vconn_source;
@@ -303,10 +313,16 @@ struct sm5714_phydrv_data {
 	bool is_otg_vboost;
 	bool is_jig_case_on;
 	bool is_noti_src_adv;
+	bool is_lpcharge;
+	bool is_1st_short;
+	bool is_2nd_short;
+	bool is_sbu_vbus_short;
 	bool is_mpsm_exit;
 	bool suspended;
 	bool soft_reset;
+	bool is_keystring;
 	bool is_timer_expired;
+	bool is_wait_sinktxok;
 	wait_queue_head_t suspend_wait;
 	struct wakeup_source	*irq_ws;
 	int cc_open_cmd;
@@ -348,8 +364,10 @@ struct sm5714_phydrv_data {
 	struct delayed_work vbus_noti_work;
 #endif
 	int vbus_noti_status;
+	struct delayed_work muic_noti_work;
 	struct delayed_work rx_buf_work;
 	struct delayed_work vbus_dischg_work;
+	struct delayed_work otg_det_work;
 	struct delayed_work debug_work;
 #if IS_ENABLED(CONFIG_IF_CB_MANAGER)
 	struct usbpd_dev	*usbpd_d;
@@ -360,10 +378,13 @@ struct sm5714_phydrv_data {
 	int host_turn_on_wait_time;
 	int detach_done_wait;
 	int wait_entermode;
+	int shut_down;
 };
 
 extern struct sm5714_usbpd_data *sm5714_g_pd_data;
 
+void sm5714_JIGON(void *data, bool mode);
+void sm5714_usbpd_set_usb_safe_mode(void *_data);
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 void sm5714_protocol_layer_reset(void *_data);
 void sm5714_cc_state_hold_on_off(void *_data, int onoff);
@@ -379,6 +400,9 @@ void sm5714_short_state_check(void *_data);
 #endif
 void sm5714_cc_control_command(void *data, int is_off);
 void sm5714_set_enable_pd_function(void *_data, int enable);
+#if IS_ENABLED(CONFIG_SEC_DISPLAYPORT) && defined(CONFIG_SM5714_SUPPORT_SBU)
+void sm5714_usbpd_delayed_sbu_short_notify(void *_data);
+#endif
 void sm5714_vbus_turn_on_ctrl(struct sm5714_phydrv_data *usbpd_data, bool enable);
 void sm5714_src_transition_to_default(void *_data);
 void sm5714_src_transition_to_pwr_on(void *_data);
@@ -387,4 +411,5 @@ bool sm5714_get_rx_buf_st(void *_data);
 void sm5714_set_bist_carrier_m2(void *_data);
 void sm5714_usbpd_set_vbus_dischg_gpio(struct sm5714_phydrv_data *pdic_data, int vbus_dischg);
 void sm5714_error_recovery_mode(void *_data);
+void sm5714_detach_with_cc(int state);
 #endif /* __SM5714_TYPEC_H__ */

@@ -15,7 +15,6 @@
 #include <linux/of_gpio.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
-#include <linux/sec_detect.h>
 
 static enum power_supply_property sm5714_fuelgauge_props[] = {
 	POWER_SUPPLY_PROP_ONLINE,
@@ -1630,7 +1629,7 @@ static void sm5714_fg_adjust_capacity_max(
 
 		if ((diff >= 1) && (fuelgauge->capacity_max < fuelgauge->g_capacity_max)) {
 			fuelgauge->capacity_max++;
-		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 1000)) {
+		} else if ((fuelgauge->capacity_max >= fuelgauge->g_capacity_max) || (curr_raw_soc == 100)) {
 			fuelgauge->g_capacity_max = 0;
 			fuelgauge->capacity_max_conv = false;
 		}
@@ -2371,12 +2370,13 @@ static void temp_parse_dt(struct sm5714_fuelgauge_platform_data *pdata)
 	struct device_node *np = of_find_node_by_name(NULL, "battery");
 	int ret = 0, len = 0;
 	unsigned int i = 0;
-	bool age_data_by_common_offset = of_property_read_bool(np, "battery,age_data_by_common_offset");
+	bool age_data_by_offset = of_property_read_bool(np, "battery,age_data_by_offset");
 
-	pr_info("%s: age_data_by_common_offset is %s", __func__, (age_data_by_common_offset ? "true" : "false"));
+	pr_info("%s: age_data_by_offset is %s", __func__, (age_data_by_offset ? "true" : "false"));
 
-	if (age_data_by_common_offset) {
+	if (age_data_by_offset) {
 		char *age_data_soc_str = "battery,age_data_full_condition_soc";
+
 		len = of_property_count_u32_elems(np, age_data_soc_str);
 		if (len > 0) {
 			pdata->num_age_step = len;
@@ -3209,7 +3209,6 @@ static struct platform_driver sm5714_fuelgauge_driver = {
 
 static int __init sm5714_fuelgauge_init(void)
 {
-	printk(KERN_INFO "%s Initializing sm5714 fuelgauge driver\n", sec_detect_label);
 	pr_info("%s:\n", __func__);
 	return platform_driver_register(&sm5714_fuelgauge_driver);
 }

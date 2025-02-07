@@ -29,6 +29,8 @@
 #include <linux/string.h>
 
 #include <linux/muic/common/muic.h>
+
+#include <linux/mfd/sm/sm5714/sm5714_log.h>
 #if defined(CONFIG_SEC_FACTORY)
 #include <linux/mfd/sm/sm5714/sm5714-private.h>
 #endif
@@ -44,7 +46,7 @@
 #include <linux/usb/typec/manager/usb_typec_manager_notifier.h>
 #endif
 
-#if !defined(CONFIG_BATTERY_NOTIFIER)
+#if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
 #include <linux/battery/sec_pd.h>
 #endif
 #if defined(CONFIG_BATTERY_NOTIFIER)
@@ -53,7 +55,7 @@
 
 static void sm5714_muic_init_pdic_info_data(struct sm5714_muic_data *muic_data)
 {
-	pr_info("%s\n", __func__);
+	sm5714_info("%s\n", __func__);
 	muic_data->pdic_info_data.pdic_evt_rid = RID_OPEN;
 	muic_data->pdic_info_data.pdic_evt_rprd = 0;
 	muic_data->pdic_info_data.pdic_evt_roleswap = 0;
@@ -64,7 +66,7 @@ static void sm5714_muic_init_pdic_info_data(struct sm5714_muic_data *muic_data)
 
 static void sm5714_muic_handle_pdic_detach(struct sm5714_muic_data *muic_data)
 {
-	pr_info("%s\n", __func__);
+	sm5714_info("%s\n", __func__);
 	muic_data->pdic_info_data.pdic_evt_rprd = 0;
 	muic_data->pdic_info_data.pdic_evt_roleswap = 0;
 	muic_data->pdic_info_data.pdic_evt_dcdcnt = 0;
@@ -112,26 +114,26 @@ static int sm5714_muic_handle_pdic_ATTACH(struct sm5714_muic_data *muic_data,
 {
 	bool need_to_run_work = false;
 
-	pr_info("%s: src:%d dest:%d id:%d attach:%d cable_type:%d rprd:%d\n",
+	sm5714_info("%s: src:%d dest:%d id:%d attach:%d cable_type:%d rprd:%d\n",
 			__func__, pnoti->src, pnoti->dest, pnoti->id,
 			pnoti->attach, pnoti->cable_type, pnoti->rprd);
 
 	/* Attached */
 	if (pnoti->attach) {
-		pr_info("%s: Attach, cable type=%d\n", __func__,
+		sm5714_info("%s: Attach, cable type=%d\n", __func__,
 				pnoti->cable_type);
 
 		muic_data->pdic_info_data.pdic_evt_attached =
 			MUIC_PDIC_NOTI_ATTACH;
 
 		if (muic_data->pdic_info_data.pdic_evt_roleswap) {
-			pr_info("%s: roleswap event, attach USB\n", __func__);
+			sm5714_info("%s: roleswap event, attach USB\n", __func__);
 			muic_data->pdic_info_data.pdic_evt_roleswap = 0;
 			need_to_run_work = true;
 		}
 
 		if (pnoti->rprd) {
-			pr_info("%s: RPRD\n", __func__);
+			sm5714_info("%s: RPRD\n", __func__);
 			muic_data->pdic_info_data.pdic_evt_rprd = 1;
 			need_to_run_work = true;
 		}
@@ -153,7 +155,7 @@ static int sm5714_muic_handle_pdic_ATTACH(struct sm5714_muic_data *muic_data,
 	} else {
 		if (pnoti->rprd) {
 			/* Role swap detach: attached=0, rprd=1 */
-			pr_info("%s: role swap event\n", __func__);
+			sm5714_info("%s: role swap event\n", __func__);
 			muic_data->pdic_info_data.pdic_evt_roleswap = 1;
 		} else {
 			/* Detached */
@@ -172,7 +174,7 @@ static int sm5714_muic_handle_pdic_ATTACH(struct sm5714_muic_data *muic_data,
 
 	/* run muic event handler */
 	if (need_to_run_work) {
-		pr_info("%s: do workqueue\n", __func__);
+		sm5714_info("%s: do workqueue\n", __func__);
 		schedule_work(&(muic_data->muic_event_work));
 	}
 
@@ -198,12 +200,12 @@ static int sm5714_muic_handle_pdic_RID(struct sm5714_muic_data *muic_data,
 	int intr2 = 0;
 #endif
 
-	pr_info("%s: src:%d dest:%d id:%d rid:%d sub2:%d sub3:%d\n",
+	sm5714_info("%s: src:%d dest:%d id:%d rid:%d sub2:%d sub3:%d\n",
 			__func__, pnoti->src, pnoti->dest, pnoti->id,
 			pnoti->rid, pnoti->sub2, pnoti->sub3);
 
 	if (rid > RID_OPEN || rid <= RID_UNDEFINED) {
-		pr_info("%s: Out of range of RID(%d)\n", __func__, rid);
+		sm5714_info("%s: Out of range of RID(%d)\n", __func__, rid);
 		return 0;
 	}
 
@@ -218,7 +220,7 @@ static int sm5714_muic_handle_pdic_RID(struct sm5714_muic_data *muic_data,
 #if defined(CONFIG_SEC_FACTORY)
 		if (!muic_data->afc_irq_disabled) {
 			disable_irq(muic_data->irqs.irq_afc_ta_attached);
-			pr_info("%s: disable_irq (%d)\n", __func__,
+			sm5714_info("%s: disable_irq (%d)\n", __func__,
 					muic_data->irqs.irq_afc_ta_attached);
 			muic_data->afc_irq_disabled = true;
 		}
@@ -229,22 +231,22 @@ static int sm5714_muic_handle_pdic_RID(struct sm5714_muic_data *muic_data,
 		if (muic_data->afc_irq_disabled) {
 			intr2 = sm5714_i2c_read_byte(muic_data->i2c,
 					SM5714_MUIC_REG_INT2);
-			pr_info("%s: REG_INT2 (0x%x)\n", __func__, intr2);
+			sm5714_info("%s: REG_INT2 (0x%x)\n", __func__, intr2);
 
 			enable_irq(muic_data->irqs.irq_afc_ta_attached);
-			pr_info("%s: enable_irq (%d)\n", __func__,
+			sm5714_info("%s: enable_irq (%d)\n", __func__,
 					muic_data->irqs.irq_afc_ta_attached);
 			muic_data->afc_irq_disabled = false;
 		}
 #endif
 		break;
 	default:
-		pr_err("%s:Not determined now\n", __func__);
+		sm5714_err("%s:Not determined now\n", __func__);
 		break;
 	}
 
 	if ((prev_rid != rid) || (rid == RID_619K)) {
-		pr_info("%s: do workqueue\n", __func__);
+		sm5714_info("%s: do workqueue\n", __func__);
 		schedule_work(&(muic_data->muic_event_work));
 	}
 
@@ -254,17 +256,17 @@ static int sm5714_muic_handle_pdic_RID(struct sm5714_muic_data *muic_data,
 static int sm5714_muic_handle_pdic_WATER(struct sm5714_muic_data *muic_data,
 		PD_NOTI_ATTACH_TYPEDEF *pnoti)
 {
-	pr_info("%s: src:%d dest:%d id:%d attach:%d cable_type:%d rprd:%d\n",
+	sm5714_info("%s: src:%d dest:%d id:%d attach:%d cable_type:%d rprd:%d\n",
 			__func__, pnoti->src, pnoti->dest, pnoti->id,
 			pnoti->attach, pnoti->cable_type, pnoti->rprd);
 
 	if (pnoti->attach == PDIC_NOTIFY_ATTACH) {
 		muic_data->is_water_detect = true;
 		muic_set_hiccup_mode(0);
-		pr_info("%s: Water detect\n", __func__);
+		sm5714_info("%s: Water detect\n", __func__);
 	} else {
 		muic_data->is_water_detect = false;
-		pr_info("%s: Dry detect\n", __func__);
+		sm5714_info("%s: Dry detect\n", __func__);
 	}
 
 	return 0;
@@ -282,13 +284,13 @@ static int sm5714_muic_handle_pdic_notification(struct notifier_block *nb,
 			struct sm5714_muic_data, pdic_nb);
 #endif
 
-	pr_info("%s: action:%d src:%d dest:%d id:%d sub[%d %d %d]\n", __func__,
+	sm5714_info("%s: action:%d src:%d dest:%d id:%d sub[%d %d %d]\n", __func__,
 		(int)action, pnoti->src, pnoti->dest, pnoti->id,
 		pnoti->sub1, pnoti->sub2, pnoti->sub3);
 
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 	if (pnoti->dest != PDIC_NOTIFY_DEV_MUIC) {
-		pr_info("%s destination id is invalid\n", __func__);
+		sm5714_info("%s destination id is invalid\n", __func__);
 		return 0;
 	}
 #endif
@@ -296,23 +298,23 @@ static int sm5714_muic_handle_pdic_notification(struct notifier_block *nb,
 
 	switch (pnoti->id) {
 	case PDIC_NOTIFY_ID_ATTACH:
-		pr_info("%s: PDIC_NOTIFY_ID_ATTACH: %s\n", __func__,
+		sm5714_info("%s: PDIC_NOTIFY_ID_ATTACH: %s\n", __func__,
 				pnoti->sub1 ? "Attached" : "Detached");
 		sm5714_muic_handle_pdic_ATTACH(muic_data,
 				(PD_NOTI_ATTACH_TYPEDEF *)pnoti);
 		break;
 	case PDIC_NOTIFY_ID_RID:
-		pr_info("%s: PDIC_NOTIFY_ID_RID\n", __func__);
+		sm5714_info("%s: PDIC_NOTIFY_ID_RID\n", __func__);
 		sm5714_muic_handle_pdic_RID(muic_data,
 				(PD_NOTI_RID_TYPEDEF *)pnoti);
 		break;
 	case PDIC_NOTIFY_ID_WATER:
-		pr_info("%s: PDIC_NOTIFY_ID_WATER\n", __func__);
+		sm5714_info("%s: PDIC_NOTIFY_ID_WATER\n", __func__);
 		sm5714_muic_handle_pdic_WATER(muic_data,
 				(PD_NOTI_ATTACH_TYPEDEF *)pnoti);
 		break;
 	default:
-		pr_info("%s: Undefined Noti. ID\n", __func__);
+		sm5714_info("%s: Undefined Noti. ID\n", __func__);
 		return NOTIFY_DONE;
 	}
 
@@ -323,7 +325,7 @@ void sm5714_muic_register_pdic_notifier(struct sm5714_muic_data *muic_data)
 {
 	int ret = 0;
 
-	pr_info("%s: Registering PDIC_NOTIFY_DEV_MUIC.\n", __func__);
+	sm5714_info("%s: Registering PDIC_NOTIFY_DEV_MUIC.\n", __func__);
 
 	sm5714_muic_init_pdic_info_data(muic_data);
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
@@ -334,11 +336,11 @@ void sm5714_muic_register_pdic_notifier(struct sm5714_muic_data *muic_data)
 		sm5714_muic_handle_pdic_notification, PDIC_NOTIFY_DEV_MUIC);
 #endif
 	if (ret < 0) {
-		pr_info("%s: PDIC Noti. is not ready\n", __func__);
+		sm5714_info("%s: PDIC Noti. is not ready\n", __func__);
 		return;
 	}
 
-	pr_info("%s: done.\n", __func__);
+	sm5714_info("%s: done.\n", __func__);
 }
 
 void sm5714_muic_unregister_pdic_notifier(struct sm5714_muic_data *muic_data)
@@ -351,9 +353,9 @@ void sm5714_muic_unregister_pdic_notifier(struct sm5714_muic_data *muic_data)
 	ret = pdic_notifier_unregister(&muic_data->pdic_nb);
 #endif
 	if (ret < 0) {
-		pr_info("%s: PDIC Noti. is not ready\n", __func__);
+		sm5714_info("%s: PDIC Noti. is not ready\n", __func__);
 		return;
 	}
 
-	pr_info("%s: done.\n", __func__);
+	sm5714_info("%s: done.\n", __func__);
 }

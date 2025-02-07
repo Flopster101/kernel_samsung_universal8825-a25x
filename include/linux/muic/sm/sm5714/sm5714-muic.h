@@ -121,6 +121,9 @@
 #define MANUAL_SW_HICCUP	(0x4 << MANUAL_SW_DM_SHIFT \
 							| 0x4 << MANUAL_SW_DP_SHIFT)
 
+/* Additional W/A setting */
+#define SM5714_AFC_DP_RESET_LIMIT 1
+
 enum sm5714_reg_manual_sw_value {
 	MANSW_OPEN = (MANUAL_SW_OPEN),
 	MANSW_USB = (MANUAL_SW_USB),
@@ -304,7 +307,7 @@ struct sm5714_muic_data {
 	int vbus_changed_9to5;
 	int fled_torch_enable;
 	int fled_flash_enable;
-	int hv_voltage;
+	int afc_dp_reset_count;
 
 	struct delayed_work	afc_retry_work;
 	struct delayed_work	afc_torch_work;

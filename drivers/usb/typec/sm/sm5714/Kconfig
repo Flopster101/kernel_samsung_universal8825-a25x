@@ -57,3 +57,21 @@ config SM5714_DISABLE_PD
 	help
 	  If you say yes here you will get support for
 	  the Disable sm5714 PD OPS.
+
+config SM5714_CC_I2C_VERIFY
+	bool "Using SM5714_CC I2C panic"
+	depends on PDIC_SM5714
+	default n
+	help
+	  If you say yes here you will get support for
+	  the SM5714_CC_I2C_VERIFY.
+
+config SM5714_NORMAL_DRP
+	bool "Using Type-C Normal DRP mode"
+	depends on PDIC_SM5714
+	default n
+	help
+	  If you say yes here you will get support for
+	  the normal DRP mode in SM5714.
+	  The device will try to set both Source and Sink mode.
+	  This feature is in typec specificaion.

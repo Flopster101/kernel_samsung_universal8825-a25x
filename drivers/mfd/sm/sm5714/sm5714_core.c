@@ -19,6 +19,7 @@
 #include <linux/mutex.h>
 #include <linux/version.h>
 #include <linux/mfd/core.h>
+#include <linux/mfd/sm/sm5714/sm5714_log.h>
 #include <linux/mfd/sm/sm5714/sm5714.h>
 #include <linux/mfd/sm/sm5714/sm5714-private.h>
 #include <linux/regulator/machine.h>
@@ -58,7 +59,7 @@ int sm5714_read_reg(struct i2c_client *i2c, u8 reg, u8 *dest)
 		ret = i2c_smbus_read_byte_data(i2c, reg);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -88,7 +89,7 @@ int sm5714_bulk_read(struct i2c_client *i2c, u8 reg, int count, u8 *buf)
 		ret = i2c_smbus_read_i2c_block_data(i2c, reg, count, buf);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -117,7 +118,7 @@ int sm5714_read_word(struct i2c_client *i2c, u8 reg)
 		ret = i2c_smbus_read_word_data(i2c, reg);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -145,7 +146,7 @@ int sm5714_write_reg(struct i2c_client *i2c, u8 reg, u8 value)
 		ret = i2c_smbus_write_byte_data(i2c, reg, value);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -173,7 +174,7 @@ int sm5714_bulk_write(struct i2c_client *i2c, u8 reg, int count, u8 *buf)
 		ret = i2c_smbus_write_i2c_block_data(i2c, reg, count, buf);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -202,7 +203,7 @@ int sm5714_write_word(struct i2c_client *i2c, u8 reg, u16 value)
 		ret = i2c_smbus_write_word_data(i2c, reg, value);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	mutex_unlock(&sm5714->i2c_lock);
 	if (ret < 0) {
@@ -231,7 +232,7 @@ int sm5714_update_reg(struct i2c_client *i2c, u8 reg, u8 val, u8 mask)
 		ret = i2c_smbus_read_byte_data(i2c, reg);
 		if (ret >= 0)
 			break;
-		pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+		sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 	}
 	if (ret >= 0) {
 		u8 old_val = ret & 0xff;
@@ -240,7 +241,7 @@ int sm5714_update_reg(struct i2c_client *i2c, u8 reg, u8 val, u8 mask)
 			ret = i2c_smbus_write_byte_data(i2c, reg, new_val);
 			if (ret >= 0)
 				break;
-			pr_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
+			sm5714_info("%s:%s reg(0x%x), ret(%d)\n", MFD_DEV_NAME, __func__, reg, ret);
 		}
 	} else {
 #if defined(CONFIG_USB_HW_PARAM)
@@ -265,7 +266,7 @@ static int of_sm5714_dt(struct device *dev, struct sm5714_platform_data *pdata)
 	pdata->irq_gpio = of_get_named_gpio(np_sm5714, "sm5714,irq-gpio", 0);
 	pdata->wakeup = of_property_read_bool(np_sm5714, "sm5714,wakeup");
 
-	pr_info("%s: irq-gpio: %u \n", __func__, pdata->irq_gpio);
+	sm5714_info("%s: irq-gpio: %u \n", __func__, pdata->irq_gpio);
 
 	return 0;
 }
@@ -334,7 +335,7 @@ static int sm5714_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 
 		pdata->irq_base = irq_alloc_descs(-1, 0, SM5714_IRQ_NR, -1);
 		if (pdata->irq_base < 0) {
-			pr_err("%s:%s irq_alloc_descs Fail! ret(%d)\n",
+			sm5714_err("%s:%s irq_alloc_descs Fail! ret(%d)\n",
 				MFD_DEV_NAME, __func__, pdata->irq_base);
 			ret = -EINVAL;
 			goto err;
@@ -356,14 +357,14 @@ static int sm5714_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
     /* Get Device ID & Check Charger I2C transmission */
     ret = sm5714_read_reg(i2c, SM5714_CHG_REG_DEVICEID, &temp);
 	if (ret < 0 || (temp & 0x7) != 0x1) {
-		pr_err("%s:%s device not found on this channel (reg_data=0x%x)\n", MFD_DEV_NAME, __func__, temp);
+		sm5714_err("%s:%s device not found on this channel (reg_data=0x%x)\n", MFD_DEV_NAME, __func__, temp);
 		ret = -ENODEV;
 		goto err_w_lock;
 	}
     sm5714->vender_id = (temp & 0x7);
     sm5714->pmic_rev = ((temp >> 3) & 0x1F);
 
-    pr_info("%s:%s v_id=0x%x, rev=0x%x\n",
+    sm5714_info("%s:%s v_id=0x%x, rev=0x%x\n",
 		MFD_DEV_NAME, __func__, sm5714->vender_id, sm5714->pmic_rev);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)
 	sm5714->fuelgauge = i2c_new_dummy(i2c->adapter, SM5714_I2C_SADR_FG);
@@ -374,7 +375,7 @@ static int sm5714_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
     /* Check FG I2C transmission */
     ret = sm5714_read_word(sm5714->fuelgauge, SM5714_FG_REG_DEVICE_ID);
     if ((unsigned int)ret > 0xFF) {
-		pr_err("%s:%s fail to setup FG I2C transmission (ret=0x%x)\n", MFD_DEV_NAME, __func__, ret);
+		sm5714_err("%s:%s fail to setup FG I2C transmission (ret=0x%x)\n", MFD_DEV_NAME, __func__, ret);
 		ret = -ENODEV;
 		goto err_w_lock;
     }
@@ -387,7 +388,7 @@ static int sm5714_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
     /* Check MUIC I2C transmission */
     ret = sm5714_read_reg(sm5714->muic, SM5714_MUIC_REG_DeviceID, &temp);
 	if (ret < 0 || temp != 0x1) {
-		pr_err("%s:%s fail to setup MUIC I2C transmission (reg_data=0x%x)\n", MFD_DEV_NAME, __func__, temp);
+		sm5714_err("%s:%s fail to setup MUIC I2C transmission (reg_data=0x%x)\n", MFD_DEV_NAME, __func__, temp);
 		ret = -ENODEV;
 		goto err_w_lock;
 	}
@@ -402,7 +403,7 @@ static int sm5714_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 
 	device_init_wakeup(sm5714->dev, pdata->wakeup);
 
-    pr_info("%s: %s done\n", MFD_DEV_NAME, __func__);
+    sm5714_info("%s: %s done\n", MFD_DEV_NAME, __func__);
 
 	return ret;
 
@@ -419,8 +420,11 @@ err:
 
     return ret;
 }
-
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+static void sm5714_i2c_remove(struct i2c_client *i2c)
+#else
 static int sm5714_i2c_remove(struct i2c_client *i2c)
+#endif
 {
 	struct sm5714_dev *sm5714 = i2c_get_clientdata(i2c);
 
@@ -433,8 +437,9 @@ static int sm5714_i2c_remove(struct i2c_client *i2c)
     mutex_destroy(&sm5714->i2c_lock);
 
     kfree(sm5714);
-
-	return 0;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
+    return 0;
+#endif
 }
 
 static const struct i2c_device_id sm5714_i2c_id[] = {
@@ -475,7 +480,7 @@ static int sm5714_resume(struct device *dev)
 	struct sm5714_dev *sm5714 = i2c_get_clientdata(i2c);
 
 #if !defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
-	pr_info("%s:%s\n", MFD_DEV_NAME, __func__);
+	sm5714_info("%s:%s\n", MFD_DEV_NAME, __func__);
 #endif /* CONFIG_SAMSUNG_PRODUCT_SHIP */
 
 	sm5714->suspended =  false;
@@ -520,7 +525,7 @@ static struct i2c_driver sm5714_i2c_driver = {
 
 static int __init sm5714_i2c_init(void)
 {
-	pr_info("%s:%s\n", MFD_DEV_NAME, __func__);
+	sm5714_info("%s:%s\n", MFD_DEV_NAME, __func__);
 	return i2c_add_driver(&sm5714_i2c_driver);
 }
 /* init early so consumer devices can complete system boot */

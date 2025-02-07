@@ -74,7 +74,6 @@ struct sm5714_charger_oper_info {
 	unsigned char factory_RID;
 	int chg_float_voltage;
 	bool set_factory_619k;
-	bool set_fledon_buckoff_state;
 };
 static struct sm5714_charger_oper_info *oper_info;
 
@@ -200,20 +199,6 @@ static inline int change_op_table(unsigned char new_status)
 			(oper_info->factory_RID == RID_255K || oper_info->factory_RID == RID_523K)) {
 		pr_info("sm5714-charger: %s: skip Flash Boost mode for Factory JIG fled:flash test\n", __func__);
 	} else {
-		/* W/A : 
-		 * When operating a torch or flash in buck-off state, change to flash_boost mode instead of suspend mode. 
-		 */
-		if (oper_info->set_fledon_buckoff_state) {
-			if (i == oper_info->max_table_num - 1) {
-				if ( (new_status & (0x1 << SM5714_CHARGER_OP_EVENT_TORCH)) || 
-					 (new_status & (0x1 << SM5714_CHARGER_OP_EVENT_FLASH)) ) {
-					pr_info("sm5714-charger: %s: Set Flash Boost mode in buck-off status\n", __func__);
-					sm5714_charger_op_mode_table[i].oper_mode = OP_MODE_FLASH_BOOST;
-				} else {
-					sm5714_charger_op_mode_table[i].oper_mode = OP_MODE_SUSPEND;
-				}
-			}
-		}
 		set_OP_MODE(oper_info->i2c, sm5714_charger_op_mode_table[i].oper_mode);
 		oper_info->current_table.oper_mode = sm5714_charger_op_mode_table[i].oper_mode;
 	}
@@ -324,9 +309,6 @@ int sm5714_charger_oper_table_init(struct sm5714_dev *sm5714)
 		oper_info->set_factory_619k = of_property_read_bool(np, "battery,set_factory_619k");
 		pr_info("%s: battery,set_factory_619k %d\n", __func__,
 			oper_info->set_factory_619k);
-		oper_info->set_fledon_buckoff_state = of_property_read_bool(np, "battery,set_fledon_buckoff_state");
-		pr_info("%s: battery,set_fledon_buckoff_state %d\n", __func__,
-			oper_info->set_fledon_buckoff_state);
 	}
 
 	pr_info("%s: current table[%d] (STATUS: 0x%x, MODE: %d, BST_OUT: 0x%x, OTG_CURRENT: 0x%x)\n",

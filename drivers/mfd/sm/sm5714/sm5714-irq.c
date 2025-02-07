@@ -12,6 +12,7 @@
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/gpio.h>
+#include <linux/mfd/sm/sm5714/sm5714_log.h>
 #include <linux/mfd/sm/sm5714/sm5714.h>
 #include <linux/mfd/sm/sm5714/sm5714-private.h>
 
@@ -187,7 +188,7 @@ static irqreturn_t sm5714_irq_thread(int irq, void *data)
 						!sm5714->suspended,
 						msecs_to_jiffies(200));
 	if (!ret) {
-		pr_info("%s suspend_wait timeout\n", __func__);
+		sm5714_info("%s suspend_wait timeout\n", __func__);
 		__pm_relax(sm5714->irq_ws);
 
 		return IRQ_NONE;
@@ -195,9 +196,9 @@ static irqreturn_t sm5714_irq_thread(int irq, void *data)
 #endif
 
 	ret = sm5714_read_reg(sm5714->charger, SM5714_CHG_REG_INT_SOURCE, &irq_src);
-	pr_info("%s\n irq_src = %x", __func__, irq_src);
+	sm5714_info("%s\n irq_src = %x", __func__, irq_src);
 	if (ret) {
-		pr_err("%s:%s fail to read interrupt source: %d\n", MFD_DEV_NAME, __func__, ret);
+		sm5714_err("%s:%s fail to read interrupt source: %d\n", MFD_DEV_NAME, __func__, ret);
 #if defined(CONFIG_ARCH_QCOM) || defined(CONFIG_ARCH_MEDIATEK)
 		__pm_relax(sm5714->irq_ws);
 #endif
@@ -219,7 +220,7 @@ static irqreturn_t sm5714_irq_thread(int irq, void *data)
 	if (irq_src & SM5714_IRQSRC_CHG) {
 		ret = sm5714_bulk_read(sm5714->charger, SM5714_CHG_REG_INT1, SM5714_NUM_IRQ_CHG_REGS, &irq_reg[CHG_INT1]);
 		if (ret) {
-			pr_err("%s:%s fail to read CHG_INT source: %d\n", MFD_DEV_NAME, __func__, ret);
+			sm5714_err("%s:%s fail to read CHG_INT source: %d\n", MFD_DEV_NAME, __func__, ret);
 #if defined(CONFIG_ARCH_QCOM) || defined(CONFIG_ARCH_MEDIATEK)
 			__pm_relax(sm5714->irq_ws);
 #endif
@@ -233,9 +234,9 @@ static irqreturn_t sm5714_irq_thread(int irq, void *data)
 	/* MUIC INT 1 ~ 2 */
 	if (irq_src & SM5714_IRQSRC_MUIC) {
 		ret = sm5714_bulk_read(sm5714->muic, SM5714_MUIC_REG_INT1, SM5714_NUM_IRQ_MUIC_REGS, &irq_reg[MUIC_INT1]);
-		pr_info ("%s:%s MUIC_INT1 = 0x%x, MUIC_INT2 = 0x%x\n", MFD_DEV_NAME, __func__, irq_reg[MUIC_INT1], irq_reg[MUIC_INT2]);
+		sm5714_info ("%s:%s MUIC_INT1 = 0x%x, MUIC_INT2 = 0x%x\n", MFD_DEV_NAME, __func__, irq_reg[MUIC_INT1], irq_reg[MUIC_INT2]);
 		if (ret) {
-			pr_err("%s:%s fail to read MUIC_INT source: %d\n", MFD_DEV_NAME, __func__, ret);
+			sm5714_err("%s:%s fail to read MUIC_INT source: %d\n", MFD_DEV_NAME, __func__, ret);
 #if defined(CONFIG_ARCH_QCOM) || defined(CONFIG_ARCH_MEDIATEK)
 			__pm_relax(sm5714->irq_ws);
 #endif
@@ -258,7 +259,7 @@ static irqreturn_t sm5714_irq_thread(int irq, void *data)
 		sm5714->irq_masks_cur[FG_INT] &= ~(1 << 7);
 		sm5714_write_word(sm5714->fuelgauge, sm5714_mask_reg[FG_INT], sm5714->irq_masks_cur[FG_INT]);
 
-		pr_info("%s:%s FG_INT = 0x%x\n", MFD_DEV_NAME, __func__, irq_reg[FG_INT]);
+		sm5714_info("%s:%s FG_INT = 0x%x\n", MFD_DEV_NAME, __func__, irq_reg[FG_INT]);
 	}
 
 	/* Apply masking */
@@ -299,7 +300,7 @@ int sm5714_irq_init(struct sm5714_dev *sm5714)
 	mutex_init(&sm5714->irqlock);
 
 	sm5714->irq = gpio_to_irq(sm5714->irq_gpio);
-	pr_err("%s:%s irq=%d, irq->gpio=%d\n", MFD_DEV_NAME, __func__,
+	sm5714_err("%s:%s irq=%d, irq->gpio=%d\n", MFD_DEV_NAME, __func__,
 			sm5714->irq, sm5714->irq_gpio);
 
 	ret = gpio_request(sm5714->irq_gpio, "if_pmic_irq");
