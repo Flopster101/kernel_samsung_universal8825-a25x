@@ -25,10 +25,10 @@
 #include <linux/uaccess.h>
 #include <linux/regulator/consumer.h>
 #include <linux/delay.h>
-#include "../../../sec_input/sec_input.h"
+#include "../../../sec_input_legacy/sec_input.h"
 #include "nt36xxx_mem_map.h"
 #if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)
-#include "../../../sec_input/sec_secure_touch.h"
+#include "../../../sec_input_legacy/sec_secure_touch.h"
 #include <linux/atomic.h>
 #include <linux/clk.h>
 #include <linux/pm_runtime.h>
