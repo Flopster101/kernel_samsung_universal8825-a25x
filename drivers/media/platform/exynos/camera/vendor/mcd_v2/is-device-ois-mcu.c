@@ -1480,50 +1480,53 @@ void is_mcu_fw_update_ois(struct is_core *core)
 
 	ret = is_mcu_fw_version(subdev);
 	if (ret) {
-#ifdef CONFIG_CHECK_HW_VERSION_FOR_MCU_FW_UPLOAD
-		int isUpload = 0;
+//#ifdef CONFIG_CHECK_HW_VERSION_FOR_MCU_FW_UPLOAD
+		if (mcd_config_check_hw_version_for_mcu_fw_upload) {
+			int isUpload = 0;
 
-		if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu))
-			isUpload = 1;
+			if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu))
+				isUpload = 1;
 
-		info("HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
-			mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
-			mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
-
-		vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
-		vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
-
-		if (vdrinfo_bin > vdrinfo_mcu)
-			isUpload = 1;
-
-		info("VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
-			mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
-			mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
-
-		if (isUpload)
-			info("Update MCU firmware!!");
-		else {
-			info("Do not update MCU firmware");
-			goto p_err;
-		}
-#else
-		if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu)) {
-			info("Do not update MCU firmware. HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
+			info("HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
 				mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
 				mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
-			goto p_err;
-		}
 
-		vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
-		vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
+			vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
+			vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
 
-		if (vdrinfo_bin <= vdrinfo_mcu) {
-			info("Do not update MCU firmware. VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
+			if (vdrinfo_bin > vdrinfo_mcu)
+				isUpload = 1;
+
+			info("VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
 				mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
 				mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
-			goto p_err;
+
+			if (isUpload)
+				info("Update MCU firmware!!");
+			else {
+				info("Do not update MCU firmware");
+				goto p_err;
+			}
+//#else
+		} else {
+			if (!is_mcu_version_compare(mcu->hw_bin, mcu->hw_mcu)) {
+				info("Do not update MCU firmware. HW binary ver = %c%c%c%c, module ver = %c%c%c%c",
+					mcu->hw_bin[0], mcu->hw_bin[1], mcu->hw_bin[2], mcu->hw_bin[3],
+					mcu->hw_mcu[0], mcu->hw_mcu[1], mcu->hw_mcu[2], mcu->hw_mcu[3]);
+				goto p_err;
+			}
+
+			vdrinfo_bin = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_bin);
+			vdrinfo_mcu = is_mcu_fw_revision_vdrinfo(mcu->vdrinfo_mcu);
+
+			if (vdrinfo_bin <= vdrinfo_mcu) {
+				info("Do not update MCU firmware. VDRINFO binary ver = %c%c%c%c, module ver = %c%c%c%c",
+					mcu->vdrinfo_bin[0], mcu->vdrinfo_bin[1], mcu->vdrinfo_bin[2], mcu->vdrinfo_bin[3],
+					mcu->vdrinfo_mcu[0], mcu->vdrinfo_mcu[1], mcu->vdrinfo_mcu[2], mcu->vdrinfo_mcu[3]);
+				goto p_err;
+			}
+//#endif
 		}
-#endif
 	}
 
 	msleep(50);
