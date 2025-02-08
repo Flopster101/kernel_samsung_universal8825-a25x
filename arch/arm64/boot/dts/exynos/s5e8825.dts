@@ -4460,7 +4460,7 @@
 		g3d_genpd_name = "pd-g3d";
 		#cooling-cells = <0x02>;
 		governor = "interactive";
-		interactive_info = <0x7bc78 0x46 0x00>;
+		interactive_info = <0x62638 0x55 0x00>;
 		gpu_dvfs_table_size = <0x09 0x08>; /* <row col> */
 		/* 8 columns:     freq      down   up   stay    mif      little  middle big */
 		gpu_dvfs_table = <0xdafe8   0x4e  0x64  0x05  0x1b5fd0  0x101d00  0x00  0x00
