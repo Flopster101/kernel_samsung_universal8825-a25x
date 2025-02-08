@@ -102,7 +102,7 @@ asm-arch := armv8.5-a
 endif
 
 ifdef asm-arch
-KBUILD_CFLAGS	+= -Wa,-march=$(asm-arch) \
+KBUILD_CFLAGS	+= -Wa,-march=$(asm-arch)+crypto \
 		   -DARM64_ASM_ARCH='"$(asm-arch)"'
 endif
 
