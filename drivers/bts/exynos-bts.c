@@ -181,13 +181,13 @@ int bts_update_bw(unsigned int index, struct bts_bw bw)
 		return -EINVAL;
 	}
 
-	mutex_lock(&btsdev->mutex_lock);
+	rt_mutex_lock(&btsdev->mutex_lock);
 	btsdev->bts_bw[index].peak = bw.peak;
 	btsdev->bts_bw[index].read = bw.read;
 	btsdev->bts_bw[index].write = bw.write;
 
 	bts_calc_bw();
-	mutex_unlock(&btsdev->mutex_lock);
+	rt_mutex_unlock(&btsdev->mutex_lock);
 
 	return 0;
 }
@@ -1483,7 +1483,7 @@ static int bts_probe(struct platform_device *pdev)
 			devm_kfree(btsdev->dev, btsdev);
 			return ret;
 		}
-		mutex_init(&btsdev->mutex_lock);
+		rt_mutex_init(&btsdev->mutex_lock);
 		INIT_LIST_HEAD(&btsdev->scen_node);
 
 		ret = bts_initialize(btsdev);
