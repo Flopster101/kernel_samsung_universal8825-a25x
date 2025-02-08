@@ -855,7 +855,7 @@ KBUILD_CPPFLAGS += -Qunused-arguments
 KBUILD_CFLAGS += -Wno-format-invalid-specifier
 KBUILD_CFLAGS += -Wno-gnu
 ifeq ($(CONFIG_ARCH_EXYNOS), y)
-KBUILD_CFLAGS  += -mcpu=cortex-a55+crypto -mtune=cortex-a55
+KBUILD_CFLAGS += -mcpu=cortex-a78+crypto -mtune=cortex-a78
 endif
 # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
 # source of a reference will be _MergedGlobals and not on of the whitelisted names.
