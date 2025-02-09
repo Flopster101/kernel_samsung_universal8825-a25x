@@ -28,26 +28,21 @@
 #include <linux/version.h>
 
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
-#include <linux/usb/typec/slsi/common/usbpd_ext.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
-#include <linux/usb/typec/slsi/common/usbpd.h>
-#include <linux/usb/typec/slsi/common/usbpd_log.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd.h>
 
-// #if IS_ENABLED(CONFIG_PDIC_S2MU004)
-// #include <linux/usb/typec/slsi/s2mu004/usbpd-s2mu004.h>
-// #elif IS_ENABLED(CONFIG_PDIC_S2MU106)
-// #include <linux/usb/typec/slsi/s2mu106/usbpd-s2mu106.h>
-// #elif IS_ENABLED(CONFIG_PDIC_S2MU205)
-// #include <linux/usb/typec/slsi/s2mu205/usbpd-s2mu205.h>
-// #elif IS_ENABLED(CONFIG_PDIC_S2MU107)
-// #include <linux/usb/typec/slsi/s2mu107/usbpd-s2mu107.h>
-// #elif IS_ENABLED(CONFIG_PDIC_S2MF301)
-// #include <linux/usb/typec/slsi/s2mf301/usbpd-s2mf301.h>
-// #endif
-
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+#include <linux/usb/typec/slsi_legacy/s2mu004/usbpd-s2mu004.h>
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
 #include <linux/usb/typec/slsi_legacy/s2mu106/usbpd-s2mu106.h>
-#include <linux/usb/typec/slsi/s2mf301/usbpd-s2mf301.h>
-#include <linux/sec_detect.h>
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+#include <linux/usb/typec/slsi_legacy/s2mu205/usbpd-s2mu205.h>
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+#include <linux/usb/typec/slsi_legacy/s2mu107/usbpd-s2mu107.h>
+#elif IS_ENABLED(CONFIG_PDIC_S2MF301)
+#include <linux/usb/typec/slsi_legacy/s2mf301/usbpd-s2mf301.h>
+#endif
 
 #if IS_ENABLED(CONFIG_SUPPORT_USB_TYPEC_OPS)
 static int typec_dr_set(struct typec_port *_port, enum typec_data_role role);
@@ -70,14 +65,14 @@ static void pdic_event_notifier(struct work_struct *data)
 
 	switch (event_work->dest) {
 	case PDIC_NOTIFY_DEV_USB:
-		usbpd_info("usb:%s, dest=%s, id=%s, attach=%s, drp=%s\n", __func__,
+		pr_info("usb:%s, dest=%s, id=%s, attach=%s, drp=%s\n", __func__,
 				pdic_event_dest_string(event_work->dest),
 				pdic_event_id_string(event_work->id),
 				event_work->attach ? "Attached" : "Detached",
 				pdic_usbstatus_string(event_work->event));
 		break;
 	default:
-		usbpd_info("usb:%s, dest=%s, id=%s, attach=%d, event=%d\n", __func__,
+		pr_info("usb:%s, dest=%s, id=%s, attach=%d, event=%d\n", __func__,
 			pdic_event_dest_string(event_work->dest),
 			pdic_event_id_string(event_work->id),
 			event_work->attach,
@@ -92,14 +87,14 @@ static void pdic_event_notifier(struct work_struct *data)
 	pdic_noti.sub2 = event_work->event;
 	pdic_noti.sub3 = event_work->sub;
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	pdic_noti.pd = &g_pd_data->pd_noti;
+	pdic_noti.pd = &legacy_g_pd_data->pd_noti;
 #endif
 	pdic_notifier_notify((PD_NOTI_TYPEDEF *)&pdic_noti, NULL, 0);
 
 	kfree(event_work);
 }
 
-void pdic_event_work(void *data, int dest, int id, int attach, int event, int sub)
+void legacy_pdic_event_work(void *data, int dest, int id, int attach, int event, int sub)
 {
 	struct usbpd_data *pd_data = data;
 	struct pdic_state_work *event_work;
@@ -109,10 +104,11 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 #endif
 
 	event_work = kmalloc(sizeof(struct pdic_state_work), GFP_ATOMIC);
-	if (!event_work)
+	if (!event_work) {
+		pr_info("usb: %s,event_work is null", __func__);
 		return;
-
-	usbpd_info("usb: %s,event_work\n", __func__);
+	}
+	pr_info("usb: %s,event_work\n", __func__);
 	INIT_WORK(&event_work->pdic_work, pdic_event_notifier);
 
 	event_work->dest = dest;
@@ -123,7 +119,7 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 
 #if defined(CONFIG_DUAL_ROLE_USB_INTF)
 	if (id == PDIC_NOTIFY_ID_USB) {
-		usbpd_info("khos usb: %s, dest=%d, event=%d, sub=%d, usbpd_data->data_role_dual=%d, usbpd_data->try_state_change=%d\n",
+		pr_info("khos usb: %s, dest=%d, event=%d, sub=%d, usbpd_data->data_role_dual=%d, usbpd_data->try_state_change=%d\n",
 			__func__, dest, event, sub, usbpd_data->data_role_dual, usbpd_data->try_state_change);
 
 		usbpd_data->data_role_dual = event;
@@ -134,7 +130,7 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 		if (usbpd_data->try_state_change &&
 			(usbpd_data->data_role_dual != USB_STATUS_NOTIFY_DETACH)) {
 			/* Role change try and new mode detected */
-			usbpd_info("usb: %s, reverse_completion\n", __func__);
+			pr_info("usb: %s, reverse_completion\n", __func__);
 			complete(&usbpd_data->reverse_completion);
 		}
 	}
@@ -147,7 +143,7 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 		if (pd_data->typec_try_state_change &&
 			(event != USB_STATUS_NOTIFY_DETACH)) {
 			// Role change try and new mode detected
-			usbpd_info("usb: %s, role_reverse_completion\n", __func__);
+			pr_info("usb: %s, role_reverse_completion\n", __func__);
 			complete(&pd_data->role_reverse_completion);
 		}
 		if (event == USB_STATUS_NOTIFY_ATTACH_UFP) {
@@ -177,11 +173,11 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 #endif
 
 	if (queue_work(pd_data->pdic_wq, &event_work->pdic_work) == 0) {
-		usbpd_info("usb: %s, event_work is dropped\n", __func__);
+		pr_info("usb: %s, event_work is dropped\n", __func__);
 		kfree(event_work);
 	}
 }
-EXPORT_SYMBOL(pdic_event_work);
+EXPORT_SYMBOL(legacy_pdic_event_work);
 #endif
 
 #if defined(CONFIG_DUAL_ROLE_USB_INTF)
@@ -194,71 +190,59 @@ static enum dual_role_property fusb_drp_properties[] = {
 
 void role_swap_check(struct work_struct *wk)
 {
-	struct delayed_work *delay_work = container_of(wk, struct delayed_work, work);
-	struct s2mu106_usbpd_data *u106_usbpd_data = NULL;
-	struct s2mf301_usbpd_data *f301_usbpd_data = NULL;
-	struct usbpd_data *usbpd_data = NULL;
+	struct delayed_work *delay_work =
+		container_of(wk, struct delayed_work, work);
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+	struct s2mu004_usbpd_data *usbpd_data =
+		container_of(delay_work, struct s2mu004_usbpd_data, role_swap_work);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
+	struct s2mu106_usbpd_data *usbpd_data =
+		container_of(delay_work, struct s2mu106_usbpd_data, role_swap_work);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+	struct s2mu205_usbpd_data *usbpd_data =
+		container_of(delay_work, struct s2mu205_usbpd_data, role_swap_work);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+	struct s2mu107_usbpd_data *usbpd_data =
+		container_of(delay_work, struct s2mu107_usbpd_data, role_swap_work);
+#endif
 	int mode = 0;
 
-	usbpd_info("%s: pdic_set_dual_role check again.\n", __func__);
-
-#if IS_ENABLED(CONFIG_PDIC_S2MU106)
-	if (sec_current_device == SEC_A33) {
-		u106_usbpd_data = container_of(delay_work, struct s2mu106_usbpd_data, role_swap_work);
-		usbpd_data = &u106_usbpd_data->pd_data;
-	}
-#endif
-#if IS_ENABLED(CONFIG_PDIC_S2MF301)
-	if (sec_current_device == SEC_A25) {
-		f301_usbpd_data = container_of(delay_work, struct s2mf301_usbpd_data, role_swap_work);
-		usbpd_data = &f301_usbpd_data->pd_data;
-	}
-#endif
-
-	if (!usbpd_data) {
-		usbpd_err("%s: Unsupported device.\n", __func__);
-		return;
-	}
-
+	pr_info("%s: pdic_set_dual_role check again.\n", __func__);
 	usbpd_data->try_state_change = 0;
 
-	if (usbpd_data->detach_valid) {
-		usbpd_err("%s: pdic_set_dual_role reverse failed, set mode to DRP\n", __func__);
-		PDIC_OPS_PARAM_FUNC(irq_control, usbpd_data, 0);
-		mode = TYPE_C_ATTACH_DRP;
+	if (usbpd_data->detach_valid) { /* modify here using pd_state */
+		pr_err("%s: pdic_set_dual_role reverse failed, set mode to DRP\n", __func__);
+		PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
+		/* exit from Disabled state and set mode to DRP */
+		mode =  TYPE_C_ATTACH_DRP;
+
 		PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, mode);
-		PDIC_OPS_PARAM_FUNC(irq_control, usbpd_data, 1);
+		PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 1);
 	}
 }
 
 static int pdic_set_dual_role(struct dual_role_phy_instance *dual_role,
-							  enum dual_role_property prop,
-							  const unsigned int *val)
+				   enum dual_role_property prop,
+				   const unsigned int *val)
 {
-	struct s2mu106_usbpd_data *usbpd_data_106 = NULL;
-	struct s2mf301_usbpd_data *usbpd_data_301 = NULL;
-	struct usbpd_data *usbpd_data = NULL;
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+	struct s2mu004_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
+	struct s2mu106_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+	struct s2mu205_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+	struct s2mu107_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#endif
 	struct i2c_client *i2c;
+
 	USB_STATUS attached_state;
 	int mode;
 	int timeout = 0;
 	int ret = 0;
 
-#if IS_ENABLED(CONFIG_PDIC_S2MU106)
-	if (sec_current_device == SEC_A33) {
-		usbpd_data_106 = dual_role_get_drvdata(dual_role);
-		usbpd_data = &usbpd_data_106->pd_data;
-	}
-#endif
-#if IS_ENABLED(CONFIG_PDIC_S2MF301)
-	if (sec_current_device == SEC_A25) {
-		usbpd_data_301 = dual_role_get_drvdata(dual_role);
-		usbpd_data = &usbpd_data_301->pd_data;
-	}
-#endif
-
 	if (!usbpd_data) {
-		usbpd_err("%s : usbpd_data is null\n", __func__);
+		pr_err("%s : usbpd_data is null \n", __func__);
 		return -EINVAL;
 	}
 
@@ -266,69 +250,70 @@ static int pdic_set_dual_role(struct dual_role_phy_instance *dual_role,
 
 	/* Get Current Role */
 	attached_state = usbpd_data->data_role_dual;
-	usbpd_info("%s : request prop = %d , attached_state = %d\n", __func__, prop, attached_state);
+	pr_info("%s : request prop = %d , attached_state = %d\n", __func__, prop, attached_state);
 
 	if (attached_state != USB_STATUS_NOTIFY_ATTACH_DFP
-		&& attached_state != USB_STATUS_NOTIFY_ATTACH_UFP) {
-		usbpd_err("%s : current mode : %d - just return\n", __func__, attached_state);
+	    && attached_state != USB_STATUS_NOTIFY_ATTACH_UFP) {
+		pr_err("%s : current mode : %d - just return \n", __func__, attached_state);
 		return 0;
 	}
 
 	if (attached_state == USB_STATUS_NOTIFY_ATTACH_DFP
-		&& *val == DUAL_ROLE_PROP_MODE_DFP) {
-		usbpd_err("%s : current mode : %d - request mode : %d just return\n",
-				  __func__, attached_state, *val);
+	    && *val == DUAL_ROLE_PROP_MODE_DFP) {
+		pr_err("%s : current mode : %d - request mode : %d just return \n",
+			__func__, attached_state, *val);
 		return 0;
 	}
 
 	if (attached_state == USB_STATUS_NOTIFY_ATTACH_UFP
-		&& *val == DUAL_ROLE_PROP_MODE_UFP) {
-		usbpd_err("%s : current mode : %d - request mode : %d just return\n",
-				  __func__, attached_state, *val);
+	    && *val == DUAL_ROLE_PROP_MODE_UFP) {
+		pr_err("%s : current mode : %d - request mode : %d just return \n",
+			__func__, attached_state, *val);
 		return 0;
 	}
 
 	if (attached_state == USB_STATUS_NOTIFY_ATTACH_DFP) {
-		/* Current mode DFP and Source */
-		usbpd_info("%s: try reversing, from Source to Sink\n", __func__);
-		usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
+		/* Current mode DFP and Source  */
+		pr_info("%s: try reversing, from Source to Sink\n", __func__);
+		legacy_usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
 #if defined(CONFIG_MUIC_SUPPORT_PDIC_OTG_CTRL)
 		muic_disable_otg_detect();
 #endif
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 		/* muic */
-		pdic_event_work(usbpd_data,
-						PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH, 0 /*attach*/, 0 /*rprd*/, 0);
+		legacy_pdic_event_work(usbpd_data,
+			PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH, 0/*attach*/, 0/*rprd*/, 0);
 #endif
 		/* exit from Disabled state and set mode to UFP */
-		mode = TYPE_C_ATTACH_UFP;
+		mode =  TYPE_C_ATTACH_UFP;
 		usbpd_data->try_state_change = TYPE_C_ATTACH_UFP;
 		PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, TYPE_C_ATTACH_UFP);
 	} else {
-		/* Current mode UFP and Sink */
-		usbpd_info("%s: try reversing, from Sink to Source\n", __func__);
+		/* Current mode UFP and Sink  */
+		pr_info("%s: try reversing, from Sink to Source\n", __func__);
 		/* exit from Disabled state and set mode to UFP */
-		mode = TYPE_C_ATTACH_DFP;
+		mode =  TYPE_C_ATTACH_DFP;
 		usbpd_data->try_state_change = TYPE_C_ATTACH_DFP;
 		PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, TYPE_C_ATTACH_DFP);
 	}
 
 	reinit_completion(&usbpd_data->reverse_completion);
 	timeout =
-		wait_for_completion_timeout(&usbpd_data->reverse_completion,
-									msecs_to_jiffies(DUAL_ROLE_SET_MODE_WAIT_MS));
+	    wait_for_completion_timeout(&usbpd_data->reverse_completion,
+					msecs_to_jiffies
+					(DUAL_ROLE_SET_MODE_WAIT_MS));
 
 	if (!timeout) {
 		usbpd_data->try_state_change = 0;
-		usbpd_err("%s: reverse failed, set mode to DRP\n", __func__);
+		pr_err("%s: reverse failed, set mode to DRP\n", __func__);
 		PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
 		/* exit from Disabled state and set mode to DRP */
-		mode = TYPE_C_ATTACH_DRP;
+		mode =  TYPE_C_ATTACH_DRP;
 		PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, mode);
 		PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 2);
 		ret = -EIO;
 	} else {
-		usbpd_err("%s: reverse success, one more check\n", __func__);
+		pr_err("%s: reverse success, one more check\n", __func__);
 		schedule_delayed_work(&usbpd_data->role_swap_work, msecs_to_jiffies(DUAL_ROLE_SET_MODE_WAIT_MS));
 	}
 
@@ -348,38 +333,31 @@ int dual_role_is_writeable(struct dual_role_phy_instance *drp,
 
 /* Callback for "cat /sys/class/dual_role_usb/otg_default/<property>" */
 int dual_role_get_local_prop(struct dual_role_phy_instance *dual_role,
-							 enum dual_role_property prop,
-							 unsigned int *val)
+				    enum dual_role_property prop,
+				    unsigned int *val)
 {
-	struct s2mu106_usbpd_data *usbpd_data_106 = NULL;
-	struct s2mf301_usbpd_data *usbpd_data_301 = NULL;
-	struct usbpd_data *usbpd_data = NULL;
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+	struct s2mu004_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
+	struct s2mu106_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+	struct s2mu205_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+	struct s2mu107_usbpd_data *usbpd_data = dual_role_get_drvdata(dual_role);
+#endif
+
 	USB_STATUS attached_state;
 	int power_role_dual;
 
-#if IS_ENABLED(CONFIG_PDIC_S2MU106)
-	if (sec_current_device == SEC_A33) {
-		usbpd_data_106 = dual_role_get_drvdata(dual_role);
-		usbpd_data = &usbpd_data_106->pd_data;
-	}
-#endif
-#if IS_ENABLED(CONFIG_PDIC_S2MF301)
-	if (sec_current_device == SEC_A25) {
-		usbpd_data_301 = dual_role_get_drvdata(dual_role);
-		usbpd_data = &usbpd_data_301->pd_data;
-	}
-#endif
-
 	if (!usbpd_data) {
-		usbpd_err("%s : usbpd_data is null : request prop = %d\n", __func__, prop);
+		pr_err("%s : usbpd_data is null : request prop = %d \n", __func__, prop);
 		return -EINVAL;
 	}
-
 	attached_state = usbpd_data->data_role_dual;
 	power_role_dual = usbpd_data->power_role_dual;
 
-	usbpd_info("%s : request prop = %d , attached_state = %d, power_role_dual = %d\n",
-			   __func__, prop, attached_state, power_role_dual);
+	pr_info("%s : request prop = %d , attached_state = %d, power_role_dual = %d\n",
+		__func__, prop, attached_state, power_role_dual);
 
 	if (prop == DUAL_ROLE_PROP_VCONN_SUPPLY) {
 		if (usbpd_data->vconn_en)
@@ -434,7 +412,7 @@ int dual_role_set_prop(struct dual_role_phy_instance *dual_role,
 			      enum dual_role_property prop,
 			      const unsigned int *val)
 {
-	usbpd_info("%s : request prop = %d , *val = %d\n", __func__, prop, *val);
+	pr_info("%s : request prop = %d , *val = %d \n", __func__, prop, *val);
 	if (prop == DUAL_ROLE_PROP_MODE)
 		return pdic_set_dual_role(dual_role, prop, val);
 	else
@@ -443,33 +421,22 @@ int dual_role_set_prop(struct dual_role_phy_instance *dual_role,
 
 int dual_role_init(void *_data)
 {
-	struct s2mu106_usbpd_data *pdic_data_106 = NULL;
-	struct s2mf301_usbpd_data *pdic_data_301 = NULL;
-	struct usbpd_data *pdic_data = NULL;
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+	struct s2mu004_usbpd_data *pdic_data = _data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
+	struct s2mu106_usbpd_data *pdic_data = _data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+	struct s2mu205_usbpd_data *pdic_data = _data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+	struct s2mu107_usbpd_data *pdic_data = _data;
+#endif
 	struct dual_role_phy_desc *desc;
 	struct dual_role_phy_instance *dual_role;
 
-#if IS_ENABLED(CONFIG_PDIC_S2MU106)
-	if (sec_current_device == SEC_A33) {
-		pdic_data_106 = _data;
-		pdic_data = &pdic_data_106->pd_data;
-	}
-#endif
-#if IS_ENABLED(CONFIG_PDIC_S2MF301)
-	if (sec_current_device == SEC_A25) {
-		pdic_data_301 = _data;
-		pdic_data = &pdic_data_301->pd_data;
-	}
-#endif
-
-	if (!pdic_data) {
-		usbpd_err("unable to allocate dual role descriptor\n");
-		return -1;
-	}
-
-	desc = devm_kzalloc(pdic_data->dev, sizeof(struct dual_role_phy_desc), GFP_KERNEL);
+	desc = devm_kzalloc(pdic_data->dev,
+			 sizeof(struct dual_role_phy_desc), GFP_KERNEL);
 	if (!desc) {
-		usbpd_err("unable to allocate dual role descriptor\n");
+		pr_err("unable to allocate dual role descriptor\n");
 		return -1;
 	}
 
@@ -480,7 +447,8 @@ int dual_role_init(void *_data)
 	desc->properties = fusb_drp_properties;
 	desc->num_properties = ARRAY_SIZE(fusb_drp_properties);
 	desc->property_is_writeable = dual_role_is_writeable;
-	dual_role = devm_dual_role_instance_register(pdic_data->dev, desc);
+	dual_role =
+		devm_dual_role_instance_register(pdic_data->dev, desc);
 	dual_role->drv_data = pdic_data;
 	pdic_data->dual_role = dual_role;
 	pdic_data->desc = desc;
@@ -497,11 +465,11 @@ void typec_role_swap_check(struct work_struct *wk)
 	struct usbpd_data *pd_data =
 		container_of(delay_work, struct usbpd_data, typec_role_swap_work);
 
-	usbpd_info("%s: pdic_set_dual_role check again.\n", __func__);
+	pr_info("%s: pdic_set_dual_role check again.\n", __func__);
 	pd_data->typec_try_state_change = 0;
 
 	if (PDIC_OPS_FUNC(get_detach_valid, pd_data)) { /* modify here using pd_state */
-		usbpd_err("%s: pdic_set_dual_role reverse failed, set mode to DRP\n", __func__);
+		pr_err("%s: pdic_set_dual_role reverse failed, set mode to DRP\n", __func__);
 		PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
 		/* exit from Disabled state and set mode to DRP */
 		PDIC_OPS_PARAM_FUNC(rprd_mode_change, pd_data->phy_driver_data, TYPE_C_ATTACH_DRP);
@@ -518,89 +486,75 @@ int typec_port_type_set(const struct typec_capability *cap, enum typec_port_type
 {
 	struct usbpd_data *pd_data = container_of(cap, struct usbpd_data, typec_cap);
 #endif
-	struct s2mu106_usbpd_data *usbpd_data_106 = NULL;
-	struct s2mf301_usbpd_data *usbpd_data_301 = NULL;
-	int timeout = 0;
 
 	if (!pd_data) {
-		usbpd_err("%s : pd_data is null\n", __func__);
+		pr_err("%s : pd_data is null\n", __func__);
 		return -EINVAL;
-	}
-
-#if IS_ENABLED(CONFIG_PDIC_S2MU106)
-	if (sec_current_device == SEC_A33) {
-		usbpd_data_106 = (struct s2mu106_usbpd_data *)pd_data->phy_driver_data;
-	}
+	} else {
+#if IS_ENABLED(CONFIG_PDIC_S2MU004)
+		struct s2mu004_usbpd_data *usbpd_data = (struct s2mu004_usbpd_data *)pd_data->phy_driver_data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU106)
+		struct s2mu106_usbpd_data *usbpd_data = (struct s2mu106_usbpd_data *)pd_data->phy_driver_data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU205)
+		struct s2mu205_usbpd_data *usbpd_data = (struct s2mu205_usbpd_data *)pd_data->phy_driver_data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MU107)
+		struct s2mu107_usbpd_data *usbpd_data = (struct s2mu107_usbpd_data *)pd_data->phy_driver_data;
+#elif IS_ENABLED(CONFIG_PDIC_S2MF301)
+		struct s2mf301_usbpd_data *usbpd_data = (struct s2mf301_usbpd_data *)pd_data->phy_driver_data;
 #endif
-#if IS_ENABLED(CONFIG_PDIC_S2MF301)
-	if (sec_current_device == SEC_A25) {
-		usbpd_data_301 = (struct s2mf301_usbpd_data *)pd_data->phy_driver_data;
-	}
-#endif
+		int timeout = 0;
 
-	if (!usbpd_data_106 && !usbpd_data_301) {
-		usbpd_err("%s : Unsupported device\n", __func__);
-		return -EINVAL;
-	}
+		pr_info("%s : typec_power_role=%d, typec_data_role=%d, port_type=%d\n",
+			__func__, pd_data->typec_power_role, pd_data->typec_data_role, port_type);
 
-	usbpd_info("%s : typec_power_role=%d, typec_data_role=%d, port_type=%d\n",
-			   __func__, pd_data->typec_power_role, pd_data->typec_data_role, port_type);
-
-	switch (port_type) {
-	case TYPEC_PORT_DFP:
-		usbpd_info("%s : try reversing, from UFP(Sink) to DFP(Source)\n", __func__);
-		pd_data->typec_try_state_change = TYPE_C_ATTACH_DFP;
-		if (usbpd_data_106)
-			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_106, TYPE_C_ATTACH_DFP);
-		else
-			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_301, TYPE_C_ATTACH_DFP);
-		break;
-	case TYPEC_PORT_UFP:
-		usbpd_info("%s : try reversing, from DFP(Source) to UFP(Sink)\n", __func__);
-		usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
+		switch (port_type) {
+		case TYPEC_PORT_DFP:
+			pr_info("%s : try reversing, from UFP(Sink) to DFP(Source)\n", __func__);
+			pd_data->typec_try_state_change = TYPE_C_ATTACH_DFP;
+			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, TYPE_C_ATTACH_DFP);
+			break;
+		case TYPEC_PORT_UFP:
+			pr_info("%s : try reversing, from DFP(Source) to UFP(Sink)\n", __func__);
+			legacy_usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
-		pdic_event_work(pd_data,
-						PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
-						0 /*attach*/, 0 /*rprd*/, 0);
+			legacy_pdic_event_work(pd_data,
+				PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
+				0/*attach*/, 0/*rprd*/, 0);
 #endif
-		pd_data->typec_try_state_change = TYPE_C_ATTACH_UFP;
-		if (usbpd_data_106)
-			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_106, TYPE_C_ATTACH_UFP);
-		else
-			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_301, TYPE_C_ATTACH_UFP);
-		break;
-	case TYPEC_PORT_DRP:
-		usbpd_info("%s : set to DRP (No action)\n", __func__);
-		return 0;
-	default:
-		usbpd_info("%s : invalid typec_role\n", __func__);
-		return -EINVAL;
-	}
-
-	if (pd_data->typec_try_state_change) {
-		reinit_completion(&pd_data->role_reverse_completion);
-		timeout =
-			wait_for_completion_timeout(&pd_data->role_reverse_completion,
-										msecs_to_jiffies(DUAL_ROLE_SET_MODE_WAIT_MS));
-
-		if (!timeout) {
-			usbpd_err("%s: reverse failed, set mode to DRP\n", __func__);
-			PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
-			/* exit from Disabled state and set mode to DRP */
-			pd_data->typec_try_state_change = 0;
-			if (usbpd_data_106)
-				PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_106, TYPE_C_ATTACH_DRP);
-			else
-				PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data_301, TYPE_C_ATTACH_DRP);
-			PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 1);
-			return -EIO;
-		} else {
-			usbpd_err("%s: reverse success, one more check\n", __func__);
-			schedule_delayed_work(&pd_data->typec_role_swap_work, msecs_to_jiffies(DUAL_ROLE_SET_MODE_WAIT_MS));
+			pd_data->typec_try_state_change = TYPE_C_ATTACH_UFP;
+			PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, TYPE_C_ATTACH_UFP);
+			break;
+		case TYPEC_PORT_DRP:
+			pr_info("%s : set to DRP (No action)\n", __func__);
+			return 0;
+		default :
+			pr_info("%s : invalid typec_role\n", __func__);
+			return -EINVAL;
 		}
-	}
 
-	return 0;
+		if (pd_data->typec_try_state_change) {
+			reinit_completion(&pd_data->role_reverse_completion);
+			timeout =
+			    wait_for_completion_timeout(&pd_data->role_reverse_completion,
+							msecs_to_jiffies
+							(DUAL_ROLE_SET_MODE_WAIT_MS));
+
+			if (!timeout) {
+				pr_err("%s: reverse failed, set mode to DRP\n", __func__);
+				PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
+				/* exit from Disabled state and set mode to DRP */
+				pd_data->typec_try_state_change = 0;
+				PDIC_OPS_PARAM_FUNC(rprd_mode_change, usbpd_data, TYPE_C_ATTACH_DRP);
+				PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 1);
+				return -EIO;
+			} else {
+				pr_err("%s: reverse success, one more check\n", __func__);
+				schedule_delayed_work(&pd_data->typec_role_swap_work, msecs_to_jiffies(DUAL_ROLE_SET_MODE_WAIT_MS));
+			}
+		}
+
+		return 0;
+	}
 }
 
 #if IS_ENABLED(CONFIG_SUPPORT_USB_TYPEC_OPS)
@@ -619,25 +573,25 @@ int typec_pr_set(const struct typec_capability *cap, enum typec_role power_role)
 		inc_hw_param(o_notify, USB_CCIC_PR_SWAP_COUNT);
 #endif /* CONFIG_USB_HW_PARAM */
 	if (!pd_data) {
-		usbpd_err("%s : pd_data is null\n", __func__);
+		pr_err("%s : pd_data is null\n", __func__);
 		return -EINVAL;
 	}
 
-	usbpd_info("%s : typec_power_role=%d, typec_data_role=%d, goto power role=%d\n",
+	pr_info("%s : typec_power_role=%d, typec_data_role=%d, goto power role=%d\n",
 									__func__, pd_data->typec_power_role,
 									pd_data->typec_data_role, power_role);
 
 	switch (power_role) {
 	case TYPEC_SOURCE:
-		usbpd_info("%s : try reversing, from Sink to Source\n", __func__);
-		usbpd_manager_send_pr_swap(pd_data->dev);
+		pr_info("%s : try reversing, from Sink to Source\n", __func__);
+		legacy_usbpd_manager_send_pr_swap(pd_data->dev);
 		break;
 	case TYPEC_SINK:
-		usbpd_info("%s : try reversing, from Source to Sink\n", __func__);
-		usbpd_manager_send_pr_swap(pd_data->dev);
+		pr_info("%s : try reversing, from Source to Sink\n", __func__);
+		legacy_usbpd_manager_send_pr_swap(pd_data->dev);
 		break;
 	default :
-		usbpd_info("%s : invalid power_role\n", __func__);
+		pr_info("%s : invalid power_role\n", __func__);
 		return -EINVAL;
 	}
 
@@ -661,23 +615,23 @@ static int typec_dr_set(const struct typec_capability *cap, enum typec_data_role
 		inc_hw_param(o_notify, USB_CCIC_DR_SWAP_COUNT);
 #endif /* CONFIG_USB_HW_PARAM */
 	if (!pd_data) {
-		usbpd_err("%s : pd_data is null\n", __func__);
+		pr_err("%s : pd_data is null\n", __func__);
 		return -EINVAL;
 	}
 
-	usbpd_info("%s : typec_power_role=%d, typec_data_role=%d, role=%d\n",
+	pr_info("%s : typec_power_role=%d, typec_data_role=%d, role=%d\n",
 		__func__, pd_data->typec_power_role, pd_data->typec_data_role, role);
 
 	if (role == TYPEC_DEVICE) {
-		usbpd_info("%s, try reversing, from DFP to UFP\n", __func__);
+		pr_info("%s, try reversing, from DFP to UFP\n", __func__);
 		pd_data->typec_try_state_change = TYPE_C_DR_SWAP;
-		usbpd_manager_send_dr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_dr_swap(pd_data->dev);
 	} else if (role == TYPEC_HOST) {
-		usbpd_info("%s, try reversing, from UFP to DFP\n", __func__);
+		pr_info("%s, try reversing, from UFP to DFP\n", __func__);
 		pd_data->typec_try_state_change = TYPE_C_DR_SWAP;
-		usbpd_manager_send_dr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_dr_swap(pd_data->dev);
 	} else {
-		usbpd_info("invalid power role\n");
+		pr_info("invalid power role\n");
 		return -EIO;
 	}
 
@@ -689,13 +643,13 @@ static int typec_dr_set(const struct typec_capability *cap, enum typec_data_role
 						(DUAL_ROLE_SET_MODE_WAIT_MS));
 
 		if (!timeout) {
-			usbpd_err("%s: reverse failed\n", __func__);
+			pr_err("%s: reverse failed\n", __func__);
 			PDIC_OPS_PARAM_FUNC(irq_control, pd_data, 0);
 			/* exit from Disabled state and set mode to DRP */
 			pd_data->typec_try_state_change = 0;
 			return -EIO;
 		} else
-			usbpd_err("%s: reverse success\n", __func__);
+			pr_err("%s: reverse success\n", __func__);
 	}
 
 	return 0;
@@ -712,7 +666,7 @@ int typec_get_pd_support(void *_data)
 	return TYPEC_PWR_MODE_USB;
 }
 
-int typec_init(struct usbpd_data *pd_data)
+int legacy_typec_init(struct usbpd_data *pd_data)
 {
 	pd_data->typec_power_role = TYPEC_SINK;
 	pd_data->typec_data_role = TYPEC_DEVICE;
@@ -733,15 +687,15 @@ int typec_init(struct usbpd_data *pd_data)
 #endif
 	pd_data->port = typec_register_port(pd_data->dev, &pd_data->typec_cap);
 	if (IS_ERR(pd_data->port)) {
-		usbpd_err("%s : unable to register typec_register_port\n", __func__);
+		pr_err("%s : unable to register typec_register_port\n", __func__);
 		return -1;
 	} else
-		usbpd_err("%s : success typec_register_port port=%pK\n", __func__, pd_data->port);
+		pr_err("%s : success typec_register_port port=%pK\n", __func__, pd_data->port);
 
 	init_completion(&pd_data->role_reverse_completion);
 	INIT_DELAYED_WORK(&pd_data->typec_role_swap_work, typec_role_swap_check);
 
 	return 0;
 }
-EXPORT_SYMBOL(typec_init);
+EXPORT_SYMBOL(legacy_typec_init);
 #endif
