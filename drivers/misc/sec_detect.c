@@ -210,9 +210,17 @@ void setup_camera_params(void) {
 	if (sec_current_device == SEC_GTA4XLS) {
 		mcd_use_camera_act_driver_soft_landing = true;
 	}
-	// mcd_disable_dual_sync = (sec_current_device == SEC_A53 || sec_current_device == SEC_A33 || sec_current_device == SEC_M33);
-	// mcd_camera_rear_dual_cal = (sec_current_device == SEC_A25 || sec_current_device == SEC_A53 || sec_current_device == SEC_A33 || sec_current_device == SEC_M33 || sec_current_device == SEC_M34);
-	// mcd_use_leds_flash_charging_voltage_control = (sec_current_device == SEC_A25 || sec_current_device == SEC_A33);
+}
+
+// New function to print machine name and sec_ variables
+static void print_sec_variables(const char *machine_name) {
+	SEC_DETECT_LOG("Current machine name: %s\n", machine_name);
+	SEC_DETECT_LOG("sec_needs_blic = %s\n", sec_needs_blic ? "true" : "false");
+	SEC_DETECT_LOG("sec_needs_decon = %s\n", sec_needs_decon ? "true" : "false");
+	SEC_DETECT_LOG("sec_doze = %s\n", sec_doze ? "true" : "false");
+	SEC_DETECT_LOG("sec_lcd_device = %s\n", sec_lcd_device ? "true" : "false");
+	SEC_DETECT_LOG("sec_legacy_sinput = %s\n", sec_legacy_sinput ? "true" : "false");
+	SEC_DETECT_LOG("sec_legacy_usbpd = %s\n", sec_legacy_usbpd ? "true" : "false");
 }
 
 int sec_detect_init(void) {
@@ -234,8 +242,6 @@ int sec_detect_init(void) {
 		SEC_DETECT_LOG("Failed to find machine name\n");
 		return -ENOENT;
 	}
-
-	SEC_DETECT_LOG("Current machine name: %s\n", machine_name);
 
 	if (strstr(machine_name, "A25") != NULL) {
 		sec_current_device = SEC_A25;
@@ -270,6 +276,9 @@ int sec_detect_init(void) {
 		sec_needs_decon = false;
 		sec_needs_blic = true;
 	}
+
+	// Print machine name and sec_ variables
+	print_sec_variables(machine_name);
 
 #ifdef CONFIG_SEC_DETECT_SYSFS
 	// Create the sysfs entry
