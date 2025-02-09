@@ -26,8 +26,8 @@
 #include <linux/completion.h>
 #include <linux/version.h>
 
-#include <linux/usb/typec/slsi/common/usbpd.h>
-#include <linux/usb/typec/slsi/s2mu106/usbpd-s2mu106.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd.h>
+#include <linux/usb/typec/slsi_legacy/s2mu106/usbpd-s2mu106.h>
 #include <linux/usb/typec/common/pdic_sysfs.h>
 #include <linux/usb/typec/common/pdic_param.h>
 
@@ -64,7 +64,7 @@
 #include <linux/regulator/consumer.h>
 
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER) || IS_ENABLED(CONFIG_DUAL_ROLE_USB_INTF)
-#include <linux/usb/typec/slsi/common/usbpd_ext.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
 
 /*
