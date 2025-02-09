@@ -1,8 +1,7 @@
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/notifier.h>
-#include <linux/usb/typec/slsi/common/s2m_pdic_notifier.h>
-#include <linux/usb/typec/slsi/common/usbpd_log.h>
+#include <linux/usb/typec/slsi_legacy/common/s2m_pdic_notifier.h>
 #include <linux/sec_detect.h>
 #define DRIVER_DESC   "S2M PDIC Notifier driver"
 
@@ -21,12 +20,12 @@ int s2m_pdic_notifier_register(struct notifier_block *nb, notifier_fn_t notifier
 {
 	int ret = 0;
 
-	usbpd_info("%s: listener=%d register\n", __func__, listener);
+	pr_info("%s: listener=%d register\n", __func__, listener);
 
 	SET_PDIC_NOTIFIER_BLOCK(nb, notifier, listener);
 	ret = blocking_notifier_chain_register(&(s2m_pdic_notifier.notifier_call_chain), nb);
 	if (ret < 0)
-		usbpd_err("%s: blocking_notifier_chain_register error(%d)\n",
+		pr_err("%s: blocking_notifier_chain_register error(%d)\n",
 				__func__, ret);
 
 	/* current pdic's attached_device status notify */
@@ -40,11 +39,11 @@ int s2m_pdic_notifier_unregister(struct notifier_block *nb)
 {
 	int ret = 0;
 
-	usbpd_info("%s: listener=%d unregister\n", __func__, nb->priority);
+	pr_info("%s: listener=%d unregister\n", __func__, nb->priority);
 
 	ret = blocking_notifier_chain_unregister(&(s2m_pdic_notifier.notifier_call_chain), nb);
 	if (ret < 0)
-		usbpd_err("%s: blocking_notifier_chain_unregister error(%d)\n",
+		pr_err("%s: blocking_notifier_chain_unregister error(%d)\n",
 				__func__, ret);
 	DESTROY_PDIC_NOTIFIER_BLOCK(nb);
 
@@ -55,7 +54,7 @@ static int s2m_pdic_notifier_notify(void)
 {
 	int ret = 0;
 
-	usbpd_info("%s: CMD=%d, DATA=%d\n", __func__, s2m_pdic_notifier.cmd,
+	pr_info("%s: CMD=%d, DATA=%d\n", __func__, s2m_pdic_notifier.cmd,
 			s2m_pdic_notifier.attached_dev);
 
 	ret = blocking_notifier_call_chain(&(s2m_pdic_notifier.notifier_call_chain),
@@ -64,14 +63,14 @@ static int s2m_pdic_notifier_notify(void)
 	switch (ret) {
 	case NOTIFY_STOP_MASK:
 	case NOTIFY_BAD:
-		usbpd_err("%s: notify error occur(0x%x)\n", __func__, ret);
+		pr_err("%s: notify error occur(0x%x)\n", __func__, ret);
 		break;
 	case NOTIFY_DONE:
 	case NOTIFY_OK:
-		usbpd_info("%s: notify done(0x%x)\n", __func__, ret);
+		pr_info("%s: notify done(0x%x)\n", __func__, ret);
 		break;
 	default:
-		usbpd_info("%s: notify status unknown(0x%x)\n", __func__, ret);
+		pr_info("%s: notify status unknown(0x%x)\n", __func__, ret);
 		break;
 	}
 
@@ -80,7 +79,7 @@ static int s2m_pdic_notifier_notify(void)
 
 void s2m_pdic_notifier_attach_attached_jig_dev(muic_attached_dev_t new_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, new_dev);
+	pr_info("%s: (%d)\n", __func__, new_dev);
 
 	s2m_pdic_notifier.cmd = PDIC_MUIC_NOTIFY_CMD_JIG_ATTACH;
 	s2m_pdic_notifier.attached_dev = new_dev;
@@ -91,7 +90,7 @@ void s2m_pdic_notifier_attach_attached_jig_dev(muic_attached_dev_t new_dev)
 #if 0
 void s2m_pdic_notifier_detach_attached_jig_dev(muic_attached_dev_t cur_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, cur_dev);
+	pr_info("%s: (%d)\n", __func__, cur_dev);
 
 	pdic_notifier.cmd = PDIC_MUIC_NOTIFY_CMD_JIG_DETACH;
 
@@ -107,9 +106,9 @@ void s2m_pdic_notifier_detach_attached_jig_dev(muic_attached_dev_t cur_dev)
 	pdic_notifier.attached_dev = ATTACHED_DEV_NONE_MUIC;
 }
 #endif
-void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
+void legacy_s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, new_dev);
+	pr_info("%s: (%d)\n", __func__, new_dev);
 
 	s2m_pdic_notifier.cmd = MUIC_NOTIFY_CMD_ATTACH;
 	s2m_pdic_notifier.attached_dev = new_dev;
@@ -117,11 +116,11 @@ void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
 	/* pdic's attached_device attach broadcast */
 	s2m_pdic_notifier_notify();
 }
-EXPORT_SYMBOL(s2m_pdic_notifier_attach_attached_dev);
+EXPORT_SYMBOL(legacy_s2m_pdic_notifier_attach_attached_dev);
 
-void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
+void legacy_s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, cur_dev);
+	pr_info("%s: (%d)\n", __func__, cur_dev);
 
 	s2m_pdic_notifier.cmd = MUIC_NOTIFY_CMD_DETACH;
 
@@ -136,11 +135,11 @@ void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
 
 	s2m_pdic_notifier.attached_dev = ATTACHED_DEV_NONE_MUIC;
 }
-EXPORT_SYMBOL(s2m_pdic_notifier_detach_attached_dev);
+EXPORT_SYMBOL(legacy_s2m_pdic_notifier_detach_attached_dev);
 
 void s2m_pdic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, new_dev);
+	pr_info("%s: (%d)\n", __func__, new_dev);
 
 	s2m_pdic_notifier.cmd = MUIC_NOTIFY_CMD_LOGICALLY_ATTACH;
 	s2m_pdic_notifier.attached_dev = new_dev;
@@ -151,7 +150,7 @@ void s2m_pdic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev
 
 void s2m_pdic_notifier_logically_detach_attached_dev(muic_attached_dev_t cur_dev)
 {
-	usbpd_info("%s: (%d)\n", __func__, cur_dev);
+	pr_info("%s: (%d)\n", __func__, cur_dev);
 
 	s2m_pdic_notifier.cmd = MUIC_NOTIFY_CMD_LOGICALLY_DETACH;
 	s2m_pdic_notifier.attached_dev = cur_dev;
@@ -166,13 +165,13 @@ static int __init s2m_pdic_notifier_init(void)
 {
 	int ret = 0;
 
-	if (sec_legacy_usbpd) {
-		SEC_DETECT_LOG("New usbpd slsi driver skipped\n");
+	if (!sec_legacy_usbpd) {
+		SEC_DETECT_LOG("Legacy usbpd slsi driver skipped\n");
 		return 0;
 	} else
-		SEC_DETECT_LOG("New usbpd slsi driver initializing\n");
+		SEC_DETECT_LOG("Legacy usbpd slsi driver initializing\n");
 
-	usbpd_info("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	BLOCKING_INIT_NOTIFIER_HEAD(&(s2m_pdic_notifier.notifier_call_chain));
 	s2m_pdic_notifier.cmd = MUIC_NOTIFY_CMD_DETACH;
@@ -183,7 +182,7 @@ static int __init s2m_pdic_notifier_init(void)
 
 static void __exit s2m_pdic_notifier_exit(void)
 {
-	usbpd_info("%s: exit\n", __func__);
+	pr_info("%s: exit\n", __func__);
 }
 
 subsys_initcall(s2m_pdic_notifier_init);

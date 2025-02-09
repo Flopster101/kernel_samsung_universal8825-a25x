@@ -65,6 +65,8 @@
 #include <linux/usb/typec/slsi/common/usbpd_ext.h>
 #endif
 
+#include <linux/sec_detect.h>
+
 /*
 *VARIABLE DEFINITION
 */
@@ -5034,6 +5036,12 @@ static struct i2c_driver s2mf301_usbpd_driver = {
 
 static int __init s2mf301_usbpd_init(void)
 {
+	if (sec_legacy_usbpd) {
+		SEC_DETECT_LOG("s2mf301 usbpd driver cannot start without new usbpd\n");
+		return 0;
+	} else
+		SEC_DETECT_LOG("s2mf301 usbpd driver initializing\n");
+
 	s2mf301_err("%s\n", __func__);
 	return i2c_add_driver(&s2mf301_usbpd_driver);
 }
