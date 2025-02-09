@@ -525,7 +525,10 @@ void is_sensor_flash_fire_work(struct work_struct *data)
 					err("failed to turn off flash at flash expired handler\n");
 #ifdef USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL
 					if (mcd_use_leds_flash_charging_voltage_control) {
-						pdo_ctrl_by_flash(0);
+						if (sec_legacy_usbpd)
+							legacy_pdo_ctrl_by_flash(0);
+						else
+							pdo_ctrl_by_flash(0);
 						muic_afc_request_voltage(FLED, 9);
 						info("[%s](%d) MAIN Flash Info: Power Down set Clear(5V -> 9V).\n" ,__func__, __LINE__);
 					}
@@ -556,7 +559,10 @@ void is_sensor_flash_fire_work(struct work_struct *data)
 
 #ifdef USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL
 			if (mcd_use_leds_flash_charging_voltage_control) {
-				pdo_ctrl_by_flash(0);
+				if (sec_legacy_usbpd)
+					legacy_pdo_ctrl_by_flash(0);
+				else
+					pdo_ctrl_by_flash(0);
 				muic_afc_request_voltage(FLED, 9);
 				info("[%s](%d) MAIN Flash Info: Power Down set Clear(5V -> 9V).\n" ,__func__, __LINE__);
 			}
@@ -835,7 +841,10 @@ void is_sensor_muic_ctrl_and_flash_fire(struct work_struct *data)
 
 	/* Pre-flash on */
 	if (flash->flash_data.mode == CAM2_FLASH_MODE_TORCH) {
-		pdo_ctrl_by_flash(1);
+		if (sec_legacy_usbpd)
+			legacy_pdo_ctrl_by_flash(1);
+		else
+			pdo_ctrl_by_flash(1);
 		muic_afc_request_voltage(FLED, 5);
 		info("[%s](%d) Pre-Flash On: Power Down Volatge set(9V -> 5V). \n" ,__func__, __LINE__);
 	}
@@ -848,13 +857,19 @@ void is_sensor_muic_ctrl_and_flash_fire(struct work_struct *data)
 	if (is_sensor_flash_fire(sensor_peri, flash->flash_data.intensity)) {
 		err("failed to turn off flash at flash expired handler\n");
 		if(flash->flash_data.mode == CAM2_FLASH_MODE_TORCH) {
-			pdo_ctrl_by_flash(0);
+			if (sec_legacy_usbpd)
+				legacy_pdo_ctrl_by_flash(0);
+			else
+				pdo_ctrl_by_flash(0);
 			muic_afc_request_voltage(FLED, 9);
 			info("[%s](%d) Pre-Flash ERR: Power Down Volatge set Clear(5V -> 9V).\n" ,__func__, __LINE__);
 		}
 	}
 	else if (flash->flash_data.mode == CAM2_FLASH_MODE_OFF) { /* Torch off - used only in Video Mode */
-		pdo_ctrl_by_flash(0);
+		if (sec_legacy_usbpd)
+			legacy_pdo_ctrl_by_flash(0);
+		else
+			pdo_ctrl_by_flash(0);
 		muic_afc_request_voltage(FLED, 9);
 		info("[%s](%d) Pre-Flash OFF: Power Down Volatge set Clear(5V -> 9V).\n" ,__func__, __LINE__);
 	}
@@ -2226,7 +2241,10 @@ int is_sensor_peri_s_stream(struct is_device_sensor *device,
 					sensor_peri->flash->flash_ae.frm_num_pre_fls = 0;
 #if defined(USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL)
 					if (mcd_use_leds_flash_charging_voltage_control) {
-						pdo_ctrl_by_flash(0);
+						if (sec_legacy_usbpd)
+							legacy_pdo_ctrl_by_flash(0);
+						else
+							pdo_ctrl_by_flash(0);
 						muic_afc_request_voltage(FLED, 9);
 						info("[%s]%d Down Voltage set Clear \n" ,__func__, __LINE__);
 					}
