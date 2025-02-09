@@ -31,6 +31,15 @@ enum SEC_devices {
 	SEC_GTA4XLS
 };
 
+static const char *const device_names[] = {
+	[SEC_A25] = "Galaxy A25 5G",
+	[SEC_A33] = "Galaxy A33 5G",
+	[SEC_A53] = "Galaxy A53 5G",
+	[SEC_M33] = "Galaxy M33 5G",
+	[SEC_M34] = "Galaxy M34 5G",
+	[SEC_GTA4XLS] = "Galaxy Tab S6 Lite 2024",
+};
+
 extern enum SEC_devices sec_devices;
 extern int sec_current_device;
 extern bool sec_needs_decon;
