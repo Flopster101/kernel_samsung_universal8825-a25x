@@ -73,29 +73,29 @@ policy_state usbpd_policy_src_startup(struct policy_data *policy)
 
 	/* PD Protocol Initialization */
 	if (policy->cap_mismatch) {
-		usbpd_manager_remove_new_cap(pd_data);
+		legacy_usbpd_manager_remove_new_cap(pd_data);
 	}
-	usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
 	PDIC_OPS_FUNC(soft_reset, pd_data);
 
 	/* For tSrcrecover after PE_SRC_Transition_to_default */
 	if (policy->txhardresetflag == 1) {
 		policy->txhardresetflag = 0;
 
-		usbpd_timer1_start(pd_data);
+		legacy_usbpd_timer1_start(pd_data);
 		while (1) {
 			if (policy->plug_valid == 0) {
 				ret = PE_SRC_Startup;
 				break;
 			}
-			ms = usbpd_check_time1(pd_data);
+			ms = legacy_usbpd_check_time1(pd_data);
 			if (ms >= 200)
 				break;
 		}
 	}
 
 	/* Check Valid VBUS */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while(1){
 		if (policy->plug_valid == 0) {
 			dev_info(pd_data->dev, "%s plug is not valid\n", __func__);
@@ -116,7 +116,7 @@ policy_state usbpd_policy_src_startup(struct policy_data *policy)
 			break;
 		}
 
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= 1000) {
 			dev_info(pd_data->dev, "%s Timer Over\n", __func__);
 			break;
@@ -141,13 +141,13 @@ policy_state usbpd_policy_src_discovery(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Delay*/
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Discovery;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= tTypeCSendSourceCap)
 			break;
 	}
@@ -197,17 +197,17 @@ policy_state usbpd_policy_src_send_capabilities(struct policy_data *policy)
 	pd_data->counter.caps_counter++;
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);	// Setting 25ms is actual 25 ~ 29ms
+	legacy_usbpd_timer1_start(pd_data);	// Setting 25ms is actual 25 ~ 29ms
 	/* Wait Message or State */
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Send_Capabilities;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_REQUEST)) {
 			pd_data->counter.hard_reset_counter = 0;
 			pd_data->counter.caps_counter = 0;
@@ -301,12 +301,12 @@ policy_state usbpd_policy_src_negotiate_capability(struct policy_data *policy)
 
 	mutex_lock(&pd_data->accept_mutex);
 	/* Analysis Received Request Message */
-	if ((usbpd_manager_match_request(pd_data) == 0) || policy->send_reject == 1) {
-		usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
+	if ((legacy_usbpd_manager_match_request(pd_data) == 0) || policy->send_reject == 1) {
+		legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
 													data_role, USBPD_SOURCE);
 		dev_info(pd_data->dev, "%s sended accept\n", __func__);
 		if (policy->cap_mismatch) {
-			usbpd_manager_inform_event(pd_data, MANAGER_CAP_MISMATCH);
+			legacy_usbpd_manager_inform_event(pd_data, MANAGER_CAP_MISMATCH);
 		}
 		ret = PE_SRC_Transition_Supply; /* Accept */
 	} else {
@@ -340,10 +340,10 @@ policy_state usbpd_policy_src_transition_supply(struct policy_data *policy)
 
 	/* Send Message */
 	// Move to PE_SRC_Nego
-	//usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept, USBPD_DFP, USBPD_SOURCE);
+	//legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept, USBPD_DFP, USBPD_SOURCE);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -351,15 +351,15 @@ policy_state usbpd_policy_src_transition_supply(struct policy_data *policy)
 			ret = PE_SRC_Transition_Supply;
 			break;
 		}
-		ms1 = usbpd_check_time1(pd_data);
+		ms1 = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
-			usbpd_timer2_start(pd_data);
+			legacy_usbpd_timer2_start(pd_data);
 			while (1) {
 				if (policy->plug_valid == 0) {
 					ret = PE_SRC_Transition_Supply;
 					break;
 				}
-				ms2 = usbpd_check_time2(pd_data);
+				ms2 = legacy_usbpd_check_time2(pd_data);
 				if (ms2 > tSrcTransition)
 					break;
 			}
@@ -372,7 +372,7 @@ policy_state usbpd_policy_src_transition_supply(struct policy_data *policy)
 			if ((policy->selected_pdo_num != policy->requested_pdo_num) || 
 					(policy->selected_pdo_type != policy->requested_pdo_type)) {
 				/* need to change output voltage */
-				usbpd_manager_response_req_pdo(pd_data, policy->requested_pdo_type, policy->requested_pdo_num);
+				legacy_usbpd_manager_response_req_pdo(pd_data, policy->requested_pdo_type, policy->requested_pdo_num);
 			}
 			policy->selected_pdo_type = policy->requested_pdo_type;
 			policy->selected_pdo_num = policy->requested_pdo_num;
@@ -380,7 +380,7 @@ policy_state usbpd_policy_src_transition_supply(struct policy_data *policy)
 			if (ret == PE_SRC_Transition_Supply)
 				return ret;
 
-			usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_PS_RDY, USBPD_DFP, USBPD_SOURCE);
+			legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_PS_RDY, USBPD_DFP, USBPD_SOURCE);
 
 			ret = PE_SRC_Ready;
 			break;
@@ -436,7 +436,7 @@ policy_state usbpd_policy_src_ready(struct policy_data *policy)
 		PDIC_OPS_PARAM_FUNC(set_rp_control, pd_data, PLUG_CTRL_RP180);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	while(1){
 		if (policy->plug_valid == 0)
@@ -447,7 +447,7 @@ policy_state usbpd_policy_src_ready(struct policy_data *policy)
 			return PE_SRC_Hard_Reset_Received;
 		}
 
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 
 #if IS_ENABLED(CONFIG_PDIC_PD30)
 		/* Specification Revision */
@@ -595,7 +595,7 @@ policy_state usbpd_policy_src_ready(struct policy_data *policy)
 	}
 
 	if (data_role == USBPD_DFP)
-		usbpd_manager_vdm_request_enabled(pd_data);
+		legacy_usbpd_manager_vdm_request_enabled(pd_data);
 
 	return PE_SRC_Ready;
 }
@@ -635,12 +635,12 @@ policy_state usbpd_policy_src_capability_response(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Reject,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Reject,
 												data_role, USBPD_SOURCE);
 	policy->send_reject += 1;
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -648,7 +648,7 @@ policy_state usbpd_policy_src_capability_response(struct policy_data *policy)
 			ret = PE_SRC_Capability_Response;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			if (policy->pd_src_ready)
 				ret = PE_SRC_Ready;
@@ -687,10 +687,10 @@ policy_state usbpd_policy_src_hard_reset(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Message ID Clear */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 
 	/* Policy Initialization */
-	usbpd_init_policy(pd_data);
+	legacy_usbpd_init_policy(pd_data);
 
 	/* Send Hardreset */
 	PDIC_OPS_FUNC(hard_reset, pd_data);
@@ -699,13 +699,13 @@ policy_state usbpd_policy_src_hard_reset(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(set_pd_control, pd_data, USBPD_CC_OFF);
 
 	/* Delay : Setting 25 is actual 57.3ms */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Hard_Reset;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= tPSHardReset)
 			break;
 	}
@@ -737,19 +737,19 @@ policy_state usbpd_policy_src_hard_reset_received(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Message ID Clear */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 
 	/* Policy Initialization */
-	usbpd_init_policy(pd_data);
+	legacy_usbpd_init_policy(pd_data);
 
 	/* Delay */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Hard_Reset_Received;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= tPSHardReset)
 			break;
 	}
@@ -786,13 +786,13 @@ policy_state usbpd_policy_src_transition_to_default(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(set_otg_control, pd_data, 0);
 
 	/* Delay */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Transition_to_default;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= tSrcRecover)
 			break;
 	}
@@ -802,8 +802,8 @@ policy_state usbpd_policy_src_transition_to_default(struct policy_data *policy)
 
 	/* initial reset */
 	PDIC_OPS_FUNC(driver_reset, pd_data);
-	usbpd_init_manager_val(pd_data);
-	usbpd_init_policy(pd_data);
+	legacy_usbpd_init_manager_val(pd_data);
+	legacy_usbpd_init_policy(pd_data);
 
 	PDIC_OPS_PARAM_FUNC(set_otg_control, pd_data, 1);
 
@@ -865,16 +865,16 @@ policy_state usbpd_policy_src_give_source_cap(struct policy_data *policy)
 	policy->tx_data_obj[0].power_data_obj.supply = 0;
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Give_Source_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_REQUEST)) {
 			ret = PE_SRC_Negotiate_Capability;
 			break;
@@ -912,20 +912,20 @@ policy_state usbpd_policy_src_get_sink_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Get_Sink_Cap, data_role, USBPD_SOURCE);
 
 	/* Wait Message */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0)
 			break;
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_SNK_CAP)) {
 			dev_info(pd_data->dev, "got SinkCap.\n");
 			pd_data->source_get_sink_obj.object
 				= policy->rx_data_obj[0].object;
-			usbpd_manager_match_sink_cap(pd_data);
+			legacy_usbpd_manager_match_sink_cap(pd_data);
 			ret = PE_SRC_Ready;
 			break;
 		}
@@ -970,30 +970,30 @@ policy_state usbpd_policy_src_send_soft_reset(struct policy_data *policy)
 	/* PD State Inform for AP */
 
 	/* USB PD Protocol Initialization */
-	usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
 
 	/* Read Data Role */
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Message ID Clear */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 	pd_data->counter.hard_reset_counter = 0;
 
 	/* Self SoftReset */
 	PDIC_OPS_FUNC(soft_reset, pd_data);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Soft_Reset,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Soft_Reset,
 													data_role, USBPD_SOURCE);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Send_Soft_Reset;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 			ret = PE_SRC_Send_Capabilities;
 			break;
@@ -1027,7 +1027,7 @@ policy_state usbpd_policy_src_soft_reset(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* USB PD Counters Initialization */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 	pd_data->counter.hard_reset_counter = 0;
 
 	/* Read Data Role */
@@ -1037,16 +1037,16 @@ policy_state usbpd_policy_src_soft_reset(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept, data_role, USBPD_SOURCE);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept, data_role, USBPD_SOURCE);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SRC_Soft_Reset;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			dev_info(pd_data->dev, "Rx MSG_GOODCRC\n");
 			ret = PE_SRC_Send_Capabilities;
@@ -1081,7 +1081,7 @@ policy_state usbpd_policy_snk_startup(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(set_rp_control, pd_data, PLUG_CTRL_RP80);
 
 	/* PD Protocol Initialization */
-	usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
 
 	return PE_SNK_Discovery;
 }
@@ -1108,7 +1108,7 @@ policy_state usbpd_policy_snk_discovery(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1116,7 +1116,7 @@ policy_state usbpd_policy_snk_discovery(struct policy_data *policy)
 			ret = PE_SNK_Discovery;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 
 		vbus_check = PDIC_OPS_FUNC(vbus_on_check, pd_data);
 		if (vbus_check < 0 || vbus_check > 0) {
@@ -1161,7 +1161,7 @@ policy_state usbpd_policy_snk_wait_for_capabilities(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(set_pd_control, pd_data, USBPD_CC_ON);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1169,7 +1169,7 @@ policy_state usbpd_policy_snk_wait_for_capabilities(struct policy_data *policy)
 			ret = PE_SNK_Wait_for_Capabilities;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		/* Rx Source Capabilities */
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_SRC_CAP)) {
 			ret = PE_SNK_Evaluate_Capability;
@@ -1239,7 +1239,7 @@ policy_state usbpd_policy_snk_evaluate_capability(struct policy_data *policy)
 #endif
 
 	/* Select Object Position */
-	sink_request_obj_num = usbpd_manager_evaluate_capability(pd_data);
+	sink_request_obj_num = legacy_usbpd_manager_evaluate_capability(pd_data);
 
 	/* Branch */
 	if (sink_request_obj_num > 0)
@@ -1287,7 +1287,7 @@ policy_state usbpd_policy_snk_select_capability(struct policy_data *policy)
 	policy->tx_msg_header.num_data_objs = 1; /* Initial Select PDO = 1 */
 
 	/* Select PDO */
-	policy->tx_data_obj[0] = usbpd_manager_select_capability(pd_data);
+	policy->tx_data_obj[0] = legacy_usbpd_manager_select_capability(pd_data);
 
 	/* Check Specification Revision */
 	if (policy->got_pps_apdo)
@@ -1300,7 +1300,7 @@ policy_state usbpd_policy_snk_select_capability(struct policy_data *policy)
 
 	/* Charger W/A */
 	obj = &policy->tx_data_obj[0];
-	if (usbpd_manager_get_selected_voltage(pd_data, obj->request_data_object.object_position) >= 6900)
+	if (legacy_usbpd_manager_get_selected_voltage(pd_data, obj->request_data_object.object_position) >= 6900)
 		PDIC_OPS_PARAM_FUNC(set_chg_lv_mode, pd_data, 9);
 	else
 		PDIC_OPS_PARAM_FUNC(set_chg_lv_mode, pd_data, 5);
@@ -1311,10 +1311,10 @@ policy_state usbpd_policy_snk_select_capability(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_PSRDY);
 
 	/* Send Message*/
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer*/
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1322,7 +1322,7 @@ policy_state usbpd_policy_snk_select_capability(struct policy_data *policy)
 			ret = PE_SNK_Select_Capability;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GET_SNK_CAP)) {
 			ret = PE_SNK_Send_Soft_Reset;
 			break;
@@ -1363,10 +1363,10 @@ policy_state usbpd_policy_snk_select_capability(struct policy_data *policy)
 					dev_info(pd_data->dev, "%s, send request againg(%d)\n",
 															__func__, retry);
 					/* Send Message*/
-					usbpd_send_msg(pd_data, &policy->tx_msg_header,
+					legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 													policy->tx_data_obj);
 					/* Start Timer*/
-					usbpd_timer1_start(pd_data);
+					legacy_usbpd_timer1_start(pd_data);
 
 					retry++;
 					continue;
@@ -1399,7 +1399,7 @@ policy_state usbpd_policy_snk_transition_sink(struct policy_data *policy)
 	policy->state = PE_SNK_Transition_Sink;
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1407,7 +1407,7 @@ policy_state usbpd_policy_snk_transition_sink(struct policy_data *policy)
 			ret = PE_SNK_Transition_Sink;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_PSRDY)) {
 			/* Device Information */
@@ -1467,7 +1467,7 @@ policy_state usbpd_policy_snk_ready(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(pd_instead_of_vbus, pd_data, 1);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_REJECT);
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT);
@@ -1483,7 +1483,7 @@ policy_state usbpd_policy_snk_ready(struct policy_data *policy)
 		}
 
 
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 #if IS_ENABLED(CONFIG_PDIC_PD30)
 		/* Specification Revision */
 		if(pd_data->specification_revision == USBPD_PD3_0){
@@ -1621,7 +1621,7 @@ policy_state usbpd_policy_snk_ready(struct policy_data *policy)
 	}
 
 	if (data_role == USBPD_DFP)
-		usbpd_manager_vdm_request_enabled(pd_data);
+		legacy_usbpd_manager_vdm_request_enabled(pd_data);
 
 	return PE_SNK_Ready;
 }
@@ -1675,15 +1675,15 @@ policy_state usbpd_policy_snk_transition_to_default(struct policy_data *policy)
 	PDIC_OPS_FUNC(send_hard_reset_dc, pd_data);
 #endif
 	/* Message ID Clear */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 
 	/* Policy Initialization */
-	usbpd_init_policy(pd_data);
+	legacy_usbpd_init_policy(pd_data);
 
 	/* Driver Reset */
 	PDIC_OPS_FUNC(driver_reset, pd_data);
-	usbpd_init_manager_val(pd_data);
-	usbpd_init_policy(pd_data);
+	legacy_usbpd_init_manager_val(pd_data);
+	legacy_usbpd_init_policy(pd_data);
 
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 	if (data_role != USBPD_UFP)
@@ -1696,16 +1696,16 @@ policy_state usbpd_policy_snk_transition_to_default(struct policy_data *policy)
 #endif
 
 	/* Vconn Off */
-	usbpd_manager_turn_off_vconn(pd_data);
+	legacy_usbpd_manager_turn_off_vconn(pd_data);
 
 	/* Wait 200ms */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_SNK_Transition_to_default;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= 300)
 			break;
 	}
@@ -1748,10 +1748,10 @@ policy_state usbpd_policy_snk_give_sink_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR);
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1759,7 +1759,7 @@ policy_state usbpd_policy_snk_give_sink_cap(struct policy_data *policy)
 			ret = PE_SNK_Give_Sink_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR)) {
 			dev_info(pd_data->dev, "got MSG_ERROR. -> PE_SNK_Send_Soft_Reset\n");
@@ -1802,11 +1802,11 @@ policy_state usbpd_policy_snk_get_source_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message*/
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 						USBPD_Get_Source_Cap, data_role, USBPD_SINK);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1814,7 +1814,7 @@ policy_state usbpd_policy_snk_get_source_cap(struct policy_data *policy)
 			ret = PE_SNK_Get_Source_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			ret = PE_SNK_Ready;
 			break;
@@ -1847,24 +1847,24 @@ policy_state usbpd_policy_snk_send_soft_reset(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* USB PD Protocol Initialization */
-	usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
 
 	/* Read Data Role */
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Message ID Clear */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 	pd_data->counter.hard_reset_counter = 0;
 
 	/* Self SoftReset */
 	PDIC_OPS_FUNC(soft_reset, pd_data);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Soft_Reset,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Soft_Reset,
 														data_role, USBPD_SINK);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1872,7 +1872,7 @@ policy_state usbpd_policy_snk_send_soft_reset(struct policy_data *policy)
 			ret = PE_SNK_Send_Soft_Reset;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 			ret = PE_SNK_Wait_for_Capabilities;
 			break;
@@ -1907,7 +1907,7 @@ policy_state usbpd_policy_snk_soft_reset(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* USB PD Counters Initialization */
-	usbpd_init_counters(pd_data);
+	legacy_usbpd_init_counters(pd_data);
 	pd_data->counter.hard_reset_counter = 0;
 
 	/* Read Data Role */
@@ -1917,10 +1917,10 @@ policy_state usbpd_policy_snk_soft_reset(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,	data_role, USBPD_SINK);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,	data_role, USBPD_SINK);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -1928,7 +1928,7 @@ policy_state usbpd_policy_snk_soft_reset(struct policy_data *policy)
 			ret = PE_SNK_Soft_Reset;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			dev_info(pd_data->dev, "Rx MSG_GOODCRC\n");
 			ret = PE_SNK_Wait_for_Capabilities;
@@ -2024,7 +2024,7 @@ policy_state usbpd_policy_drs_dfp_ufp_evaluate_dr_swap(struct policy_data *polic
 	/* PD State Inform for AP */
 	dev_info(pd_data->dev, "%s\n", __func__);
 
-	drs_ok = usbpd_manager_data_role_swap(pd_data);
+	drs_ok = legacy_usbpd_manager_data_role_swap(pd_data);
 
 	if (drs_ok)
 		return PE_DRS_DFP_UFP_Accept_DR_Swap;
@@ -2048,7 +2048,7 @@ policy_state usbpd_policy_drs_dfp_ufp_accept_dr_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
 	mutex_lock(&pd_data->accept_mutex);
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 						USBPD_Accept, USBPD_DFP, power_role);
 
 	PDIC_OPS_PARAM_FUNC(set_data_role, pd_data, USBPD_UFP);
@@ -2099,15 +2099,15 @@ policy_state usbpd_policy_drs_dfp_ufp_send_dr_swap(struct policy_data *policy)
 			PDIC_OPS_PARAM_FUNC(set_rp_control, pd_data, PLUG_CTRL_RP180);
 	}
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_DR_Swap, USBPD_DFP, power_role)) {
-		usbpd_timer1_start(pd_data);
+		legacy_usbpd_timer1_start(pd_data);
 		while (1) {
 			if (policy->plug_valid == 0) {
 				ret = PE_DRS_DFP_UFP_Send_DR_Swap;
 				break;
 			}
-			ms = usbpd_check_time1(pd_data);
+			ms = legacy_usbpd_check_time1(pd_data);
 			if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 				dev_info(pd_data->dev, "%s, got Accept\n", __func__);
 				ret = PE_DRS_DFP_UFP_Change_to_UFP;
@@ -2149,7 +2149,7 @@ policy_state usbpd_policy_drs_dfp_ufp_reject_dr_swap(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Reject, USBPD_DFP, power_role)) {
 		if (power_role == USBPD_SOURCE)
 			return PE_SRC_Ready;
@@ -2173,7 +2173,7 @@ policy_state usbpd_policy_drs_ufp_dfp_evaluate_dr_swap(struct policy_data *polic
 
 	dev_info(pd_data->dev, "%s\n", __func__);
 
-	drs_ok = usbpd_manager_data_role_swap(pd_data);
+	drs_ok = legacy_usbpd_manager_data_role_swap(pd_data);
 
 	if (drs_ok)
 		return PE_DRS_UFP_DFP_Accept_DR_Swap;
@@ -2196,7 +2196,7 @@ policy_state usbpd_policy_drs_ufp_dfp_accept_dr_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
 	mutex_lock(&pd_data->accept_mutex);
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 					USBPD_Accept, USBPD_UFP, power_role);
 
 	usbpd_manager_restart_discover_msg(pd_data);
@@ -2247,15 +2247,15 @@ policy_state usbpd_policy_drs_ufp_dfp_send_dr_swap(struct policy_data *policy)
 			PDIC_OPS_PARAM_FUNC(set_rp_control, pd_data, PLUG_CTRL_RP180);
 	}
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_DR_Swap, USBPD_UFP, power_role)) {
-		usbpd_timer1_start(pd_data);
+		legacy_usbpd_timer1_start(pd_data);
 		while (1) {
 			if (policy->plug_valid == 0) {
 				ret = PE_DRS_UFP_DFP_Send_DR_Swap;
 				break;
 			}
-			ms = usbpd_check_time1(pd_data);
+			ms = legacy_usbpd_check_time1(pd_data);
 			if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 				dev_info(pd_data->dev, "%s, got Accept\n", __func__);
 				ret = PE_DRS_UFP_DFP_Change_to_DFP;
@@ -2299,7 +2299,7 @@ policy_state usbpd_policy_drs_ufp_dfp_reject_dr_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Reject, data_role, USBPD_SINK)) {
 		if (power_role == USBPD_SOURCE)
 			return PE_SRC_Ready;
@@ -2325,7 +2325,7 @@ policy_state usbpd_policy_prs_src_snk_reject_pr_swap(struct policy_data *policy)
 
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Reject, data_role, USBPD_SOURCE))
 		return PE_SRC_Ready;
 
@@ -2346,7 +2346,7 @@ policy_state usbpd_policy_prs_src_snk_evaluate_swap(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* DPM Check to support roleswap */
-	prs_ok = usbpd_manager_power_role_swap(pd_data);
+	prs_ok = legacy_usbpd_manager_power_role_swap(pd_data);
 
 	/* Branch */
 	if (prs_ok)
@@ -2378,18 +2378,18 @@ policy_state usbpd_policy_prs_src_snk_send_swap(struct policy_data *policy)
 	/* Read Data Role */
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 								USBPD_PR_Swap, data_role, USBPD_SOURCE);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SRC_SNK_Send_Swap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 			ret = PE_PRS_SRC_SNK_Transition_off;
 			break;
@@ -2433,7 +2433,7 @@ policy_state usbpd_policy_prs_src_snk_accept_swap(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 					USBPD_Accept, data_role, USBPD_SOURCE);
 
 	return PE_PRS_SRC_SNK_Transition_off;
@@ -2456,13 +2456,13 @@ policy_state usbpd_policy_prs_src_snk_transition_to_off(struct policy_data *poli
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Delay */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SRC_SNK_Transition_off;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= tSrcTransition)
 			break;
 	}
@@ -2482,13 +2482,13 @@ policy_state usbpd_policy_prs_src_snk_transition_to_off(struct policy_data *poli
 
 	pr_info("%s, %d\n", __func__, manager->acc_type);
 
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SRC_SNK_Transition_off;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= 600)
 			break;
 	}
@@ -2541,22 +2541,22 @@ policy_state usbpd_policy_prs_src_snk_wait_source_on(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 						USBPD_PS_RDY, data_role, USBPD_SINK);
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SRC_SNK_Wait_Source_on;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_PSRDY)) {
 			dev_info(pd_data->dev, "got PSRDY.\n");
 			pd_data->counter.swap_hard_reset_counter = 0;
 
 			/* Message ID Clear */
-			usbpd_init_counters(pd_data);
+			legacy_usbpd_init_counters(pd_data);
 			pd_data->counter.hard_reset_counter = 0;
 			usleep_range(2000, 2100);
 			PDIC_OPS_FUNC(soft_reset, pd_data);
@@ -2591,7 +2591,7 @@ policy_state usbpd_policy_prs_snk_src_reject_swap(struct policy_data *policy)
 
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Reject, data_role, USBPD_SINK))
 		return PE_SNK_Ready;
 
@@ -2613,7 +2613,7 @@ policy_state usbpd_policy_prs_snk_src_evaluate_swap(struct policy_data *policy)
 	//dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Power Role Swap Check */
-	prs_ok = usbpd_manager_power_role_swap(pd_data);
+	prs_ok = legacy_usbpd_manager_power_role_swap(pd_data);
 
 	if (prs_ok)
 		ret = PE_PRS_SNK_SRC_Accept_Swap;
@@ -2641,17 +2641,17 @@ policy_state usbpd_policy_prs_snk_src_send_swap(struct policy_data *policy)
 
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 						USBPD_PR_Swap, data_role, USBPD_SINK);
 
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SNK_SRC_Send_Swap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ACCEPT)) {
 			PDIC_OPS_PARAM_FUNC(set_power_role, pd_data, USBPD_SINK);
 			ret = PE_PRS_SNK_SRC_Transition_off;
@@ -2696,10 +2696,10 @@ policy_state usbpd_policy_prs_snk_src_accept_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 #if IS_ENABLED(CONFIG_PDIC_S2MU004)
 	PDIC_OPS_PARAM_FUNC(set_power_role, pd_data, USBPD_SINK);
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
 													data_role, USBPD_SINK);
 #else
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Accept,
 													data_role, USBPD_SINK);
 	PDIC_OPS_PARAM_FUNC(set_power_role, pd_data, USBPD_SINK);
 #endif
@@ -2726,7 +2726,7 @@ policy_state usbpd_policy_prs_snk_src_transition_to_off(struct policy_data *poli
 	PDIC_OPS_PARAM_FUNC(pr_swap, pd_data, USBPD_SINK_OFF);
 
 	/* Start Timer 750ms */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	while (1) {
 		if (policy->plug_valid == 0) {
@@ -2735,7 +2735,7 @@ policy_state usbpd_policy_prs_snk_src_transition_to_off(struct policy_data *poli
 			ret = PE_PRS_SNK_SRC_Transition_off;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_PSRDY)) {
 			dev_info(pd_data->dev, "got PSRDY.\n");
 			ret = PE_PRS_SNK_SRC_Assert_Rp;
@@ -2792,13 +2792,13 @@ policy_state usbpd_policy_prs_snk_src_source_on(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(set_otg_control, pd_data, 1);
 
 	/* Dealy */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 	while (1) {
 		if (policy->plug_valid == 0) {
 			ret = PE_PRS_SNK_SRC_Source_on;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (ms >= 200)
 			break;
 	}
@@ -2807,16 +2807,16 @@ policy_state usbpd_policy_prs_snk_src_source_on(struct policy_data *policy)
 		return ret;
 
 	/* send PS_RDY */
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_PS_RDY, data_role, USBPD_SOURCE)) {
 		PDIC_OPS_PARAM_FUNC(set_power_role, pd_data, USBPD_DRP);
-		usbpd_timer1_start(pd_data);
+		legacy_usbpd_timer1_start(pd_data);
 		while (1) {
 			if (policy->plug_valid == 0) {
 				ret = PE_PRS_SNK_SRC_Source_on;
 				break;
 			}
-			ms = usbpd_check_time1(pd_data);
+			ms = legacy_usbpd_check_time1(pd_data);
 			if (ms >= tSwapSourceStart)
 				break;
 		}
@@ -2826,7 +2826,7 @@ policy_state usbpd_policy_prs_snk_src_source_on(struct policy_data *policy)
 		/*  TODO: 4) check GoodCRC : may need to be added for certification */
 
 		/* Message ID Clear */
-		usbpd_init_counters(pd_data);
+		legacy_usbpd_init_counters(pd_data);
 		pd_data->counter.hard_reset_counter = 0;
 
 		return PE_SRC_Startup;
@@ -2852,7 +2852,7 @@ policy_state usbpd_policy_vcs_evaluate_swap(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Request from DPM */
-	vcs_ok = usbpd_manager_vconn_source_swap(pd_data);
+	vcs_ok = legacy_usbpd_manager_vconn_source_swap(pd_data);
 
 	if (vcs_ok)
 		return PE_VCS_Accept_Swap;
@@ -2876,7 +2876,7 @@ policy_state usbpd_policy_vcs_accept_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Accept, data_role, power_role)) {
 		if (vconn_source)
 			return PE_VCS_Wait_for_VCONN;
@@ -2912,10 +2912,10 @@ policy_state usbpd_policy_vcs_send_swap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
 	/* Send Vconn Swap */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_VCONN_Swap, USBPD_DFP, power_role);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_VCONN_Swap, USBPD_DFP, power_role);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -2923,7 +2923,7 @@ policy_state usbpd_policy_vcs_send_swap(struct policy_data *policy)
 			ret = PE_VCS_Send_Swap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			if (vconn_source)
 				ret = PE_VCS_Wait_for_VCONN;
@@ -2957,7 +2957,7 @@ policy_state usbpd_policy_vcs_wait_for_vconn(struct policy_data *policy)
 	dev_info(pd_data->dev, "%s\n", __func__);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -2965,7 +2965,7 @@ policy_state usbpd_policy_vcs_wait_for_vconn(struct policy_data *policy)
 			ret = PE_VCS_Wait_for_VCONN;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_PSRDY)) {
 			pd_data->counter.swap_hard_reset_counter = 0;
 			ret = PE_VCS_Turn_Off_VCONN;
@@ -3040,7 +3040,7 @@ policy_state usbpd_policy_vcs_send_ps_rdy(struct policy_data *policy)
 
 	usleep_range(5000,5100);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_PS_RDY, data_role, data_role)) {
 		if (power_role == USBPD_SOURCE)
 			return PE_SRC_Ready;
@@ -3065,7 +3065,7 @@ policy_state usbpd_policy_vcs_reject_vconn_swap(struct policy_data *policy)
 
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
-	if (usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 				USBPD_Reject, USBPD_DFP, power_role)) {
 		if (power_role == USBPD_SOURCE)
 			return PE_SRC_Ready;
@@ -3196,7 +3196,7 @@ policy_state usbpd_policy_ufp_vdm_send_identity(struct policy_data *policy)
 		policy->tx_data_obj[3].product_vdo.Device_Version);
 
 	/* TODO: data object should be prepared from device manager */
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3244,7 +3244,7 @@ policy_state usbpd_policy_ufp_vdm_get_identity_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = Discover_Identity;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3264,7 +3264,7 @@ policy_state usbpd_policy_ufp_vdm_get_svids(struct policy_data *policy)
 	**********************************************/
 
 /*
-	if (usbpd_manager_get_svids(pd_data) == 0)
+	if (legacy_usbpd_manager_get_svids(pd_data) == 0)
 		return PE_UFP_VDM_Send_SVIDs;
 	else
 		return PE_UFP_VDM_Get_SVIDs_NAK;
@@ -3308,7 +3308,7 @@ policy_state usbpd_policy_ufp_vdm_send_svids(struct policy_data *policy)
 
 	/* TODO: data object should be prepared from device manager */
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3354,7 +3354,7 @@ policy_state usbpd_policy_ufp_vdm_get_svids_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = Discover_SVIDs;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3373,7 +3373,7 @@ policy_state usbpd_policy_ufp_vdm_get_modes(struct policy_data *policy)
 	Request Modes information from DPM
 	**********************************************/
 
-	if (usbpd_manager_get_modes(pd_data) == 0)
+	if (legacy_usbpd_manager_get_modes(pd_data) == 0)
 		return PE_UFP_VDM_Send_Modes;
 	else
 		return PE_UFP_VDM_Get_Modes_NAK;
@@ -3414,7 +3414,7 @@ policy_state usbpd_policy_ufp_vdm_send_modes(struct policy_data *policy)
 
 	/* TODO: data object should be prepared from device manager */
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3461,7 +3461,7 @@ policy_state usbpd_policy_ufp_vdm_get_modes_nak(struct policy_data *policy)
 
 	/* TODO: data object should be prepared from device manager */
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3486,12 +3486,12 @@ policy_state usbpd_policy_ufp_vdm_evaluate_mode_entry(struct policy_data *policy
 	usbpd_manager_enter_mode(pd_data);
 	if (manager->Standard_Vendor_ID == SAMSUNG_VENDOR_ID) {
 		/* Standard Vendor ID */
-		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
+		legacy_pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
 			PDIC_NOTIFY_ID_SVID_INFO, manager->Standard_Vendor_ID/*Standard Vendor ID*/, 0, 0);
 	}
 
 	/* Certification: Ellisys: TD.PD.VDMU.E15.Applicability */
-	if (usbpd_manager_get_svids(pd_data) == 0)
+	if (legacy_usbpd_manager_get_svids(pd_data) == 0)
 		return PE_UFP_VDM_Mode_Entry_ACK;
 	else
 		return PE_UFP_VDM_Mode_Entry_NAK;
@@ -3540,7 +3540,7 @@ policy_state usbpd_policy_ufp_vdm_mode_entry_ack(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_ACK;
 	policy->tx_data_obj[0].structured_vdm.command = Enter_Mode;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		/* TODO: may need to wait a while(5ms) and send status_update */
 		if (power_role == USBPD_SINK)
@@ -3585,7 +3585,7 @@ policy_state usbpd_policy_ufp_vdm_mode_entry_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = Enter_Mode;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3609,7 +3609,7 @@ policy_state usbpd_policy_ufp_vdm_mode_exit(struct policy_data *policy)
 
 	/* get mode to exit */
 	mode_pos = policy->rx_data_obj[0].structured_vdm.obj_pos;
-	if (usbpd_manager_exit_mode(pd_data, mode_pos) == 0)
+	if (legacy_usbpd_manager_exit_mode(pd_data, mode_pos) == 0)
 		ret =  PE_UFP_VDM_Mode_Exit_ACK;
 	else
 		ret =  PE_UFP_VDM_Mode_Exit_NAK;
@@ -3648,7 +3648,7 @@ policy_state usbpd_policy_ufp_vdm_mode_exit_ack(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_ACK;
 	policy->tx_data_obj[0].structured_vdm.command = Exit_Mode;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3692,7 +3692,7 @@ policy_state usbpd_policy_ufp_vdm_mode_exit_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = Exit_Mode;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3733,7 +3733,7 @@ policy_state usbpd_policy_ufp_vdm_attention_request(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Initiator;
 	policy->tx_data_obj[0].structured_vdm.command = Attention;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3803,7 +3803,7 @@ policy_state usbpd_policy_ufp_vdm_status_ack(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_ACK;
 	policy->tx_data_obj[0].structured_vdm.command = DisplayPort_Status_Update;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3846,7 +3846,7 @@ policy_state usbpd_policy_ufp_vdm_status_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = DisplayPort_Status_Update;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3915,7 +3915,7 @@ policy_state usbpd_policy_ufp_vdm_configure_ack(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_ACK;
 	policy->tx_data_obj[0].structured_vdm.command = DisplayPort_Configure;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3958,7 +3958,7 @@ policy_state usbpd_policy_ufp_vdm_configure_nak(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Responder_NAK;
 	policy->tx_data_obj[0].structured_vdm.command = DisplayPort_Configure;
 
-	if (usbpd_send_msg(pd_data, &policy->tx_msg_header,
+	if (legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header,
 				policy->tx_data_obj)) {
 		if (power_role == USBPD_SINK)
 			return PE_SNK_Ready;
@@ -3984,7 +3984,7 @@ static policy_state usbpd_policy_dfp_vdm_evaluate(struct policy_data *policy)
 
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
-	ms = usbpd_check_timer_vdm(pd_data);
+	ms = legacy_usbpd_check_timer_vdm(pd_data);
 	if (ms >= tVDMSenderResponse) {
 		dev_info(pd_data->dev, "tVDMSenderResponse over\n");
 		is_timeout = 1;
@@ -4103,9 +4103,9 @@ policy_state usbpd_policy_dfp_vdm_identity_request(struct policy_data *policy)
 	pd_data->counter.discover_identity_counter++;
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4122,7 +4122,7 @@ static policy_state usbpd_policy_dfp_vdm_response(struct policy_data *policy,
 	/**********************************************
 	**********************************************/
 
-	usbpd_manager_inform_event(pd_data, event);
+	legacy_usbpd_manager_inform_event(pd_data, event);
 
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
@@ -4206,9 +4206,9 @@ policy_state usbpd_policy_dfp_vdm_svids_request(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Initiator;
 	policy->tx_data_obj[0].structured_vdm.command = Discover_SVIDs;
 
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4282,9 +4282,9 @@ policy_state usbpd_policy_dfp_vdm_modes_request(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Initiator;
 	policy->tx_data_obj[0].structured_vdm.command = Discover_Modes;
 
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4359,9 +4359,9 @@ policy_state usbpd_policy_dfp_vdm_entry_request(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command = Enter_Mode;
 
 	/* TODO: obj_pos , vdo should be set by device manager */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4432,9 +4432,9 @@ policy_state usbpd_policy_dfp_vdm_exit_request(struct policy_data *policy)
 	policy->tx_data_obj[0].structured_vdm.command_type = Initiator;
 	policy->tx_data_obj[0].structured_vdm.command = Exit_Mode;
 
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4522,9 +4522,9 @@ policy_state usbpd_policy_dfp_vdm_status_update(struct policy_data *policy)
 
 	/* TODO: obj_pos , vdo should be set by device manager */
 
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4594,9 +4594,9 @@ policy_state usbpd_policy_dfp_vdm_displayport_configure(struct policy_data *poli
 	policy->tx_data_obj[1].displayport_configurations.displayport_protocol = DP_V_1_3;
 	policy->tx_data_obj[1].displayport_configurations.ufp_u_pin_assignment = PIN_ASSIGNMENT_D;
 
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
-	usbpd_timer_vdm_start(pd_data);
+	legacy_usbpd_timer_vdm_start(pd_data);
 
 	if (power_role == USBPD_SINK)
 		return PE_SNK_Ready;
@@ -4639,7 +4639,7 @@ policy_state usbpd_policy_dfp_uvdm_send_message(struct policy_data *policy)
 
 	dev_info(pd_data->dev, "%s\n", __func__);
 
-	usbpd_send_msg(pd_data, &manager->uvdm_msg_header, manager->uvdm_data_obj);
+	legacy_usbpd_send_msg(pd_data, &manager->uvdm_msg_header, manager->uvdm_data_obj);
 
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
@@ -4659,7 +4659,7 @@ policy_state usbpd_policy_dfp_uvdm_receive_message(struct policy_data *policy)
 
 	dev_info(pd_data->dev, "%s\n", __func__);
 
-	usbpd_manager_inform_event(pd_data, MANAGER_UVDM_RECEIVE_MESSAGE);
+	legacy_usbpd_manager_inform_event(pd_data, MANAGER_UVDM_RECEIVE_MESSAGE);
 
 	PDIC_OPS_PARAM_FUNC(get_power_role, pd_data, &power_role);
 
@@ -4691,10 +4691,10 @@ policy_state usbpd_policy_dr_src_get_source_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Get_Source_Cap, data_role, USBPD_SOURCE);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Get_Source_Cap, data_role, USBPD_SOURCE);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -4702,7 +4702,7 @@ policy_state usbpd_policy_dr_src_get_source_cap(struct policy_data *policy)
 			ret = PE_DR_SRC_Get_Source_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR)) {
 			ret = PE_SRC_Send_Soft_Reset;
 			break;
@@ -4766,10 +4766,10 @@ policy_state usbpd_policy_dr_src_give_sink_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR);
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -4777,7 +4777,7 @@ policy_state usbpd_policy_dr_src_give_sink_cap(struct policy_data *policy)
 			ret = PE_DR_SRC_Give_Sink_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			dev_info(pd_data->dev, "got dr_src_give_sink_cap MSG_GOODCRC.\n");
 			ret = PE_SRC_Ready;
@@ -4824,11 +4824,11 @@ policy_state usbpd_policy_dr_snk_get_sink_cap(struct policy_data *policy)
 	PDIC_OPS_PARAM_FUNC(get_data_role, pd_data, &data_role);
 
 	/* Send Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header,
 							USBPD_Get_Sink_Cap, data_role, USBPD_SINK);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
@@ -4836,7 +4836,7 @@ policy_state usbpd_policy_dr_snk_get_sink_cap(struct policy_data *policy)
 			ret = PE_DR_SNK_Get_Sink_Cap;
 			break;
 		}
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_ERROR)) {
 			ret = PE_SNK_Send_Soft_Reset;
 			break;
@@ -4910,16 +4910,16 @@ policy_state usbpd_policy_dr_snk_give_source_cap(struct policy_data *policy)
 	policy->tx_data_obj[0].power_data_obj.supply = 0;
 
 	/* Send Message */
-	usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
+	legacy_usbpd_send_msg(pd_data, &policy->tx_msg_header, policy->tx_data_obj);
 
 	/* Start Timer */
-	usbpd_timer1_start(pd_data);
+	legacy_usbpd_timer1_start(pd_data);
 
 	/* Wait Message or State */
 	while (1) {
 		if (policy->plug_valid == 0)
 			break;
-		ms = usbpd_check_time1(pd_data);
+		ms = legacy_usbpd_check_time1(pd_data);
 		if (PDIC_OPS_PARAM_FUNC(get_status, pd_data, MSG_GOODCRC)) {
 			ret = PE_SNK_Ready;
 			break;
@@ -4982,7 +4982,7 @@ policy_state usbpd_policy_src_send_not_supported(struct policy_data *policy)
 	}
 
 	/* Send Not_Supported Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Not_Supported, data_role, USBPD_SOURCE);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Not_Supported, data_role, USBPD_SOURCE);
 
 	ret = PE_SRC_Ready;
 
@@ -5046,7 +5046,7 @@ policy_state usbpd_policy_snk_send_not_supported(struct policy_data *policy)
 	}
 
 	/* Send Not_Supported Message */
-	usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Not_Supported, data_role, USBPD_SINK);
+	legacy_usbpd_send_ctrl_msg(pd_data, &policy->tx_msg_header, USBPD_Not_Supported, data_role, USBPD_SINK);
 
 	ret = PE_SNK_Ready;
 
@@ -5774,7 +5774,7 @@ policy_state usbpd_error_recovery(struct policy_data *policy)
 	return Error_Recovery;
 }
 
-void usbpd_policy_work(struct work_struct *work)
+void legacy_usbpd_policy_work(struct work_struct *work)
 {
 	struct usbpd_data *pd_data = container_of(work, struct usbpd_data,
 			worker);
@@ -6336,9 +6336,9 @@ void usbpd_policy_work(struct work_struct *work)
 	__pm_relax(pd_data->policy_wake);
 	dev_info(pd_data->dev, "%s Finished\n", __func__);
 }
-EXPORT_SYMBOL(usbpd_policy_work);
+EXPORT_SYMBOL(legacy_usbpd_policy_work);
 
-void usbpd_init_policy(struct usbpd_data *pd_data)
+void legacy_usbpd_init_policy(struct usbpd_data *pd_data)
 {
 	int i;
 	struct policy_data *policy = &pd_data->policy;
@@ -6388,9 +6388,9 @@ void usbpd_init_policy(struct usbpd_data *pd_data)
 		policy->tx_data_obj[i].object = 0;
 	}
 }
-EXPORT_SYMBOL(usbpd_init_policy);
+EXPORT_SYMBOL(legacy_usbpd_init_policy);
 
-void usbpd_kick_policy_work(struct device *dev)
+void legacy_usbpd_kick_policy_work(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 
@@ -6399,14 +6399,14 @@ void usbpd_kick_policy_work(struct device *dev)
 	else
 		schedule_work(&pd_data->worker);
 }
-EXPORT_SYMBOL(usbpd_kick_policy_work);
+EXPORT_SYMBOL(legacy_usbpd_kick_policy_work);
 
-void usbpd_cancel_policy_work(struct device *dev)
+void legacy_usbpd_cancel_policy_work(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 
 	if (pd_data->policy_wqueue)
 		flush_workqueue(pd_data->policy_wqueue);
 }
-EXPORT_SYMBOL(usbpd_cancel_policy_work);
+EXPORT_SYMBOL(legacy_usbpd_cancel_policy_work);
 

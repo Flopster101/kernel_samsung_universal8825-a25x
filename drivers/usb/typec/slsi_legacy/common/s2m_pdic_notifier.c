@@ -105,7 +105,7 @@ void s2m_pdic_notifier_detach_attached_jig_dev(muic_attached_dev_t cur_dev)
 	pdic_notifier.attached_dev = ATTACHED_DEV_NONE_MUIC;
 }
 #endif
-void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
+void legacy_s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
 {
 	pr_info("%s: (%d)\n", __func__, new_dev);
 
@@ -115,9 +115,9 @@ void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev)
 	/* pdic's attached_device attach broadcast */
 	s2m_pdic_notifier_notify();
 }
-EXPORT_SYMBOL(s2m_pdic_notifier_attach_attached_dev);
+EXPORT_SYMBOL(legacy_s2m_pdic_notifier_attach_attached_dev);
 
-void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
+void legacy_s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
 {
 	pr_info("%s: (%d)\n", __func__, cur_dev);
 
@@ -134,7 +134,7 @@ void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev)
 
 	s2m_pdic_notifier.attached_dev = ATTACHED_DEV_NONE_MUIC;
 }
-EXPORT_SYMBOL(s2m_pdic_notifier_detach_attached_dev);
+EXPORT_SYMBOL(legacy_s2m_pdic_notifier_detach_attached_dev);
 
 void s2m_pdic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev)
 {

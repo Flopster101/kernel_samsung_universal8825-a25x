@@ -45,8 +45,8 @@ enum {
  * this function is for JUST MUIC device driver.
  * DON'T use function anywhrer else!!
  */
-extern void s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
-extern void s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
+extern void legacy_s2m_pdic_notifier_attach_attached_dev(muic_attached_dev_t new_dev);
+extern void legacy_s2m_pdic_notifier_detach_attached_dev(muic_attached_dev_t cur_dev);
 extern void s2m_pdic_notifier_logically_attach_attached_dev(muic_attached_dev_t new_dev);
 extern void s2m_pdic_notifier_logically_detach_attached_dev(muic_attached_dev_t cur_dev);
 void s2m_pdic_notifier_attach_attached_jig_dev(muic_attached_dev_t new_dev);

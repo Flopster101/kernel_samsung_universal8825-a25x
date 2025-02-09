@@ -19,7 +19,7 @@
 #define __USBPD_EXT_H__
 
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-extern struct usbpd_data *g_pd_data;
+extern struct usbpd_data *legacy_g_pd_data;
 #endif
 
 /* Samsung Acc VID */
@@ -55,14 +55,14 @@ extern struct usbpd_data *g_pd_data;
 #define DP_PIN_ASSIGNMENT_F	0x00000020	/* ( 1 << 5 ) */
 
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
-extern void pdic_event_work(void *data, int dest, int id, int attach, int event, int sub);
+extern void legacy_pdic_event_work(void *data, int dest, int id, int attach, int event, int sub);
 extern void select_pdo(int num);
 extern int sec_pd_select_pps(int num, int ppsVol, int ppsCur);
 extern int sec_pd_get_apdo_max_power(unsigned int *pdo_pos,
 	unsigned int *taMaxVol, unsigned int * taMaxCur, unsigned int *taMaxPwr);
 extern int sec_pps_enable(int num, int ppsVol, int ppsCur, int enable);
 extern int sec_get_pps_voltage(void);
-extern void pdo_ctrl_by_flash(bool mode);
+extern void legacy_pdo_ctrl_by_flash(bool mode);
 #endif
 #if defined(CONFIG_DUAL_ROLE_USB_INTF)
 extern void role_swap_check(struct work_struct *wk);
@@ -84,7 +84,7 @@ extern int typec_port_type_set(const struct typec_capability *cap, enum typec_po
 #endif
 extern int typec_get_pd_support(void *_data);
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-extern int typec_init(struct usbpd_data *_data);
+extern int legacy_typec_init(struct usbpd_data *_data);
 #endif
 #endif
 #endif

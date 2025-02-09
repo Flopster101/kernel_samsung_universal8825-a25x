@@ -74,7 +74,7 @@ static char *pdic_supplied_to[] = {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 void usbpd_manager_set_source_cap(int size_of_power_list, POWER_LIST power_list[])
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	msg_header_type *msg_header	= &pd_data->source_msg_header;
@@ -150,7 +150,7 @@ void usbpd_manager_set_source_cap(int size_of_power_list, POWER_LIST power_list[
 
 void usbpd_manager_select_pdo(int num)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	bool vbus_short = 0;
 #if IS_ENABLED(CONFIG_PDIC_PD30)
@@ -190,7 +190,7 @@ void usbpd_manager_select_pdo(int num)
 	}
 #endif
 	if (pd_data->pd_noti.sink_status.selected_pdo_num == num)
-		usbpd_manager_plug_attach(pd_data->dev, ATTACHED_DEV_TYPE3_CHARGER_MUIC);
+		legacy_usbpd_manager_plug_attach(pd_data->dev, ATTACHED_DEV_TYPE3_CHARGER_MUIC);
 	else if (num > pd_data->pd_noti.sink_status.available_pdo_num)
 		pd_data->pd_noti.sink_status.selected_pdo_num = pd_data->pd_noti.sink_status.available_pdo_num;
 	else if (num < 1)
@@ -207,7 +207,7 @@ exit:
 #if IS_ENABLED(CONFIG_PDIC_PD30)
 int usbpd_manager_select_pps(int num, int ppsVol, int ppsCur)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	bool vbus_short = 0;
 	int ret = 0;
@@ -275,7 +275,7 @@ int usbpd_manager_select_pps(int num, int ppsVol, int ppsCur)
 		__func__, pd_data->pd_noti.sink_status.selected_pdo_num, ppsVol, ppsCur);
 
 //	schedule_delayed_work(&manager->select_pdo_handler, msecs_to_jiffies(50));
-	usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
+	legacy_usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
 
 exit:
 	mutex_unlock(&manager->pdo_mutex);
@@ -289,7 +289,7 @@ int usbpd_manager_get_apdo_max_power(unsigned int *pdo_pos,
 	int i;
 	int ret = 0;
 	int max_current = 0, max_voltage = 0, max_power = 0;
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 
 	if (!pd_data->pd_noti.sink_status.has_apdo) {
 		pr_info("%s: pd don't have apdo\n", __func__);
@@ -339,7 +339,7 @@ int usbpd_manager_get_apdo_max_power(unsigned int *pdo_pos,
 
 int usbpd_manager_pps_enable(int num, int ppsVol, int ppsCur, int enable)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	bool vbus_short = 0;
 	int ret = 0;
@@ -414,14 +414,14 @@ int usbpd_manager_pps_enable(int num, int ppsVol, int ppsCur, int enable)
 
 	if (enable) {
 //		schedule_delayed_work(&manager->select_pdo_handler, msecs_to_jiffies(0));
-		usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
+		legacy_usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
 		msleep(150);
 		PDIC_OPS_PARAM_FUNC(pps_enable, pd_data, PPS_ENABLE);
 	} else {
 		PDIC_OPS_PARAM_FUNC(pps_enable, pd_data, PPS_DISABLE);
 		msleep(100);
 //		schedule_delayed_work(&manager->select_pdo_handler, msecs_to_jiffies(0));
-		usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
+		legacy_usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
 	}
 exit:
 	mutex_unlock(&manager->pdo_mutex);
@@ -431,7 +431,7 @@ exit:
 
 int usbpd_manager_get_pps_voltage(void)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	int ret = (PDIC_OPS_FUNC(get_pps_voltage, pd_data) * USBPD_PPS_RQ_VOLT_UNIT);
 
 	if (ret < 0)
@@ -448,7 +448,7 @@ int sec_get_pps_voltage(void)
 	return 0;
 }
 #endif
-void pdo_ctrl_by_flash(bool mode)
+void legacy_pdo_ctrl_by_flash(bool mode)
 {
 	struct usbpd_data *pd_data;
 	struct usbpd_manager_data *manager;
@@ -456,7 +456,7 @@ void pdo_ctrl_by_flash(bool mode)
 	int pps_enable = -1;
 #endif
 
-	pd_data = g_pd_data;
+	pd_data = legacy_g_pd_data;
 	if (!pd_data) {
 		pr_info("%s, pd_data is NULL\n", __func__);
 		return;
@@ -490,18 +490,18 @@ void pdo_ctrl_by_flash(bool mode)
 	if (pd_data->pd_noti.sink_status.selected_pdo_num != 0) {
 		pd_data->pd_noti.sink_status.selected_pdo_num = 1;
 		usbpd_manager_select_pdo_cancel(pd_data->dev);
-		usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_GET_SRC_CAP);
+		legacy_usbpd_manager_inform_event(pd_data->pd_noti.pusbpd, MANAGER_GET_SRC_CAP);
 	}
 	mutex_unlock(&manager->pdo_mutex);
 }
-EXPORT_SYMBOL(pdo_ctrl_by_flash);
+EXPORT_SYMBOL(legacy_pdo_ctrl_by_flash);
 #endif
 
 void usbpd_manager_select_pdo_handler(struct work_struct *work)
 {
 	pr_info("%s: call select pdo handler\n", __func__);
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	usbpd_manager_inform_event(g_pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
+	legacy_usbpd_manager_inform_event(legacy_g_pd_data->pd_noti.pusbpd, MANAGER_NEW_POWER_SRC);
 #endif
 }
 
@@ -533,7 +533,7 @@ void usbpd_manager_start_discover_msg_handler(struct work_struct *work)
 	mutex_lock(&manager->vdm_mutex);
 	if (manager->alt_sended == 0 && manager->vdm_en == 1) {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-		usbpd_manager_inform_event(g_pd_data,
+		legacy_usbpd_manager_inform_event(legacy_g_pd_data,
 						MANAGER_START_DISCOVER_IDENTITY);
 #endif
 		manager->alt_sended = 1;
@@ -549,27 +549,27 @@ void usbpd_manager_start_discover_msg_cancel(struct device *dev)
 	cancel_delayed_work_sync(&manager->start_discover_msg_handler);
 }
 
-void usbpd_manager_send_pr_swap(struct device *dev)
+void legacy_usbpd_manager_send_pr_swap(struct device *dev)
 {
 	pr_info("%s: call send pr swap msg\n", __func__);
 
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	usbpd_manager_inform_event(g_pd_data, MANAGER_SEND_PR_SWAP);
+	legacy_usbpd_manager_inform_event(legacy_g_pd_data, MANAGER_SEND_PR_SWAP);
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_send_pr_swap);
+EXPORT_SYMBOL(legacy_usbpd_manager_send_pr_swap);
 
-void usbpd_manager_send_dr_swap(struct device *dev)
+void legacy_usbpd_manager_send_dr_swap(struct device *dev)
 {
 	pr_info("%s: call send pr swap msg\n", __func__);
 
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	usbpd_manager_inform_event(g_pd_data, MANAGER_SEND_DR_SWAP);
+	legacy_usbpd_manager_inform_event(legacy_g_pd_data, MANAGER_SEND_DR_SWAP);
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_send_dr_swap);
+EXPORT_SYMBOL(legacy_usbpd_manager_send_dr_swap);
 
-void usbpd_manager_match_sink_cap(struct usbpd_data *pd_data)
+void legacy_usbpd_manager_match_sink_cap(struct usbpd_data *pd_data)
 {
 	unsigned src_cur, volt, op_cur;
 	data_obj_type *data_obj = &pd_data->source_data_obj[0];
@@ -592,7 +592,7 @@ void usbpd_manager_match_sink_cap(struct usbpd_data *pd_data)
 
 	return;
 }
-EXPORT_SYMBOL(usbpd_manager_match_sink_cap);
+EXPORT_SYMBOL(legacy_usbpd_manager_match_sink_cap);
 
 void init_source_cap_data(struct usbpd_manager_data *_data)
 {
@@ -617,12 +617,12 @@ void init_source_cap_data(struct usbpd_manager_data *_data)
 	data_obj[0].power_data_obj.usb_comm_capable = 1;
 }
 
-void usbpd_manager_remove_new_cap(struct usbpd_data *pd_data)
+void legacy_usbpd_manager_remove_new_cap(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	init_source_cap_data(manager);
 }
-EXPORT_SYMBOL(usbpd_manager_remove_new_cap);
+EXPORT_SYMBOL(legacy_usbpd_manager_remove_new_cap);
 
 static void init_sink_cap_data(struct usbpd_manager_data *_data)
 {
@@ -652,11 +652,11 @@ static void init_sink_cap_data(struct usbpd_manager_data *_data)
 	(data_obj + 1)->power_data_obj_sink.op_current = 2000/10;
 }
 
-int samsung_uvdm_ready(void)
+int legacy_samsung_uvdm_ready(void)
 {
 	int uvdm_ready = false;
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	pr_info("%s\n", __func__);
@@ -668,12 +668,12 @@ int samsung_uvdm_ready(void)
 #endif
 	return uvdm_ready;
 }
-EXPORT_SYMBOL(samsung_uvdm_ready);
+EXPORT_SYMBOL(legacy_samsung_uvdm_ready);
 
-void samsung_uvdm_close(void)
+void legacy_samsung_uvdm_close(void)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	pr_info("%s\n", __func__);
@@ -682,12 +682,12 @@ void samsung_uvdm_close(void)
 	complete(&manager->uvdm_in_wait);
 #endif
 }
-EXPORT_SYMBOL(samsung_uvdm_close);
+EXPORT_SYMBOL(legacy_samsung_uvdm_close);
 
 int usbpd_manager_send_samsung_uvdm_message(void *data, const char *buf, size_t size)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	int received_data = 0;
 	int data_role = 0;
@@ -731,15 +731,15 @@ int usbpd_manager_send_samsung_uvdm_message(void *data, const char *buf, size_t 
 		// phase 3. fill sec uvdm header
 
 	}
-	usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
+	legacy_usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
 #endif
 	return 0;
 }
 
-int samsung_uvdm_write(void *data, int size)
+int legacy_samsung_uvdm_write(void *data, int size)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	uint8_t *SEC_DATA;
 	uint8_t rcv_data[MAX_INPUT_DATA] = {0,};
@@ -806,7 +806,7 @@ int samsung_uvdm_write(void *data, int size)
 			set_sec_uvdm_tx_tailer(&manager->uvdm_data_obj[0]);
 
 			reinit_completion(&manager->uvdm_out_wait);
-			usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
+			legacy_usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
 
 			time_left = wait_for_completion_interruptible_timeout(&manager->uvdm_out_wait, msecs_to_jiffies(SEC_UVDM_WAIT_MS));
 			if (time_left <= 0) {
@@ -824,12 +824,12 @@ int samsung_uvdm_write(void *data, int size)
 #endif
 	return 0;
 }
-EXPORT_SYMBOL(samsung_uvdm_write);
+EXPORT_SYMBOL(legacy_samsung_uvdm_write);
 
-int samsung_uvdm_read(void *data)
+int legacy_samsung_uvdm_read(void *data)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	struct policy_data *policy = &pd_data->policy;
 	uint8_t in_data[MAX_INPUT_DATA] = {0,};
@@ -869,7 +869,7 @@ int samsung_uvdm_read(void *data)
 
 	/* 5. Send data to PDIC */
 	reinit_completion(&manager->uvdm_in_wait);
-	usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
+	legacy_usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
 
 	cur_set_num = 0;
 	total_set_num = 1;
@@ -932,7 +932,7 @@ int samsung_uvdm_read(void *data)
 
 		set_sec_uvdm_rx_header(&manager->uvdm_data_obj[0], cur_set_num, cur_set_data, ack);
 		reinit_completion(&manager->uvdm_in_wait);
-		usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
+		legacy_usbpd_manager_inform_event(pd_data, MANAGER_UVDM_SEND_MESSAGE);
 	} while ( cur_set_num < total_set_num);
 
 	set_endian(in_data, data, size);
@@ -942,7 +942,7 @@ int samsung_uvdm_read(void *data)
 	return 0;
 #endif
 }
-EXPORT_SYMBOL(samsung_uvdm_read);
+EXPORT_SYMBOL(legacy_samsung_uvdm_read);
 
 void usbpd_manager_receive_samsung_uvdm_message(struct usbpd_data *pd_data)
 {
@@ -1001,7 +1001,7 @@ void usbpd_manager_receive_samsung_uvdm_message(struct usbpd_data *pd_data)
 	return;
 }
 
-void usbpd_manager_plug_attach(struct device *dev, muic_attached_dev_t new_dev)
+void legacy_usbpd_manager_plug_attach(struct device *dev, muic_attached_dev_t new_dev)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
@@ -1017,7 +1017,7 @@ void usbpd_manager_plug_attach(struct device *dev, muic_attached_dev_t new_dev)
 			pd_data->pd_noti.event = PDIC_NOTIFY_EVENT_PD_SINK;
 		manager->ps_rdy = 1;
 		manager->prev_available_pdo = pd_data->pd_noti.sink_status.available_pdo_num;
-		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT, PDIC_NOTIFY_ID_POWER_STATUS,
+		legacy_pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT, PDIC_NOTIFY_ID_POWER_STATUS,
 				1, 0, 0);
 	}
 #else
@@ -1026,12 +1026,12 @@ void usbpd_manager_plug_attach(struct device *dev, muic_attached_dev_t new_dev)
 
 	pr_info("%s: usbpd plug attached\n", __func__);
 	manager->attached_dev = new_dev;
-	s2m_pdic_notifier_attach_attached_dev(manager->attached_dev);
+	legacy_s2m_pdic_notifier_attach_attached_dev(manager->attached_dev);
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_plug_attach);
+EXPORT_SYMBOL(legacy_usbpd_manager_plug_attach);
 
-void usbpd_manager_plug_detach(struct device *dev, bool notify)
+void legacy_usbpd_manager_plug_detach(struct device *dev, bool notify)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
@@ -1039,21 +1039,21 @@ void usbpd_manager_plug_detach(struct device *dev, bool notify)
 
 	pr_info("%s: usbpd plug detached\n", __func__);
 
-	usbpd_policy_reset(pd_data, PLUG_DETACHED);
+	legacy_usbpd_policy_reset(pd_data, PLUG_DETACHED);
 	if (notify)
-		s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
+		legacy_s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
 	manager->attached_dev = ATTACHED_DEV_NONE_MUIC;
 
 	if (pd_data->pd_noti.event != PDIC_NOTIFY_EVENT_DETACH) {
 		pd_data->pd_noti.event = PDIC_NOTIFY_EVENT_DETACH;
-		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT, PDIC_NOTIFY_ID_POWER_STATUS,
+		legacy_pdic_event_work(pd_data, PDIC_NOTIFY_DEV_BATT, PDIC_NOTIFY_ID_POWER_STATUS,
 				0, 0, 0);
 	}
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_plug_detach);
+EXPORT_SYMBOL(legacy_usbpd_manager_plug_detach);
 
-void usbpd_manager_acc_detach(struct device *dev)
+void legacy_usbpd_manager_acc_detach(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -1065,11 +1065,11 @@ void usbpd_manager_acc_detach(struct device *dev)
 			schedule_delayed_work(&manager->acc_detach_handler, msecs_to_jiffies(1000));
 		else
 			schedule_delayed_work(&manager->acc_detach_handler, msecs_to_jiffies(0));
-		pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
+		legacy_pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
 			PDIC_NOTIFY_ID_CLEAR_INFO, PDIC_NOTIFY_ID_DEVICE_INFO, 0, 0);
 	}
 }
-EXPORT_SYMBOL(usbpd_manager_acc_detach);
+EXPORT_SYMBOL(legacy_usbpd_manager_acc_detach);
 
 int usbpd_manager_command_to_policy(struct device *dev,
 		usbpd_manager_command_type command)
@@ -1079,7 +1079,7 @@ int usbpd_manager_command_to_policy(struct device *dev,
 
 	manager->cmd |= command;
 
-	usbpd_kick_policy_work(dev);
+	legacy_usbpd_kick_policy_work(dev);
 
 	/* TODO: check result
 	if (manager->event) {
@@ -1089,7 +1089,7 @@ int usbpd_manager_command_to_policy(struct device *dev,
 	return 0;
 }
 
-void usbpd_manager_inform_event(struct usbpd_data *pd_data,
+void legacy_usbpd_manager_inform_event(struct usbpd_data *pd_data,
 		usbpd_manager_event_type event)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -1110,12 +1110,12 @@ void usbpd_manager_inform_event(struct usbpd_data *pd_data,
 				MANAGER_REQ_VDM_DISCOVER_SVID);
 		break;
 	case MANAGER_DISCOVER_SVID_ACKED:
-		usbpd_manager_get_svids(pd_data);
+		legacy_usbpd_manager_get_svids(pd_data);
 		usbpd_manager_command_to_policy(pd_data->dev,
 				MANAGER_REQ_VDM_DISCOVER_MODE);
 		break;
 	case MANAGER_DISCOVER_MODE_ACKED:
-		usbpd_manager_get_modes(pd_data);
+		legacy_usbpd_manager_get_modes(pd_data);
 		usbpd_manager_command_to_policy(pd_data->dev,
 				MANAGER_REQ_VDM_ENTER_MODE);
 		break;
@@ -1165,9 +1165,9 @@ void usbpd_manager_inform_event(struct usbpd_data *pd_data,
 		pr_info("%s: not matched event(%d)\n", __func__, event);
 	}
 }
-EXPORT_SYMBOL(usbpd_manager_inform_event);
+EXPORT_SYMBOL(legacy_usbpd_manager_inform_event);
 
-bool usbpd_manager_vdm_request_enabled(struct usbpd_data *pd_data)
+bool legacy_usbpd_manager_vdm_request_enabled(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	/* TODO : checking cable discovering
@@ -1186,29 +1186,29 @@ bool usbpd_manager_vdm_request_enabled(struct usbpd_data *pd_data)
 
 	return true;
 }
-EXPORT_SYMBOL(usbpd_manager_vdm_request_enabled);
+EXPORT_SYMBOL(legacy_usbpd_manager_vdm_request_enabled);
 
-bool usbpd_manager_power_role_swap(struct usbpd_data *pd_data)
+bool legacy_usbpd_manager_power_role_swap(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	return manager->power_role_swap;
 }
-EXPORT_SYMBOL(usbpd_manager_power_role_swap);
+EXPORT_SYMBOL(legacy_usbpd_manager_power_role_swap);
 
-bool usbpd_manager_vconn_source_swap(struct usbpd_data *pd_data)
+bool legacy_usbpd_manager_vconn_source_swap(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	return manager->vconn_source_swap;
 }
-EXPORT_SYMBOL(usbpd_manager_vconn_source_swap);
+EXPORT_SYMBOL(legacy_usbpd_manager_vconn_source_swap);
 
-void usbpd_manager_turn_off_vconn(struct usbpd_data *pd_data)
+void legacy_usbpd_manager_turn_off_vconn(struct usbpd_data *pd_data)
 {
 	/* TODO : Turn off vconn */
 }
-EXPORT_SYMBOL(usbpd_manager_turn_off_vconn);
+EXPORT_SYMBOL(legacy_usbpd_manager_turn_off_vconn);
 
 void usbpd_manager_turn_on_source(struct usbpd_data *pd_data)
 {
@@ -1217,7 +1217,7 @@ void usbpd_manager_turn_on_source(struct usbpd_data *pd_data)
 	pr_info("%s: usbpd plug attached\n", __func__);
 
 	manager->attached_dev = ATTACHED_DEV_TYPE3_ADAPTER_MUIC;
-	s2m_pdic_notifier_attach_attached_dev(manager->attached_dev);
+	legacy_s2m_pdic_notifier_attach_attached_dev(manager->attached_dev);
 	/* TODO : Turn on source */
 }
 
@@ -1227,7 +1227,7 @@ void usbpd_manager_turn_off_power_supply(struct usbpd_data *pd_data)
 
 	pr_info("%s: usbpd plug detached\n", __func__);
 
-	s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
+	legacy_s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
 	manager->attached_dev = ATTACHED_DEV_NONE_MUIC;
 	/* TODO : Turn off power supply */
 }
@@ -1238,18 +1238,18 @@ void usbpd_manager_turn_off_power_sink(struct usbpd_data *pd_data)
 
 	pr_info("%s: usbpd sink turn off\n", __func__);
 
-	s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
+	legacy_s2m_pdic_notifier_detach_attached_dev(manager->attached_dev);
 	manager->attached_dev = ATTACHED_DEV_NONE_MUIC;
 	/* TODO : Turn off power sink */
 }
 
-bool usbpd_manager_data_role_swap(struct usbpd_data *pd_data)
+bool legacy_usbpd_manager_data_role_swap(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
 	return manager->data_role_swap;
 }
-EXPORT_SYMBOL(usbpd_manager_data_role_swap);
+EXPORT_SYMBOL(legacy_usbpd_manager_data_role_swap);
 
 void usbpd_manager_acc_detach_handler(struct work_struct *wk)
 {
@@ -1271,7 +1271,7 @@ void usbpd_manager_acc_detach_handler(struct work_struct *wk)
 	}
 }
 
-void usbpd_manager_acc_handler_cancel(struct device *dev)
+void legacy_usbpd_manager_acc_handler_cancel(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -1281,7 +1281,7 @@ void usbpd_manager_acc_handler_cancel(struct device *dev)
 		cancel_delayed_work_sync(&manager->acc_detach_handler);
 	}
 }
-EXPORT_SYMBOL(usbpd_manager_acc_handler_cancel);
+EXPORT_SYMBOL(legacy_usbpd_manager_acc_handler_cancel);
 
 static int usbpd_manager_check_accessory(struct usbpd_manager_data *manager)
 {
@@ -1326,7 +1326,7 @@ static int usbpd_manager_check_accessory(struct usbpd_manager_data *manager)
 			case MPA2_PRODUCT_ID:
 				acc_type = PDIC_DOCK_NEW;
 				pr_info("%s : Samsung MPA2 connected. need to SRCCAP_CHANGE\n", __func__);
-				usbpd_manager_match_sink_cap(pd_data);
+				legacy_usbpd_manager_match_sink_cap(pd_data);
 				usbpd_manager_command_to_policy(pd_data->dev,
 						MANAGER_REQ_SRCCAP_CHANGE);
 				break;
@@ -1376,7 +1376,7 @@ int usbpd_manager_get_identity(struct usbpd_data *pd_data)
 	if (usbpd_manager_check_accessory(manager))
 		pr_info("%s, Samsung Accessory Connected.\n", __func__);
 
-	pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
+	legacy_pdic_event_work(pd_data, PDIC_NOTIFY_DEV_ALL,
 			PDIC_NOTIFY_ID_DEVICE_INFO, manager->Vendor_ID,
 			manager->Product_ID, manager->Device_Version);
 
@@ -1384,7 +1384,7 @@ int usbpd_manager_get_identity(struct usbpd_data *pd_data)
 }
 
 /* Ok : 0 (SVID_0 is DP support(0xff01)), NAK: -1 */
-int usbpd_manager_get_svids(struct usbpd_data *pd_data)
+int legacy_usbpd_manager_get_svids(struct usbpd_data *pd_data)
 {
 	struct policy_data *policy = &pd_data->policy;
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -1400,10 +1400,10 @@ int usbpd_manager_get_svids(struct usbpd_data *pd_data)
 
 	return -1;
 }
-EXPORT_SYMBOL(usbpd_manager_get_svids);
+EXPORT_SYMBOL(legacy_usbpd_manager_get_svids);
 
 /* Ok : 0 (SVID_0 is DP support(0xff01)), NAK: -1 */
-int usbpd_manager_get_modes(struct usbpd_data *pd_data)
+int legacy_usbpd_manager_get_modes(struct usbpd_data *pd_data)
 {
 	struct policy_data *policy = &pd_data->policy;
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -1418,7 +1418,7 @@ int usbpd_manager_get_modes(struct usbpd_data *pd_data)
 	}
 	return -1;
 }
-EXPORT_SYMBOL(usbpd_manager_get_modes);
+EXPORT_SYMBOL(legacy_usbpd_manager_get_modes);
 
 int usbpd_manager_enter_mode(struct usbpd_data *pd_data)
 {
@@ -1429,13 +1429,13 @@ int usbpd_manager_enter_mode(struct usbpd_data *pd_data)
 	return 0;
 }
 
-int usbpd_manager_exit_mode(struct usbpd_data *pd_data, unsigned mode)
+int legacy_usbpd_manager_exit_mode(struct usbpd_data *pd_data, unsigned mode)
 {
 	return 0;
 }
-EXPORT_SYMBOL(usbpd_manager_exit_mode);
+EXPORT_SYMBOL(legacy_usbpd_manager_exit_mode);
 
-data_obj_type usbpd_manager_select_capability(struct usbpd_data *pd_data)
+data_obj_type legacy_usbpd_manager_select_capability(struct usbpd_data *pd_data)
 {
 	/* TODO: Request from present capabilities
 		indicate if other capabilities would be required */
@@ -1474,9 +1474,9 @@ data_obj_type usbpd_manager_select_capability(struct usbpd_data *pd_data)
 
 	return obj;
 }
-EXPORT_SYMBOL(usbpd_manager_select_capability);
+EXPORT_SYMBOL(legacy_usbpd_manager_select_capability);
 
-int usbpd_manager_get_selected_voltage(struct usbpd_data *pd_data, int selected_pdo)
+int legacy_usbpd_manager_get_selected_voltage(struct usbpd_data *pd_data, int selected_pdo)
 {
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 #if IS_ENABLED(CONFIG_BATTERY_NOTIFIER)
@@ -1508,16 +1508,16 @@ int usbpd_manager_get_selected_voltage(struct usbpd_data *pd_data, int selected_
 	return 0;
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_get_selected_voltage);
+EXPORT_SYMBOL(legacy_usbpd_manager_get_selected_voltage);
 
 /*
-   usbpd_manager_evaluate_capability
+   legacy_usbpd_manager_evaluate_capability
    : Policy engine ask Device Policy Manager to evaluate option
      based on supplied capabilities
 	return	>0	: request object number
 		0	: no selected option
 */
-int usbpd_manager_evaluate_capability(struct usbpd_data *pd_data)
+int legacy_usbpd_manager_evaluate_capability(struct usbpd_data *pd_data)
 {
 	struct policy_data *policy = &pd_data->policy;
 	int i = 0;
@@ -1669,10 +1669,10 @@ int usbpd_manager_evaluate_capability(struct usbpd_data *pd_data)
 	return 1; /* select default first obj */
 #endif
 }
-EXPORT_SYMBOL(usbpd_manager_evaluate_capability);
+EXPORT_SYMBOL(legacy_usbpd_manager_evaluate_capability);
 
 /* return: 0: cab be met, -1: cannot be met, -2: could be met later */
-int usbpd_manager_match_request(struct usbpd_data *pd_data)
+int legacy_usbpd_manager_match_request(struct usbpd_data *pd_data)
 {
 	/* TODO: Evaluation of sink request */
 	unsigned src_max_current = 0;
@@ -1729,9 +1729,9 @@ log_battery:
 	mismatch = pd_data->source_request_obj.request_data_object_battery.capability_mismatch;
 	return 0;
 }
-EXPORT_SYMBOL(usbpd_manager_match_request);
+EXPORT_SYMBOL(legacy_usbpd_manager_match_request);
 
-void usbpd_manager_response_req_pdo(struct usbpd_data *pd_data, int req_pdo_type, int req_pdo_num)
+void legacy_usbpd_manager_response_req_pdo(struct usbpd_data *pd_data, int req_pdo_type, int req_pdo_num)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	int sel_pdo = req_pdo_num;
@@ -1757,7 +1757,7 @@ void usbpd_manager_response_req_pdo(struct usbpd_data *pd_data, int req_pdo_type
 		__func__, sel_pdo, manager->req_pdo_type);
 	PDIC_OPS_PARAM_FUNC(set_otg_control, pd_data, 1);
 }
-EXPORT_SYMBOL(usbpd_manager_response_req_pdo);
+EXPORT_SYMBOL(legacy_usbpd_manager_response_req_pdo);
 
 static void usbpd_manager_send_new_src_cap(int auth_t, int d2d_t)
 {
@@ -1802,7 +1802,7 @@ static void usbpd_manager_send_new_src_cap(int auth_t, int d2d_t)
 
 void usbpd_manager_vpdo_auth(int auth, int d2d_type)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	struct usbpd_manager_data *manager = &pd_data->manager;
 	int power_role = -1;
 
@@ -1843,7 +1843,7 @@ void usbpd_manager_vpdo_auth(int auth, int d2d_type)
 
 void usbpd_manager_short_check_handler(struct work_struct *work)
 {
-	struct usbpd_data *pd_data = g_pd_data;
+	struct usbpd_data *pd_data = legacy_g_pd_data;
 	bool vbus_short = 0;
 
 	pr_info("%s, ++\n", __func__);
@@ -1867,7 +1867,7 @@ void usbpd_manager_short_check_handler(struct work_struct *work)
 	PDIC_OPS_FUNC(send_psrdy, pd_data);
 #endif
 	/* Notify Plug Attach */
-	usbpd_manager_plug_attach(pd_data->dev, ATTACHED_DEV_TYPE3_CHARGER_MUIC);
+	legacy_usbpd_manager_plug_attach(pd_data->dev, ATTACHED_DEV_TYPE3_CHARGER_MUIC);
 
 	return;
 }
@@ -1930,7 +1930,7 @@ static bool usbpd_manager_src_otg_type(bool enable, int auth_t, int req_pdo, int
 	return enable;
 }
 
-void usbpd_manager_vbus_turn_on_ctrl(void *_data, bool enable)
+void legacy_usbpd_manager_vbus_turn_on_ctrl(void *_data, bool enable)
 {
 	struct usbpd_data *pd_data = _data;
 	struct power_supply *psy_otg = NULL;
@@ -2048,7 +2048,7 @@ void usbpd_manager_vbus_turn_on_ctrl(void *_data, bool enable)
 	}
 
 }
-EXPORT_SYMBOL_GPL(usbpd_manager_vbus_turn_on_ctrl);
+EXPORT_SYMBOL_GPL(legacy_usbpd_manager_vbus_turn_on_ctrl);
 
 #ifdef CONFIG_OF
 static int of_usbpd_manager_dt(struct usbpd_manager_data *_data)
@@ -2209,7 +2209,7 @@ static int usbpd_manager_set_property(struct power_supply *psy,
 	return 0;
 }
 
-int usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent)
+int legacy_usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent)
 {
 	struct power_supply_config psy_cfg = {};
 	int ret = 0;
@@ -2219,7 +2219,7 @@ int usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent)
 		return -1;
 	}
 
-	_data->pdic_desc.name           = "usbpd-manager";
+	_data->pdic_desc.name           = "legacy-usbpd-manager";
 	_data->pdic_desc.type           = POWER_SUPPLY_TYPE_UNKNOWN;
 	_data->pdic_desc.get_property   = usbpd_manager_get_property;
 	_data->pdic_desc.set_property   = usbpd_manager_set_property;
@@ -2238,9 +2238,9 @@ int usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent)
 	}
 	return ret;
 }
-EXPORT_SYMBOL_GPL(usbpd_manager_psy_init);
+EXPORT_SYMBOL_GPL(legacy_usbpd_manager_psy_init);
 
-void usbpd_init_manager_val(struct usbpd_data *pd_data)
+void legacy_usbpd_init_manager_val(struct usbpd_data *pd_data)
 {
 	struct usbpd_manager_data *manager = &pd_data->manager;
 
@@ -2261,9 +2261,9 @@ void usbpd_init_manager_val(struct usbpd_data *pd_data)
 	usbpd_manager_select_pdo_cancel(pd_data->dev);
 	usbpd_manager_start_discover_msg_cancel(pd_data->dev);
 }
-EXPORT_SYMBOL(usbpd_init_manager_val);
+EXPORT_SYMBOL(legacy_usbpd_init_manager_val);
 
-int usbpd_init_manager(struct usbpd_data *pd_data)
+int legacy_usbpd_init_manager(struct usbpd_data *pd_data)
 {
 	int ret = 0;
 	struct usbpd_manager_data *manager = &pd_data->manager;
@@ -2326,5 +2326,5 @@ int usbpd_init_manager(struct usbpd_data *pd_data)
 	pr_info("%s done\n", __func__);
 	return ret;
 }
-EXPORT_SYMBOL(usbpd_init_manager);
+EXPORT_SYMBOL(legacy_usbpd_init_manager);
 

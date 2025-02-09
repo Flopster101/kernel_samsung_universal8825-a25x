@@ -18,8 +18,8 @@
 #else
 #include <linux/battery/sec_pd.h>
 #endif
-struct usbpd_data *g_pd_data;
-EXPORT_SYMBOL(g_pd_data);
+struct usbpd_data *legacy_g_pd_data;
+EXPORT_SYMBOL(legacy_g_pd_data);
 #endif
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 #include <linux/usb/typec/common/pdic_sysfs.h>
@@ -49,13 +49,13 @@ enum pdic_sysfs_property usbpd_sysfs_properties[] = {
 extern struct device *pdic_device;
 #endif
 
-void usbpd_timer_vdm_start(struct usbpd_data *pd_data)
+void legacy_usbpd_timer_vdm_start(struct usbpd_data *pd_data)
 {
 	ktime_get_real_ts64(&pd_data->time_vdm);
 }
-EXPORT_SYMBOL(usbpd_timer_vdm_start);
+EXPORT_SYMBOL(legacy_usbpd_timer_vdm_start);
 
-long long usbpd_check_timer_vdm(struct usbpd_data *pd_data)
+long long legacy_usbpd_check_timer_vdm(struct usbpd_data *pd_data)
 {
 	uint32_t ms = 0;
 	uint32_t sec = 0;
@@ -68,15 +68,15 @@ long long usbpd_check_timer_vdm(struct usbpd_data *pd_data)
 
     return (sec * 1000) + ms;
 }
-EXPORT_SYMBOL(usbpd_check_timer_vdm);
+EXPORT_SYMBOL(legacy_usbpd_check_timer_vdm);
 
-void usbpd_timer1_start(struct usbpd_data *pd_data)
+void legacy_usbpd_timer1_start(struct usbpd_data *pd_data)
 {
 	ktime_get_real_ts64(&pd_data->time1);
 }
-EXPORT_SYMBOL(usbpd_timer1_start);
+EXPORT_SYMBOL(legacy_usbpd_timer1_start);
 
-long long usbpd_check_time1(struct usbpd_data *pd_data)
+long long legacy_usbpd_check_time1(struct usbpd_data *pd_data)
 {
 	uint32_t ms = 0;
 	uint32_t sec = 0;
@@ -94,21 +94,21 @@ long long usbpd_check_time1(struct usbpd_data *pd_data)
     /* for demon update after boot */
     if ((sec > 100) || (sec < 0)) {
         pr_info("%s, timer changed\n", __func__);
-        usbpd_timer1_start(pd_data);
+        legacy_usbpd_timer1_start(pd_data);
         return 0;
     }
 
     return (sec * 1000) + ms;
 }
-EXPORT_SYMBOL(usbpd_check_time1);
+EXPORT_SYMBOL(legacy_usbpd_check_time1);
 
-void usbpd_timer2_start(struct usbpd_data *pd_data)
+void legacy_usbpd_timer2_start(struct usbpd_data *pd_data)
 {
 	ktime_get_real_ts64(&pd_data->time2);
 }
-EXPORT_SYMBOL(usbpd_timer2_start);
+EXPORT_SYMBOL(legacy_usbpd_timer2_start);
 
-long long usbpd_check_time2(struct usbpd_data *pd_data)
+long long legacy_usbpd_check_time2(struct usbpd_data *pd_data)
 {
     int ms = 0;
     int sec = 0;
@@ -121,7 +121,7 @@ long long usbpd_check_time2(struct usbpd_data *pd_data)
 
     return (sec * 1000) + ms;
 }
-EXPORT_SYMBOL(usbpd_check_time2);
+EXPORT_SYMBOL(legacy_usbpd_check_time2);
 
 static void increase_message_id_counter(struct usbpd_data *pd_data)
 {
@@ -166,15 +166,15 @@ static void tx_discard_message(struct protocol_data *tx)
 		tx->data_obj[i].object = 0;
 }
 
-void usbpd_init_protocol(struct usbpd_data *pd_data)
+void legacy_usbpd_init_protocol(struct usbpd_data *pd_data)
 {
 	rx_layer_init(&pd_data->protocol_rx);
 	tx_layer_init(&pd_data->protocol_tx);
 	pd_data->msg_id = USBPD_nMessageIDCount + 1;
 }
-EXPORT_SYMBOL(usbpd_init_protocol);
+EXPORT_SYMBOL(legacy_usbpd_init_protocol);
 
-void usbpd_init_counters(struct usbpd_data *pd_data)
+void legacy_usbpd_init_counters(struct usbpd_data *pd_data)
 {
 	pr_info("%s: init counter\n", __func__);
 	pd_data->counter.retry_counter = 0;
@@ -186,14 +186,14 @@ void usbpd_init_counters(struct usbpd_data *pd_data)
 	pd_data->counter.swap_hard_reset_counter = 0;
 	pd_data->counter.discover_identity_counter = 0;
 }
-EXPORT_SYMBOL(usbpd_init_counters);
+EXPORT_SYMBOL(legacy_usbpd_init_counters);
 
-void usbpd_policy_reset(struct usbpd_data *pd_data, unsigned flag)
+void legacy_usbpd_policy_reset(struct usbpd_data *pd_data, unsigned flag)
 {
 	if (flag == HARDRESET_RECEIVED) {
 		pd_data->policy.rx_hardreset = 1;
 		dev_info(pd_data->dev, "%s Hard reset\n", __func__);
-		usbpd_manager_remove_new_cap(pd_data);
+		legacy_usbpd_manager_remove_new_cap(pd_data);
 	} else if (flag == SOFTRESET_RECEIVED) {
 		pd_data->policy.rx_softreset = 1;
 		dev_info(pd_data->dev, "%s Soft reset\n", __func__);
@@ -207,10 +207,10 @@ void usbpd_policy_reset(struct usbpd_data *pd_data, unsigned flag)
 		dev_info(pd_data->dev, "%s DETACHED\n", __func__);
 		pd_data->counter.hard_reset_counter = 0;
 		pd_data->source_get_sink_obj.object = 0;
-		usbpd_manager_remove_new_cap(pd_data);
+		legacy_usbpd_manager_remove_new_cap(pd_data);
 	}
 }
-EXPORT_SYMBOL(usbpd_policy_reset);
+EXPORT_SYMBOL(legacy_usbpd_policy_reset);
 
 protocol_state usbpd_protocol_tx_phy_layer_reset(struct protocol_data *tx)
 {
@@ -381,7 +381,7 @@ protocol_state usbpd_protocol_tx_discard_message(struct protocol_data *tx)
 	return PRL_Tx_PHY_Layer_Reset;
 }
 
-void usbpd_set_ops(struct device *dev, usbpd_phy_ops_type *ops)
+void legacy_usbpd_set_ops(struct device *dev, usbpd_phy_ops_type *ops)
 {
 	struct usbpd_data *pd_data = (struct usbpd_data *) dev_get_drvdata(dev);
 
@@ -457,7 +457,7 @@ void usbpd_set_ops(struct device *dev, usbpd_phy_ops_type *ops)
 	pd_data->phy_ops.ops_control_option_command	= ops->ops_control_option_command;
 	pd_data->phy_ops.set_pcp_clk			= ops->set_pcp_clk;
 }
-EXPORT_SYMBOL(usbpd_set_ops);
+EXPORT_SYMBOL(legacy_usbpd_set_ops);
 
 protocol_state usbpd_protocol_rx_layer_reset_for_receive(struct protocol_data *rx)
 {
@@ -584,7 +584,7 @@ void usbpd_protocol_tx(struct usbpd_data *pd_data)
 	tx->state = next_state;
 }
 
-void usbpd_protocol_rx(struct usbpd_data *pd_data)
+void legacy_usbpd_protocol_rx(struct usbpd_data *pd_data)
 {
 	struct protocol_data *rx = &pd_data->protocol_rx;
 	protocol_state next_state = rx->state;
@@ -618,7 +618,7 @@ void usbpd_protocol_rx(struct usbpd_data *pd_data)
 */
 	rx->state = PRL_Rx_Wait_for_PHY_Message;
 }
-EXPORT_SYMBOL(usbpd_protocol_rx);
+EXPORT_SYMBOL(legacy_usbpd_protocol_rx);
 
 void usbpd_read_msg(struct usbpd_data *pd_data)
 {
@@ -633,7 +633,7 @@ void usbpd_read_msg(struct usbpd_data *pd_data)
 }
 
 /* return 1: sent with goodcrc, 0: fail */
-bool usbpd_send_msg(struct usbpd_data *pd_data, msg_header_type *header,
+bool legacy_usbpd_send_msg(struct usbpd_data *pd_data, msg_header_type *header,
 		data_obj_type *obj)
 {
 	int i;
@@ -652,18 +652,18 @@ bool usbpd_send_msg(struct usbpd_data *pd_data, msg_header_type *header,
 	else
 		return false;
 }
-EXPORT_SYMBOL(usbpd_send_msg);
+EXPORT_SYMBOL(legacy_usbpd_send_msg);
 
-inline bool usbpd_send_ctrl_msg(struct usbpd_data *d, msg_header_type *h,
+inline bool legacy_usbpd_send_ctrl_msg(struct usbpd_data *d, msg_header_type *h,
 		unsigned msg, unsigned dr, unsigned pr)
 {
 	h->msg_type = msg;
 	h->port_data_role = dr;
 	h->port_power_role = pr;
 	h->num_data_objs = 0;
-	return usbpd_send_msg(d, h, 0);
+	return legacy_usbpd_send_msg(d, h, 0);
 }
-EXPORT_SYMBOL(usbpd_send_ctrl_msg);
+EXPORT_SYMBOL(legacy_usbpd_send_ctrl_msg);
 
 /* return: 0 if timed out, positive is status */
 inline unsigned usbpd_wait_msg(struct usbpd_data *pd_data,
@@ -695,42 +695,42 @@ inline unsigned usbpd_wait_msg(struct usbpd_data *pd_data,
 	return PDIC_OPS_PARAM_FUNC(get_status, pd_data, msg_status);
 }
 
-void usbpd_rx_hard_reset(struct device *dev)
+void legacy_usbpd_rx_hard_reset(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 
-	usbpd_reinit(dev);
-	usbpd_policy_reset(pd_data, HARDRESET_RECEIVED);
+	legacy_usbpd_reinit(dev);
+	legacy_usbpd_policy_reset(pd_data, HARDRESET_RECEIVED);
 }
-EXPORT_SYMBOL(usbpd_rx_hard_reset);
+EXPORT_SYMBOL(legacy_usbpd_rx_hard_reset);
 
 void usbpd_rx_soft_reset(struct usbpd_data *pd_data)
 {
-	usbpd_reinit(pd_data->dev);
-	usbpd_policy_reset(pd_data, SOFTRESET_RECEIVED);
+	legacy_usbpd_reinit(pd_data->dev);
+	legacy_usbpd_policy_reset(pd_data, SOFTRESET_RECEIVED);
 }
 
-void usbpd_reinit(struct device *dev)
+void legacy_usbpd_reinit(struct device *dev)
 {
 	struct usbpd_data *pd_data = dev_get_drvdata(dev);
 
-	usbpd_init_counters(pd_data);
-	usbpd_init_protocol(pd_data);
-	usbpd_init_policy(pd_data);
-	usbpd_init_manager_val(pd_data);
+	legacy_usbpd_init_counters(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_policy(pd_data);
+	legacy_usbpd_init_manager_val(pd_data);
 	reinit_completion(&pd_data->msg_arrived);
 	pd_data->wait_for_msg_arrived = 0;
 	pd_data->is_prswap = false;
 	complete(&pd_data->msg_arrived);
 }
-EXPORT_SYMBOL(usbpd_reinit);
+EXPORT_SYMBOL(legacy_usbpd_reinit);
 
 /*
- * usbpd_init - alloc usbpd data
+ * legacy_usbpd_init - alloc usbpd data
  *
  * Returns 0 on success; negative errno on failure
 */
-int usbpd_sysfs_get_prop(struct _pdic_data_t *ppdic_data,
+int legacy_usbpd_sysfs_get_prop(struct _pdic_data_t *ppdic_data,
 		enum pdic_sysfs_property prop, char *buf)
 {
 	struct usbpd_data *pd_data = ppdic_data->drv_data;
@@ -823,10 +823,10 @@ int usbpd_sysfs_get_prop(struct _pdic_data_t *ppdic_data,
 
 	return retval;
 }
-EXPORT_SYMBOL_GPL(usbpd_sysfs_get_prop);
+EXPORT_SYMBOL_GPL(legacy_usbpd_sysfs_get_prop);
 
 
-ssize_t usbpd_sysfs_set_prop(struct _pdic_data_t *ppdic_data,
+ssize_t legacy_usbpd_sysfs_set_prop(struct _pdic_data_t *ppdic_data,
 				enum pdic_sysfs_property prop,
 				const char *buf, size_t size)
 {
@@ -875,9 +875,9 @@ ssize_t usbpd_sysfs_set_prop(struct _pdic_data_t *ppdic_data,
 
 	return retval;
 }
-EXPORT_SYMBOL_GPL(usbpd_sysfs_set_prop);
+EXPORT_SYMBOL_GPL(legacy_usbpd_sysfs_set_prop);
 
-int usbpd_sysfs_is_writeable(struct _pdic_data_t *ppdic_data,
+int legacy_usbpd_sysfs_is_writeable(struct _pdic_data_t *ppdic_data,
 				enum pdic_sysfs_property prop)
 {
 	int ret = 0;
@@ -894,9 +894,9 @@ int usbpd_sysfs_is_writeable(struct _pdic_data_t *ppdic_data,
 
 	return ret;
 }
-EXPORT_SYMBOL_GPL(usbpd_sysfs_is_writeable);
+EXPORT_SYMBOL_GPL(legacy_usbpd_sysfs_is_writeable);
 
-int usbpd_init(struct device *dev, void *phy_driver_data)
+int legacy_usbpd_init(struct device *dev, void *phy_driver_data)
 {
 	struct usbpd_data *pd_data;
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
@@ -919,15 +919,15 @@ int usbpd_init(struct device *dev, void *phy_driver_data)
 	dev_set_drvdata(dev, pd_data);
 
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	g_pd_data = pd_data;
+	legacy_g_pd_data = pd_data;
 	pd_data->pd_noti.pusbpd = pd_data;
 	pd_data->pd_noti.sink_status.current_pdo_num = 0;
 	pd_data->pd_noti.sink_status.selected_pdo_num = 0;
 #endif
-	usbpd_init_counters(pd_data);
-	usbpd_init_protocol(pd_data);
-	usbpd_init_policy(pd_data);
-	usbpd_init_manager(pd_data);
+	legacy_usbpd_init_counters(pd_data);
+	legacy_usbpd_init_protocol(pd_data);
+	legacy_usbpd_init_policy(pd_data);
+	legacy_usbpd_init_manager(pd_data);
 
 	mutex_init(&pd_data->accept_mutex);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 188)
@@ -950,9 +950,9 @@ int usbpd_init(struct device *dev, void *phy_driver_data)
 	dev_set_drvdata(pdic_device, pd_data);
 	ppdic_data = kzalloc(sizeof(pdic_data_t), GFP_KERNEL);
 	ppdic_sysfs_prop = kzalloc(sizeof(pdic_sysfs_property_t), GFP_KERNEL);
-	ppdic_sysfs_prop->get_property = usbpd_sysfs_get_prop;
-	ppdic_sysfs_prop->set_property = usbpd_sysfs_set_prop;
-	ppdic_sysfs_prop->property_is_writeable = usbpd_sysfs_is_writeable;
+	ppdic_sysfs_prop->get_property = legacy_usbpd_sysfs_get_prop;
+	ppdic_sysfs_prop->set_property = legacy_usbpd_sysfs_set_prop;
+	ppdic_sysfs_prop->property_is_writeable = legacy_usbpd_sysfs_is_writeable;
 	ppdic_sysfs_prop->properties = usbpd_sysfs_properties;
 	ppdic_sysfs_prop->num_properties = ARRAY_SIZE(usbpd_sysfs_properties);
 	ppdic_data->pdic_sysfs_prop = ppdic_sysfs_prop;
@@ -973,19 +973,19 @@ int usbpd_init(struct device *dev, void *phy_driver_data)
 	if (ret) {
 		pr_err("pdic_misc_init is failed, error %d\n", ret);
 	} else {
-		ppdic_data->misc_dev->uvdm_ready = samsung_uvdm_ready;
-		ppdic_data->misc_dev->uvdm_close = samsung_uvdm_close;
-		ppdic_data->misc_dev->uvdm_read = samsung_uvdm_read;
-		ppdic_data->misc_dev->uvdm_write = samsung_uvdm_write;
+		ppdic_data->misc_dev->uvdm_ready = legacy_samsung_uvdm_ready;
+		ppdic_data->misc_dev->uvdm_close = legacy_samsung_uvdm_close;
+		ppdic_data->misc_dev->uvdm_read = legacy_samsung_uvdm_read;
+		ppdic_data->misc_dev->uvdm_write = legacy_samsung_uvdm_write;
 		pd_data->ppdic_data = ppdic_data;
 	}
 #endif
 
-	INIT_WORK(&pd_data->worker, usbpd_policy_work);
+	INIT_WORK(&pd_data->worker, legacy_usbpd_policy_work);
 
 	init_completion(&pd_data->msg_arrived);
 
 	return 0;
 }
-EXPORT_SYMBOL(usbpd_init);
+EXPORT_SYMBOL(legacy_usbpd_init);
 

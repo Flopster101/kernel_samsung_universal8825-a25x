@@ -87,14 +87,14 @@ static void pdic_event_notifier(struct work_struct *data)
 	pdic_noti.sub2 = event_work->event;
 	pdic_noti.sub3 = event_work->sub;
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG) && IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
-	pdic_noti.pd = &g_pd_data->pd_noti;
+	pdic_noti.pd = &legacy_g_pd_data->pd_noti;
 #endif
 	pdic_notifier_notify((PD_NOTI_TYPEDEF *)&pdic_noti, NULL, 0);
 
 	kfree(event_work);
 }
 
-void pdic_event_work(void *data, int dest, int id, int attach, int event, int sub)
+void legacy_pdic_event_work(void *data, int dest, int id, int attach, int event, int sub)
 {
 	struct usbpd_data *pd_data = data;
 	struct pdic_state_work *event_work;
@@ -177,7 +177,7 @@ void pdic_event_work(void *data, int dest, int id, int attach, int event, int su
 		kfree(event_work);
 	}
 }
-EXPORT_SYMBOL(pdic_event_work);
+EXPORT_SYMBOL(legacy_pdic_event_work);
 #endif
 
 #if defined(CONFIG_DUAL_ROLE_USB_INTF)
@@ -275,13 +275,13 @@ static int pdic_set_dual_role(struct dual_role_phy_instance *dual_role,
 	if (attached_state == USB_STATUS_NOTIFY_ATTACH_DFP) {
 		/* Current mode DFP and Source  */
 		pr_info("%s: try reversing, from Source to Sink\n", __func__);
-		usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
+		legacy_usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
 #if defined(CONFIG_MUIC_SUPPORT_PDIC_OTG_CTRL)
 		muic_disable_otg_detect();
 #endif
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 		/* muic */
-		pdic_event_work(usbpd_data,
+		legacy_pdic_event_work(usbpd_data,
 			PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH, 0/*attach*/, 0/*rprd*/, 0);
 #endif
 		/* exit from Disabled state and set mode to UFP */
@@ -515,9 +515,9 @@ int typec_port_type_set(const struct typec_capability *cap, enum typec_port_type
 			break;
 		case TYPEC_PORT_UFP:
 			pr_info("%s : try reversing, from DFP(Source) to UFP(Sink)\n", __func__);
-			usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
+			legacy_usbpd_manager_vbus_turn_on_ctrl(pd_data, 0);
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
-			pdic_event_work(pd_data,
+			legacy_pdic_event_work(pd_data,
 				PDIC_NOTIFY_DEV_MUIC, PDIC_NOTIFY_ID_ATTACH,
 				0/*attach*/, 0/*rprd*/, 0);
 #endif
@@ -584,11 +584,11 @@ int typec_pr_set(const struct typec_capability *cap, enum typec_role power_role)
 	switch (power_role) {
 	case TYPEC_SOURCE:
 		pr_info("%s : try reversing, from Sink to Source\n", __func__);
-		usbpd_manager_send_pr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_pr_swap(pd_data->dev);
 		break;
 	case TYPEC_SINK:
 		pr_info("%s : try reversing, from Source to Sink\n", __func__);
-		usbpd_manager_send_pr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_pr_swap(pd_data->dev);
 		break;
 	default :
 		pr_info("%s : invalid power_role\n", __func__);
@@ -625,11 +625,11 @@ static int typec_dr_set(const struct typec_capability *cap, enum typec_data_role
 	if (role == TYPEC_DEVICE) {
 		pr_info("%s, try reversing, from DFP to UFP\n", __func__);
 		pd_data->typec_try_state_change = TYPE_C_DR_SWAP;
-		usbpd_manager_send_dr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_dr_swap(pd_data->dev);
 	} else if (role == TYPEC_HOST) {
 		pr_info("%s, try reversing, from UFP to DFP\n", __func__);
 		pd_data->typec_try_state_change = TYPE_C_DR_SWAP;
-		usbpd_manager_send_dr_swap(pd_data->dev);
+		legacy_usbpd_manager_send_dr_swap(pd_data->dev);
 	} else {
 		pr_info("invalid power role\n");
 		return -EIO;
@@ -666,7 +666,7 @@ int typec_get_pd_support(void *_data)
 	return TYPEC_PWR_MODE_USB;
 }
 
-int typec_init(struct usbpd_data *pd_data)
+int legacy_typec_init(struct usbpd_data *pd_data)
 {
 	pd_data->typec_power_role = TYPEC_SINK;
 	pd_data->typec_data_role = TYPEC_DEVICE;
@@ -697,5 +697,5 @@ int typec_init(struct usbpd_data *pd_data)
 
 	return 0;
 }
-EXPORT_SYMBOL(typec_init);
+EXPORT_SYMBOL(legacy_typec_init);
 #endif

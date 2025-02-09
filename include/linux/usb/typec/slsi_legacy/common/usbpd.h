@@ -842,79 +842,79 @@ static inline struct usbpd_data *manager_to_usbpd(struct usbpd_manager_data *man
 
 extern char *pdo_type_to_str[];
 
-extern int usbpd_init(struct device *dev, void *phy_driver_data);
-extern void usbpd_init_policy(struct usbpd_data *);
+extern int legacy_usbpd_init(struct device *dev, void *phy_driver_data);
+extern void legacy_usbpd_init_policy(struct usbpd_data *);
 
-extern void  usbpd_init_manager_val(struct usbpd_data *);
-extern int  usbpd_init_manager(struct usbpd_data *);
-extern int usbpd_manager_get_selected_voltage(struct usbpd_data *, int selected_pdo);
-extern void usbpd_manager_plug_attach(struct device *, muic_attached_dev_t);
-extern void usbpd_manager_plug_detach(struct device *dev, bool notify);
-extern void usbpd_manager_acc_detach(struct device *dev);
-extern int  usbpd_manager_match_request(struct usbpd_data *);
-extern void usbpd_manager_response_req_pdo(struct usbpd_data *pd_data, int req_pdo_type, int req_pdo_num);
-extern bool usbpd_manager_power_role_swap(struct usbpd_data *);
-extern bool usbpd_manager_vconn_source_swap(struct usbpd_data *);
+extern void  legacy_usbpd_init_manager_val(struct usbpd_data *);
+extern int  legacy_usbpd_init_manager(struct usbpd_data *);
+extern int legacy_usbpd_manager_get_selected_voltage(struct usbpd_data *, int selected_pdo);
+extern void legacy_usbpd_manager_plug_attach(struct device *, muic_attached_dev_t);
+extern void legacy_usbpd_manager_plug_detach(struct device *dev, bool notify);
+extern void legacy_usbpd_manager_acc_detach(struct device *dev);
+extern int  legacy_usbpd_manager_match_request(struct usbpd_data *);
+extern void legacy_usbpd_manager_response_req_pdo(struct usbpd_data *pd_data, int req_pdo_type, int req_pdo_num);
+extern bool legacy_usbpd_manager_power_role_swap(struct usbpd_data *);
+extern bool legacy_usbpd_manager_vconn_source_swap(struct usbpd_data *);
 extern void usbpd_manager_turn_on_source(struct usbpd_data *);
 extern void usbpd_manager_turn_off_power_supply(struct usbpd_data *);
 extern void usbpd_manager_turn_off_power_sink(struct usbpd_data *);
-extern void usbpd_manager_turn_off_vconn(struct usbpd_data *);
-extern bool usbpd_manager_data_role_swap(struct usbpd_data *);
+extern void legacy_usbpd_manager_turn_off_vconn(struct usbpd_data *);
+extern bool legacy_usbpd_manager_data_role_swap(struct usbpd_data *);
 extern int usbpd_manager_get_identity(struct usbpd_data *);
-extern int usbpd_manager_get_svids(struct usbpd_data *);
-extern int usbpd_manager_get_modes(struct usbpd_data *);
+extern int legacy_usbpd_manager_get_svids(struct usbpd_data *);
+extern int legacy_usbpd_manager_get_modes(struct usbpd_data *);
 extern int usbpd_manager_enter_mode(struct usbpd_data *);
-extern int usbpd_manager_exit_mode(struct usbpd_data *, unsigned mode);
-extern void usbpd_manager_inform_event(struct usbpd_data *,
+extern int legacy_usbpd_manager_exit_mode(struct usbpd_data *, unsigned mode);
+extern void legacy_usbpd_manager_inform_event(struct usbpd_data *,
 		usbpd_manager_event_type);
-extern int usbpd_manager_evaluate_capability(struct usbpd_data *);
-extern data_obj_type usbpd_manager_select_capability(struct usbpd_data *);
-extern bool usbpd_manager_vdm_request_enabled(struct usbpd_data *);
-extern void usbpd_manager_acc_handler_cancel(struct device *);
+extern int legacy_usbpd_manager_evaluate_capability(struct usbpd_data *);
+extern data_obj_type legacy_usbpd_manager_select_capability(struct usbpd_data *);
+extern bool legacy_usbpd_manager_vdm_request_enabled(struct usbpd_data *);
+extern void legacy_usbpd_manager_acc_handler_cancel(struct device *);
 extern void usbpd_manager_acc_detach_handler(struct work_struct *);
 extern void usbpd_manager_short_check(struct usbpd_data *pd_data);
-extern void usbpd_manager_send_pr_swap(struct device *);
-extern void usbpd_manager_send_dr_swap(struct device *);
-extern void usbpd_manager_match_sink_cap(struct usbpd_data *);
-extern void usbpd_manager_remove_new_cap(struct usbpd_data *);
+extern void legacy_usbpd_manager_send_pr_swap(struct device *);
+extern void legacy_usbpd_manager_send_dr_swap(struct device *);
+extern void legacy_usbpd_manager_match_sink_cap(struct usbpd_data *);
+extern void legacy_usbpd_manager_remove_new_cap(struct usbpd_data *);
 extern int usbpd_manager_command_to_policy(struct device *dev, usbpd_manager_command_type command);
 extern void usbpd_manager_restart_discover_msg(struct usbpd_data *pd_data);
-extern int usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent);
-extern void usbpd_manager_vbus_turn_on_ctrl(void *_data, bool enbale);
+extern int legacy_usbpd_manager_psy_init(struct usbpd_data *_data, struct device *parent);
+extern void legacy_usbpd_manager_vbus_turn_on_ctrl(void *_data, bool enbale);
 extern void init_source_cap_data(struct usbpd_manager_data *_data);
-extern void usbpd_policy_work(struct work_struct *);
+extern void legacy_usbpd_policy_work(struct work_struct *);
 extern void usbpd_protocol_tx(struct usbpd_data *);
-extern void usbpd_protocol_rx(struct usbpd_data *);
-extern void usbpd_kick_policy_work(struct device *);
-extern void usbpd_cancel_policy_work(struct device *);
-extern void usbpd_rx_hard_reset(struct device *);
+extern void legacy_usbpd_protocol_rx(struct usbpd_data *);
+extern void legacy_usbpd_kick_policy_work(struct device *);
+extern void legacy_usbpd_cancel_policy_work(struct device *);
+extern void legacy_usbpd_rx_hard_reset(struct device *);
 extern void usbpd_rx_soft_reset(struct usbpd_data *);
-extern void usbpd_policy_reset(struct usbpd_data *, unsigned flag);
+extern void legacy_usbpd_policy_reset(struct usbpd_data *, unsigned flag);
 
-extern void usbpd_set_ops(struct device *, usbpd_phy_ops_type *);
+extern void legacy_usbpd_set_ops(struct device *, usbpd_phy_ops_type *);
 extern void usbpd_read_msg(struct usbpd_data *);
-extern bool usbpd_send_msg(struct usbpd_data *, msg_header_type *,
+extern bool legacy_usbpd_send_msg(struct usbpd_data *, msg_header_type *,
 		data_obj_type *);
-extern bool usbpd_send_ctrl_msg(struct usbpd_data *d, msg_header_type *h,
+extern bool legacy_usbpd_send_ctrl_msg(struct usbpd_data *d, msg_header_type *h,
 		unsigned msg, unsigned dr, unsigned pr);
 extern unsigned usbpd_wait_msg(struct usbpd_data *pd_data, unsigned msg_status,
 		unsigned ms);
-extern void usbpd_reinit(struct device *);
-extern void usbpd_init_protocol(struct usbpd_data *);
-extern void usbpd_init_counters(struct usbpd_data *);
+extern void legacy_usbpd_reinit(struct device *);
+extern void legacy_usbpd_init_protocol(struct usbpd_data *);
+extern void legacy_usbpd_init_counters(struct usbpd_data *);
 
-extern int samsung_uvdm_ready(void);
-extern void samsung_uvdm_close(void);
-extern int samsung_uvdm_write(void *data, int size);
-extern int samsung_uvdm_read(void *data);
+extern int legacy_samsung_uvdm_ready(void);
+extern void legacy_samsung_uvdm_close(void);
+extern int legacy_samsung_uvdm_write(void *data, int size);
+extern int legacy_samsung_uvdm_read(void *data);
 
 /* for usbpd certification polling */
 /* for usbpd certification polling */
-void usbpd_timer1_start(struct usbpd_data *pd_data);
-long long usbpd_check_time1(struct usbpd_data *pd_data);
-void usbpd_timer2_start(struct usbpd_data *pd_data);
-long long usbpd_check_time2(struct usbpd_data *pd_data);
-void usbpd_timer_vdm_start(struct usbpd_data *pd_data);
-long long usbpd_check_timer_vdm(struct usbpd_data *pd_data);
+void legacy_usbpd_timer1_start(struct usbpd_data *pd_data);
+long long legacy_usbpd_check_time1(struct usbpd_data *pd_data);
+void legacy_usbpd_timer2_start(struct usbpd_data *pd_data);
+long long legacy_usbpd_check_time2(struct usbpd_data *pd_data);
+void legacy_usbpd_timer_vdm_start(struct usbpd_data *pd_data);
+long long legacy_usbpd_check_timer_vdm(struct usbpd_data *pd_data);
 
 #endif
