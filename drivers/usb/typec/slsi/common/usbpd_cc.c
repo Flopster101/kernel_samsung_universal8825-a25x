@@ -45,7 +45,7 @@
 // #include <linux/usb/typec/slsi/s2mf301/usbpd-s2mf301.h>
 // #endif
 
-#include <linux/usb/typec/slsi/s2mu106/usbpd-s2mu106.h>
+#include <linux/usb/typec/slsi_legacy/s2mu106/usbpd-s2mu106.h>
 #include <linux/usb/typec/slsi/s2mf301/usbpd-s2mf301.h>
 #include <linux/sec_detect.h>
 

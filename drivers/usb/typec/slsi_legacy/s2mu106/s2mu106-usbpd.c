@@ -67,6 +67,8 @@
 #include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
 
+#include <linux/sec_detect.h>
+
 /*
 *VARIABLE DEFINITION
 */
@@ -4837,6 +4839,12 @@ static struct i2c_driver s2mu106_usbpd_driver = {
 
 static int __init s2mu106_usbpd_init(void)
 {
+	if (!sec_legacy_usbpd) {
+		SEC_DETECT_LOG("s2mu106 usbpd driver cannot start without legacy usbpd\n");
+		return 0;
+	} else
+		SEC_DETECT_LOG("s2mu106 usbpd driver initializing\n");
+
 	pr_err("%s\n", __func__);
 	return i2c_add_driver(&s2mu106_usbpd_driver);
 }

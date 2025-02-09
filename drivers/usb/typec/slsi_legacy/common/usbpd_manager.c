@@ -6,7 +6,7 @@
 #include <linux/workqueue.h>
 #include <linux/slab.h>
 #include <linux/sched.h>
-#include <linux/usb/typec/slsi/common/usbpd.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd.h>
 #include <linux/delay.h>
 #include <linux/of_gpio.h>
 
@@ -15,7 +15,7 @@
 #include <linux/muic/common/muic_notifier.h>
 #endif /* CONFIG_MUIC_NOTIFIER */
 #include <linux/usb/typec/common/pdic_notifier.h>
-#include <linux/usb/typec/slsi/common/s2m_pdic_notifier.h>
+#include <linux/usb/typec/slsi_legacy/common/s2m_pdic_notifier.h>
 #if IS_ENABLED(CONFIG_USB_TYPEC_MANAGER_NOTIFIER)
 #if IS_ENABLED(CONFIG_BATTERY_NOTIFIER)
 #include <linux/battery/battery_notifier.h>
@@ -25,7 +25,7 @@
 #endif
 
 #if (IS_ENABLED(CONFIG_PDIC_NOTIFIER) || defined CONFIG_DUAL_ROLE_USB_INTF)
-#include <linux/usb/typec/slsi/common/usbpd_ext.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
 #include <linux/usb/typec/common/pdic_core.h>
 

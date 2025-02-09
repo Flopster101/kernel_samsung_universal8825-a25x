@@ -5,7 +5,7 @@
 #include <linux/device.h>
 #include <linux/slab.h>
 #include <linux/sched.h>
-#include <linux/usb/typec/slsi/common/usbpd.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd.h>
 #include <linux/delay.h>
 #include <linux/workqueue.h>
 #include <linux/completion.h>

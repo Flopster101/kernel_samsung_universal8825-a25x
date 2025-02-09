@@ -6,7 +6,7 @@
 #include <linux/workqueue.h>
 #include <linux/slab.h>
 #include <linux/sched.h>
-#include <linux/usb/typec/slsi/common/usbpd.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd.h>
 #include <linux/usb/typec/common/pdic_core.h>
 #include <linux/delay.h>
 #include <linux/completion.h>
@@ -19,7 +19,7 @@
 #include <linux/usb_notify.h>
 
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
-#include <linux/usb/typec/slsi/common/usbpd_ext.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
 
 #if IS_ENABLED(CONFIG_BATTERY_SAMSUNG)
