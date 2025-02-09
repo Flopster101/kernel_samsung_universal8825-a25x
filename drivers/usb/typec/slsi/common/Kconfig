@@ -56,3 +56,10 @@ config S2M_PDIC_MANUAL_RETRY
 	help
 	  If you say yes here you will get support for
 	  manual retry to avoid alert-req collision
+
+config S2M_SUPPORT_DELAYED_REQUEST_MESSAGE_UFP
+	bool "Using delayed request message in UFP"
+	default n
+	help
+	  If you say yes here you will get support for
+	  the delayed request message in ufp.
