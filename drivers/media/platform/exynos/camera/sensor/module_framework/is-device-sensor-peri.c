@@ -27,6 +27,7 @@
 #if defined(USE_LEDS_FLASH_CHARGING_VOLTAGE_CONTROL)
 #include <linux/muic/common/muic.h>
 #include <linux/usb/typec/slsi/common/usbpd_ext.h>
+#include <linux/usb/typec/slsi_legacy/common/usbpd_ext.h>
 #endif
 
 static struct is_device_sensor_peri *get_sensor_peri(struct v4l2_subdev *subdev)
