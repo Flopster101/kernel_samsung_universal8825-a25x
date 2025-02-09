@@ -1042,6 +1042,12 @@ int usbpd_init(struct device *dev, void *phy_driver_data)
 	pd_data->policy_wake = wakeup_source_register(NULL, "policy_wake"); // 5.4 R
 #endif
 
+#if IS_ENABLED(CONFIG_PDIC_PD30)
+	pd_data->specification_revision = USBPD_PD3_0;
+#else
+	pd_data->specification_revision = USBPD_PD2_0;
+#endif
+
 	pd_data->policy_wqueue =
 		create_singlethread_workqueue(dev_name(dev));
 	if (!pd_data->policy_wqueue)
