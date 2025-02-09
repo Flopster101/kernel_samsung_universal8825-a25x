@@ -105,28 +105,8 @@ static ssize_t device_name_show(struct kobject *kobj, struct kobj_attribute *att
 static ssize_t device_model_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
 	const char *model_name = "Unknown";
-
-	switch (sec_current_device) {
-		case SEC_A25:
-			model_name = "Galaxy A25 5G";
-			break;
-		case SEC_A33:
-			model_name = "Galaxy A33 5G";
-			break;
-		case SEC_A53:
-			model_name = "Galaxy A53 5G";
-			break;
-		case SEC_M33:
-			model_name = "Galaxy M33 5G";
-			break;
-		case SEC_M34:
-			model_name = "Galaxy M34 5G";
-			break;
-		case SEC_GTA4XLS:
-			model_name = "Galaxy Tab S6 Lite 2024";
-			break;
-	}
-
+	if (sec_current_device >= 0 && sec_current_device < ARRAY_SIZE(device_names))
+		model_name = device_names[sec_current_device];
 	return snprintf(buf, 32, "%s\n", model_name);
 }
 
@@ -146,8 +126,9 @@ static struct attribute_group attr_group = {
 static struct kobject *device_kobj;
 #endif
 
-void setup_camera_params(void) {
-	if (sec_current_device == SEC_A25) {
+static inline void setup_camera_params(void) {
+	switch (sec_current_device) {
+	case SEC_A25:
 		mcd_camera_rear_dual_cal = true;
 		mcd_use_imx258_13mp_full_size = true;
 		mcd_use_leds_flash_charging_voltage_control = true;
@@ -159,9 +140,8 @@ void setup_camera_params(void) {
 		mcd_use_camera_adaptive_mipi = true;
 		mcd_read_dual_cal_firmware_data = true;
 		mcd_camera_use_aois = true;
-	}
-
-	if (sec_current_device == SEC_A33) {
+		break;
+	case SEC_A33:
 		mcd_camera_front_fixed_focus = true;
 		mcd_camera_rear_dual_cal = true;
 		mcd_config_check_hw_version_for_mcu_fw_upload = true;
@@ -171,9 +151,8 @@ void setup_camera_params(void) {
 		mcd_use_ois_hall_data_for_vdis = true;
 		mcd_camera_uwide_dualized = true;
 		mcd_read_dual_cal_firmware_data = true;
-	}
-
-	if (sec_current_device == SEC_A53) {
+		break;
+	case SEC_A53:
 		mcd_camera_front_fixed_focus = true;
 		mcd_camera_rear_dual_cal = true;
 		mcd_disable_dual_sync = true;
@@ -182,18 +161,16 @@ void setup_camera_params(void) {
 		mcd_read_dual_cal_firmware_data = true;
 		mcd_use_leds_flash_charging_voltage_control = true;
 		mcd_use_hi1336c_setfile = true;
-	}
-
-	if (sec_current_device == SEC_M33) {
+		break;
+	case SEC_M33:
 		mcd_camera_rear_dual_cal = true;
 		mcd_disable_dual_sync = true;
 		mcd_modify_cal_map_for_swremosaic_lib = true;
 		mcd_use_camera_adaptive_mipi = true;
 		mcd_use_camera_act_driver_soft_landing = true;
 		mcd_read_dual_cal_firmware_data = true;
-	}
-
-	if (sec_current_device == SEC_M34) {
+		break;
+	case SEC_M34:
 		mcd_camera_rear_dual_cal = true;
 		mcd_use_ois_hall_data_for_vdis = true;
 		mcd_apply_mirror_vertical_flip = true;
@@ -201,19 +178,19 @@ void setup_camera_params(void) {
 		mcd_simplify_ois_init = true;
 		mcd_use_camera_adaptive_mipi = true;
 		mcd_read_dual_cal_firmware_data = true;
-		// Although this option below is not enabled in the stock header, it is required for flash to work in video mode.
-		// The reason for that is unknown.
-		mcd_use_leds_flash_charging_voltage_control = true;
+		mcd_use_leds_flash_charging_voltage_control = true;	// Not enabled in stock, but required here?
 		mcd_camera_use_aois = true;
-	}
-
-	if (sec_current_device == SEC_GTA4XLS) {
+		break;
+	case SEC_GTA4XLS:
 		mcd_use_camera_act_driver_soft_landing = true;
+		break;
+	default:
+		break;
 	}
 }
 
 // New function to print machine name and sec_ variables
-static void print_sec_variables(const char *machine_name) {
+static inline void print_sec_variables(const char *machine_name) {
 	SEC_DETECT_LOG("Current machine name: %s\n", machine_name);
 	SEC_DETECT_LOG("sec_needs_blic = %s\n", sec_needs_blic ? "true" : "false");
 	SEC_DETECT_LOG("sec_needs_decon = %s\n", sec_needs_decon ? "true" : "false");
