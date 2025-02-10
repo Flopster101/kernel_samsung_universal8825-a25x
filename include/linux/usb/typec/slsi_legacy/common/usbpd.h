@@ -548,6 +548,10 @@ typedef enum {
 	PD_WATER_DEFAULT,
 } PDIC_WATER_STATUS;
 
+enum {
+	CC_OPEN_OVERHEAT,
+};
+
 #define PDIC_OPS_FUNC(func, _data) \
 	((pd_data->phy_ops.func) ? \
 	 (pd_data->phy_ops.func(_data)) : \
