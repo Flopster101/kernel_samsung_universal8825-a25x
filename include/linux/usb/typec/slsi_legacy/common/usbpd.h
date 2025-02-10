@@ -633,7 +633,7 @@ typedef struct usbpd_phy_ops {
 	void	(*ops_control_option_command)(void *, int);
 	void	(*ops_sysfs_lpm_mode)(void *, int cmd);
 	void	(*set_pcp_clk)(void *, int);
-
+	void	(*ops_ccopen_req)(void *, int);
 } usbpd_phy_ops_type;
 
 struct policy_data {
