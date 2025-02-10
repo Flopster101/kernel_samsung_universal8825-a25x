@@ -33,6 +33,7 @@
 #include <linux/mfd/slsi/s2mf301/s2mf301.h>
 #include <linux/mfd/slsi/s2mf301/s2mf301_log.h>
 #include <linux/muic/slsi/s2mf301/s2mf301-muic.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_COMMON_SYSFS)
 #include <linux/muic/common/muic_sysfs.h>
@@ -2489,6 +2490,9 @@ static struct platform_driver s2mf301_muic_driver = {
 
 static int __init s2mf301_muic_init(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	return platform_driver_register(&s2mf301_muic_driver);
 }
 

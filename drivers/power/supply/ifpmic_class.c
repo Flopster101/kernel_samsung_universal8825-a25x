@@ -12,6 +12,7 @@
 #include <linux/err.h>
 #include <linux/power/ifpmic_class.h>
 #include <linux/module.h>
+#include <linux/sec_detect.h>
 
 /* CAUTION : Do not be declared as external ifpmic_class  */
 static struct class *ifpmic_class;
@@ -50,6 +51,9 @@ EXPORT_SYMBOL_GPL(ifpmic_device_destroy);
 
 static int __init ifpmic_class_create(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	ifpmic_class = class_create(THIS_MODULE, "ifpmic");
 
 	if (IS_ERR(ifpmic_class)) {

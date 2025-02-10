@@ -32,6 +32,7 @@
 #include <linux/muic/common/muic.h>
 #include <linux/mfd/slsi/s2mu106/s2mu106.h>
 #include <linux/muic/slsi/s2mu106/s2mu106-muic.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_SYSFS)
 #include <linux/muic/common/muic_sysfs.h>
@@ -2358,6 +2359,9 @@ static struct platform_driver s2mu106_muic_driver = {
 
 static int __init s2mu106_muic_init(void)
 {
+	if (!sec_power_s2mu106)
+		return 0;
+
 	return platform_driver_register(&s2mu106_muic_driver);
 }
 

@@ -20,6 +20,7 @@
 #include <linux/mfd/samsung/s2mu106.h>
 #include <linux/leds-s2mu106.h>
 #include <linux/platform_device.h>
+#include <linux/sec_detect.h>
 
 #define CONTROL_I2C	0
 #define CONTROL_GPIO	1
@@ -1062,6 +1063,9 @@ static struct platform_driver s2mu106_led_driver = {
 
 static int __init s2mu106_led_driver_init(void)
 {
+	if (!sec_power_s2mu106)
+		return 0;
+
 	return platform_driver_register(&s2mu106_led_driver);
 }
 module_init(s2mu106_led_driver_init);

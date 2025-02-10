@@ -22,6 +22,7 @@
 #include "is-device-sensor.h"
 #include "is-device-sensor-peri.h"
 #include "is-core.h"
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_LEDS_SM5714)
 #include <linux/sm5714.h>
@@ -328,6 +329,9 @@ static int flash_sm5714_platform_probe(struct platform_device *pdev)
 	int ret = 0;
 	struct device *dev;
 
+	if (!sec_power_sm5714)
+		return 0;
+
 	FIMC_BUG(!pdev);
 
 	dev = &pdev->dev;
@@ -368,6 +372,9 @@ builtin_platform_driver(sensor_flash_sm5714_platform_driver);
 static int __init sensor_flash_sm5714_init(void)
 {
 	int ret;
+
+	if (!sec_power_sm5714)
+		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_sm5714_platform_driver,
 				flash_sm5714_platform_probe);

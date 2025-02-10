@@ -27,6 +27,7 @@
 #include "s2mf301_fuelgauge.h"
 #include "../../common/sec_charging_common.h"
 #include <linux/of_gpio.h>
+#include <linux/sec_detect.h>
 
 #define SINGLE_BYTE	1
 #define TABLE_SIZE	22
@@ -2562,6 +2563,9 @@ static struct platform_driver s2mf301_fuelgauge_driver = {
 
 static int __init s2mf301_fuelgauge_init(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	pr_info("%s\n", __func__);
 	return platform_driver_register(&s2mf301_fuelgauge_driver);
 }

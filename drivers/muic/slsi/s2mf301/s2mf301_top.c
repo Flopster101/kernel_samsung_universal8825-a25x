@@ -24,6 +24,7 @@
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_S2MF301_RID)
 static int s2mf301_top_set_jig_on(void *_data, bool enable);
@@ -238,6 +239,9 @@ static struct platform_driver s2mf301_top_driver = {
 
 static int __init s2mf301_top_init(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	s2mf301_info("%s\n", __func__);
 	return platform_driver_register(&s2mf301_top_driver);
 }

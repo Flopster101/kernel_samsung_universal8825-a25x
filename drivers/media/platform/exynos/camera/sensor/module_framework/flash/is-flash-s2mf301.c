@@ -25,6 +25,7 @@
 #include "is-sysfs.h"
 
 #include <linux/leds-s2mf301.h>
+#include <linux/sec_detect.h>
 
 extern int s2mf301_create_sysfs(struct class *);
 
@@ -466,6 +467,9 @@ static int flash_s2mf301_platform_probe_i2c(struct platform_device *pdev)
 	struct device *dev;
 	struct class *camera_class;
 
+	if (!sec_power_s2mf301)
+		return 0;
+
 	FIMC_BUG(!pdev);
 
 	dev = &pdev->dev;
@@ -509,6 +513,9 @@ builtin_platform_driver(sensor_flash_s2mf301_platform_driver);
 static int __init sensor_flash_s2mf301_init_i2c(void)
 {
 	int ret;
+
+	if (!sec_power_s2mf301)
+		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_s2mf301_platform_driver,
 				flash_s2mf301_platform_probe_i2c);

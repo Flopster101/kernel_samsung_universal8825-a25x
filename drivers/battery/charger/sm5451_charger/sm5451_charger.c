@@ -26,6 +26,7 @@
 #if IS_ENABLED(CONFIG_SEC_ABC)
 #include <linux/sti/abc_common.h>
 #endif
+#include <linux/sec_detect.h>
 
 #define SM5451_DC_VERSION  "WD1"
 
@@ -2192,6 +2193,9 @@ static struct i2c_driver sm5451_charger_driver = {
 
 static int __init sm5451_i2c_init(void)
 {
+	if (!sec_power_sm5451)
+		return 0;
+
 	pr_info("sm5451-charger: %s\n", __func__);
 	return i2c_add_driver(&sm5451_charger_driver);
 }

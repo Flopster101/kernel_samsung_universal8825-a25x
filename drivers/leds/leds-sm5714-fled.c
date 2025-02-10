@@ -17,6 +17,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/platform_device.h>
+#include <linux/sec_detect.h>
 
 #define SM5714_FLED_VERSION "XXX.UA1"
 
@@ -835,6 +836,9 @@ static struct platform_driver sm5714_led_driver = {
 
 static int __init sm5714_led_driver_init(void)
 {
+	if (!sec_power_sm5714)
+		return 0;
+
 	return platform_driver_register(&sm5714_led_driver);
 }
 module_init(sm5714_led_driver_init);

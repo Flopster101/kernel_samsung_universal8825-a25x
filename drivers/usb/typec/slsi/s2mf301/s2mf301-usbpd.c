@@ -25,6 +25,7 @@
 #include <linux/delay.h>
 #include <linux/completion.h>
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 
 #include <linux/usb/typec/slsi/common/usbpd.h>
 #include <linux/usb/typec/slsi/s2mf301/usbpd-s2mf301.h>
@@ -5036,6 +5037,9 @@ static struct i2c_driver s2mf301_usbpd_driver = {
 
 static int __init s2mf301_usbpd_init(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	if (sec_legacy_usbpd) {
 		SEC_DETECT_LOG("s2mf301 usbpd driver cannot start without new usbpd\n");
 		return 0;

@@ -43,6 +43,7 @@
 #include "../../../../battery/common/sec_charging_common.h"
 #endif
 #include <linux/usb_notify.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
 static enum pdic_sysfs_property sm5714_sysfs_properties[] = {
@@ -4266,6 +4267,9 @@ static struct i2c_driver sm5714_usbpd_driver = {
 
 static int __init sm5714_usbpd_typec_init(void)
 {
+	if (!sec_power_sm5714)
+		return 0;
+
 	return i2c_add_driver(&sm5714_usbpd_driver);
 }
 late_initcall(sm5714_usbpd_typec_init);

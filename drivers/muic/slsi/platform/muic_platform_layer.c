@@ -28,6 +28,7 @@
 #include <linux/muic/slsi/platform/muic_platform_layer.h>
 #include <linux/muic/slsi/platform/muic_platform_manager.h>
 #include <linux/muic/slsi/platform/muic_platform_log.h>
+#include <linux/sec_detect.h>
 
 #if IS_ENABLED(CONFIG_MUIC_NOTIFIER)
 #include <linux/muic/common/muic_notifier.h>
@@ -1684,6 +1685,9 @@ EXPORT_SYMBOL_GPL(unregister_muic_platform_layer);
 static int __init muic_platform_layer_init(void)
 {
 	int ret = 0;
+
+	if ((!sec_power_s2mu106) && (!sec_power_s2mf301))
+		return 0;
 
 	if (!mpl_data)
 		ret = mpl_init();

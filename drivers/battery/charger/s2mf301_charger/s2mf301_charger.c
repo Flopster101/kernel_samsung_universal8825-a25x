@@ -26,6 +26,7 @@
 #include "../../../battery/charger/s2mf301_charger/s2mf301_pmeter.h"
 #endif
 #include <linux/version.h>
+#include <linux/sec_detect.h>
 
 static unsigned int __read_mostly lpcharge;
 module_param(lpcharge, uint, 0444);
@@ -2091,6 +2092,9 @@ static struct platform_driver s2mf301_charger_driver = {
 
 static int __init s2mf301_charger_init(void)
 {
+	if (!sec_power_s2mf301)
+		return 0;
+
 	pr_info("%s\n", __func__);
 	return platform_driver_register(&s2mf301_charger_driver);
 }

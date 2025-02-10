@@ -25,6 +25,7 @@
 
 #include <linux/leds-s2mu106.h>
 #include <linux/muic/common/muic.h>
+#include <linux/sec_detect.h>
 
 extern int muic_afc_get_voltage(void);
 
@@ -499,6 +500,9 @@ static int flash_s2mu106_platform_probe(struct platform_device *pdev)
 	int ret = 0;
 	struct device *dev;
 
+	if (!sec_power_s2mu106)
+		return 0;
+
 	FIMC_BUG(!pdev);
 
 	dev = &pdev->dev;
@@ -538,6 +542,9 @@ static int flash_s2mu106_module_init(void)
 {
 	int ret = 0;
 
+	if (!sec_power_s2mu106)
+		return 0;
+
 	ret = platform_driver_register(&sensor_flash_s2mu106_platform_driver);
 	if (ret) {
 		err("flash_s2mu106 driver register failed(%d)", ret);
@@ -557,6 +564,9 @@ module_exit(flash_s2mu106_module_exit);
 static int __init is_sensor_flash_s2mu106_init(void)
 {
 	int ret;
+
+	if (!sec_power_s2mu106)
+		return 0;
 
 	ret = platform_driver_probe(&sensor_flash_s2mu106_platform_driver,
 				flash_s2mu106_platform_probe);

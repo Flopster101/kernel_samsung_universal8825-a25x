@@ -34,6 +34,7 @@
 #ifdef CONFIG_USB_HOST_NOTIFY
 #include <linux/usb_notify.h>
 #endif
+#include <linux/sec_detect.h>
 
 #define ENABLE 1
 #define DISABLE 0
@@ -2841,6 +2842,9 @@ static struct platform_driver s2mu106_charger_driver = {
 
 static int __init s2mu106_charger_init(void)
 {
+	if (!sec_power_s2mu106)
+		return 0;
+
 	pr_info("%s start\n", __func__);
 	return platform_driver_register(&s2mu106_charger_driver);
 }

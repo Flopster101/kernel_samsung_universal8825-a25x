@@ -4839,6 +4839,9 @@ static struct i2c_driver s2mu106_usbpd_driver = {
 
 static int __init s2mu106_usbpd_init(void)
 {
+	if (!sec_power_s2mu106)
+		return 0;
+
 	if (!sec_legacy_usbpd) {
 		SEC_DETECT_LOG("s2mu106 usbpd driver cannot start without legacy usbpd\n");
 		return 0;

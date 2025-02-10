@@ -3209,6 +3209,9 @@ static struct platform_driver sm5714_fuelgauge_driver = {
 
 static int __init sm5714_fuelgauge_init(void)
 {
+	if (!sec_power_sm5714)
+		return 0;
+
 	printk(KERN_INFO "%s Initializing sm5714 fuelgauge driver\n", sec_detect_label);
 	pr_info("%s:\n", __func__);
 	return platform_driver_register(&sm5714_fuelgauge_driver);
