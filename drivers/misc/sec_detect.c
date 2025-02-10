@@ -210,6 +210,7 @@ static inline void setup_power_drivers(void) {
 		sec_power_s2mu106 = true;
 		sec_power_sm5451 = true;
 		sec_power_hl7132 = true;
+		sec_legacy_usbpd = true;
 		break;
 	case SEC_A53:
 		sec_power_sm5714 = true;
@@ -277,7 +278,6 @@ int sec_detect_init(void) {
 		sec_current_device = SEC_A33;
 		strncpy(sec_current_device_name, "a33x", sizeof(sec_current_device_name));
 		sec_needs_decon = true;
-		sec_legacy_usbpd = true;
 	} else if (strstr(machine_name, "A53") != NULL) {
 		sec_current_device = SEC_A53;
 		strncpy(sec_current_device_name, "a53x", sizeof(sec_current_device_name));
