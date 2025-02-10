@@ -7,7 +7,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
  */
 
 #include <linux/sec_detect.h>
@@ -92,6 +91,18 @@ EXPORT_SYMBOL(mcd_use_hi1336c_setfile);
 
 bool mcd_camera_use_aois = false;
 EXPORT_SYMBOL(mcd_camera_use_aois);
+
+// Power driver configuration
+bool sec_power_sm5451 = false;
+bool sec_power_sm5714 = false;
+bool sec_power_hl7132 = false;
+bool sec_power_s2mf301 = false;
+bool sec_power_s2mu106 = false;
+EXPORT_SYMBOL(sec_power_sm5451);
+EXPORT_SYMBOL(sec_power_sm5714);
+EXPORT_SYMBOL(sec_power_hl7132);
+EXPORT_SYMBOL(sec_power_s2mf301);
+EXPORT_SYMBOL(sec_power_s2mu106);
 
 #ifdef CONFIG_SEC_DETECT_SYSFS
 // Sysfs attribute to show the current device name
@@ -188,6 +199,38 @@ static inline void setup_camera_params(void) {
 	}
 }
 
+// Function to initialize power driver configuration
+static inline void setup_power_drivers(void) {
+	switch (sec_current_device) {
+	case SEC_A25:
+		sec_power_s2mf301 = true;
+		sec_power_hl7132 = true;
+		break;
+	case SEC_A33:
+		sec_power_s2mu106 = true;
+		sec_power_sm5451 = true;
+		sec_power_hl7132 = true;
+		break;
+	case SEC_A53:
+		sec_power_sm5714 = true;
+		sec_power_sm5451 = true;
+		break;
+	case SEC_M33:
+		sec_power_sm5714 = true;
+		sec_power_sm5451 = true;
+		break;
+	case SEC_M34:
+		sec_power_sm5714 = true;
+		sec_power_sm5451 = true;
+		break;
+	case SEC_GTA4XLS:
+		sec_power_sm5714 = true;
+		break;
+	default:
+		break;
+	}
+}
+
 // New function to print machine name and sec_ variables
 static inline void print_sec_variables(const char *machine_name) {
 	SEC_DETECT_LOG("Current machine name: %s\n", machine_name);
@@ -197,6 +240,12 @@ static inline void print_sec_variables(const char *machine_name) {
 	SEC_DETECT_LOG("sec_lcd_device = %s\n", sec_lcd_device ? "true" : "false");
 	SEC_DETECT_LOG("sec_legacy_sinput = %s\n", sec_legacy_sinput ? "true" : "false");
 	SEC_DETECT_LOG("sec_legacy_usbpd = %s\n", sec_legacy_usbpd ? "true" : "false");
+	SEC_DETECT_LOG("Power drivers present:\n");
+	SEC_DETECT_LOG("sm5451 = %s\n", sec_power_sm5451 ? "true" : "false");
+	SEC_DETECT_LOG("sm5714 = %s\n", sec_power_sm5714 ? "true" : "false");
+	SEC_DETECT_LOG("hl7132 = %s\n", sec_power_hl7132 ? "true" : "false");
+	SEC_DETECT_LOG("s2mf301 = %s\n", sec_power_s2mf301 ? "true" : "false");
+	SEC_DETECT_LOG("s2mu106 = %s\n", sec_power_s2mu106 ? "true" : "false");
 }
 
 int sec_detect_init(void) {
@@ -253,9 +302,6 @@ int sec_detect_init(void) {
 		sec_needs_blic = true;
 	}
 
-	// Print machine name and sec_ variables
-	print_sec_variables(machine_name);
-
 #ifdef CONFIG_SEC_DETECT_SYSFS
 	// Create the sysfs entry
 	device_kobj = kobject_create_and_add("sec_detect", kernel_kobj);
@@ -268,6 +314,10 @@ int sec_detect_init(void) {
 #endif
 
 	setup_camera_params();
+	setup_power_drivers();
+
+	// Print machine name and sec_ variables
+	print_sec_variables(machine_name);
 
 	return retval;
 }

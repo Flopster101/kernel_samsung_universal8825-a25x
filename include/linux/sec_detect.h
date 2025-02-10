@@ -66,6 +66,13 @@ extern bool mcd_use_ois_hall_data_for_vdis;
 extern bool mcd_use_hi1336c_setfile;
 extern bool mcd_camera_use_aois;
 
+// Power driver configuration
+extern bool sec_power_sm5451;
+extern bool sec_power_sm5714;
+extern bool sec_power_hl7132;
+extern bool sec_power_s2mf301;
+extern bool sec_power_s2mu106;
+
 #ifdef CONFIG_SEC_DETECT_SYSFS
 extern char sec_current_device_name[32];
 #endif
