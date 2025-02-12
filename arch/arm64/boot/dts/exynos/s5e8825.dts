@@ -4876,7 +4876,6 @@
 		compatible = "samsung,exynos-seclog";
 		interrupts = <0x00 0xe0 0x04>;
 		memory-region = <0xb3>;
-		status = "disabled";
 	};
 
 	tzasc {
@@ -4914,12 +4913,10 @@
 	fmp {
 		compatible = "samsung,exynos-fmp";
 		dun-swap = [00];
-		status = "disabled";
 	};
 
 	fmp-simulator {
 		compatible = "samsung,exynos-fmp-simulator";
-		status = "disabled";
 	};
 
 	cryptomanager {
