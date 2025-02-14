@@ -2,7 +2,7 @@
 # Automatically generated file; DO NOT EDIT.
 # Linux/arm64 5.10.233 Kernel Configuration
 #
-CONFIG_CC_VERSION_TEXT="Android (12806354, +pgo, +bolt, +lto, +mlgo, based on r547379) clang version 20.0.0 (https://android.googlesource.com/toolchain/llvm-project b718bcaf8c198c82f3021447d943401e3ab5bd54)"
+CONFIG_CC_VERSION_TEXT="Android (13006029, +pgo, +bolt, +lto, +mlgo, based on r547379) clang version 20.0.0 (https://android.googlesource.com/toolchain/llvm-project b718bcaf8c198c82f3021447d943401e3ab5bd54)"
 CONFIG_GCC_VERSION=0
 CONFIG_LD_VERSION=0
 CONFIG_CC_IS_CLANG=y
@@ -28,9 +28,6 @@ CONFIG_INIT_ENV_ARG_LIMIT=32
 CONFIG_WERROR=y
 CONFIG_LOCALVERSION="-Floppy-v3.1-K"
 # CONFIG_LOCALVERSION_AUTO is not set
-CONFIG_UNAME_OVERRIDE=y
-CONFIG_UNAME_OVERRIDE_TARGET="com.google.android.gms"
-CONFIG_UNAME_OVERRIDE_STRING="5.10.198-android12-9-00019-g6efebf1322d6-ab11471183"
 CONFIG_BUILD_SALT=""
 CONFIG_DEFAULT_INIT=""
 CONFIG_DEFAULT_HOSTNAME="(none)"
@@ -6794,8 +6791,11 @@ CONFIG_INPUT_SEC_INPUT=m
 # CONFIG_SEC_DEBUG_TSP_LOG is not set
 # CONFIG_INPUT_TOUCHSCREEN_TCLMV2 is not set
 # CONFIG_INPUT_SEC_SECURE_TOUCH is not set
+# CONFIG_INPUT_SEC_TRUSTED_TOUCH is not set
 # CONFIG_TOUCHSCREEN_DUMP_MODE is not set
 # CONFIG_INPUT_SEC_NOTIFIER is not set
+# CONFIG_SEC_INPUT_MULTI_DEVICE is not set
+# CONFIG_SEC_INPUT_RAWDATA is not set
 # CONFIG_TOUCHSCREEN_DUAL_FOLDABLE is not set
 
 #
@@ -6882,6 +6882,10 @@ CONFIG_PDIC_PD30=y
 CONFIG_SUPPORT_USB_TYPEC_OPS=y
 # CONFIG_S2M_PDIC_MANUAL_RETRY is not set
 CONFIG_S2M_SUPPORT_DELAYED_REQUEST_MESSAGE_UFP=y
+
+#
+# PDIC configs
+#
 
 #
 # USB PDIC common configs
