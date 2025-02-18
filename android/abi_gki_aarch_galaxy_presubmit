@@ -1,0 +1,16 @@
+# Galaxy presubmit whitelist
+# This symbol should be merged to abi_gki_aarch64_galaxy
+# Plase add module name, like as "# required by sound/soc/codecs/snd-soc-wm-adsp.ko"
+[abi_symbol_list]
+_trace_android_vh_record_pcpu_rwsem_starttime
+wait_on_page_bit
+# required by drivers/samsung/pm/sec_pm_debug.ko
+pm_get_active_wakeup_sources
+wakeup_sources_walk_start
+wakeup_sources_walk_next
+wakeup_sources_read_lock
+wakeup_sources_read_unlock
+# required by drivers/usb/notify/usb_notify_layer.ko
+usb_set_configuration
+# required by sound/soc/codecs/dbmdx/dbmdx_codec.ko
+snd_card_ref
