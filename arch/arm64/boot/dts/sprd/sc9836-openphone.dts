@@ -1,49 +1,347 @@
-/*
- * Spreadtrum SC9836 openphone board DTS file
- *
- * Copyright (C) 2014, Spreadtrum Communications Inc.
- *
- * This file is licensed under a dual GPLv2 or X11 license.
- */
-
 /dts-v1/;
 
-#include "sc9836.dtsi"
-
 / {
+	interrupt-parent = <0x01>;
+	#address-cells = <0x02>;
+	#size-cells = <0x02>;
+	compatible = "sprd,sc9836-openphone\0sprd,sc9836";
 	model = "Spreadtrum SC9836 Openphone Board";
 
-	compatible = "sprd,sc9836-openphone", "sprd,sc9836";
+	soc {
+		compatible = "simple-bus";
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+		ranges;
+
+		ap-apb {
+			compatible = "simple-bus";
+			#address-cells = <0x02>;
+			#size-cells = <0x02>;
+			ranges;
+
+			serial@70000000 {
+				compatible = "sprd,sc9836-uart";
+				reg = <0x00 0x70000000 0x00 0x100>;
+				interrupts = <0x00 0x02 0xf04>;
+				clocks = <0x02>;
+				status = "okay";
+				phandle = <0x13>;
+			};
+
+			serial@70100000 {
+				compatible = "sprd,sc9836-uart";
+				reg = <0x00 0x70100000 0x00 0x100>;
+				interrupts = <0x00 0x03 0xf04>;
+				clocks = <0x02>;
+				status = "okay";
+				phandle = <0x14>;
+			};
+
+			serial@70200000 {
+				compatible = "sprd,sc9836-uart";
+				reg = <0x00 0x70200000 0x00 0x100>;
+				interrupts = <0x00 0x04 0xf04>;
+				clocks = <0x02>;
+				status = "okay";
+				phandle = <0x15>;
+			};
+
+			serial@70300000 {
+				compatible = "sprd,sc9836-uart";
+				reg = <0x00 0x70300000 0x00 0x100>;
+				interrupts = <0x00 0x05 0xf04>;
+				clocks = <0x02>;
+				status = "okay";
+				phandle = <0x16>;
+			};
+		};
+	};
+
+	clk26mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0x00>;
+		clock-frequency = <0x18cba80>;
+		phandle = <0x02>;
+	};
+
+	cpus {
+		#address-cells = <0x02>;
+		#size-cells = <0x00>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x00 0x00>;
+			enable-method = "psci";
+			phandle = <0x0a>;
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x00 0x01>;
+			enable-method = "psci";
+			phandle = <0x0c>;
+		};
+
+		cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x00 0x02>;
+			enable-method = "psci";
+			phandle = <0x0e>;
+		};
+
+		cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0x00 0x03>;
+			enable-method = "psci";
+			phandle = <0x10>;
+		};
+	};
+
+	etf@10003000 {
+		compatible = "arm,coresight-tmc\0arm,primecell";
+		reg = <0x00 0x10003000 0x00 0x1000>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		in-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x03>;
+					phandle = <0x04>;
+				};
+			};
+		};
+	};
+
+	funnel@10001000 {
+		compatible = "arm,coresight-dynamic-funnel\0arm,primecell";
+		reg = <0x00 0x10001000 0x00 0x1000>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x04>;
+					phandle = <0x03>;
+				};
+			};
+		};
+
+		in-ports {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			port@0 {
+				reg = <0x00>;
+
+				endpoint {
+					remote-endpoint = <0x05>;
+					phandle = <0x0b>;
+				};
+			};
+
+			port@1 {
+				reg = <0x01>;
+
+				endpoint {
+					remote-endpoint = <0x06>;
+					phandle = <0x0d>;
+				};
+			};
+
+			port@2 {
+				reg = <0x02>;
+
+				endpoint {
+					remote-endpoint = <0x07>;
+					phandle = <0x0f>;
+				};
+			};
+
+			port@3 {
+				reg = <0x03>;
+
+				endpoint {
+					remote-endpoint = <0x08>;
+					phandle = <0x11>;
+				};
+			};
+
+			port@4 {
+				reg = <0x04>;
+
+				endpoint {
+					remote-endpoint = <0x09>;
+					phandle = <0x12>;
+				};
+			};
+		};
+	};
+
+	etm@10440000 {
+		compatible = "arm,coresight-etm4x\0arm,primecell";
+		reg = <0x00 0x10440000 0x00 0x1000>;
+		cpu = <0x0a>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x0b>;
+					phandle = <0x05>;
+				};
+			};
+		};
+	};
+
+	etm@10540000 {
+		compatible = "arm,coresight-etm4x\0arm,primecell";
+		reg = <0x00 0x10540000 0x00 0x1000>;
+		cpu = <0x0c>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x0d>;
+					phandle = <0x06>;
+				};
+			};
+		};
+	};
+
+	etm@10640000 {
+		compatible = "arm,coresight-etm4x\0arm,primecell";
+		reg = <0x00 0x10640000 0x00 0x1000>;
+		cpu = <0x0e>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x0f>;
+					phandle = <0x07>;
+				};
+			};
+		};
+	};
+
+	etm@10740000 {
+		compatible = "arm,coresight-etm4x\0arm,primecell";
+		reg = <0x00 0x10740000 0x00 0x1000>;
+		cpu = <0x10>;
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x11>;
+					phandle = <0x08>;
+				};
+			};
+		};
+	};
+
+	stm@10006000 {
+		compatible = "arm,coresight-stm\0arm,primecell";
+		reg = <0x00 0x10006000 0x00 0x1000 0x00 0x1000000 0x00 0x180000>;
+		reg-names = "stm-base\0stm-stimulus-base";
+		clocks = <0x02>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+
+			port {
+
+				endpoint {
+					remote-endpoint = <0x12>;
+					phandle = <0x09>;
+				};
+			};
+		};
+	};
+
+	interrupt-controller@12001000 {
+		compatible = "arm,gic-400";
+		reg = <0x00 0x12001000 0x00 0x1000 0x00 0x12002000 0x00 0x2000 0x00 0x12004000 0x00 0x2000 0x00 0x12006000 0x00 0x2000>;
+		#interrupt-cells = <0x03>;
+		interrupt-controller;
+		interrupts = <0x01 0x09 0xf04>;
+		phandle = <0x01>;
+	};
+
+	psci {
+		compatible = "arm,psci";
+		method = "smc";
+		cpu_on = <0xc4000003>;
+		cpu_off = <0x84000002>;
+		cpu_suspend = <0xc4000001>;
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x01 0x0d 0xf08 0x01 0x0e 0xf08 0x01 0x0b 0xf08 0x01 0x0a 0xf08>;
+	};
 
 	aliases {
-		serial0 = &uart0;
-		serial1 = &uart1;
-		serial2 = &uart2;
-		serial3 = &uart3;
+		serial0 = "/soc/ap-apb/serial@70000000";
+		serial1 = "/soc/ap-apb/serial@70100000";
+		serial2 = "/soc/ap-apb/serial@70200000";
+		serial3 = "/soc/ap-apb/serial@70300000";
 	};
 
 	memory@80000000 {
 		device_type = "memory";
-		reg = <0 0x80000000 0 0x20000000>;
+		reg = <0x00 0x80000000 0x00 0x20000000>;
 	};
 
 	chosen {
 		stdout-path = "serial1:115200n8";
 	};
-};
 
-&uart0 {
-	status = "okay";
-};
-
-&uart1 {
-	status = "okay";
-};
-
-&uart2 {
-	status = "okay";
-};
-
-&uart3 {
-	status = "okay";
+	__symbols__ {
+		uart0 = "/soc/ap-apb/serial@70000000";
+		uart1 = "/soc/ap-apb/serial@70100000";
+		uart2 = "/soc/ap-apb/serial@70200000";
+		uart3 = "/soc/ap-apb/serial@70300000";
+		clk26mhz = "/clk26mhz";
+		cpu0 = "/cpus/cpu@0";
+		cpu1 = "/cpus/cpu@1";
+		cpu2 = "/cpus/cpu@2";
+		cpu3 = "/cpus/cpu@3";
+		etf_in = "/etf@10003000/in-ports/port/endpoint";
+		funnel_out_port0 = "/funnel@10001000/out-ports/port/endpoint";
+		funnel_in_port0 = "/funnel@10001000/in-ports/port@0/endpoint";
+		funnel_in_port1 = "/funnel@10001000/in-ports/port@1/endpoint";
+		funnel_in_port2 = "/funnel@10001000/in-ports/port@2/endpoint";
+		funnel_in_port3 = "/funnel@10001000/in-ports/port@3/endpoint";
+		funnel_in_port4 = "/funnel@10001000/in-ports/port@4/endpoint";
+		etm0_out = "/etm@10440000/out-ports/port/endpoint";
+		etm1_out = "/etm@10540000/out-ports/port/endpoint";
+		etm2_out = "/etm@10640000/out-ports/port/endpoint";
+		etm3_out = "/etm@10740000/out-ports/port/endpoint";
+		stm_out = "/stm@10006000/out-ports/port/endpoint";
+		gic = "/interrupt-controller@12001000";
+	};
 };

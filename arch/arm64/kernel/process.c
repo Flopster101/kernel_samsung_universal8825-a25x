@@ -307,6 +307,17 @@ void show_regs(struct pt_regs * regs)
 }
 EXPORT_SYMBOL_GPL(show_regs);
 
+#ifdef CONFIG_SEC_DEBUG_AUTO_COMMENT
+void show_regs_auto_comment(struct pt_regs *regs, bool comm)
+{
+	__show_regs(regs);
+	if (comm)
+		dump_backtrace_auto_comment(regs, NULL);
+	else
+		dump_backtrace(regs, NULL, KERN_DEFAULT);
+}
+#endif
+
 static void tls_thread_flush(void)
 {
 	write_sysreg(0, tpidr_el0);
