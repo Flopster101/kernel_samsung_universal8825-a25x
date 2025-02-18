@@ -31,6 +31,9 @@ enum mapping_flags {
 	/* writeback related tags are not used */
 	AS_NO_WRITEBACK_TAGS = 5,
 	AS_THP_SUPPORT = 6,	/* THPs supported */
+#if defined(CONFIG_SDP)
+	AS_SENSITIVE = __GFP_BITS_SHIFT + 5, /* Group of sensitive pages to be cleaned up */
+#endif
 };
 
 /**
@@ -155,6 +158,25 @@ static inline void filemap_nr_thps_dec(struct address_space *mapping)
 	WARN_ON_ONCE(1);
 #endif
 }
+
+#if defined(CONFIG_SDP)
+static inline void mapping_set_sensitive(struct address_space *mapping)
+{
+	set_bit(AS_SENSITIVE, &mapping->flags);
+}
+
+static inline void mapping_clear_sensitive(struct address_space *mapping)
+{
+	clear_bit(AS_SENSITIVE, &mapping->flags);
+}
+
+static inline int mapping_sensitive(struct address_space *mapping)
+{
+	if (mapping)
+		return test_bit(AS_SENSITIVE, &mapping->flags);
+	return !!mapping;
+}
+#endif
 
 void release_pages(struct page **pages, int nr);
 
@@ -807,6 +829,7 @@ struct readahead_control {
 	}
 
 #define VM_READAHEAD_PAGES	(SZ_128K / PAGE_SIZE)
+extern unsigned int mmap_readaround_limit;
 
 void page_cache_ra_unbounded(struct readahead_control *,
 		unsigned long nr_to_read, unsigned long lookahead_count);

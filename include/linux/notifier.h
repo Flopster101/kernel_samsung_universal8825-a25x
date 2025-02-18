@@ -232,5 +232,7 @@ static inline int notifier_to_errno(int ret)
 
 extern struct blocking_notifier_head reboot_notifier_list;
 
+extern int am_app_launch_notifier_register(struct notifier_block *nb);
+extern int am_app_launch_notifier_unregister(struct notifier_block *nb);
 #endif /* __KERNEL__ */
 #endif /* _LINUX_NOTIFIER_H */

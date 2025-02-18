@@ -26,6 +26,25 @@ DEFINE_EVENT(android_fs_data_end_template, android_fs_datawrite_end,
 	TP_PROTO(struct inode *inode, loff_t offset, int bytes),
 	     TP_ARGS(inode, offset, bytes));
 
+
+#ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
+DEFINE_EVENT(android_fs_separation_template,
+			android_fs_separation_start,
+	TP_PROTO(struct inode *inode, loff_t offset, int bytes,
+		pid_t pid, char *pathname, char *command, long long *arr,
+		long long calculate_cold),
+	TP_ARGS(inode, offset, bytes, pid, pathname, command, arr,
+		calculate_cold));
+
+
+DEFINE_EVENT(android_fs_data_wb_template, android_fs_datawrite_start_wb,
+	TP_PROTO(struct inode *inode, loff_t offset, int bytes,
+		 pid_t pid, char *pathname, char *command, unsigned long long time,
+		 int is_cache, int is_file, int is_fuse,
+		 unsigned long long write_chunk, long long *arr),
+	TP_ARGS(inode, offset, bytes, pid, pathname, command, time, is_cache,
+	is_file, is_fuse, write_chunk, arr));
+#endif
 #endif /* _TRACE_ANDROID_FS_H */
 
 /* This part must be outside protection */

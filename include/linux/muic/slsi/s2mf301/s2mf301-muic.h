@@ -1,0 +1,605 @@
+/*
+ * Copyright (C) 2019 Samsung Electronics
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+ *
+ */
+
+#ifndef __S2MF301_MUIC_H__
+#define __S2MF301_MUIC_H__
+
+#include <linux/muic/common/muic.h>
+#if IS_ENABLED(CONFIG_MUIC_PLATFORM)
+#include <linux/muic/slsi/platform/muic_platform_manager.h>
+#endif
+#include <linux/muic/slsi/s2mf301/s2mf301-muic-hv.h>
+#include <linux/pm_wakeup.h>
+
+#define MUIC_DEV_NAME   "muic-s2mf301"
+
+
+enum s2mf301_muic_registers {
+	S2MF301_REG_AFC_INT             = 0x00,
+	S2MF301_REG_MUIC_INT            = 0x01,
+	S2MF301_REG_AFC_INT_MASK        = 0x02,
+	S2MF301_REG_MUIC_INT_MASK       = 0x03,
+	S2MF301_REG_AFC_STATUS          = 0x04,
+    S2MF301_REG_OVP_STATUS          = 0x05,
+	S2MF301_REG_DEVICE_TYP1         = 0x06,
+	S2MF301_REG_DEVICE_TYP2         = 0x07,
+	S2MF301_REG_AFC_CTRL1           = 0x08,
+	S2MF301_REG_AFC_CTRL2           = 0x09,
+	S2MF301_REG_AFC_TX_BYTE         = 0x0A,
+    S2MF301_REG_AFC_RX_BYTE1        = 0x0B,
+    S2MF301_REG_AFC_RX_BYTE2        = 0x0C,
+    S2MF301_REG_AFC_RX_BYTE3        = 0x0D,
+    S2MF301_REG_AFC_RX_BYTE4        = 0x0E,
+    S2MF301_REG_AFC_RX_BYTE5        = 0x0F,
+
+    S2MF301_REG_AFC_RX_BYTE6        = 0x10,
+    S2MF301_REG_AFC_RX_BYTE7        = 0x11,
+    S2MF301_REG_AFC_RX_BYTE8        = 0x12,
+    S2MF301_REG_AFC_RX_BYTE9        = 0x13,
+    S2MF301_REG_AFC_RX_BYTE10       = 0x14,
+    S2MF301_REG_AFC_RX_BYTE11       = 0x15,
+    S2MF301_REG_AFC_RX_BYTE12       = 0x16,
+    S2MF301_REG_AFC_RX_BYTE13       = 0x17,
+    S2MF301_REG_AFC_RX_BYTE14       = 0x18,
+    S2MF301_REG_AFC_RX_BYTE15       = 0x19,
+    S2MF301_REG_AFC_RX_BYTE16       = 0x1A,
+	S2MF301_REG_AFC_LOGIC_RDATA1    = 0x1B,
+	S2MF301_REG_AFC_LOGIC_RDATA2    = 0x1C,
+	S2MF301_REG_AFC_LOGIC_CTRL1     = 0x1D,
+	S2MF301_REG_AFC_LOGIC_CTRL2     = 0x1E,
+	S2MF301_REG_AFC_LOGIC_RDATA3    = 0x1F,
+
+	S2MF301_REG_QC30_DP_STEP        = 0x20,
+	S2MF301_REG_QC30_DM_STEP        = 0x21,
+	S2MF301_REG_AFC_MONITOR         = 0x22,
+    S2MF301_REG_RESET_BCD_RESCAN    = 0x23,
+	S2MF301_REG_TEST                = 0x24,
+    S2MF301_REG_MUIC_MONITOR_SEL    = 0x25,
+	S2MF301_REG_AFC_OTP0            = 0x26,
+	S2MF301_REG_AFC_OTP1            = 0x27,
+	S2MF301_REG_AFC_OTP2            = 0x28,
+	S2MF301_REG_AFC_OTP3            = 0x29,
+	S2MF301_REG_AFC_OTP4            = 0x2A,
+	S2MF301_REG_AFC_OTP5            = 0x2B,
+	S2MF301_REG_AFC_OTP6            = 0x2C,
+	S2MF301_REG_TIMER_SET1          = 0x2D,
+    S2MF301_REG_OVPSW_LDO           = 0x2E,
+    S2MF301_REG_TRIM_CHARGER_DET    = 0x2F,
+
+	S2MF301_REG_MUIC_CTRL1          = 0x30,
+    S2MF301_REG_MUIC_CTRL2          = 0x31,
+	S2MF301_REG_MANUAL_SW_CTRL      = 0x32,
+    S2MF301_REG_MUIC_ETC            = 0x33,
+	S2MF301_REG_MUIC_RSVD1          = 0x34,
+	S2MF301_REG_MUIC_RSVD2          = 0x35,
+};
+#define ADC_CONVERSION_ERR_MASK		(0x1 << 7)
+
+/* s2mf301 muic register read/write related information defines. */
+/* S2MF301 Control register */
+
+
+/* S2MF301 MUIC_INT register (0x01)*/
+#define S2MF301_MUIC_INT_GP_OVP_I_SHIFT         7
+#define S2MF301_MUIC_INT_USB_KILLER_I_SHIFT     6
+#define S2MF301_MUIC_INT_VBUS_OFF_I_SHIFT       5
+#define S2MF301_MUIC_INT_VBUS_ON_I_SHIFT        4
+#define S2MF301_MUIC_INT_USB_OVP_I_SHIFT        3
+#define S2MF301_MUIC_INT_RSVD_SHIFT             2
+#define S2MF301_MUIC_INT_DETACH_I_SHIFT         1
+#define S2MF301_MUIC_INT_ATTACH_I_SHIFT         0
+
+#define S2MF301_MUIC_INT_GP_OVP_I_MASK          (0x1 << S2MF301_MUIC_INT_WAKE_UP_I_SHIFT)
+#define S2MF301_MUIC_INT_USB_KILLER_I_MASK      (0x1 << S2MF301_MUIC_INT_USB_KILLER_I_SHIFT)
+#define S2MF301_MUIC_INT_VBUS_OFF_I_MASK        (0x1 << S2MF301_MUIC_INT_RID_CHG_I_SHIFT)
+#define S2MF301_MUIC_INT_VBUS_ON_I_MASK         (0x1 << S2MF301_MUIC_INT_LKR_I_SHIFT)
+#define S2MF301_MUIC_INT_USB_OVP_I_MASK         (0x1 << S2MF301_MUIC_INT_LKP_I_SHIFT)
+#define S2MF301_MUIC_INT_RSVD_MASK              (0x1 << S2MF301_MUIC_INT_KP_I_SHIFT)
+#define S2MF301_MUIC_INT_DETACH_I_MASK          (0x1 << S2MF301_MUIC_INT_DETACH_I_SHIFT)
+#define S2MF301_MUIC_INT_ATTACH_I_MASK          (0x1 << S2MF301_MUIC_INT_ATTACH_I_SHIFT)
+
+#define INT_MUIC_MASK			~(0x33)
+
+/* S2MF301 MUIC_INT_MASK register (0x03)*/
+#define S2MF301_MUIC_INT_MASK_GP_OVP_I_SHIFT         7
+#define S2MF301_MUIC_INT_MASK_USB_KILLER_I_SHIFT     6
+#define S2MF301_MUIC_INT_MASK_VBUS_OFF_I_SHIFT       5
+#define S2MF301_MUIC_INT_MASK_VBUS_ON_I_SHIFT        4
+#define S2MF301_MUIC_INT_MASK_USB_OVP_I_SHIFT        3
+#define S2MF301_MUIC_INT_MASK_RSVD_SHIFT             2
+#define S2MF301_MUIC_INT_MASK_DETACH_I_SHIFT         1
+#define S2MF301_MUIC_INT_MASK_ATTACH_I_SHIFT         0
+
+#define S2MF301_MUIC_INT_MASK_GP_OVP_I_MASK          (0x1 << S2MF301_MUIC_INT_MASK_WAKE_UP_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_USB_KILLER_I_MASK      (0x1 << S2MF301_MUIC_INT_MASK_USB_KILLER_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_VBUS_OFF_I_MASK        (0x1 << S2MF301_MUIC_INT_MASK_RID_CHG_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_VBUS_ON_I_MASK         (0x1 << S2MF301_MUIC_INT_MASK_LKR_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_USB_OVP_I_MASK         (0x1 << S2MF301_MUIC_INT_MASK_LKP_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_RSVD_MASK              (0x1 << S2MF301_MUIC_INT_MASK_KP_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_DETACH_I_MASK          (0x1 << S2MF301_MUIC_INT_MASK_DETACH_I_SHIFT)
+#define S2MF301_MUIC_INT_MASK_ATTACH_I_MASK          (0x1 << S2MF301_MUIC_INT_MASK_ATTACH_I_SHIFT)
+
+/* S2MF301 OVP_STATUS register (0x05)*/
+#define S2MF301_MUIC_OVP_STATUS_GP1_OVP_SHIFT           7
+#define S2MF301_MUIC_OVP_STATUS_GP2_OVP_SHIFT           6
+#define S2MF301_MUIC_OVP_STATUS_RSVD1_SHIFT             5
+#define S2MF301_MUIC_OVP_STATUS_RSVD2_SHIFT             4
+#define S2MF301_MUIC_OVP_STATUS_RSVD3_SHIFT             3
+#define S2MF301_MUIC_OVP_STATUS_RSVD4_SHIFT             2
+#define S2MF301_MUIC_OVP_STATUS_DPCON_OVP_SHIFT         1
+#define S2MF301_MUIC_OVP_STATUS_DMCON_OVP_SHIFT         0
+
+#define S2MF301_MUIC_OVP_STATUS_GP1_OVP_MASK            (0x1 << S2MF301_MUIC_OVP_STATUS_GP1_OVP_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_GP2_OVP_MASK            (0x1 << S2MF301_MUIC_OVP_STATUS_GP2_OVP_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_RSVD1_MASK              (0x1 << S2MF301_MUIC_OVP_STATUS_RSVD1_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_RSVD2_MASK              (0x1 << S2MF301_MUIC_OVP_STATUS_RSVD2_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_RSVD3_MASK              (0x1 << S2MF301_MUIC_OVP_STATUS_RSVD3_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_RSVD4_MASK              (0x1 << S2MF301_MUIC_OVP_STATUS_RSVD4_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_DPCON_OVP_MASK          (0x1 << S2MF301_MUIC_OVP_STATUS_DPCON_OVP_SHIFT)
+#define S2MF301_MUIC_OVP_STATUS_DMCON_OVP_MASK          (0x1 << S2MF301_MUIC_OVP_STATUS_DMCON_OVP_SHIFT)
+
+/* S2MF301 DEVICE_TYPE1 register (0x06)*/
+#define S2MF301_MUIC_DEVICE_TYPE1_DCPCHG_SHIFT          7
+#define S2MF301_MUIC_DEVICE_TYPE1_USBCHG_SHIFT          6
+#define S2MF301_MUIC_DEVICE_TYPE1_CDPCHG_SHIFT          5
+#define S2MF301_MUIC_DEVICE_TYPE1_SDP1P8S_SHIFT         4
+#define S2MF301_MUIC_DEVICE_TYPE1_U200_CHG_SHIFT        3
+#define S2MF301_MUIC_DEVICE_TYPE1_OPPO_DCP_SHIFT        2
+#define S2MF301_MUIC_DEVICE_TYPE1_DP_3V_SDP_SHIFT       1
+#define S2MF301_MUIC_DEVICE_TYPE1_EXTRA_SHIFT           0
+
+#define S2MF301_MUIC_DEVICE_TYPE1_DCPCHG_MASK           (0x1 << S2MF301_MUIC_DEVICE_TYPE1_DCPCHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_USBCHG_MASK           (0x1 << S2MF301_MUIC_DEVICE_TYPE1_USBCHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_CDPCHG_MASK           (0x1 << S2MF301_MUIC_DEVICE_TYPE1_CDPCHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_SDP1P8S_MASK          (0x1 << S2MF301_MUIC_DEVICE_TYPE1_SDP1P8S_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_U200_CHG_MASK         (0x1 << S2MF301_MUIC_DEVICE_TYPE1_U200_CHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_OPPO_DCP_MASK         (0x1 << S2MF301_MUIC_DEVICE_TYPE1_OPPO_DCP_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_DP_3V_SDP_MASK        (0x1 << S2MF301_MUIC_DEVICE_TYPE1_DP_3V_SDP_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE1_EXTRA_MASK            (0x1 << S2MF301_MUIC_DEVICE_TYPE1_EXTRA_SHIFT)
+
+/* S2MF301 DEVICE_TYPE2 register (0x07)*/
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_0P5A_CHG_SHIFT  7
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_1A_CHG_SHIFT    6
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_2A_CHG_SHIFT    5
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_2P4A_CHG_SHIFT  4
+#define S2MF301_MUIC_DEVICE_TYPE2_SDP_DCD_OUT_SHIFT     3
+#define S2MF301_MUIC_DEVICE_TYPE2_USB_KILLER_SHIFT      2
+#define S2MF301_MUIC_DEVICE_TYPE2_VBUS_WAKEUP_SHIFT     1
+#define S2MF301_MUIC_DEVICE_TYPE2_RSVD_SHIFT            0
+
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_0P5A_CHG_MASK   (0x1 << S2MF301_MUIC_DEVICE_TYPE2_APPLE_0P5A_CHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_1A_CHG_MASK     (0x1 << S2MF301_MUIC_DEVICE_TYPE2_APPLE_1A_CHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_2A_CHG_MASK     (0x1 << S2MF301_MUIC_DEVICE_TYPE2_APPLE_2A_CHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_APPLE_2P4A_CHG_MASK   (0x1 << S2MF301_MUIC_DEVICE_TYPE2_APPLE_2P4A_CHG_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_SDP_DCD_OUT_MASK      (0x1 << S2MF301_MUIC_DEVICE_TYPE2_SDP_DCD_OUT_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_USB_KILLER_MASK       (0x1 << S2MF301_MUIC_DEVICE_TYPE2_USB_KILLER_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_VBUS_WAKEUP_MASK      (0x1 << S2MF301_MUIC_DEVICE_TYPE2_VBUS_WAKEUP_SHIFT)
+#define S2MF301_MUIC_DEVICE_TYPE2_RSVD_MASK             (0x1 << S2MF301_MUIC_DEVICE_TYPE2_RSVD_SHIFT)
+
+
+/* S2MF301 RESET_N_BCD_RESCAN register (0x23)*/
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_REG_RESET_SHIFT         2
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_FUNCTION_RESET_SHIFT    1
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_BCD_RESCAN_SHIFT        0
+
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_REG_RESET_MASK          (0x1 << S2MF301_MUIC_RESET_N_BCD_RESCAN_REG_RESET_SHIFT)
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_FUNCTION_RESET_MASK     (0x1 << S2MF301_MUIC_RESET_N_BCD_RESCAN_FUNCTION_RESET_SHIFT)
+#define S2MF301_MUIC_RESET_N_BCD_RESCAN_BCD_RESCAN_MASK         (0x1 << S2MF301_MUIC_RESET_N_BCD_RESCAN_BCD_RESCAN_SHIFT)
+
+/* S2MF301 TEST1 register (0x24)*/
+#define S2MF301_MUIC_TEST1_TEST_CHG_DET_SHIFT           7
+#define S2MF301_MUIC_TEST1_TEST_IDPSRC_RDMDN_SHIFT      6
+#define S2MF301_MUIC_TEST1_TEST_VDPSRC_IDMSNK_SHIFT     5
+#define S2MF301_MUIC_TEST1_TEST_VDMSRC_IDPSNK_SHIFT     4
+#define S2MF301_MUIC_TEST1_TEST_APPLE_U200_CHK_SHIFT    3
+#define S2MF301_MUIC_TEST1_RSVD1_SHIFT                  2
+#define S2MF301_MUIC_TEST1_RSVD2_SHIFT                  2
+#define S2MF301_MUIC_TEST1_RSVD3_SHIFT                  0
+
+#define S2MF301_MUIC_TEST1_TEST_CHG_DET_MASK            (0x1 << S2MF301_MUIC_TEST1_TEST_CHG_DET_SHIFT)
+#define S2MF301_MUIC_TEST1_TEST_IDPSRC_RDMDN_MASK       (0x1 << S2MF301_MUIC_TEST1_TEST_IDPSRC_RDMDN_SHIFT)
+#define S2MF301_MUIC_TEST1_TEST_VDPSRC_IDMSNK_MASK      (0x1 << S2MF301_MUIC_TEST1_TEST_VDPSRC_IDMSNK_SHIFT)
+#define S2MF301_MUIC_TEST1_TEST_VDMSRC_IDPSNK_MASK      (0x1 << S2MF301_MUIC_TEST1_TEST_VDMSRC_IDPSNK_SHIFT)
+#define S2MF301_MUIC_TEST1_TEST_APPLE_U200_CHK_MASK     (0x1 << S2MF301_MUIC_TEST1_TEST_APPLE_U200_CHK_SHIFT)
+#define S2MF301_MUIC_TEST1_RSVD1_MASK                   (0x1 << S2MF301_MUIC_TEST1_RSVD1_SHIFT)
+#define S2MF301_MUIC_TEST1_RSVD2_MASK                   (0x1 << S2MF301_MUIC_TEST1_RSVD2_SHIFT)
+#define S2MF301_MUIC_TEST1_RSVD3_MASK                   (0x1 << S2MF301_MUIC_TEST1_RSVD3_SHIFT)
+
+/* S2MF301 TIMER_SET1 register (0x2D)*/
+#define S2MF301_MUIC_TIMER_SET1_SWITCHING_WAIT_SHIFT        4
+#define S2MF301_MUIC_TIMER_SET1_VBUS_DEB_SEL_SHIFT          3
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT             0
+
+#define S2MF301_MUIC_TIMER_SET1_SWITCHING_WAIT_MASK         (0xF << S2MF301_MUIC_TIMER_SET1_SWITCHING_WAIT_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_VBUS_DEB_SEL_MASK           (0x1 << S2MF301_MUIC_TIMER_SET1_VBUS_DEB_SEL_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_MASK              (0x7 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_250MS             (0x0 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_300MS             (0x1 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_350MS             (0x2 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_400MS             (0x3 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_600MS             (0x4 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_1200MS            (0x5 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_1800MS            (0x6 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+#define S2MF301_MUIC_TIMER_SET1_DCDTMRSET_2400MS            (0x7 << S2MF301_MUIC_TIMER_SET1_DCDTMRSET_SHIFT)
+
+/* S2MF301 OVPSW_LDO register (0x2E)*/
+#define S2MF301_MUIC_OVPSW_LDO_MAN_GP1_OVP_OFFB_SHIFT       7
+#define S2MF301_MUIC_OVPSW_LDO_MAN_TEST_PRE_MUX_SEL_SHIFT   5
+#define S2MF301_MUIC_OVPSW_LDO_OVPSW_LDO_SEL_SHIFT          0
+
+#define S2MF301_MUIC_OVPSW_LDO_MAN_GP1_OVP_OFFB_MASK        (0x1 << S2MF301_MUIC_OVPSW_LDO_MAN_GP1_OVP_OFFB_SHIFT)
+#define S2MF301_MUIC_OVPSW_LDO_MAN_TEST_PRE_MUX_SEL_MASK    (0x3 << S2MF301_MUIC_OVPSW_LDO_MAN_TEST_PRE_MUX_SEL_SHIFT)
+#define S2MF301_MUIC_OVPSW_LDO_OVPSW_LDO_SEL_MASK           (0x1F << S2MF301_MUIC_OVPSW_LDO_OVPSW_LDO_SEL_SHIFT)
+
+/* S2MF301 TRIM_CHARGER_DET register (0x2F)*/
+#define S2MF301_MUIC_TRIM_CHARGER_DET_MAN_GP2_OVP_OFFB_SHIFT    7
+#define S2MF301_MUIC_TRIM_CHARGER_DET_VTH_APPLE_SHIFT           4
+#define S2MF301_MUIC_TRIM_CHARGER_DET_VTRIM_DATA_SHIFT          0
+
+#define S2MF301_MUIC_TRIM_CHARGER_DET_MAN_GP2_OVP_OFFB_MASK     (0x1 << S2MF301_MUIC_TRIM_CHARGER_DET_MAN_GP2_OVP_OFFB_SHIFT)
+#define S2MF301_MUIC_TRIM_CHARGER_DET_VTH_APPLE_MASK            (0x7 << S2MF301_MUIC_TRIM_CHARGER_DET_VTH_APPLE_SHIFT)
+#define S2MF301_MUIC_TRIM_CHARGER_DET_VTRIM_DATA_MASK           (0xF << S2MF301_MUIC_TRIM_CHARGER_DET_VTRIM_DATA_SHIFT)
+
+/* S2MF301 MUIC_CTRL1 register (0x30)*/
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DPDM_SHORT_SHIFT      7
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DP_RDN_SHIFT          6
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DM_RDN_SHIFT          5
+#define S2MF301_MUIC_MUIC_CTRL1_SWITCH_OPENB_SHIFT       4
+#define S2MF301_MUIC_MUIC_CTRL1_FAC_WAIT_SHIFT           3
+#define S2MF301_MUIC_MUIC_CTRL1_MANUAL_SW_SHIFT          2
+#define S2MF301_MUIC_MUIC_CTRL1_WAIT_VALUE_SHIFT         1
+#define S2MF301_MUIC_MUIC_CTRL1_RSVD_SHIFT               0
+
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DPDM_SHORT_MASK       (0x1 << S2MF301_MUIC_MUIC_CTRL1_TX_DPDM_SHORT_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DP_RDN_MASK           (0x1 << S2MF301_MUIC_MUIC_CTRL1_TX_DP_RDN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_TX_DM_RDN_MASK           (0x1 << S2MF301_MUIC_MUIC_CTRL1_TX_DM_RDN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_SWITCH_OPENB_MASK        (0x1 << S2MF301_MUIC_MUIC_CTRL1_SWITCH_OPENB_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_FAC_WAIT_MASK            (0x1 << S2MF301_MUIC_MUIC_CTRL1_FAC_WAIT_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_MANUAL_SW_MASK           (0x1 << S2MF301_MUIC_MUIC_CTRL1_MANUAL_SW_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_WAIT_VALUE_MASK          (0x1 << S2MF301_MUIC_MUIC_CTRL1_WAIT_VALUE_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL1_RSVD_MASK                (0x1 << S2MF301_MUIC_MUIC_CTRL1_RSVD_SHIFT)
+
+/* S2MF301 MUIC_CTRL2 register (0x31)*/
+#define S2MF301_MUIC_MUIC_CTRL2_GP_OVP_EN_SHIFT             7
+#define S2MF301_MUIC_MUIC_CTRL2_MAN_VBUSTMR_ON_SHIFT        6
+#define S2MF301_MUIC_MUIC_CTRL2_DCD_DA_ATTACH_EN_SHIFT      5
+#define S2MF301_MUIC_MUIC_CTRL2_USBKILL_OTG_EN_SHIFT        4
+#define S2MF301_MUIC_MUIC_CTRL2_DCDTMR_OUT_EN_SHIFT         3
+#define S2MF301_MUIC_MUIC_CTRL2_USB_2ND_EN_SHIFT            2
+#define S2MF301_MUIC_MUIC_CTRL2_DET_CHARGER_OFF_SHIFT       1
+#define S2MF301_MUIC_MUIC_CTRL2_INT_PIN_MASK_SHIFT          0
+
+#define S2MF301_MUIC_MUIC_CTRL2_GP_OVP_EN_MASK              (0x1 << S2MF301_MUIC_MUIC_CTRL2_GP_OVP_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_MAN_VBUSTMR_ON_MASK         (0x1 << S2MF301_MUIC_MUIC_CTRL2_MAN_VBUSTMR_ON_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_DCD_DA_ATTACH_EN_MASK       (0x1 << S2MF301_MUIC_MUIC_CTRL2_DCD_DA_ATTACH_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_USBKILL_OTG_EN_MASK         (0x1 << S2MF301_MUIC_MUIC_CTRL2_USBKILL_OTG_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_DCDTMR_OUT_EN_MASK          (0x1 << S2MF301_MUIC_MUIC_CTRL2_DCDTMR_OUT_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_USB_2ND_EN_MASK             (0x1 << S2MF301_MUIC_MUIC_CTRL2_USB_2ND_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_DET_CHARGER_OFF_MASK        (0x1 << S2MF301_MUIC_MUIC_CTRL2_DET_CHARGER_OFF_SHIFT)
+#define S2MF301_MUIC_MUIC_CTRL2_INT_PIN_MASK_MASK           (0x1 << S2MF301_MUIC_MUIC_CTRL2_INT_PIN_MASK_SHIFT)
+
+/* S2MF301 MUIC_SW_CTRL register (0x32)*/
+#define S2MF301_MUIC_MUIC_SW_CTRL_DP_HICCUP_SHIFT           7
+#define S2MF301_MUIC_MUIC_SW_CTRL_DM_HICCUP_SHIFT           6
+#define S2MF301_MUIC_MUIC_SW_CTRL_USB_OVP_EN_SHIFT          5
+#define S2MF301_MUIC_MUIC_SW_CTRL_GATESW_ON_SHIFT           4
+#define S2MF301_MUIC_MUIC_SW_CTRL_REVD_SHIFT                3
+#define S2MF301_MUIC_MUIC_SW_CTRL_UART2_SW_SHIFT            2
+#define S2MF301_MUIC_MUIC_SW_CTRL_UART1_SW_SHIFT            1
+#define S2MF301_MUIC_MUIC_SW_CTRL_USB_SW_SHIFT              0
+
+#define S2MF301_MUIC_MUIC_SW_CTRL_DP_HICCUP_MASK           (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_DP_HICCUP_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_DM_HICCUP_MASK           (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_DM_HICCUP_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_USB_OVP_EN_MASK          (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_USB_OVP_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_GATESW_ON_MASK           (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_GATESW_ON_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_REVD_MASK                (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_REVD_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_UART2_SW_MASK            (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_UART2_SW_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_UART1_SW_MASK            (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_UART1_SW_SHIFT)
+#define S2MF301_MUIC_MUIC_SW_CTRL_USB_SW_MASK              (0x1 << S2MF301_MUIC_MUIC_SW_CTRL_USB_SW_SHIFT)
+
+#define S2MF301_MANUAL_SW_CTRL_UART2    (S2MF301_MUIC_MUIC_SW_CTRL_UART2_SW_MASK)
+#define S2MF301_MANUAL_SW_CTRL_UART1    (S2MF301_MUIC_MUIC_SW_CTRL_UART1_SW_MASK)
+#define S2MF301_MANUAL_SW_CTRL_USB      (S2MF301_MUIC_MUIC_SW_CTRL_USB_SW_MASK)
+#define S2MF301_MANUAL_SW_CTRL_HICCUP   (S2MF301_MUIC_MUIC_SW_CTRL_DP_HICCUP_MASK | S2MF301_MUIC_MUIC_SW_CTRL_DM_HICCUP_MASK)
+#define S2MF301_MANUAL_SW_CTRL_USB_OVP  (S2MF301_MUIC_MUIC_SW_CTRL_USB_OVP_EN_MASK)
+#define S2MF301_MANUAL_SW_CTRL_GATESW   (S2MF301_MUIC_MUIC_SW_CTRL_GATESW_ON_MASK)
+#define S2MF301_MANUAL_SW_CTRL_OPEN     (0)
+#define S2MF301_MANUAL_SW_CTRL_SWITCH_MASK (S2MF301_MANUAL_SW_CTRL_UART2|S2MF301_MANUAL_SW_CTRL_UART1\
+                                            |S2MF301_MANUAL_SW_CTRL_USB| S2MF301_MANUAL_SW_CTRL_HICCUP)
+
+
+/* S2MF301 MUIC_ETC register (0x33)*/
+#define S2MF301_MUIC_MUIC_ETC_I_D2D_MUIC_TOP2MUIC_ATTACH_SHIFT      7
+#define S2MF301_MUIC_MUIC_ETC_REG_CHG_DET_OFF_SHIFT                 6
+#define S2MF301_MUIC_MUIC_ETC_REG_JIG_BYPASS_NOT_CHECK_EN_SHIFT     5
+#define S2MF301_MUIC_MUIC_ETC_REG_SW_WAIT_NOT_SHIFT                 4
+#define S2MF301_MUIC_MUIC_ETC_MAN_HW_CLK_ON_HIGH_SHIFT              3
+#define S2MF301_MUIC_MUIC_ETC_INT_REVD2_SHIFT                       2
+#define S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL2_SHIFT      1
+#define S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL1_SHIFT      0
+
+#define S2MF301_MUIC_MUIC_ETC_I_D2D_MUIC_TOP2MUIC_ATTACH_MASK       (0x1 << S2MF301_MUIC_MUIC_ETC_I_D2D_MUIC_TOP2MUIC_ATTACH_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_REG_CHG_DET_OFF_MASK                  (0x1 << S2MF301_MUIC_MUIC_ETC_REG_CHG_DET_OFF_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_REG_JIG_BYPASS_NOT_CHECK_EN_MASK      (0x1 << S2MF301_MUIC_MUIC_ETC_REG_JIG_BYPASS_NOT_CHECK_EN_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_REG_SW_WAIT_NOT_MASK                  (0x1 << S2MF301_MUIC_MUIC_ETC_REG_SW_WAIT_NOT_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_MAN_HW_CLK_ON_HIGH_MASK               (0x1 << S2MF301_MUIC_MUIC_ETC_MAN_HW_CLK_ON_HIGH_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_INT_REVD2_MASK                        (0x1 << S2MF301_MUIC_MUIC_ETC_INT_REVD2_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL2_MASK       (0x1 << S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL2_SHIFT)
+#define S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL1_MASK       (0x1 << S2MF301_MUIC_MUIC_ETC_REG_DETACH_ATTACH_IRQ_SEL1_SHIFT)
+
+/* S2MF301 MUIC MUIC_RSVD8 Register (0x87) */
+
+
+/* S2MF301 MUIC ATE_OTP0 Register (0xFC) */
+
+
+/* S2MF301 MUIC ATE_OTP1 Register (0xFD) */
+
+
+/* S2MF301 MUIC ATE_OTP2 Register (0xFE) */
+
+
+/* S2MF301 MUIC ATE_OTP3 Register (0xFF) */
+
+/* S2MF301_REG_LDOADC_VSETH register */
+#define LDOADC_VSETH_MASK	0x1F
+#define LDOADC_VSETL_MASK	0x1F
+#define LDOADC_VSET_3V		0x1F
+#define LDOADC_VSET_2_7V	0x1C
+#define LDOADC_VSET_2_6V	0x0E
+#define LDOADC_VSET_2_4V	0x0C
+#define LDOADC_VSET_2_2V	0x0A
+#define LDOADC_VSET_2_0V	0x08
+#define LDOADC_VSET_1_8V	0x06
+#define LDOADC_VSET_1_7V	0x05
+#define LDOADC_VSET_1_6V	0x04
+#define LDOADC_VSET_1_5V	0x03
+#define LDOADC_VSET_1_4V	0x02
+#define LDOADC_VSET_1_2V	0x00
+#define LDOADC_VSETH_WAKE_HYS_SHIFT	6
+#define LDOADC_VSETH_WAKE_HYS_MASK	(0x1 << LDOADC_VSETH_WAKE_HYS_SHIFT)
+
+enum s2mf301_muic_enable {
+	S2MF301_DISABLE,
+	S2MF301_ENABLE,
+};
+
+enum s2mf301_muic_adc_mode {
+	S2MF301_ADC_ONESHOT,
+	S2MF301_ADC_PERIODIC,
+};
+
+enum s2mf301_muic_detect_dev_read_val {
+	DEVICE_TYPE1 = 0,
+	DEVICE_TYPE2,
+	DEVICE_TYPE3,
+	ADC,
+	DEVICE_APPLE,
+	CHG_TYPE,
+	SC_STATUS2,
+	MAX_NUM,
+};
+
+typedef enum {
+	S2MF301_MODE_NONE = -1,
+	S2MF301_MODE_AUTO,
+	S2MF301_MODE_MANUAL,
+	S2MF301_MODE_MAX,
+} t_mode_data ;
+
+typedef enum {
+	S2MF301_PATH_NONE = -1,
+	S2MF301_PATH_OPEN,
+	S2MF301_PATH_USB,
+	S2MF301_PATH_UART_AP,
+	S2MF301_PATH_UART_CP,
+	S2MF301_PATH_RSVD,
+	S2MF301_PATH_MAX,
+} t_path_data;
+
+typedef enum {
+	S2MF301_WATER_MUIC_IDLE,
+	S2MF301_WATER_MUIC_VERIFY,
+	S2MF301_WATER_MUIC_DET,
+	S2MF301_WATER_MUIC_CCIC_DET,
+	S2MF301_WATER_MUIC_CCIC_STABLE,
+	S2MF301_WATER_MUIC_CCIC_INVALID,
+} t_water_status;
+
+typedef enum {
+	S2MF301_WATER_DRY_MUIC_IDLE,
+	S2MF301_WATER_DRY_MUIC_DET,
+	S2MF301_WATER_DRY_MUIC_CCIC_DET,
+	S2MF301_WATER_DRY_MUIC_CCIC_INVALID,
+} t_water_dry_status;
+
+typedef enum {
+	S2MF301_DETECT_NONE,
+	S2MF301_DETECT_DONE,
+	S2MF301_DETECT_SKIP,
+} t_detect_status;
+
+typedef enum {
+	S2MF301_IRQ_CHECK_DONE,
+	S2MF301_IRQ_SKIP,
+} t_irq_status;
+
+typedef enum {
+	S2MF301_AFC_5V_to_9V,
+	S2MF301_AFC_9V_to_5V,
+} t_afc_vol_change;
+
+struct s2mf301_pm_rid_ops {
+	int		(*control_rid_adc)(void *_data, bool enable);
+	int		(*mask_rid_change)(void *_data, bool enable);
+	int		(*get_rid_adc)(void *_data);
+	bool		(*rid_is_enable)(void *_data);
+	void		*_data;
+};
+
+struct s2mf301_top_rid_ops {
+	int		(*set_jig_on)(void *_data, bool enable);
+	int		(*mask_rid_change)(void *_data, bool enable);
+	void		*_data;
+};
+
+/* muic chip specific internal data structure
+ * that setted at muic-xxxx.c file
+ */
+struct s2mf301_muic_data {
+	struct device *dev;
+	struct i2c_client *i2c; /* i2c addr: 0x7C; MUIC */
+	struct s2mf301_dev *s2mf301_dev;
+
+	struct mutex muic_mutex;
+	struct mutex switch_mutex;
+#if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
+	struct mutex afc_mutex;
+#endif
+
+	struct mutex bcd_rescan_mutex;
+	struct wakeup_source *muic_ws;
+	struct power_supply *psy_pd;
+
+	struct s2mf301_top *top;
+	struct s2mf301_pmeter_data *pmeter;
+	struct power_supply *psy_pm;
+	struct power_supply *psy_top;
+	struct s2mf301_pm_rid_ops	pm_rid_ops;
+	struct s2mf301_top_rid_ops	top_rid_ops;
+	struct delayed_work get_pm_ops_work;
+	struct delayed_work get_top_ops_work;
+	int (*rid_isr)(void *_data);
+
+	/* model dependant mfd platform data */
+	struct s2mf301_platform_data *mfd_pdata;
+
+	int irq_attach;
+	int irq_detach;
+	int irq_rid_chg;
+	int irq_usb_killer;
+	int irq_vbus_on;
+	int irq_rsvd_attach;
+	int irq_adc_change;
+	int irq_av_charge;
+	int irq_vbus_off;
+#if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
+	int irq_vdnmon;
+	int irq_mpnack;
+	int irq_mrxtrf;
+	int irq_mrxrdy;
+	struct power_supply *psy_chg;
+#endif
+	bool afc_check;
+#if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
+	bool is_dp_drive;
+	bool is_hvcharger_detected;
+	bool is_charger_ready;
+#endif
+
+	muic_attached_dev_t new_dev;
+
+	int adc;
+	int vbvolt;
+	int vmid;
+	int reg[MAX_NUM];
+#if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
+	int mrxrdy_cnt;
+	int mping_cnt;
+	int qc_retry_cnt;
+	int tx_data;
+	int qc_retry_wait_cnt;
+
+	muic_hv_state_t hv_state;
+#endif
+
+	/*
+	 * Distinguisher is needed,
+	 * if it doesn't have the muic manager.
+	 */
+	int rescan_cnt;
+
+	/* W/A waiting for the charger ic */
+	struct delayed_work dcd_recheck;
+	struct delayed_work pcp_clk_work;
+#if IS_ENABLED(CONFIG_HV_MUIC_S2MF301_AFC)
+	struct delayed_work reset_work;
+	struct delayed_work mping_retry_work;
+	struct delayed_work qc_retry_work;
+	struct delayed_work muic_hv_charger_init_work;
+#endif
+	struct delayed_work rescan_validity_checker;
+	bool is_timeout_attached;
+
+#if IS_ENABLED(CONFIG_S2MF301_IFCONN_HOUSE_NOT_GND)
+	bool is_rescanning;
+#endif
+	bool is_sido_vbus_switch;
+	bool is_disable_afc;
+	bool is_water_detected;
+#if IS_ENABLED(CONFIG_HICCUP_CHARGER)
+	bool is_hiccup_mode;
+#endif
+#if defined(CONFIG_S2MF301_TYPEC_WATER)
+	bool is_vbus_on_after_otg;
+	struct timespec64 otg_on_time;
+#endif
+#if IS_ENABLED(CONFIG_MUIC_HV_SUPPORT_POGO_DOCK)
+	/* Pogo dock gpio */
+	int gpio_dock;
+	int irq_dock;
+#endif
+	struct muic_share_data *sdata;
+	int pcp_clk_delayed;
+};
+
+extern struct muic_platform_data muic_pdata;
+
+extern void *s2mf301_muic_register_pm_rid_ops(void *_data, struct s2mf301_pm_rid_ops rid_ops);
+extern void *s2mf301_muic_register_top_rid_ops(void *_data, struct s2mf301_top_rid_ops rid_ops);
+
+extern int s2mf301_i2c_read_byte(struct i2c_client *client, u8 command);
+int s2mf301_i2c_write_byte(struct i2c_client *client, u8 command, u8 value);
+int s2mf301_muic_recheck_adc(struct s2mf301_muic_data *muic_data);
+void s2mf301_muic_control_vbus_det(struct s2mf301_muic_data *muic_data,
+			bool enable);
+extern void s2mf301_muic_dcd_rescan(struct s2mf301_muic_data *muic_data);
+extern int s2mf301_muic_control_rid_adc(struct s2mf301_muic_data *muic_data,
+				bool enable);
+extern int s2mf301_muic_bcd_rescan(struct s2mf301_muic_data *muic_data);
+extern void s2mf301_muic_charger_init(void);
+int s2mf301_muic_jig_on(struct s2mf301_muic_data *muic_data);
+void s2mf301_muic_control_vbus_det(struct s2mf301_muic_data *muic_data,
+			bool enable);
+
+int s2mf301_set_gpio_uart_sel(struct s2mf301_muic_data *muic_data,
+			int uart_sel);
+int s2mf301_init_interface(struct s2mf301_muic_data *muic_data,
+			struct muic_interface_t *muic_if);
+#if IS_ENABLED(CONFIG_CCIC_S2MF301)
+int s2mf301_muic_refresh_adc(struct s2mf301_muic_data *muic_data);
+#endif
+#if IS_ENABLED(CONFIG_SEC_FACTORY)
+int s2mf301_muic_set_otg_reg(struct s2mf301_muic_data *muic_data, bool on);
+#else
+int s2mf301_muic_get_otg_state(void);
+#endif
+#endif /* __S2MF301_MUIC_H__ */
+
