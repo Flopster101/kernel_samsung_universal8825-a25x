@@ -29,6 +29,10 @@ struct rb_node {
 
 struct rb_root {
 	struct rb_node *rb_node;
+
+#if IS_ENABLED(CONFIG_SKB_TRACER)
+	unsigned long long	mask;
+#endif
 };
 
 #define rb_parent(r)   ((struct rb_node *)((r)->__rb_parent_color & ~3))
