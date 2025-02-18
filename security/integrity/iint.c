@@ -19,6 +19,9 @@
 #include <linux/uaccess.h>
 #include <linux/security.h>
 #include <linux/lsm_hooks.h>
+#ifdef CONFIG_FIVE
+#include <uapi/linux/magic.h>
+#endif
 #include "integrity.h"
 
 static struct rb_root integrity_iint_tree = RB_ROOT;
@@ -109,6 +112,13 @@ static void iint_init_always(struct integrity_iint_cache *iint,
 
 static void iint_free(struct integrity_iint_cache *iint)
 {
+#ifdef CONFIG_FIVE
+	kfree(iint->five_label);
+	iint->five_label = NULL;
+	iint->five_flags = 0UL;
+	iint->five_status = FIVE_FILE_UNKNOWN;
+	iint->five_signing = false;
+#endif
 	kfree(iint->ima_hash);
 	mutex_destroy(&iint->mutex);
 	kmem_cache_free(iint_cache, iint);
@@ -188,6 +198,10 @@ void integrity_inode_free(struct inode *inode)
 
 	write_lock(&integrity_iint_lock);
 	iint = __integrity_iint_find(inode);
+	if (!iint) {
+		write_unlock(&integrity_iint_lock);
+		return;
+	}
 	rb_erase(&iint->rb_node, &integrity_iint_tree);
 	write_unlock(&integrity_iint_lock);
 
@@ -199,6 +213,11 @@ static void iint_init_once(void *foo)
 	struct integrity_iint_cache *iint = foo;
 
 	memset(iint, 0, sizeof(*iint));
+#ifdef CONFIG_FIVE
+	iint->five_flags = 0UL;
+	iint->five_status = FIVE_FILE_UNKNOWN;
+	iint->five_signing = false;
+#endif
 }
 
 static int __init integrity_iintcache_init(void)
