@@ -82,6 +82,9 @@
 #include <linux/netfilter_bridge.h>
 #include <linux/netlink.h>
 #include <linux/tcp.h>
+#ifdef CONFIG_SKB_TRACER
+#include <net/skb_tracer.h>
+#endif
 
 static int
 ip_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
@@ -99,6 +102,10 @@ EXPORT_SYMBOL(ip_send_check);
 int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
 {
 	struct iphdr *iph = ip_hdr(skb);
+
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL___IP_LOCAL_OUT);
+#endif
 
 	iph->tot_len = htons(skb->len);
 	ip_send_check(iph);
@@ -436,6 +443,10 @@ int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 	skb->dev = dev;
 	skb->protocol = htons(ETH_P_IP);
 
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL_IP_OUTPUT);
+#endif
+
 	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
 			    net, sk, skb, indev, dev,
 			    ip_finish_output,
@@ -468,6 +479,10 @@ int __ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl,
 	struct rtable *rt;
 	struct iphdr *iph;
 	int res;
+
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL___IP_QUEUE_XMIT);
+#endif
 
 	/* Skip all of this if the packet is already routed,
 	 * f.e. by something like SCTP.

@@ -55,6 +55,9 @@
 #include <net/l3mdev.h>
 #include <net/lwtunnel.h>
 #include <net/ip_tunnels.h>
+#ifdef CONFIG_SKB_TRACER
+#include <net/skb_tracer.h>
+#endif
 
 static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *skb)
 {
@@ -66,6 +69,10 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
 	struct ipv6hdr *hdr;
 	struct neighbour *neigh;
 	int ret;
+
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL_IP6_FINISH_OUTPUT2);
+#endif
 
 	/* Be paranoid, rather than too clever. */
 	if (unlikely(hh_len > skb_headroom(skb)) && dev->header_ops) {
@@ -225,6 +232,10 @@ int ip6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 	skb->protocol = htons(ETH_P_IPV6);
 	skb->dev = dev;
 
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL_IP6_OUTPUT);
+#endif
+
 	if (unlikely(!idev || READ_ONCE(idev->cnf.disable_ipv6))) {
 		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
 		kfree_skb(skb);
@@ -267,6 +278,9 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
 	int hlimit = -1;
 	u32 mtu;
 
+#ifdef CONFIG_SKB_TRACER
+	skb_tracer_func_trace(sk, skb, STL_IP6_XMIT_01);
+#endif
 	head_room = sizeof(struct ipv6hdr) + LL_RESERVED_SPACE(dev);
 	if (opt)
 		head_room += opt->opt_nflen + opt->opt_flen;
@@ -331,6 +345,9 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
 		if (unlikely(!skb))
 			return 0;
 
+#ifdef CONFIG_SKB_TRACER
+		skb_tracer_func_trace(sk, skb, STL_IP6_XMIT_02);
+#endif
 		/* hooks should never assume socket lock is held.
 		 * we promote our socket to non const
 		 */

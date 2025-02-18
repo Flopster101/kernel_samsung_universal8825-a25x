@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# skb_tracer configuration
+#
+config SKB_TRACER
+	tristate "skb tracer"
+	depends on NET
+	select SKB_EXTENSIONS
+	help
+          skb tracer
+
+config SKB_TRACER_TEST
+	tristate "KUnit test for skb tracer"
+	depends on SKB_TRACER
+	help
+	  test skb tracer
