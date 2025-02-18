@@ -118,6 +118,8 @@ void __weak *alloc_insn_page(void)
 
 void __weak free_insn_page(void *page)
 {
+	dump_stack();
+	pr_err("%s, %lx\n", __func__, page);
 	module_memfree(page);
 }
 
