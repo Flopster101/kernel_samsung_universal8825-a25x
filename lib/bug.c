@@ -48,6 +48,7 @@
 #include <linux/sched.h>
 #include <linux/rculist.h>
 #include <linux/ftrace.h>
+#include <linux/sec_debug.h>
 
 #include <trace/hooks/bug.h>
 
@@ -200,9 +201,9 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
 	}
 
 	if (file)
-		pr_crit("kernel BUG at %s:%u!\n", file, line);
+		pr_auto(ASL1, "kernel BUG at %s:%u!\n", file, line);
 	else
-		pr_crit("Kernel BUG at %pB [verbose debug info unavailable]\n",
+		pr_auto(ASL1, "Kernel BUG at %pB [verbose debug info unavailable]\n",
 			(void *)bugaddr);
 
 	trace_android_rvh_report_bug(file, line, bugaddr);
