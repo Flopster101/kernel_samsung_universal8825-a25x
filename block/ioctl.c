@@ -145,7 +145,10 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
 
 	if (start + len > i_size_read(bdev->bd_inode))
 		return -EINVAL;
-
+	printk("%s %d:%d %llu %llu",
+		(flags & BLKDEV_DISCARD_SECURE) ? "SECDIS" : "DIS",
+		MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev),
+		(unsigned long long)start, (unsigned long long)len);
 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
 	if (err)
 		return err;
