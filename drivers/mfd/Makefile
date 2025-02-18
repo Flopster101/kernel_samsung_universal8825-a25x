@@ -267,3 +267,26 @@ obj-$(CONFIG_MFD_KHADAS_MCU) 	+= khadas-mcu.o
 obj-$(CONFIG_SGI_MFD_IOC3)	+= ioc3.o
 obj-$(CONFIG_MFD_SIMPLE_MFD_I2C)	+= simple-mfd-i2c.o
 obj-$(CONFIG_MFD_INTEL_M10_BMC)   += intel-m10-bmc.o
+obj-$(CONFIG_MFD_S2MPS23)		+= s2mps23_mfd.o
+s2mps23_mfd-$(CONFIG_MFD_S2MPS23)	+= s2mps23_core.o s2mps23_irq.o
+
+obj-$(CONFIG_MFD_S2MPS24)		+= s2mps24_mfd.o
+s2mps24_mfd-$(CONFIG_MFD_S2MPS24)	+= s2mps24_core.o s2mps24-notifier.o
+
+obj-$(CONFIG_MFD_S2MPS25)		+= s2mps25_mfd.o
+s2mps25_mfd-$(CONFIG_MFD_S2MPS25)	+= s2mps25_core.o s2mps25_irq.o
+obj-$(CONFIG_MFD_S2MPS26)		+= s2mps26_mfd.o
+s2mps26_mfd-$(CONFIG_MFD_S2MPS26)	+= s2mps26_core.o s2mps26_notifier.o
+
+obj-$(CONFIG_MFD_S2MPU13)		+= s2mpu13_mfd.o
+s2mpu13_mfd-$(CONFIG_MFD_S2MPU13)	+= s2mpu13_core.o s2mpu13_irq.o
+
+obj-$(CONFIG_MFD_S2MPU14)		+= s2mpu14_mfd.o
+s2mpu14_mfd-$(CONFIG_MFD_S2MPU14)	+= s2mpu14_core.o s2mpu14_notifier.o
+
+obj-$(CONFIG_MFD_S2MPB02)		+= s2mpb02_mfd.o
+s2mpb02_mfd-$(CONFIG_MFD_S2MPB02)	+= s2mpb02-core.o s2mpb02-irq.o
+
+obj-$(CONFIG_MFD_S2MPM07)		+= s2mpm07_mfd.o
+s2mpm07_mfd-$(CONFIG_MFD_S2MPM07)	+= s2mpm07_core.o
+

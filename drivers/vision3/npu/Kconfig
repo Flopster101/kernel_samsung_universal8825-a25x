@@ -1,0 +1,1 @@
+source "drivers/vision3/npu/core/Kconfig"

@@ -47,6 +47,10 @@ obj-$(CONFIG_PINCTRL_INGENIC)	+= pinctrl-ingenic.o
 obj-$(CONFIG_PINCTRL_RK805)	+= pinctrl-rk805.o
 obj-$(CONFIG_PINCTRL_OCELOT)	+= pinctrl-ocelot.o
 obj-$(CONFIG_PINCTRL_EQUILIBRIUM)   += pinctrl-equilibrium.o
+obj-$(CONFIG_PINCTRL_SAMSUNG_S2MPS26) += pinctrl-samsung-s2mps26.o
+obj-$(CONFIG_PINCTRL_SAMSUNG_S2MPM07) += pinctrl-samsung-s2mpm07.o
+obj-$(CONFIG_PINCTRL_SAMSUNG_S2MPU13) += pinctrl-samsung-s2mpu13.o
+obj-$(CONFIG_PINCTRL_SAMSUNG_S2MPU14) += pinctrl-samsung-s2mpu14.o
 
 obj-y				+= actions/
 obj-$(CONFIG_ARCH_ASPEED)	+= aspeed/

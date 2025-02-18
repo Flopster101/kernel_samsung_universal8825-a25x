@@ -1,0 +1,54 @@
+&${gpio_int_parent} {
+	tsp_int_active: tsp_int_active {
+		GPIO_CONFIG_PUD_DRV(${gpio_int}, FUNC_INPUT_WAKEUP, PULL_NONE, DRV_LV1);
+	};
+
+	tsp_int_sleep: tsp_int_sleep {
+		GPIO_CONFIG_PUD_DRV(${gpio_int}, FUNC_INPUT_WAKEUP, PULL_NONE, DRV_LV1);
+	};
+};
+
+&${inf_spi} {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+
+	tsp_stm_spi: touchscreen@0 {
+		status = "ok";
+		compatible = "stm,stm_ts_spi";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+		pinctrl-names = "on_state", "off_state";
+		pinctrl-0 = <&tsp_int_active>;
+		pinctrl-1 = <&tsp_int_sleep>;
+		tsp_io_ldo-supply = <&${tsp_io_ldo}>;
+		tsp_avdd_ldo-supply = <&${tsp_avdd_ldo}>;
+		sec,irq_gpio = <SEC_GPIO_REF(${gpio_int}) 0>;
+		sec,gpio_spi_cs = <SEC_GPIO_REF(${gpio_spi_cs}) 0>;
+		/* This part is for firmware */
+		sec,project_name = "${@[0]}", "${model_name}";
+		sec,bringup = <${bringup}>;
+		sec,regulator_boot_on;
+		sec,ss_touch_num = <1>;
+
+		sec,tclm_level = <1>;
+		sec,afe_base = <0x0000>;
+		sec,area-size = <133 266 341>; /* indicator: 24dp navigator:48dp edge:60px dpi=320 */
+		sec,max_coords = <4096 4096>; /* x y */
+		enable_settings_aot;
+		support_dex_mode;
+		support_mis_calibration_test;
+		support_ear_detect_mode;
+		//sync-reportrate-120;
+		support_open_short_test;
+		sec,firmware_name = "tsp_stm/fts9cu80f_q2.bin";
+		//sec,regulator_boot_on;
+		sec,support_dual_foldable = <1>;	//main
+
+		controller-data {
+			cs-gpio = <SEC_GPIO_REF(${gpio_spi_cs}) 0>;
+			samsung,spi-feedback-delay = <0>;
+		};
+	};
+};
+

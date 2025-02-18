@@ -1,0 +1,23 @@
+#menu depth2
+menu "Vendor Feature Setting"
+	depends on VIDEO_EXYNOS_PABLO_ISP
+
+choice VENDER_FEATURES
+	prompt "Use vender features"
+	depends on VIDEO_EXYNOS_PABLO_ISP
+	default CAMERA_VENDER_DEFAULT
+	help
+	  Use the vender specific features.
+
+config CAMERA_VENDER_DEFAULT
+        bool "Default"
+config CAMERA_VENDER_MCD
+        bool "MCD"
+config CAMERA_VENDER_MCD_V2
+        bool "MCD_V2"
+endchoice
+
+source "drivers/media/platform/exynos/camera/vendor/default/Kconfig"
+source "drivers/media/platform/exynos/camera/vendor/mcd/Kconfig"
+source "drivers/media/platform/exynos/camera/vendor/mcd_v2/Kconfig"
+endmenu

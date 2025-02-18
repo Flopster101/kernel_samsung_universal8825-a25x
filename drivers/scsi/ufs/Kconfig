@@ -97,6 +97,15 @@ config SCSI_UFS_DWC_TC_PLATFORM
 
 	  If unsure, say N.
 
+config SCSI_UFS_TEST_MODE
+	bool "Samsung UFS TEST feature"
+	depends on SCSI_UFSHCD && SCSI_UFSHCD_PLATFORM
+	help
+	  This selects support for test mode for debugging.
+	  Select this option if this feature is needed on working.
+
+	  If unsure, say N.
+
 config SCSI_UFS_QCOM
 	tristate "QCOM specific hooks to UFS controller platform driver"
 	depends on SCSI_UFSHCD_PLATFORM && ARCH_QCOM
@@ -175,6 +184,72 @@ config SCSI_UFS_EXYNOS
 	  Select this if you have UFS host controller on EXYNOS chipset.
 	  If unsure, say N.
 
+config SCSI_UFS_EXYNOS_DUMP_TO_CONSOLE
+	tristate "EXYNOS specific dump to console to UFS controller platform driver"
+	depends on SCSI_UFSHCD_PLATFORM && (ARCH_EXYNOS || COMPILE_TEST)
+	help
+	  This selects dumping and printing debuggin information of the EXYNOS
+	  specific additions to UFSHCD platform driver.
+
+	  Select this if you have UFS host controller on EXYNOS chipset.
+	  If unsure, say N.
+
+config SCSI_UFS_EXYNOS_BLOCK_WDT_RST
+	tristate "Not permit WDT reset for fatal cases to Exynos UFS controller"
+	depends on SCSI_UFSHCD_PLATFORM && (ARCH_EXYNOS || COMPILE_TEST)
+	help
+	  Exynos UFS host generally raise WDT reset for system fatal cases.
+	  This selects blocking the action.
+
+	  Select this if you have UFS host controller on EXYNOS chipset.
+	  If unsure, say N.
+
+config SCSI_UFS_EXYNOS_SRPMB
+	bool "EXYNOS Secure RPMB(Replay Protected Memory Block) UFS Host"
+	depends on SCSI_UFS_EXYNOS && UFS_SRPMB
+	help
+	  RPMB(Replay Protected Memory Block) is a storage which is to store data
+	  to the specific memory area in an authenticated and replay protected manner.
+	  Usage of nonce and write count register are providing additional
+	  protection against replay of messages where messages could be recorded and
+	  played back later by an attacker.
+
+	  If you have a controller with this interface, say Y or M here. If unsure, say N.
+
+config SCSI_UFS_EXYNOS_FMP
+	bool "EXYNOS Flash Memory Protector for UFS Host"
+	depends on SCSI_UFS_EXYNOS && SCSI_UFS_CRYPTO
+	help
+	  This selects the EXYNOS UFS FMP Driver.
+
+	  Select this if you need a inline crypto engine for your UFS controller.
+	  If unsure, say N.
+
+choice
+	prompt "Option for FMP mode"
+	depends on SCSI_UFS_EXYNOS_FMP
+	default HW_KEYS_IN_CUSTOM_KEYSLOT
+
+config KEYS_IN_PRDT
+	bool "Init fmp to use keys in prdt"
+	depends on SCSI_UFS_EXYNOS_FMP
+	help
+	  Choose here to select that fmp mode to use keys in custom prdt.
+
+config HW_KEYS_IN_CUSTOM_KEYSLOT
+	bool "Init fmp to use hw wrapped keys in custom keyslot"
+	depends on SCSI_UFS_EXYNOS_FMP
+	help
+	  Choose here to select that fmp mode to use hw wrapped keys in custom keyslot.
+
+config KEYS_IN_CUSTOM_KEYSLOT
+	bool "Init fmp to use keys in custom keyslot"
+	depends on SCSI_UFS_EXYNOS_FMP
+	help
+	  Choose here to select that fmp mode to use keys in custom keyslot.
+
+endchoice
+
 config SCSI_UFS_CRYPTO
 	bool "UFS Crypto Engine Support"
 	depends on SCSI_UFSHCD && BLK_INLINE_ENCRYPTION
@@ -192,3 +267,35 @@ config SCSI_UFS_HPB
 	  L2P (logical to physical) map of UFS to host DRAM. The driver uses HPB
 	  read command by piggybacking physical page number for bypassing FTL (flash
 	  translation layer)'s L2P address translation.
+
+config SEC_UFS_FEATURE
+	tristate "SEC specific UFS feature"
+	depends on SCSI_UFSHCD
+	help
+	  Enable Samsung feature support
+	  Enabling this allows kernel to use SEC specific feature
+	  defined and implemented by SEC.
+
+config EXYNOS_UFS_EOM
+	tristate "SEC UFS eom feature"
+	depends on SCSI_UFSHCD
+	help
+	  Enable UFS eom feature.
+	  defined and implemented by SEC.
+
+config SEC_UFS_WB_FEATURE
+	tristate "SEC specific UFS Write Booster Support"
+	depends on SCSI_UFSHCD && SEC_UFS_FEATURE
+	help
+	  Enable Samsung Write Booster feature support
+	  Enabling this allows kernel to use SEC WB feature defined
+	  and implemented by SEC.
+
+config SCSI_UFS_TEST_MODE
+	bool "Samsung UFS TEST feature"
+	depends on SCSI_UFSHCD && SEC_UFS_FEATURE
+	help
+	  This selects support for test mode for debugging.
+	  Select this option if this feature is needed on working.
+
+	  If unsure, say N.

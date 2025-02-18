@@ -1,0 +1,34 @@
+config CHARGER_S2MF301
+	tristate "S2MF301 charger support"
+	depends on MFD_S2MF301
+	help
+	 Say Y here to enable support for the S2MF301 charger.
+	 S2MF301 charger is an AFC compatible charging IC.
+	 S2MF301 charger is dependent on MFD_S2MF301
+	 so it needs to be defined.
+
+config PM_S2MF301
+	tristate "S2MF301 power meter support"
+	depends on MFD_S2MF301
+	help
+	 Say Y here to enable support for
+	 the S2MF301 power meter.
+	 S2MF301 power meter is dependent on MFD_S2MF301
+	 so it needs to be defined.
+
+config LSI_IFPMIC
+	 bool "support for lsi ifpmic"
+	 help
+	  Say Y to include support for LSI IFPMIC feature.
+	  LSI IFPMICs share factory mode settings which
+	  are processed according to specific cable types
+	  used in factory process.
+
+config SHIPMODE_BY_VBAT
+	bool "enable for check shipmode by vbat"
+	default n
+	depends on CHARGER_S2MF301
+	help
+	  Say Y here to enable
+	  support for SHIPMODE_BY_VBAT.
+	  this is for shipmode by vbat.

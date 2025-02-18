@@ -1,0 +1,54 @@
+/*
+ * Samsung Exynos SoC series Pablo driver
+ *
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* GPIO_PERI */
+&pinctrl_4 {
+	/* REAR ACT i2c3 */
+	hsi2c17_bus: hsi2c17-bus {
+		samsung,pins = "gpp8-2", "gpp8-3";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <3>;
+		samsung,pin-drv = <0>;
+	};
+
+	hsi2c17_bus_in: hsi2c17-bus_-in {
+		samsung,pins = "gpp8-2", "gpp8-3";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <3>;
+		samsung,pin-drv = <0>;
+	};
+};
+
+&hsi2c_17 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	gpios = <&gpp8 2 0 &gpp8 3 0>;
+	status = "okay";
+	clock-frequency = <1000000>;
+	samsung,reset-before-trans;
+	samsung,fast-plus-mode;
+
+	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-0 = <&hsi2c17_bus_in>;
+	pinctrl-1 = <&hsi2c17_bus>;
+	pinctrl-2 = <&hsi2c17_bus_in>;
+
+	is-actuator@0C {
+		compatible = "samsung,exynos-is-actuator-ak737x";
+		reg = <0x0C>;
+		id = <0>; /* matching is_sensor id */
+		/* AK737x: addr 0xF3, data 0x0E */
+		vendor_product_id = <0xF3 0x0E 0xF3 0x13 0xF3 0x00>;
+		vendor_first_pos = <120>;
+		vendor_first_delay = <2000>;
+		vendor_use_sleep_mode;
+		status = "okay";
+	};
+};

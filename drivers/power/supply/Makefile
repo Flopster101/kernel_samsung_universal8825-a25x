@@ -98,3 +98,15 @@ obj-$(CONFIG_CHARGER_BD70528)	+= bd70528-charger.o
 obj-$(CONFIG_CHARGER_BD99954)	+= bd99954-charger.o
 obj-$(CONFIG_CHARGER_WILCO)	+= wilco-charger.o
 obj-$(CONFIG_RN5T618_POWER)	+= rn5t618_power.o
+obj-$(CONFIG_SYSFS_S2MF301)   += ifpmic_class.o
+
+ifneq ($(CONFIG_BATTERY_SAMSUNG),m)
+obj-$(CONFIG_CHARGER_S2MF301)   += s2mf301_charger.o
+obj-$(CONFIG_FUELGAUGE_S2MF301) += s2mf301_fuelgauge.o
+obj-$(CONFIG_PM_S2MF301)  		+= s2mf301_pmeter.o
+obj-$(CONFIG_TOP_S2MF301)  		+= s2mf301_top.o
+obj-$(CONFIG_MANAGER_S2M_CHARGER)   += s2m_chg_manager.o
+obj-$(CONFIG_SWITCHING_S2ASL01)   += s2asl01_switching.o
+s2mc501_dc_module-$(CONFIG_CHARGER_S2MC501) += s2mc501_direct_charger.o s2mc501_pmeter.o
+obj-$(CONFIG_CHARGER_S2MC501)	+= s2mc501_dc_module.o
+endif

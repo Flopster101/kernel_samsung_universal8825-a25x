@@ -88,6 +88,8 @@
 # define n_tty_trace(f, args...)	no_printk(f, ##args)
 #endif
 
+#define BLUETOOTH_UART_PORT_LINE 1
+
 struct n_tty_data {
 	/* producer-published */
 	size_t read_head;
@@ -2372,8 +2374,11 @@ static ssize_t n_tty_write(struct tty_struct *tty, struct file *file,
 	add_wait_queue(&tty->write_wait, &wait);
 	while (1) {
 		if (signal_pending(current)) {
-			retval = -ERESTARTSYS;
-			break;
+			pr_err("%s TTY-%d signal_pending\n", __func__, tty->index);
+			if (tty->index != BLUETOOTH_UART_PORT_LINE) {
+				retval = -ERESTARTSYS;
+				break;
+			}
 		}
 		if (tty_hung_up_p(file) || (tty->link && !tty->link->count)) {
 			retval = -EIO;

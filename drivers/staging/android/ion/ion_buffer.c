@@ -154,7 +154,10 @@ struct ion_buffer *ion_buffer_alloc(struct ion_device *dev, size_t len,
 		/* if the caller didn't specify this heap id */
 		if (!((1 << heap->id) & heap_id_mask))
 			continue;
+		tracing_mark_begin("%s(%s, %zu, 0x%x, 0x%x)", "ion_alloc",
+				   heap->name, len, heap_id_mask, flags);
 		buffer = ion_buffer_create(heap, dev, len, flags);
+		tracing_mark_end();
 		if (!IS_ERR(buffer))
 			break;
 	}

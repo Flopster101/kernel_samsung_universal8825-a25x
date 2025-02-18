@@ -1,0 +1,85 @@
+BCM4389 DHD 101.10.569.2 for Android S OS - Rainbow Project
+
+
+DHD 101.10.569.2 - 2021.10.01
+New Feature
+ - Added IGMP_OFFLOAD_SUPPORT  in Makefile
+ - Samsung MRDv3.6 - Advanced Logging from the upper layer #2
+       (Added part of Auth/Assoc/Deauth/Connect/Roaming)
+
+Kernel Panic
+ - CS00012209247(By LEE EONJI) Fixed kernel crash due to wrong ieee channel update in cfg80211 roam/connect indication
+ - CS00012210345(By Kim TaeYong) Fixed Kernel Panic by added the busy state for pm callback function
+
+Others
+ - CS00012198776(By Min Hyun-Kee) Fixed to show 6Ghz scan result at first boot
+ - CS00012203918(By Choi Hyeonu) Hiding SSID in PNO log message due to protect personal information
+ - CS00012206498(By MinSoo Kim) Removed unnecessary flags related to region
+ - CS00012206501(By Kim TaeYong) Forced hang when pcie link down is detected in dhd isr
+ - CS00012206768(By Choi Jongmin) Fixed to allow vlp and psc channels only for 6G SoftAP
+ - CS00012207428(By Jeong Min Cheol) Supported multiple nvram file for GS22 board revision
+ - CS00012209052(By Lee Sunghee) Fixed CONNECT/DHCP/EAP/ROAM logs of advanced logging properly
+ - CS00012210003(By Kim TaeYong) Removed pcie shutdown callback during device power off sequence
+ - Fixed to sync roam_off state between DHD and FW properly under DUAL-STA scenario
+ - Supported NL80211_SCAN_FLAG_COLOCATED_6GHZ flag
+ - Supported RTT LCI feature
+ - Supported UNI4 channels for 5Ghz band
+ - Supported dynamic pm2_sleep_ret for power saving at idle state
+ - Supported extended linkstat info for Android Vendor HAL 1.5
+
+Vendor HAL Library
+ - HAL_REL_12_10_14
+  - Added validity check for RING EVENT
+
+
+DHD 101.10.560 - 2021.09.10
+New Feature
+ - CS00012061454(By LEE EONJI) Enabled msi for GS22 4389 project
+ - Samsung MRDv3.6 - Advanced Logging from the upper layer #1
+       (Included DHCP/EAPOL/GTK/EAP and added part of Connect/Roaming)
+
+Others
+ - CS00011788095(By Choi Hyeonu) Sending TWT INFO with TWT suspend during suspend
+ - CS00012195304(By Choi Hyeonu) Enabled features(static/prealloc buffer, dump and PCIe OOB) by default
+ - CS00012198566(By Jeong Min Cheol) Applied new pcie rc driver changes for S OS MSM platform
+ - CS00012199012(By Jeong Min Cheol) Fixed FATAL_NOC_ERROR when triggering sysfs dump and calling dhd_stop() at same time
+ - CS00012199412(By Kim TaeYong) Removed unused codes for KMI break API
+ - CS00012203713(By Kim MinSoo) Fixed to restore WiFi Optimizer related IOVAR values when turning off WiFi
+ - CS00012203857(By Choi Jongmin) Fixed to be turned on SoftAP at 6Ghz band
+ - CS00012205186(By Min Hyun-Kee) Changed sub6 bandinfo related settings
+ - CS00012205300(By maddineni seshu babu) Changed static interface name to support Dual AP
+ - CS00012206101(By Choi Jongmin) Added 6G PSC channel concurrency for SoftAP creation
+ - CS00012206194(By Myung Jung-Young) Changed the excess pm setting to be called in pm suspend/resume
+ - Changed to handle nan ranging enable and disable through framework
+ - Fixed changing to 80Mhz bandwidth of 165 Channel in spite of configured 20MHz bandwidth in softap
+ - Fixed the auto channel selection on the same band for the dual AP
+ - Fixed the NAN CTS failure for the discovering with ranging test
+ - Fixed the race condition for the flowring hash between free and find
+ - Fixed the reconnection failed issue due to a duplicate disconnect event
+ - Fixed the RTT failure issue due to the previous session not complete by an unexpected RTT stop
+ - Remove unnecessary WLBP power requests getting called from every DPC
+ - [Coverity] Fixed for calling risky function
+
+Vendor HAL Library
+ - HAL_REL_12_10_13
+  - CS00012205300(By maddineni seshu babu) Increased virtual interface number to support Dual AP
+
+
+101.10.553 - 2021.08.27
+New Feature
+- Supported Dual STA (STA + STA)
+- Supported Dual AP (AP + AP + STA)
+- Supported UNII band 3 on SoftAP mode
+- Supported TWT session on SoftAP mode
+- Enabled framework API for TWT
+- Enhanced Supported Security (WPA3 R3, WPA3 R2 FT, GCMP 128)
+- Supported NAN 5G/6G Upgrade/Downgrade
+- Enhanced Ranging accuracy
+- SoftAP TWT sessions are prioritized over TWT session in STA interface (MRD 3.6)
+- Updated BTM operation flow (MRD 3.6)
+- Updated SAR operation
+
+Vendor HAL Library
+ - HAL_REL_12_10_12
+
+

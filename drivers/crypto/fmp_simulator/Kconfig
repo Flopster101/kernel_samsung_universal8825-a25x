@@ -1,0 +1,20 @@
+
+# FMP SIMULATOR DRIVER
+#
+config EXYNOS_FMP_SIMULATOR
+	tristate "Samsung EXYNOS FMP FIPS SIMULATOR driver"
+	help
+	  Say yes here to build support for FMP (Flash Memory Protector)
+	  simulator for FIPS TEST.
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here
+
+config EXYNOS_FIPS_SIMULATOR
+	bool "Samsung EXYNOS FMP Driver for FIPS"
+	depends on EXYNOS_FMP_SIMULATOR
+	default y
+	help
+	  Say yes here to build support for FMP (Flash Memory Protector)
+	  FIPS validation driver.
+	  If unsure, say N.

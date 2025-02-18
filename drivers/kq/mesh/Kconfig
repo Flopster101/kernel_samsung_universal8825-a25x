@@ -1,0 +1,9 @@
+config SEC_KQ_MESH
+	tristate "Samsung KQ MESH support"
+	default n
+	depends on DRV_SAMSUNG
+	help
+	  This option enables Samsung KQ MESH features.
+	  This module created to enhance system stability.
+	  Enable this feature to check MESH system functionality.
+	  This module only works with MESH application.

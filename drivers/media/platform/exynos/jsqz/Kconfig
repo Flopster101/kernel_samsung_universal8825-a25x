@@ -1,0 +1,9 @@
+#
+# Exynos multimedia device drivers
+#
+config VIDEO_EXYNOS_JPEG_SQZ
+        tristate "Exynos Jpeg Squeeze driver"
+        depends on VIDEO_EXYNOS
+        default n
+        help
+          This is a representative exynos Jpeg squeezer device

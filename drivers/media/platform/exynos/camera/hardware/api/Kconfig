@@ -1,0 +1,230 @@
+config MC_SCALER_V8_1
+	bool "Use MC-SCALER H/W v8.1"
+	depends on PABLO_V8_1_0
+	default n
+	help
+	  use mc-scaler v8.1
+
+config MC_SCALER_V8_10
+	bool "Use MC-SCALER H/W v8.10"
+	depends on PABLO_V8_10_0
+	default n
+	help
+	  use mc-scaler v8.10
+
+config MC_SCALER_V8_20
+	bool "Use MC-SCALER H/W v8.20"
+	depends on PABLO_V8_20_0
+	default n
+	help
+	  use mc-scaler v8.20
+
+config MC_SCALER_V9_1
+	bool "Use MC-SCALER H/W v9.1"
+	depends on PABLO_V9_1_0
+	default n
+	help
+	  use mc-scaler v9.1
+
+config MC_SCALER_V9_10
+	bool "Use MC-SCALER H/W v9.10"
+	depends on PABLO_V9_10_0
+	default n
+	help
+	  use mc-scaler v9.10
+
+config MC_SCALER_V10_0
+	bool "Use MC-SCALER H/W v10.0"
+	depends on PABLO_V10_0_0
+	default n
+	help
+	  use mc-scaler v10.0
+
+config MC_SCALER_V10_1
+	bool "Use MC-SCALER H/W v10.1"
+	depends on PABLO_V10_1_0
+	default n
+	help
+	  use mc-scaler v10.1
+
+config MC_SCALER_V10_20
+	bool "Use MC-SCALER H/W v10.20"
+	depends on PABLO_V10_20_0
+	default n
+	help
+	  use mc-scaler v10.20
+
+config VRA_V2_0
+	bool "Use VRA H/W v2.0"
+	depends on PABLO_V8_20_0
+	default n
+	help
+	  use vra v2.0
+
+config PDP_V1_0_0
+        bool "Use PDP H/W v1.0.0"
+	depends on  PABLO_V8_1_0 || PABLO_V8_10_0
+        default n
+        help
+          use PDP v1.0.0
+
+config PDP_V3_1
+        bool "Use PDP H/W v3.1"
+	depends on PABLO_V9_1_0 || PABLO_V9_10_0 || PABLO_V10_20_0
+        default n
+        help
+          use PDP v3.1
+
+config PDP_V4_0
+	bool "Use PDP H/W v4.0"
+	depends on PABLO_V10_0_0
+	default n
+	help
+	  use PDP v4.0
+
+config PDP_V4_1
+	bool "Use PDP H/W v4.1"
+	depends on PABLO_V10_1_0
+	default n
+	help
+	  use PDP v4.1
+
+config CSTAT_V1_0
+	bool "Use CSTAT H/W v1.0"
+	depends on PABLO_V10_0_0
+	default n
+	help
+	 use CSTAT v1.0
+
+config CSTAT_V1_1
+	bool "Use CSTAT H/W v1.1"
+	depends on PABLO_V10_1_0
+	default n
+	help
+	 use CSTAT v1.1
+
+config YUVPP_V2_1
+        bool "Use YUVPP H/W v2.1"
+	depends on PABLO_V9_1_0 || PABLO_V9_10_0 || PABLO_V10_20_0
+        default n
+	help
+	  use YUVPP v2.1
+
+config BYRP_V1_0
+        bool "Use BYRP H/W v1.0"
+	depends on PABLO_V10_0_0
+        default n
+        help
+          use BYRP v1.0
+
+config BYRP_V1_1
+        bool "Use BYRP H/W v1.1"
+	depends on PABLO_V10_1_0
+        default n
+        help
+          use BYRP v1.1
+
+config RGBP_V1_0
+        bool "Use RGBP H/W v1.0"
+	depends on PABLO_V10_0_0
+        default n
+        help
+          use RGBP v1.0
+
+config RGBP_V1_1
+        bool "Use RGBP H/W v1.1"
+	depends on PABLO_V10_1_0
+        default n
+        help
+          use RGBP v1.1
+
+config LME_V1_1
+	bool "Use LME H/W v1.1"
+	depends on PABLO_V9_1_0 || PABLO_V9_10_0
+	default n
+	help
+	  use LME v1.1
+
+config LME_V2_0
+	bool "Use LME H/W v2.0"
+	depends on PABLO_V10_0_0
+	default n
+	help
+	  use LME v2.0
+
+config LME_V2_1
+	bool "Use LME H/W v2.1"
+	depends on PABLO_V10_1_0
+	default n
+	help
+	  use LME v2.1
+
+config MCFP_V10_0
+        bool "Use MCFP H/W v10.0"
+	depends on PABLO_V10_0_0
+        default n
+        help
+          use MCFP v10.0
+
+config MCFP_V10_1
+        bool "Use MCFP H/W v10.1"
+	depends on PABLO_V10_1_0
+        default n
+        help
+          use MCFP v10.1
+
+config YUVP_V1_0
+        bool "Use YUVP H/W v1.0"
+	depends on PABLO_V10_0_0
+        default n
+        help
+          use YUVP v1.0
+
+config YUVP_V1_1
+        bool "Use YUVP H/W v1.1"
+	depends on PABLO_V10_1_0
+        default n
+        help
+          use YUVP v1.1
+
+config DRCP_V1_0
+        bool "Use DRCP H/W v1.0"
+	depends on PABLO_V10_0_0
+        default n
+        help
+          use DRCP v1.0
+
+config TAA_V9_20
+        bool "Use TAA H/W v9.20"
+	depends on PABLO_V10_20_0
+        default n
+        help
+          use 3AA v9.20
+
+config ORBMCH_V2_1
+	bool "Use ORBMCH H/W v2.1"
+	depends on PABLO_V10_20_0
+	default n
+	help
+	  use ORBMCH v2.1
+
+config DNS_V1_20
+        bool "Use DNS H/W v1.20"
+	depends on PABLO_V10_20_0
+        default n
+        help
+          use DNS v1.20
+
+config ITP_V1_20
+        bool "Use ITP H/W v1.20"
+	depends on PABLO_V10_20_0
+        default n
+        help
+          use ITP v1.0
+
+config MCFP_V10_20
+	bool "Use MCFP H/W v10.20"
+	depends on PABLO_V10_20_0
+	default n
+	help
+	  use MCFP v10.20

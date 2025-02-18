@@ -620,9 +620,16 @@ config I2C_EXYNOS5
 	tristate "Exynos high-speed I2C driver"
 	depends on OF
 	depends on ARCH_EXYNOS || COMPILE_TEST
-	default y if ARCH_EXYNOS
 	help
 	  High-speed I2C controller on Exynos5 and newer Samsung SoCs.
+
+config I2C_SAMSUNG_HWACG
+	bool "HWACG(HW Auto Clock Gating) support for Exynos I2C port"
+	default y
+	help
+	If HWACG is enabled on I2C, System power mode will goes into
+	suspend state only when I2C master is not in busy state.
+	To support HWACG on I2C, this configuration should be selected.
 
 config I2C_GPIO
 	tristate "GPIO-based bitbanging I2C"
@@ -1419,5 +1426,11 @@ config I2C_FSI
 
 	  This driver can also be built as a module. If so, the module will be
 	  called as i2c-fsi.
+
+config EXYNOS_ACPM_MFD_BUS
+	tristate "SAMSUNG EXYNOS ACPM_MFD_BUS driver"
+	depends on ARCH_EXYNOS && OF
+	help
+	  ACPM MFD BUS on Exynos based Samsung SoCs.
 
 endmenu

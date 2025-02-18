@@ -1,0 +1,8 @@
+config EXYNOS_DEVICE_CAMERA_MODULE
+	bool "Use Camera modules"
+	depends on VIDEO_EXYNOS_PABLO_ISP
+	default y
+	help
+	  Select camera module.
+
+source "drivers/media/platform/exynos/camera/sensor/module_framework/Kconfig"

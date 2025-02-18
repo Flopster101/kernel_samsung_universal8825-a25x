@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-2.0
+
+obj-y   += stm/fts5cu56a/
+
+obj-y   += sec_input/
+
+obj-y   += stm/stm_spi/

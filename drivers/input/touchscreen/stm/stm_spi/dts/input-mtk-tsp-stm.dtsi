@@ -1,0 +1,65 @@
+&${gpio_int_parent} {
+	tsp_int_active: tsp_int_active {
+		GPIO_CONFIG_PUD_DRV(${gpio_int}, FUNC_INPUT_WAKEUP, PULL_NONE, DRV_LV1);
+	};
+
+	tsp_int_sleep: tsp_int_sleep {
+		GPIO_CONFIG_PUD_DRV(${gpio_int}, FUNC_INPUT_WAKEUP, PULL_NONE, DRV_LV1);
+	};
+};
+
+&${gpio_spi_parent} {
+	spi_mosi_tsp_active: spi_mosi_tsp_active {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_mosi}, FUNC_QUP4, PULL_NONE, DRV_LV3);
+	};
+	spi_mosi_tsp_sleep: spi_mosi_tsp_sleep {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_mosi}, FUNC_INPUT, PULL_NONE, DRV_LV3);
+	};
+	spi_miso_tsp_active: spi_miso_tsp_active {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_miso}, FUNC_QUP4, PULL_NONE, DRV_LV3);
+	};
+	spi_miso_tsp_sleep: spi_miso_tsp_sleep {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_miso}, FUNC_INPUT, PULL_NONE, DRV_LV3);
+	};
+	spi_clk_tsp_active: spi_clk_tsp_active {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_clk}, FUNC_QUP4, PULL_NONE, DRV_LV3);
+	};
+	spi_clk_tsp_sleep: spi_clk_tsp_sleep {
+		GPIO_CONFIG_PUD_DRV(${gpio_spi_clk}, FUNC_INPUT, PULL_NONE, DRV_LV3);
+	};
+};
+
+&${inf_spi} {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	pinctrl-0 = <&spi_mosi_tsp_active &spi_miso_tsp_active &spi_clk_tsp_active>;
+	pinctrl-1 = <&spi_mosi_tsp_sleep &spi_miso_tsp_sleep &spi_clk_tsp_sleep>;
+
+	tsp_stm: touchscreen@0 {
+		status = "ok";
+		compatible = "stm,stm_ts";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+		pinctrl-names = "on_state", "off_state";
+		pinctrl-0 = <&tsp_int_active>;
+		pinctrl-1 = <&tsp_int_sleep>;
+		tsp_io_ldo-supply = <&${tsp_io_ldo}>;
+		tsp_avdd_ldo-supply = <&${tsp_avdd_ldo}>;
+		sec,irq_gpio = <SEC_GPIO_REF(${gpio_int}) 0>;
+
+		/* This part is for firmware */
+		sec,project_name = "${@[0]}", "${model_name}";
+		sec,bringup = <${bringup}>;
+		sec,regulator_boot_on;
+		sec,ss_touch_num = <1>;
+	};
+};
+
+&soc {
+	ss_touch {
+		compatible = "samsung,ss_touch";
+		ss_touch,numbers = <1>;
+	};
+};
+

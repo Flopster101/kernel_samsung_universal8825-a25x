@@ -3,45 +3,32 @@
 # Phy drivers for Samsung platforms
 #
 config PHY_EXYNOS_DP_VIDEO
-	tristate "Exynos SoC series Display Port PHY driver"
+	tristate "EXYNOS SoC series Display Port PHY driver"
 	depends on OF
 	depends on ARCH_EXYNOS || COMPILE_TEST
-	default ARCH_EXYNOS
-	select GENERIC_PHY
 	help
-	  Support for Display Port PHY found on Samsung Exynos SoCs.
+	  Support for Display Port PHY found on Samsung EXYNOS SoCs.
 
 config PHY_EXYNOS_MIPI_VIDEO
-	tristate "S5P/Exynos SoC series MIPI CSI-2/DSI PHY driver"
+	tristate "S5P/EXYNOS SoC series MIPI CSI-2/DSI PHY driver"
 	depends on HAS_IOMEM
 	depends on ARCH_S5PV210 || ARCH_EXYNOS || COMPILE_TEST
-	select GENERIC_PHY
-	default y if ARCH_S5PV210 || ARCH_EXYNOS
+	default y if ARCH_S5PV210
 	help
 	  Support for MIPI CSI-2 and MIPI DSI DPHY found on Samsung S5P
-	  and Exynos SoCs.
+	  and EXYNOS SoCs.
 
 config PHY_EXYNOS_PCIE
 	bool "Exynos PCIe PHY driver"
 	depends on OF && (ARCH_EXYNOS || COMPILE_TEST)
-	select GENERIC_PHY
 	help
 	  Enable PCIe PHY support for Exynos SoC series.
 	  This driver provides PHY interface for Exynos PCIe controller.
 
-config PHY_SAMSUNG_UFS
-	tristate "SAMSUNG SoC series UFS PHY driver"
-	depends on OF && (ARCH_EXYNOS || COMPILE_TEST)
-	select GENERIC_PHY
-	help
-	  Enable this to support the Samsung UFS PHY driver for
-	  Samsung SoCs. This driver provides the interface for UFS
-	  host controller to do PHY related programming.
-
 config PHY_SAMSUNG_USB2
 	tristate "Samsung USB 2.0 PHY driver"
 	depends on HAS_IOMEM
-	depends on USB_EHCI_EXYNOS || USB_OHCI_EXYNOS || USB_DWC2 || COMPILE_TEST
+	depends on USB_EHCI_EXYNOS || USB_OHCI_EXYNOS || USB_DWC2
 	select GENERIC_PHY
 	select MFD_SYSCON
 	default ARCH_EXYNOS
@@ -69,25 +56,51 @@ config PHY_EXYNOS5250_USB2
 config PHY_S5PV210_USB2
 	bool "Support for S5PV210"
 	depends on PHY_SAMSUNG_USB2
-	depends on ARCH_S5PV210 || COMPILE_TEST
+	depends on ARCH_S5PV210
 	help
 	  Enable USB PHY support for S5PV210. This option requires that Samsung
 	  USB 2.0 PHY driver is enabled and means that support for this
 	  particular SoC is compiled in the driver. In case of S5PV210 two phys
 	  are available - device and host.
 
-config PHY_EXYNOS5_USBDRD
-	tristate "Exynos5 SoC series USB DRD PHY driver"
-	depends on (ARCH_EXYNOS && OF) || COMPILE_TEST
+config PHY_EXYNOS_USBDRD_EUSB
+	tristate "Exynos SoC series eUSB DRD PHY driver"
+	depends on ARCH_EXYNOS && OF
 	depends on HAS_IOMEM
-	depends on USB_DWC3_EXYNOS
-	select GENERIC_PHY
-	select MFD_SYSCON
-	default y
 	help
-	  Enable USB DRD PHY support for Exynos 5 SoC series.
+	  Enable eUSB DRD PHY support for Exynos SoC series.
 	  This driver provides PHY interface for USB 3.0 DRD controller
-	  present on Exynos5 SoC series.
+	  present on Exynos SoC series.
+
+config PHY_EXYNOS_EUSB_REPEATER
+	tristate "Exynos SoC series eUSB Repeater driver"
+	depends on ARCH_EXYNOS && OF
+	depends on HAS_IOMEM
+	help
+	  Enable eUSB Repeater support for Exynos SoC series.
+
+config PHY_EXYNOS_USBDRD
+	tristate "Exynos SoC series USB DRD PHY driver"
+	depends on ARCH_EXYNOS && OF
+	depends on HAS_IOMEM
+	help
+	  Enable USB DRD PHY support for Exynos SoC series.
+	  This driver provides PHY interface for USB 3.0 DRD controller
+	  present on Exynos SoC series.
+
+config PHY_SAMSUNG_USB_CAL
+	bool "Samsung USB PHY CAL"
+	depends on PHY_EXYNOS_USBDRD || PHY_EXYNOS_USBDRD_EUSB
+	help
+	  Enable this to support CAL (Chip Abstraction Layer)
+	  for Samsung USB PHY controller.
+
+config PHY_SAMSUNG_USB_GEN2
+	bool  "Exynos SoC series USB DRD PHY DebugFS"
+	depends on PHY_SAMSUNG_USB_CAL
+	depends on PHY_EXYNOS_USBDRD || PHY_EXYNOS_USBDRD_EUSB
+	help
+	  Support SAMSUNG USB3.1 GEN2 PHY.
 
 config PHY_EXYNOS5250_SATA
 	tristate "Exynos5250 Sata SerDes/PHY driver"
@@ -103,3 +116,20 @@ config PHY_EXYNOS5250_SATA
 	  Exynos5250 based SoCs.This SerDes/Phy supports SATA 1.5 Gb/s,
 	  SATA 3.0 Gb/s, SATA 6.0 Gb/s speeds. It supports one SATA host
 	  port to accept one SATA device.
+
+config PHY_EXYNOS_MIPI
+	tristate "Samsung EXYNOS SoC MIPI CSI/DSI D/C-PHY driver"
+	depends on HAS_IOMEM
+	depends on ARCH_EXYNOS && OF || COMPILE_TEST
+	help
+		Support for MIPI CSI and MIPI DSI DPHY found on Samsung
+		and EXYNOS SoCs.
+
+config PHY_EXYNOS_MIPI_DSIM
+	tristate "Samsung EXYNOS SoC MIPI DSI D-PHY driver"
+	depends on HAS_IOMEM
+	depends on ARCH_EXYNOS && OF || COMPILE_TEST
+	select GENERIC_PHY
+	help
+	  Support for MIPI DSI DPHY found on Samsung
+	  and EXYNOS SoCs.

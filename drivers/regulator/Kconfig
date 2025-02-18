@@ -1289,5 +1289,75 @@ config REGULATOR_QCOM_LABIBB
 	  boost regulator and IBB can be used as a negative boost regulator
 	  for LCD display panel.
 
+config REGULATOR_S2MPS23
+	tristate "Samsung S2MPS23 voltage regulator"
+	depends on MFD_S2MPS23
+	help
+	  This driver supports a Samsung S2MPS23 voltage output regulator
+	  via I2C bus. S2MPS23 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPS24
+	tristate "Samsung S2MPS24 voltage regulator"
+	depends on MFD_S2MPS24
+	help
+	  This driver supports a Samsung S2MPS24 voltage output regulator
+	  via I2C bus. S2MPS24 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPS25
+	tristate "Samsung S2MPS25 voltage regulator"
+	depends on MFD_S2MPS25
+	help
+	  This driver supports a Samsung S2MPS25 voltage output regulator
+	  via I2C bus. S2MPS25 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPS26
+	tristate "Samsung S2MPS26 voltage regulator"
+	depends on MFD_S2MPS26
+	help
+	  This driver supports a Samsung S2MPS26 voltage output regulator
+	  via I2C bus. S2MPS26 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPU13
+	tristate "Samsung S2MPU13 voltage regulator"
+	depends on MFD_S2MPU13
+	help
+	  This driver supports a Samsung S2MPU13 voltage output regulator
+	  via I2C bus. S2MPU13 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPU14
+	tristate "Samsung S2MPU14 voltage regulator"
+	depends on MFD_S2MPU14
+	help
+	  This driver supports a Samsung S2MPU14 voltage output regulator
+	  via I2C bus. S2MPU14 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPM07
+	tristate "Samsung S2MPM07 voltage regulator"
+	depends on MFD_S2MPM07
+	help
+	  This driver supports a Samsung S2MPM07 voltage output regulator
+	  via I2C bus. S2MPM07 is comprised of high efficient Buck converters
+	  including Dual-Phase Buck converter, Buck-Boost converter, various LDOs.
+
+config REGULATOR_S2MPB02
+	tristate "Samsung S2MPB02 regulator"
+	depends on MFD_S2MPB02
+	help
+	  This driver controls a Samsung S2MPB02 regulator
+	  via I2C bus.
+
+config REGULATOR_S2MPB03
+	tristate "Samsung S2MPB03 regulator"
+	depends on I2C
+	help
+	  This driver controls a Samsung S2MPB03 regulator
+	  via I2C bus.
+
 endif
 

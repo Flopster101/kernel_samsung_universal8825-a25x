@@ -1,0 +1,53 @@
+# drivers/samsung/pm/Kconfig
+#
+# Copyright (c) 2010-2021 Samsung Electronics Co., Ltd.
+#		http://www.samsung.com/
+#
+# Licensed under GPLv2
+#
+comment "Samsung Mobile Power Management Options"
+menuconfig SEC_PM
+	bool "Samsung Mobile Power Management"
+	default n
+	help
+	  This option enables support for various drivers and features for
+	  Samsung Mobile Power Management.
+
+config SEC_PM_DEBUG
+	tristate "Enable Samsung Mobile Power management debug support"
+	default n
+	depends on SEC_PM
+	help
+	  This option enables Samsung Mobile Power management debug support.
+	  Intended for test and debug only.
+
+config SEC_PM_THERMISTOR
+    tristate "SEC Thermistor support"
+    depends on SEC_PM && IIO
+    default n
+    help
+      This driver supports SEC Thermistor sensor reading and its
+      interpretation. This driver uses the industrial I/O subsystem
+      and needs adc-temperature mapping table for conversion.
+
+config SEC_PM_CPUFREQ
+	tristate "Enable Samsung Mobile CPU Frequency control support"
+	default n
+	depends on SEC_PM && SEC_FACTORY
+	help
+	  This option enables Samsung Mobile CPU Frequency control support.
+	  Adjust the minimum and maximum frequency for each CPU clusters.
+
+config SEC_WAKEUP_CPU_ALLOCATOR
+    tristate "SEC Wakeup cpu support"
+    depends on SEC_PM
+    default n
+    help
+      This driver supports SEC Wakeup cpu support
+
+config RTC_AUTO_PWRON
+	tristate "RTC Auto Power on PMICs"
+	depends on SEC_PM
+	default n
+	help
+	  Support for the auto power on alarm on the PMIC.

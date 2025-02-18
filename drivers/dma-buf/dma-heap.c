@@ -20,6 +20,10 @@
 #include <linux/dma-heap.h>
 #include <uapi/linux/dma-heap.h>
 
+#include <linux/jiffies.h>
+#include <linux/sched/cputime.h>
+#include <linux/vmstat.h>
+
 #define DEVNAME "dma_heap"
 
 #define NUM_HEAP_MINORS 128
@@ -76,10 +80,59 @@ void dma_heap_buffer_free(struct dma_buf *dmabuf)
 }
 EXPORT_SYMBOL_GPL(dma_heap_buffer_free);
 
+static void sum_vm_event(unsigned long *ret, int item)
+{
+	int cpu;
+
+	*ret = 0;
+	for_each_online_cpu(cpu) {
+		struct vm_event_state *this = &per_cpu(vm_event_states, cpu);
+
+		*ret += this->event[item];
+	}
+}
+
+static const int vm_events_item[] = {
+	PGPGIN,
+	PGSTEAL_KSWAPD,
+	PGSTEAL_DIRECT,
+	PGSTEAL_ANON,
+	PGSTEAL_FILE,
+	FOR_ALL_ZONES(PGALLOC),
+};
+
+static void get_vm_events(unsigned long ret[])
+{
+	int i;
+
+	for (i = 0; i < (int)ARRAY_SIZE(vm_events_item); i++)
+		sum_vm_event(&ret[i], vm_events_item[i]);
+}
+
+static void dma_heap_print_vmstat(unsigned long before[], unsigned long after[])
+{
+	int i;
+
+	pr_info("%s(ikdaf[za]): ", __func__);
+	pr_cont("%lu ", (after[0] - before[0]) / 2); //PGPGIN
+	for (i = 1; i < (int)ARRAY_SIZE(vm_events_item); i++)
+		pr_cont("%lu ", (after[i] - before[i]) << (PAGE_SHIFT - 10));
+
+	pr_cont("na %lu ", global_node_page_state_pages(NR_ANON_MAPPED) << (PAGE_SHIFT - 10));
+	pr_cont("nf %lu\n", global_node_page_state_pages(NR_FILE_PAGES) << (PAGE_SHIFT - 10));
+}
+
 struct dma_buf *dma_heap_buffer_alloc(struct dma_heap *heap, size_t len,
 				      unsigned int fd_flags,
 				      unsigned int heap_flags)
 {
+	struct dma_buf *dma_buf;
+	unsigned long jiffies_s = jiffies;
+	u64 utime, stime_s, stime_e, stime_d;
+	static DEFINE_RATELIMIT_STATE(show_mem_ratelimit, HZ * 10, 1);
+	unsigned long vm_events_before[ARRAY_SIZE(vm_events_item)];
+	unsigned long vm_events_after[ARRAY_SIZE(vm_events_item)];
+
 	if (fd_flags & ~DMA_HEAP_VALID_FD_FLAGS)
 		return ERR_PTR(-EINVAL);
 
@@ -93,7 +146,28 @@ struct dma_buf *dma_heap_buffer_alloc(struct dma_heap *heap, size_t len,
 	if (!len)
 		return ERR_PTR(-EINVAL);
 
-	return heap->ops->allocate(heap, len, fd_flags, heap_flags);
+	get_vm_events(vm_events_before);
+	task_cputime(current, &utime, &stime_s);
+	tracing_mark_begin("%s(%s, %zu, 0x%x, 0x%x)", "dma-buf_alloc",
+			   heap->name, len, fd_flags, heap_flags);
+
+	dma_buf = heap->ops->allocate(heap, len, fd_flags, heap_flags);
+
+	tracing_mark_end();
+	task_cputime(current, &utime, &stime_e);
+	stime_d = stime_e - stime_s;
+	if (stime_d / NSEC_PER_MSEC > 100) {
+		get_vm_events(vm_events_after);
+		dma_heap_print_vmstat(vm_events_before, vm_events_after);
+		pr_info("%s: %s fd_flags=0x%x heap_flags=0x%x timeJS(ms):%u/%llu len:%zu\n",
+			__func__, heap->name, fd_flags, heap_flags,
+			jiffies_to_msecs(jiffies - jiffies_s),
+			stime_d / NSEC_PER_MSEC, len);
+		if (__ratelimit(&show_mem_ratelimit))
+			show_mem(0, NULL);
+	}
+
+	return dma_buf;
 }
 EXPORT_SYMBOL_GPL(dma_heap_buffer_alloc);
 
