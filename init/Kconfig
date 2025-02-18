@@ -939,6 +939,11 @@ config MEMCG_SWAP
 	depends on MEMCG && SWAP
 	default y
 
+config MEMCG_FORCE_USE_VM_SWAPPINESS
+	bool "Force to use vm_swappiness instead of memcg->swappiness"
+	depends on MEMCG_SWAP
+	default y
+
 config MEMCG_KMEM
 	bool
 	depends on MEMCG && !SLOB
@@ -1220,6 +1225,28 @@ config NET_NS
 	  of the network stack.
 
 endif # NAMESPACES
+
+config SCHED_EMS
+	tristate "Exynos Mobile Scheduler"
+	depends on SMP
+	default n
+	help
+	  This option supports Exynos mobile scheduler. It is designed to
+	  secure the limits of energy aware scheduler. This option provides
+	  features such as independent boosting functinos such as on-time migration,
+	  and prefer_perf and enhanced prefer_idle that work in conjunction with
+	  SCHEDTUNE.
+
+	  If unsure, say N.
+
+config SCHED_EMS_TUNE
+	bool "Tuner for Exynos Mobile Scheduler"
+	depends on SCHED_EMS
+	default n
+	help
+	  This option supports tuner for Exynos mobile scheduler.
+
+	  If unsure, say N.
 
 config CHECKPOINT_RESTORE
 	bool "Checkpoint/restore support"
@@ -2387,6 +2414,12 @@ config UNUSED_KSYMS_WHITELIST
 	  set here is the path to a text file containing the list of symbols,
 	  one per line. The path can be absolute, or relative to the kernel
 	  source tree.
+
+config KMI_SYMBOL_LISTS
+	string "KMI symbol lists to keep in ksymtab"
+	help
+	  By default, all unused exported symbols will be un-exported from the
+	  build when TRIM_UNUSED_KSYMS is selected.
 
 endif # MODULES
 
