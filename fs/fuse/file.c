@@ -18,6 +18,7 @@
 #include <linux/swap.h>
 #include <linux/falloc.h>
 #include <linux/uio.h>
+#include <linux/sched/mm.h>
 #include <linux/fs.h>
 
 static struct page **fuse_pages_alloc(unsigned int npages, gfp_t flags,
@@ -164,7 +165,15 @@ int fuse_do_open(struct fuse_mount *fm, u64 nodeid, struct file *file,
 		}
 	}
 
+	/*
+	 * Ignores FOPEN_DIRECT_IO from the fuse daemon when user does not
+	 * explicitly request direct IO. This is fine since we invalidate the fuse
+	 * page cache when the lower file is updated with passthrough.
+	 */
 	if (isdir)
+		ff->open_flags &= ~FOPEN_DIRECT_IO;
+	else if (fc->passthrough && !(file->f_flags & O_DIRECT) &&
+		 (ff->open_flags & FOPEN_DIRECT_IO))
 		ff->open_flags &= ~FOPEN_DIRECT_IO;
 
 	ff->nodeid = nodeid;
@@ -449,7 +458,7 @@ static void fuse_wait_on_page_writeback(struct inode *inode, pgoff_t index)
 {
 	struct fuse_inode *fi = get_fuse_inode(inode);
 
-	wait_event(fi->page_waitq, !fuse_page_is_writeback(inode, index));
+	fuse_wait_event(fi->page_waitq, !fuse_page_is_writeback(inode, index));
 }
 
 /*

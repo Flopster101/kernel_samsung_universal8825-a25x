@@ -107,3 +107,18 @@ config PROC_PID_ARCH_STATUS
 config PROC_CPU_RESCTRL
 	def_bool n
 	depends on PROC_FS
+
+config PROC_FSLOG
+	bool "Enable FS logs for improving filesystem debug"
+	depends on PROC_FS
+	default y
+
+config PROC_STLOG
+	bool "Enable Storage log"
+	depends on PROC_FSLOG
+	default y
+
+config PROC_DLOG
+	bool "Enable delete logs for improving filesystem debug"
+	depends on PROC_FSLOG
+	default y
