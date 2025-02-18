@@ -24,14 +24,26 @@ if CRYPTO
 comment "Crypto core or helper"
 
 config CRYPTO_FIPS
-	bool "FIPS 200 compliance"
-	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
-	depends on (MODULE_SIG || !MODULES)
+	bool "FIPS 140-2 compliance"
+	select CRYPTO_HMAC
+	select CRYPTO_SHA512
+	select CRYPTO_SHA256
+	select CRYPTO_SHA1
+	select CRYPTO_ECB
+	select CRYPTO_CBC
+	select CRYPTO_GCM
+	select CRYPTO_AUTHENC
+	select CRYPTO_DRBG_HMAC
+	select CRYPTO_JITTERENTROPY
+	select CRYPTO_SEQIV
+	select CRYPTO_ECHAINIV
+	select CRYPTO_SHA1_ARM64_CE
+	select CRYPTO_SHA2_ARM64_CE
+	select CRYPTO_AES_ARM64_CE_BLK
+
 	help
-	  This option enables the fips boot option which is
-	  required if you want the system to operate in a FIPS 200
-	  certification.  You should say no unless you know what
-	  this is.
+	  This option enables FIPS 140-2 capability which meets
+	  CMVP requirement.
 
 # CRYPTO_FIPS140 just enables the support in the kernel for loading fips140.ko.
 # The module still needs to be built and loaded if you need FIPS 140 compliance.
@@ -232,7 +244,7 @@ config CRYPTO_AUTHENC
 
 config CRYPTO_TEST
 	tristate "Testing module"
-	depends on m
+	default n
 	select CRYPTO_MANAGER
 	help
 	  Quick & dirty crypto test module.
@@ -528,7 +540,7 @@ config CRYPTO_ADIANTUM
 	  designed for fast and secure disk encryption, especially on
 	  CPUs without dedicated crypto instructions.  It encrypts
 	  each sector using the XChaCha12 stream cipher, two passes of
-	  an ε-almost-∆-universal hash function, and an invocation of
+	  an ε-almost-??-universal hash function, and an invocation of
 	  the AES-256 block cipher on a single 16-byte block.  On CPUs
 	  without AES instructions, Adiantum is much faster than
 	  AES-XTS.
