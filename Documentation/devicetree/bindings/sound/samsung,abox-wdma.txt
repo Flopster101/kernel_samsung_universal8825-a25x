@@ -1,0 +1,23 @@
+WDMA of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-wdma"
+
+- reg : address of SFR.
+
+- reg-names : "sfr".
+
+- samsung,id : id of the DMA.
+
+- samsung,type : type of the DMA. "normal", "call", "compress", "realtime", "vi-sensing", "sync".
+
+- samsung,buffer_type : type of the DMA buffer. "dma", "ion", "ram".
+
+- #sound-dai-cells : 1
+
+- sound-name-prefix : "ABOX WDMA0", "ABOX WDMA1", .......
+
+Optional properties: no optional property.

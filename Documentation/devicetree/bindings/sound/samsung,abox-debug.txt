@@ -1,0 +1,13 @@
+Debug driver of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-debug".
+
+- memory-region : phandles to reserved memory for debug and silent log.
+
+- reg : <0x0 0x0 0x0>.
+
+Optional properties: no optional property.

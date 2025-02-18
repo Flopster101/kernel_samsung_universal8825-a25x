@@ -1,0 +1,49 @@
+Core of ABOX IP
+
+This device is an audio subsystem of Exynos AP
+
+Required properties:
+
+- compatible : "samsung,abox-core".
+
+- reg : address for GPR and status
+
+- reg-names : "gpr".
+
+- samsung,id : ID of the core.
+
+- samsung,type : Type of the core. "CA32", "CA7".
+
+- samsung,pmu_power : SFR offset and mask to control power.
+
+Optional properties:
+
+- samsung,pmu_standby : SFR offset and mask to check standby.
+  one of pmu_standy and sys_standby should be declared.
+
+- samsung,sys_standby : SFR offset and mask to check standby.
+  one of pmu_standy and sys_standby should be declared.
+
+- abox_firmware_sram0 : SRAM firmware.
+
+  - samsung,name : name of the firmware.
+
+  - samsung,area : download area of the firmware. 0 for SRAM, 1 for DRAM.
+
+  - samsung,offset : offset of the download address.
+
+  - samsung,fw-signed : delare it if the firmware is signed.
+
+  - samsung,fw-id : ID of the firmware.
+
+- abox_firmware_dram0 : DRAM firmware
+
+  - samsung,name : name of the firmware.
+
+  - samsung,area : download area of the firmware. 0 for SRAM, 1 for DRAM.
+
+  - samsung,offset : offset of the download address.
+
+  - samsung,fw-signed : delare it if the firmware is signed.
+
+  - samsung,fw-id : ID of the firmware.
