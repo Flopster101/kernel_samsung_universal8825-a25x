@@ -50,8 +50,8 @@ AC_DIR="$WP/aospclang"
 PC_DIR="$WP/protonclang"
 LZ_DIR="$WP/lolzclang"
 SL_DIR="$WP/slimllvm"
-AK3_DIR="$WP/AK3-a25x"
-AK3_BRANCH="unity"
+AK3_DIR="$WP/AK3-1280"
+AK3_BRANCH="floppy-unity"
 KDIR="$(readlink -f .)"
 
 ## Inherited paths
@@ -158,13 +158,13 @@ if [ $DO_KSU -eq 1 ]; then
 else
     FK_TYPE="Vanilla"
 fi
-ZIP_PATH="$KDIR/kernel_build/BasicKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
-TAR_PATH="$KDIR/kernel_build/BasicKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
+ZIP_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.zip"
+TAR_PATH="$KDIR/kernel_build/FloppyKernel_$FK_VER-$FK_TYPE-$CODENAME-$DATE.tar"
 
 echo -e "\nINFO: Build info:
 - Device: $DEVICE ($CODENAME)
 - Addons = $FK_TYPE
-- BasicKernel version: $FK_VER
+- FloppyKernel version: $FK_VER
 - Linux version: $LINUX_VER
 - Defconfig: $DEFCONFIG
 - Build date: $DATE
