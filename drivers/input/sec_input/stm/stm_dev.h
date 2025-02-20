@@ -703,8 +703,8 @@ void  stm_ts_rawdata_buffer_remove(struct stm_ts_data *ts);
 #endif
 
 #if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
-extern int panel_notifier_register(struct notifier_block *nb);
-extern int panel_notifier_unregister(struct notifier_block *nb);
+extern int decon_panel_notifier_register(struct notifier_block *nb);
+extern int decon_panel_notifier_unregister(struct notifier_block *nb);
 #endif
 
 #if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)

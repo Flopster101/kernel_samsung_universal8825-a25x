@@ -1352,7 +1352,7 @@ void stm_ts_release(struct stm_ts_data *ts)
 	ts->plat_data->disable = NULL;
 
 #if IS_ENABLED(CONFIG_SEC_PANEL_NOTIFIER_V2) || IS_ENABLED(CONFIG_PANEL_NOTIFY) && IS_ENABLED(CONFIG_SEC_FACTORY)
-	panel_notifier_unregister(&ts->lcd_nb);
+	decon_panel_notifier_unregister(&ts->lcd_nb);
 #endif
 
 #if IS_ENABLED(CONFIG_INPUT_SEC_NOTIFIER)
@@ -1467,7 +1467,7 @@ int stm_ts_probe(struct device *dev)
 	ts->lcd_nb.priority = 1;
 	ts->lcd_nb.notifier_call = stm_notifier_call;
 	ts->panel_attached = STM_PANEL_ATTACHED;
-	panel_notifier_register(&ts->lcd_nb);
+	decon_panel_notifier_register(&ts->lcd_nb);
 #endif
 
 	input_err(true, ts->dev, "%s: done\n", __func__);
