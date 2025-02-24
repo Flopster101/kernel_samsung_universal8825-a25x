@@ -826,6 +826,11 @@ static int ec6xx_parse_dt(struct device *dev, struct ec6xx_data *etspi)
 			(const char **)&etspi->position)) {
 		etspi->position = "NA";
 	}
+
+	if (strcmp(etspi->position, "NA") == 0) {
+		etspi->position = "0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00";
+	}
+
 	pr_info("position: %s\n", etspi->position);
 
 	etspi->p = pinctrl_get_select_default(dev);
