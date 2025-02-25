@@ -293,6 +293,56 @@ static int execve_handler_pre(struct kprobe *p, struct pt_regs *regs)
 					  NULL);
 }
 
+#if 1
+static struct kprobe faccessat_kp = {
+	.symbol_name = SYS_FACCESSAT_SYMBOL,
+	.pre_handler = faccessat_handler_pre,
+};
+#else
+static struct kprobe faccessat_kp = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+	.symbol_name = "do_faccessat",
+#else
+	.symbol_name = "sys_faccessat",
+#endif
+	.pre_handler = faccessat_handler_pre,
+};
+#endif
+
+#if 1
+static struct kprobe newfstatat_kp = {
+	.symbol_name = SYS_NEWFSTATAT_SYMBOL,
+	.pre_handler = newfstatat_handler_pre,
+};
+#else
+static struct kprobe newfstatat_kp = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+	.symbol_name = "vfs_statx",
+#else
+	.symbol_name = "vfs_fstatat",
+#endif
+	.pre_handler = newfstatat_handler_pre,
+};
+#endif
+
+#if 1
+static struct kprobe execve_kp = {
+	.symbol_name = SYS_EXECVE_SYMBOL,
+	.pre_handler = execve_handler_pre,
+};
+#else
+static struct kprobe execve_kp = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
+	.symbol_name = "do_execveat_common",
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
+	.symbol_name = "__do_execve_file",
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
+	.symbol_name = "do_execveat_common",
+#endif
+	.pre_handler = execve_handler_pre,
+};
+#endif
+
 static int pts_unix98_lookup_pre(struct kprobe *p, struct pt_regs *regs)
 {
 	struct inode *inode;
@@ -305,6 +355,11 @@ static int pts_unix98_lookup_pre(struct kprobe *p, struct pt_regs *regs)
 
 	return ksu_handle_devpts(inode);
 }
+
+static struct kprobe pts_unix98_lookup_kp = { .symbol_name =
+	"pts_unix98_lookup",
+.pre_handler =
+	pts_unix98_lookup_pre };
 
 static struct kprobe *init_kprobe(const char *name,
 				  kprobe_pre_handler_t handler)
@@ -392,4 +447,3 @@ void ksu_susfs_enable_sus_su(void) {
 	ksu_devpts_hook = true;
 }
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_SU
-
