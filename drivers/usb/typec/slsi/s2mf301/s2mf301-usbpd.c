@@ -3127,14 +3127,12 @@ static void s2mf301_usbpd_otg_attach(struct s2mf301_usbpd_data *pdic_data)
 	pdic_event_work(pd_data, PDIC_NOTIFY_DEV_USB, PDIC_NOTIFY_ID_USB,
 			1/*attach*/, USB_STATUS_NOTIFY_ATTACH_DFP/*drp*/, 0);
 	/* add to turn on external 5V */
-#if IS_ENABLED(CONFIG_USB_HOST_NOTIFY) && IS_ENABLED(CONFIG_DISABLE_LOCKSCREEN_USB_RESTRICTION)
+#if IS_ENABLED(CONFIG_USB_HOST_NOTIFY)
 	if (!is_blocked(o_notify, NOTIFY_BLOCK_TYPE_HOST)) {
-#endif
 #if IS_ENABLED(CONFIG_PM_S2MF301)
 		s2mf301_usbpd_check_vbus(pdic_data, 800, VBUS_OFF);
 #endif
 		usbpd_manager_vbus_turn_on_ctrl(pd_data, VBUS_ON);
-#if IS_ENABLED(CONFIG_USB_HOST_NOTIFY) && IS_ENABLED(CONFIG_DISABLE_LOCKSCREEN_USB_RESTRICTION)
 	}
 #endif
 	usbpd_manager_acc_handler_cancel(dev);
